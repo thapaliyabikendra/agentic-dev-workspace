@@ -37,7 +37,7 @@ file is mechanical with predetermined detection rules per class.
 Periodic debt scan of the workspace. **Lint detects drift; it does not
 regenerate artifacts.** Distinct from
 [`derived-reports.md`](derived-reports.md) (which rebuilds
-`docs/home.md` and `docs/overview/*` from source) — lint walks the
+`docs/home.md` and `reports/*` from source) — lint walks the
 canonical content and flags violations of the discipline rules in
 [`../../CLAUDE.md`](../../CLAUDE.md),
 [`../WORKFLOW.md`](../WORKFLOW.md),
@@ -175,10 +175,10 @@ This is already a Phase 1.5 gate finding (`baseline-not-cited`). Lint
 catches instances that slipped through (e.g., artifact authored before
 the gate fired, or the artifact bypassed the gate).
 
-**Scan procedure.** Grep frontmatter of `docs/frs/`, `docs/specs/`,
-`docs/discovery/`, and `docs/milestones/M-NN-*/specs/FS-*/` for
+**Scan procedure.** Grep frontmatter of `docs/milestones/M-NN-*/frs/` and
+`docs/milestones/M-NN-*/specs/FS-NNN-*/` for
 `adrs: []` or files missing the field entirely
-(`grep -L "^adrs:" docs/frs/*.md` for missing field). Cross-check the
+(`grep -rL "^adrs:" docs/milestones/` for missing field). Cross-check the
 ADR index for non-emptiness.
 
 **Action.** Open an OQ-NNN with `origin: validation-gate` and

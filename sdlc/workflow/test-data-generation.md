@@ -5,7 +5,7 @@
 > [`plan.md → Test plan ingest`](plan.md#test-plan-ingest-after-fs-validation)
 > for how Test Data entries are emitted into each TC's `## Test Data`
 > section, and
-> [`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
+> [`test-suite-codegen.md`](test-suite-codegen.md)
 > for how those entries are interpolated into test runner code.
 > Codifies the four placeholder tokens (`{timestamp}`, `{counter}`,
 > `{uuid}`, `{tcNumber}`), the directive vocabulary for matrix-driven
@@ -367,10 +367,10 @@ hours or days later as opaque CI failure.
   node sources a field's constraints.
 - **Required before:** [`plan.md → Test plan ingest`](plan.md#test-plan-ingest-after-fs-validation)
   — Phase 2 caller; Test Data emission fires here.
-- **Required before:** [`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
+- **Required before:** [`test-suite-codegen.md`](test-suite-codegen.md)
   — Phase 3 caller; codegen consumes the directives this file emits.
 - **Callers:** [`plan.md`](plan.md) (Phase 2 ingest);
-  [`implementation.md`](implementation.md) (Phase 3 codegen).
+  [`test-suite-codegen.md`](test-suite-codegen.md) (Phase 3 codegen).
 - **Adjacent (not callers but consulted):**
   [`coverage-matrix.md`](coverage-matrix.md) — identifies which TCs
   need values; [`test-runner-cookbook.md`](test-runner-cookbook.md) —

@@ -1,7 +1,7 @@
 # Regenerate Roadmap
 
-> **Maintenance operation.** Regenerates the derived
-> [`docs/overview/ROADMAP.md`](../../docs/overview/ROADMAP.md) report
+> **Maintenance operation.** Regenerates the tracked planning artifact
+> [`docs/ROADMAP.md`](../../docs/ROADMAP.md)
 > from the planning artifacts under `docs/milestones/`, plus OQ index.
 > Codifies the closed set of five Stuck classes (Stale FRSs, Stale
 > OQs, Stalled milestones, Stuck CHGs, Blocked-by-OQ artifacts) with
@@ -16,6 +16,11 @@
 > `sdlc-framework-refinement-v3.md` Δ10.
 
 ## When to Use
+
+> **Boundary note.** `docs/ROADMAP.md` is **project state** — it tracks
+> milestones in-flight, FRS/FS status, and the five Stuck classes. It is
+> NOT an audience overview report. For BUSINESS/TECHNICAL overviews, use
+> [`derived-reports.md`](derived-reports.md) instead.
 
 **Use when:** preparing for a stakeholder review where milestone
 state matters, suspecting a milestone or FRS has gone silently
@@ -59,7 +64,7 @@ Phase 3 user-review handoff already cover scheduled review points.
 ## Procedure
 
 1. **Copy template.** Copy `sdlc/_templates/OVERVIEW-ROADMAP.md` to
-   `docs/overview/ROADMAP.md` (overwrite if exists — derived report).
+   `docs/ROADMAP.md` (overwrite if exists — regenerated planning artifact).
 2. **Walk the `Pulls from` list** declared in the template's header.
    Read the Karpathy-style indexes first — milestone files,
    `docs/discovery/open-questions/index.md` — then narrow-load
@@ -69,7 +74,12 @@ Phase 3 user-review handoff already cover scheduled review points.
    a class is empty, omit its sub-section from the rendered file —
    `_none yet_` placeholders are not preserved at regeneration.
 4. **Fill the in-flight / shipped tables** by walking milestones in
-   ID order.
+   ID order. For each in-flight milestone, also read its
+   `MILESTONE-STATE.md` to populate `progress_percent` (→ **Progress**
+   column) and `next_action` (→ **Next action** column). If
+   `MILESTONE-STATE.md` is absent, leave those columns blank.
+   Shipped milestones (`status: done`) do not need `MILESTONE-STATE.md`
+   — read only the portal doc for the Shipped table.
 5. **Update `generated_at:` and `source_commit:`** at the top of the
    rendered file. `source_commit:` records the workspace HEAD sha at
    regen time; if working with uncommitted edits, write
@@ -77,7 +87,8 @@ Phase 3 user-review handoff already cover scheduled review points.
 6. **Commit the regenerated ROADMAP.md** alongside the work that
    motivated the regen.
 
-No tiered touch, no `index.md` / `log.md` pair for `docs/overview/`.
+No tiered touch, no `index.md` / `log.md` pair — `docs/ROADMAP.md` is
+a regenerated planning artifact, not a canonical DDD node.
 
 ## Detection rules — Stuck classes
 
@@ -150,11 +161,11 @@ shipped tables when narrative summaries beat raw frontmatter dumps.
 - **Do not add new "stuck" classes beyond the five.** Expansion goes
   through `evolving-the-workflow.md`. If you find a real recurring
   drift pattern that doesn't fit, write an Exploration first.
-- **Do not hand-edit `docs/overview/ROADMAP.md`.** It is derived. Fix
+- **Do not hand-edit `docs/ROADMAP.md`.** It is derived. Fix
   the source data and regenerate.
 - **Do not promote the roadmap into a tiered-touch surface.** No
   `index.md` / `log.md` pair, no participation in
-  `maintenance-discipline.md`. Build artifact only.
+  `maintenance-discipline.md`. Regenerated planning artifact only.
 
 ## Anti-Pattern: "The Partial Roadmap"
 
@@ -185,11 +196,13 @@ declared source set has silently fabricated its scope.
   milestone / FRS / OQ / CHG IDs and never paraphrases their bodies.
 - **Required before:** [`derived-reports.md`](derived-reports.md) —
   generic regen rule book this file specialises; the "no `index.md` /
-  `log.md` pair" rule for `docs/overview/` is canonical there.
-- **Required before:** [`../WORKFLOW.md → Retrieval discipline`](../WORKFLOW.md#retrieval-discipline)
+  `log.md` pair" rule for `reports/` is canonical there.
+- **Required before:** [`retrieval-discipline.md`](retrieval-discipline.md)
   — Karpathy-index-first reading order applies during the
   `Pulls from` walk.
 - **Reads:** `docs/milestones/M-NN-*/M-NN-<slug>.md` files;
+  `docs/milestones/M-NN-*/MILESTONE-STATE.md` (in-flight milestones —
+  `progress_percent`, `next_action`);
   `docs/discovery/open-questions/index.md`; FS frontmatter for
   `merged:`; CHG frontmatter for `status:`; OQ frontmatter for
   `resolution_path:`.

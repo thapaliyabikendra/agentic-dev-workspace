@@ -232,7 +232,7 @@ The rubric consumes the 3-block return; it does not modify it.
 - **Caller:** [`design.md`](design.md) (Phase 1.5 QA dispatch when run
   as a review pass — though the canonical gate rule book is
   [`frs-validation-rules.md`](frs-validation-rules.md)),
-  [`implementation.md`](implementation.md) (Phase 3 QA dispatch — the
+  [`qa-gate.md`](qa-gate.md) (Phase 3 QA dispatch — the
   primary inline-dispatch caller of this file).
 - **Routes findings to:**
   [`evolving-the-workflow.md`](evolving-the-workflow.md) for

@@ -15,12 +15,15 @@ audience: planning
 > See [`../workflow/derived-reports.md`](../workflow/derived-reports.md)
 > and [`../workflow/regenerate-roadmap.md`](../workflow/regenerate-roadmap.md).
 >
-> File location when rendered: `docs/overview/ROADMAP.md` (lazy —
-> created on first regenerate).
+> File location when rendered: `docs/ROADMAP.md` (lazy —
+> created on first regenerate). This is a **tracked planning artifact**,
+> not a derived overview report — it lives at the docs root alongside
+> `docs/home.md`, not under `reports/`.
 
 ## Pulls from
 
-- `docs/milestones/M-*/M-*.md` — milestone status, kind, extends, FRS list.
+- `docs/milestones/M-*/M-*.md` — milestone status, kind, extends, FRS list, target_quarter.
+- `docs/milestones/M-*/MILESTONE-STATE.md` — `progress_percent`, `next_action` (in-flight milestones only).
 - `docs/milestones/M-*/frs/FRS-*.md` — FRS status + last-edited dates.
 - `docs/milestones/M-*/specs/FS-*/FS-*.md` — FS `merged:` flag,
   `service_repos:`, `depends_on_specs:`.
@@ -77,13 +80,14 @@ paraphrases the source page's body.
 
 ## Milestones in flight
 
-Source: `docs/milestones/M-*/M-*.md`. One row per milestone with
-`status: planning | in-progress`. Done milestones go to **Shipped**
-below.
+Source: `docs/milestones/M-*/M-*.md` (status, kind, target_quarter) and
+`docs/milestones/M-*/MILESTONE-STATE.md` (progress_percent, next_action).
+One row per milestone with `status: planning | in-progress`. Done
+milestones go to **Shipped** below.
 
-| ID | Title | Kind | Status | FRSs | Specs merged | Started |
-| -- | ----- | ---- | ------ | ---- | ------------ | ------- |
-| _none yet_ |  |  |  |  |  |  |
+| ID | Title | Kind | Status | Target | Progress | Next action | FRSs | Specs merged | Started |
+| -- | ----- | ---- | ------ | ------ | -------- | ----------- | ---- | ------------ | ------- |
+| _none yet_ |  |  |  |  |  |  |  |  |  |
 
 ---
 

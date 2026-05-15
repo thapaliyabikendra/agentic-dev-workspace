@@ -14,7 +14,7 @@ audience: business
 >
 > See [`../workflow/derived-reports.md`](../workflow/derived-reports.md).
 >
-> File location when rendered: `docs/overview/BUSINESS.md` (lazy —
+> File location when rendered: `reports/BUSINESS.md` (lazy —
 > created on first regenerate).
 
 ## Pulls from

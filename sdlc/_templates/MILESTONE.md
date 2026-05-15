@@ -8,6 +8,7 @@ discovery: discovery/milestone-scope.md
 frs: []                       # FRS-NNN IDs, filled iteratively in Phase 1
 specs: []                     # FS-NNN IDs, filled in Phase 2
 created: YYYY-MM-DD
+target_quarter: ""             # YYYY-Qn, e.g. "2026-Q3" (optional; leave "" if not yet known)
 ---
 
 # M-NN: <Title>

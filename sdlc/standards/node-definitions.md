@@ -16,7 +16,7 @@ related_adrs: []
 
 > **Engine-level technical standard.** Applies to any project using this
 > methodology. Defines what each canonical node type (ACT, ENT, CMD, QRY,
-> FLW, STA, DEC, INT, MOD, SCR, EP, PERM, CHG) is contractually obligated
+> FLW, STA, DEC, INT, MOD, SCR, CON, PERM, SVC, FA, EVT, CHG) is contractually obligated
 > to carry — frontmatter fields, body sections, link shape.
 
 ## Scope

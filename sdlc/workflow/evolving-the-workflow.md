@@ -111,7 +111,7 @@ sequentially — refine first, invent last.
    collapse into an ADR (cross-cutting) or DEC (node-scoped) — see
    [`authoring-adr.md → When to file a Standard, ADR, or DEC`](authoring-adr.md#when-to-file-a-standard-adr-or-dec-the-3-way-discriminator).
 2. **No existing type carries the semantics naturally.** Walk the 13
-   types in [`../WORKFLOW.md → Knowledge base layout`](../WORKFLOW.md#knowledge-base-layout).
+   types in [`../KB-LAYOUT.md`](../KB-LAYOUT.md).
    If one covers ≥60% of the new type's shape, extend that type's
    template rather than coining a new one.
 3. **The new type has its own lifecycle or index behavior** that the
@@ -121,9 +121,9 @@ sequentially — refine first, invent last.
 
 **Procedure:**
 
-1. Append the new type to the
-   [`../WORKFLOW.md → Knowledge base layout`](../WORKFLOW.md#knowledge-base-layout)
-   block — directory, ID prefix, lazy-creation note if applicable.
+1. Append the new type to
+   [`../KB-LAYOUT.md`](../KB-LAYOUT.md) —
+   directory, ID prefix, lazy-creation note if applicable.
 2. Add a node template at `_templates/nodes/<TYPE>.md`.
 3. Lazy-create the per-type `docs/<component>/nodes/<type>/index.md` +
    `docs/<component>/nodes/<type>/log.md` pair on first instance, per the
@@ -155,7 +155,7 @@ Forward-reference to
 [`derived-reports.md → Defining a new report type`](derived-reports.md#defining-a-new-report-type).
 Same discriminator, same procedure, same log entry. The distinction
 from node types and templates: reports are build artifacts under
-`docs/overview/`, never carry an `index.md`/`log.md` pair, and are
+`reports/`, never carry an `index.md`/`log.md` pair, and are
 always regenerable from the wiki.
 
 ## Landing extensions
@@ -176,8 +176,8 @@ maintained.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   "Coining a new artifact type when an existing one would carry the
   data" is the named anti-pattern.
-- **Required before:** [`../WORKFLOW.md ### Knowledge base layout`](../WORKFLOW.md#knowledge-base-layout)
-  — the 13 existing node types this file extends.
+- **Required before:** [`../KB-LAYOUT.md`](../KB-LAYOUT.md)
+  — the existing node types this file extends.
 - **Callers (this file is wholesale-read by):**
   [`plan.md`](plan.md) (Phase 2 surfaces a missing node type or
   template gap),

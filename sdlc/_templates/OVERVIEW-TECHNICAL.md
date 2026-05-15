@@ -13,7 +13,7 @@ audience: technical
 >
 > See [`../workflow/derived-reports.md`](../workflow/derived-reports.md).
 >
-> File location when rendered: `docs/overview/TECHNICAL.md` (lazy —
+> File location when rendered: `reports/TECHNICAL.md` (lazy —
 > created on first regenerate).
 
 ## Pulls from

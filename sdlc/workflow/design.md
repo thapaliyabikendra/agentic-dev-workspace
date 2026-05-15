@@ -88,6 +88,12 @@ non-skippable.
 
 ## Phase 0 — Milestone Scoping
 
+**Prerequisite:** The milestone folder must be pre-created by running
+[`open-milestone.md`](open-milestone.md) before this phase begins.
+`open-milestone.md` allocates the M-NN ID, creates the folder structure,
+and lazy-creates `MILESTONE-STATE.md`. If the folder already exists (reopened
+from a prior session), skip `open-milestone.md` and proceed directly.
+
 **Operation:** `generate-frs` (Milestone framing)
 **Inputs:** raw scope description, ADR index, canonical wiki summaries
 **Outputs:**
@@ -144,8 +150,8 @@ with matched IDs. For new features: set `kind: new-feature`; the
 "Existing nodes scanned" section may be left empty.
 
 The KB scan and ADR-index scan are the only places in the workflow where
-wholesale reading is allowed — see "Retrieval discipline" in
-[`../WORKFLOW.md`](../WORKFLOW.md#retrieval-discipline).
+wholesale reading is allowed — see
+[`retrieval-discipline.md`](retrieval-discipline.md).
 
 ### Milestone doc
 
@@ -179,6 +185,8 @@ constraints. Out-of-scope items go in the discovery doc, not the portal.
 - [ ] Milestone portal frontmatter set: `id`, `title`, `status: planning`,
       `discovery: discovery/milestone-scope.md`. `frs: []` and `specs: []`
       start empty.
+- [ ] Run [`regenerate-roadmap.md`](regenerate-roadmap.md) so the milestone
+      surfaces in `docs/ROADMAP.md` (if not already present).
 
 ---
 
@@ -209,8 +217,9 @@ For each user-journey in the milestone:
      Use Path B only when node scope is already well-defined before
      discovery begins.
 2. Classify OQs from the Survey using the 4-tier table in
-   [`research.md`](research.md). If any OQ is `blocking-frs`, invoke the
-   `research-gate` operation in [`research.md`](research.md) before
+   [`research.md`](research.md) (load when ≥1 OQ requires tier-classification;
+   skip entirely when no Survey OQs exist). If any OQ is `blocking-frs`, invoke
+   the `research-gate` operation in [`research.md`](research.md) before
    authoring the FRS body. If no OQ is `blocking-frs`, proceed directly
    to step 3.
 3. Author the complete FRS at
@@ -459,12 +468,16 @@ Next: [`plan.md`](plan.md) (Phase 2, Ingest) after context reset.
   [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md)
   (brownfield code-mining at Phase 0).
 - **Maintenance ops that may fire during this flow:**
-  [`research.md`](research.md) (Phase 1 Survey surfaces a `blocking-frs`
-  OQ — invoke the research gate before authoring the FRS body),
+  [`research.md`](research.md) (conditional: load when Survey OQs exist;
+  invoke research-gate only on `blocking-frs` classification),
   [`authoring-adr.md`](authoring-adr.md) (a Phase 1 dialog can surface
   a new ADR),
   [`new-component-bootstrap.md`](new-component-bootstrap.md) (Phase 0
-  may need to scaffold a new component before any FRS lands).
+  may need to scaffold a new component before any FRS lands),
+  [`discuss.md`](discuss.md) (optional post-Phase-1.5 gate — invoke when
+  deferred FRS findings carry high architectural impact on Phase 2 FS
+  authoring; produces DISCUSSION-LOG.md and per-FS CONTEXT.md before
+  `/clear`).
 - **Routes to (after `/clear`):**
   [`plan.md`](plan.md) — Phase 2 Ingest, with the validated FRS set as
   input.

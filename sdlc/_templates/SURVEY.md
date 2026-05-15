@@ -48,8 +48,8 @@ related: []
 **Brownfield projects:** mandatory when `kind: change-request`; may be
 left empty when `kind: new-feature`. Scans the **canonical** wiki at
 `docs/nodes/**`. The scan is the only place in the workflow where
-wholesale reading of `docs/nodes/` is allowed (see Retrieval discipline
-in [`../WORKFLOW.md`](../WORKFLOW.md#retrieval-discipline)).
+wholesale reading of `docs/nodes/` is allowed (see
+[`../workflow/retrieval-discipline.md`](../workflow/retrieval-discipline.md)).
 
 **Greenfield projects (`project_type: greenfield` in `CLAUDE.md`):**
 omit this section entirely — there are no existing nodes to scan.

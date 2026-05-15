@@ -5,7 +5,7 @@
 > type; individual node/ADR pages are narrow-loaded from here.
 >
 > See [`../workflow/maintenance-discipline.md`](../workflow/maintenance-discipline.md)
-> and [`../WORKFLOW.md → Retrieval discipline`](../WORKFLOW.md#retrieval-discipline).
+> and [`../workflow/retrieval-discipline.md`](../workflow/retrieval-discipline.md).
 
 **Replace `<Type>` and `<scope>` above** with the actual type (Actors, Entities,
 Commands, Flows, States, Decisions, Integrations, ADRs) and folder path

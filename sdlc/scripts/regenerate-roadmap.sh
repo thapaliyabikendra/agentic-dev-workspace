@@ -3,7 +3,7 @@
 # regenerate-roadmap.sh — Advisory helper for the Roadmap derived report.
 #
 # Computes the five "stuck" signal classes (v3 Δ10) from frontmatter and
-# file timestamps, and emits a draft `docs/overview/ROADMAP.md` for the
+# file timestamps, and emits a draft `docs/ROADMAP.md` for the
 # author to review and commit.
 #
 # Authoritative procedure: sdlc/workflow/regenerate-roadmap.md.
@@ -13,7 +13,7 @@
 #   ./sdlc/scripts/regenerate-roadmap.sh
 #
 # Output: prints to stdout. Pipe / redirect:
-#   ./sdlc/scripts/regenerate-roadmap.sh > docs/overview/ROADMAP.md
+#   ./sdlc/scripts/regenerate-roadmap.sh > docs/ROADMAP.md
 
 set -euo pipefail
 

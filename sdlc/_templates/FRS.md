@@ -57,7 +57,7 @@ verify each scenario.
 The TC ID columns are filled at Phase 2 by
 [`../workflow/plan.md → Test plan ingest`](../workflow/plan.md#test-plan-ingest-after-fs-validation);
 the spec files are generated at Phase 3 by
-[`../workflow/implementation.md → Test suite codegen`](../workflow/implementation.md#test-suite-codegen).
+[`../workflow/test-suite-codegen.md`](../workflow/test-suite-codegen.md).
 Both operations consume FLW scenario anchors via the TC's `Traces to:`
 line — that is the source-of-truth link between this FRS, the FLW node
 scenarios, and the TC files. FLW nodes remain the behavioral spec; TCs

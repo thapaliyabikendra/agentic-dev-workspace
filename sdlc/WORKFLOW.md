@@ -1,3 +1,8 @@
+---
+name: workflow
+description: "Phase-pipeline index and cross-cutting practices hub. You MUST load this when entering or transitioning between phases, evaluating a cross-cutting practice, or deciding which flow file to load next."
+---
+
 # WORKFLOW.md — Development Workflow
 
 This file is the phase-pipeline index and cross-cutting practices hub for
@@ -7,30 +12,16 @@ discipline every flow inherits. Per-phase procedure lives in the
 per-flow files under [`workflow/`](workflow/); doctrinal *why* lives in
 [`PRINCIPLES.md`](PRINCIPLES.md).
 
-> **HARD-GATE:** Do NOT begin Phase 2 (Ingest) or Phase 3 (Merge + Code)
-> without a `/clear` and a reload of the next flow file only. Context that
-> survives a phase boundary is a bug, not a feature. Detail at
-> [`### Context resets`](#context-resets).
-> (Cross-cutting rules: see [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules).)
-
-## When to Use
-
-**Use when:** entering or transitioning between phases, evaluating a
-cross-cutting practice that spans flows, deciding which flow file to load
-next, or proposing a new rule that may need to live here vs. in a per-op
-file.
-
-**Do NOT use when:** drafting a specific phase artifact — load the per-flow
-file ([`workflow/design.md`](workflow/design.md),
-[`workflow/plan.md`](workflow/plan.md),
-[`workflow/implementation.md`](workflow/implementation.md)) instead.
-
-**Vs. sibling files:** [`CLAUDE.md`](../CLAUDE.md) carries the always-on
-hard rules; [`PRINCIPLES.md`](PRINCIPLES.md) carries the doctrinal *why*;
-this file carries the *what* and the *when* of the phase pipeline plus
-the cross-cutting practices every flow inherits.
+<HARD-GATE>
+Do NOT begin Phase 2 (Ingest) or Phase 3 (Merge + Code) without a `/clear` and a reload of
+the next flow file only. Context that survives a phase boundary is a bug, not a feature.
+Detail at [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip).
+(Cross-cutting rules: see [CLAUDE.md ## Hard rules](../CLAUDE.md#hard-rules).)
+</HARD-GATE>
 
 ---
+
+## Overview
 
 Workflow aligns operations to Karpathy's Ingest/Query pattern: the
 FRS flow Queries the canonical DDD wiki to validate requirements; the FS flow
@@ -38,54 +29,6 @@ Ingests new DDD nodes directly into the canonical wiki at `docs/<component>/node
 `status: proposed`, and emits a milestone-scoped CHG node when existing canonical
 nodes are touched; implementation Applies the CHG deltas to canonical and flips
 the new nodes `proposed → active`.
-
-## Process Flow
-
-```dot
-digraph workflow_phases {
-    rankdir=TB;
-    node [fontname="Helvetica"];
-
-    inputs    [shape=oval,  label="Inputs:\nraw requirements\n+ existing DDD nodes"];
-    phase0    [shape=box,   label="Phase 0\nMilestone Scoping"];
-    phase1    [shape=box,   label="Phase 1\nFRS Authoring"];
-    gate15    [shape=diamond, label="Phase 1.5\nValidation Gate?"];
-    phase2    [shape=box,   label="Phase 2\nFS + Node Ingest"];
-    fsval     [shape=diamond, label="FS validation?"];
-    phase2tp  [shape=box,   label="Phase 2 (cont.)\nTest plan ingest"];
-    phase3    [shape=box,   label="Phase 3\nMerge + Code + QA"];
-
-    out_ms    [shape=doublecircle, label="Milestone portal\n+ scope discovery"];
-    out_frs   [shape=doublecircle, label="Validated FRSs\n+ OQs"];
-    out_fs    [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
-    out_tc    [shape=doublecircle, label="TC files staged"];
-    out_impl  [shape=doublecircle, label="Active canonical\n+ code + test specs"];
-
-    inputs -> phase0;
-    phase0 -> out_ms;
-    phase0 -> phase1;
-    phase1 -> gate15;
-    gate15 -> phase1   [label="fail — revise FRS"];
-    gate15 -> out_frs  [label="pass"];
-    out_frs -> phase2  [label="/clear (context reset)"];
-    phase2 -> fsval;
-    fsval -> phase2    [label="fail — repair"];
-    fsval -> out_fs    [label="pass"];
-    out_fs -> phase2tp;
-    phase2tp -> out_tc;
-    out_tc -> phase3   [label="/clear (context reset)"];
-    phase3 -> out_impl;
-}
-```
-
-Steps `[shape=box]` are phase work; gates `[shape=diamond]` are
-non-skippable validation; terminal artifacts `[shape=doublecircle]` are
-the durable outputs each phase emits. The `/clear` labels on the
-phase-1.5→2 and 2→3 edges are the canonical `HARD-GATE` instances above.
-
-The milestone is **the planning container**, top-down or retroactive — it holds
-its discoveries, FRSs, and FSs under one path. Multiple FSs can be generated
-from one milestone, each aggregating a subset of the milestone's FRSs.
 
 Three principles run through every phase:
 
@@ -111,33 +54,128 @@ templates live in [`_templates/nodes/`](_templates/nodes/).
 
 ---
 
-## The three flows
+## Anti-Pattern: "The Informed Skip"
 
-| Flow            | File                                                         | Operation             | Mode                | Phases covered |
-| --------------- | ------------------------------------------------------------ | --------------------- | ------------------- | -------------- |
-| Design          | [`workflow/design.md`](workflow/design.md)                   | `generate-frs`        | Validation (Query)  | 0, 1, 1.5      |
-| Plan            | [`workflow/plan.md`](workflow/plan.md)                       | `generate-feat-spec`  | Ingest              | 2              |
-| Plan            | [`workflow/plan.md → Test plan ingest`](workflow/plan.md#test-plan-ingest-after-fs-validation) | `generate-test-plan` | Ingest (test plan) | 2 (after FS validation) |
-| Implementation  | [`workflow/implementation.md`](workflow/implementation.md)   | `implement-feat`      | Merge + Code        | 3              |
-| Implementation  | [`workflow/implementation.md → Test suite codegen`](workflow/implementation.md#test-suite-codegen) | `generate-test-suite` | Codegen (test suite) | 3 (Stage 3 QA, before checklist) |
+Convincing yourself the context reset isn't needed because the current
+session has "good context" — usually the validated FRS set is still in
+view, or the Phase 1.5 findings are fresh, and a `/clear` feels wasteful.
+The reset exists precisely because retained context drifts silently
+across phases: Phase 2 needs the FRS as input but not the validation
+deliberations; Phase 3 needs the FS as input but not the Phase 2
+alternatives. The "good context" you preserve becomes Phase 2's silent
+broadening of `touches_nodes` or Phase 3's silent canonical edit. **The
+rule is non-skippable, every time.** Detail in
+[`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules).
+
+---
+
+## When to Use
+
+**Use when:** entering or transitioning between phases, evaluating a
+cross-cutting practice that spans flows, deciding which flow file to load
+next, or proposing a new rule that may need to live here vs. in a per-op
+file.
+
+**Do NOT use when:** drafting a specific phase artifact — load the per-flow
+file ([`workflow/design.md`](workflow/design.md),
+[`workflow/plan.md`](workflow/plan.md),
+[`workflow/implementation.md`](workflow/implementation.md),
+[`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md),
+[`workflow/qa-gate.md`](workflow/qa-gate.md)) instead.
+
+**Vs. sibling files:** [`CLAUDE.md`](../CLAUDE.md) carries the always-on
+hard rules; [`PRINCIPLES.md`](PRINCIPLES.md) carries the doctrinal *why*;
+this file carries the *what* and the *when* of the phase pipeline plus
+the cross-cutting practices every flow inherits.
+
+---
+
+## Process Flow
+
+```dot
+digraph workflow_phases {
+    rankdir=TB;
+    node [fontname="Helvetica"];
+
+    inputs    [shape=oval,  label="Inputs:\nraw requirements\n+ existing DDD nodes"];
+    phase0    [shape=box,   label="Phase 0\nMilestone Scoping"];
+    phase1    [shape=box,   label="Phase 1\nFRS Authoring"];
+    gate15    [shape=diamond, label="Phase 1.5\nValidation Gate?"];
+    phase2    [shape=box,   label="Phase 2\nFS + Node Ingest"];
+    fsval     [shape=diamond, label="FS validation?"];
+    phase2tp  [shape=box,   label="Phase 2 (cont.)\nTest plan ingest"];
+    phase3a   [shape=box,   label="Phase 3\nMerge + Code"];
+    phase3b   [shape=box,   label="Phase 3 (cont.)\nTest suite codegen"];
+    phase3c   [shape=box,   label="Phase 3 (cont.)\nQA Gate"];
+
+    out_ms    [shape=doublecircle, label="Milestone portal\n+ scope discovery"];
+    out_frs   [shape=doublecircle, label="Validated FRSs\n+ OQs"];
+    out_fs    [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
+    out_tc    [shape=doublecircle, label="TC files staged"];
+    out_impl  [shape=doublecircle, label="Active canonical\n+ code + test specs\n+ FS implemented"];
+
+    inputs -> phase0;
+    phase0 -> out_ms;
+    phase0 -> phase1;
+    phase1 -> gate15;
+    gate15 -> phase1   [label="fail — revise FRS"];
+    gate15 -> out_frs  [label="pass"];
+    out_frs -> phase2  [label="/clear (context reset)"];
+    phase2 -> fsval;
+    fsval -> phase2    [label="fail — repair"];
+    fsval -> out_fs    [label="pass"];
+    out_fs -> phase2tp;
+    phase2tp -> out_tc;
+    out_tc -> phase3a  [label="/clear (context reset)"];
+    phase3a -> phase3b;
+    phase3b -> phase3c;
+    phase3c -> out_impl;
+}
+```
+
+Steps `[shape=box]` are phase work; gates `[shape=diamond]` are
+non-skippable validation; terminal artifacts `[shape=doublecircle]` are
+the durable outputs each phase emits. The `/clear` labels on the
+phase-1.5→2 and 2→3 edges are the canonical `HARD-GATE` instances above.
+
+The milestone is **the planning container**, top-down or retroactive — it holds
+its discoveries, FRSs, and FSs under one path. Multiple FSs can be generated
+from one milestone, each aggregating a subset of the milestone's FRSs.
+
+---
+
+## Phase flows
+
+| Flow                | File                                                                       | Operation             | Mode                  | Phases covered              |
+| ------------------- | -------------------------------------------------------------------------- | --------------------- | --------------------- | --------------------------- |
+| Design              | [`workflow/design.md`](workflow/design.md)                                 | `generate-frs`        | Validation (Query)    | 0, 1, 1.5                   |
+| Pre-plan            | [`workflow/discuss.md`](workflow/discuss.md)                               | `pre-plan-discuss`    | Optional              | Between 1.5 and 2           |
+| Plan                | [`workflow/plan.md`](workflow/plan.md)                                     | `generate-feat-spec`  | Ingest                | 2                           |
+| Test plan ingest    | [`workflow/test-plan-ingest.md`](workflow/test-plan-ingest.md)             | `generate-test-plan`  | Ingest (test plan)    | 2 (same session, after FS validation) |
+| Implementation      | [`workflow/implementation.md`](workflow/implementation.md)                 | `implement-feat`      | Merge + Code          | 3                           |
+| Test suite codegen  | [`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md)         | `generate-test-suite` | Codegen (test suite)  | 3 (same session, after Stage 2 Code) |
+| QA Gate             | [`workflow/qa-gate.md`](workflow/qa-gate.md)                               | `qa-gate`             | QA + status flip      | 3 (same session, after test codegen) |
 
 Each flow file owns its phase detail, validation checklists, and exit
-criteria. The two test operations (`generate-test-plan`,
-`generate-test-suite`) live inside the Plan and Implementation flows
-respectively — same session, same context, no separate flow file. The
-sections below this point (Cross-cutting practices, Knowledge base
-layout, Migration to VCS platform) apply to all three flows.
+criteria. The three Phase 3 files (`implementation.md`, `test-suite-codegen.md`,
+`qa-gate.md`) run in sequence in the same Phase 3 session — no `/clear` between
+them; the `/clear` boundary sits only at Phase 2→3 entry. Test plan ingest runs
+in the same Phase 2 session as Plan — no `/clear` there either.
+The sections below this point (The Process, Knowledge base
+layout, Migration to VCS platform) apply to all flows.
 
 **Maintenance operations** sit alongside the phase flows but are not
-tied to phases: `authoring-adr` (see [Authoring an ADR](#authoring-an-adr))
-and `absorb-legacy-doc` (see [Legacy absorption](#legacy-absorption)).
-Both can fire from inside any phase or stand alone; both share the
-tiered touch discipline from
+tied to phases: `authoring-adr` (see [Authoring an ADR](#authoring-an-adr)),
+`absorb-legacy-doc` (see [Legacy absorption](#legacy-absorption)), and
+`absorb-concept` (see [Derived reports](#derived-reports) — promotes
+insights surfaced during report synthesis to canonical KB nodes via
+RESEARCH staging). All three can fire from inside any phase or stand
+alone; all share the tiered touch discipline from
 [Maintenance discipline](#maintenance-discipline).
 
 ---
 
-## Cross-cutting practices
+## The Process
 
 ### Reference, never copy
 
@@ -176,89 +214,16 @@ body, is silent drift waiting to happen. See
 
 ### Retrieval discipline
 
-The primary token lever. Skill prompts compact at the margin; not re-deriving
-the corpus each session is the 10× win.
+At every phase entry: load only nodes declared in the milestone's
+`touches_nodes` and `produces_nodes` plus one transitive hop. For ADRs:
+wholesale-read `adrs/index.md` only; narrow-load individual pages.
+`glossary.md` and `cross-cutting-concerns.md` snapshot-read at Phase 1.5
+gate entry. `tech-stack.md` wholesale-read at Phase 3 entry. Test rule books
+and maintenance operation references are wholesale-read only when their
+matching operation fires.
 
-**Nodes.** When entering Phase 2 (Ingest) or Phase 3 (Merge + Code), read
-**only** the nodes the milestone's FRSs declare in `touches_nodes` and
-`produces_nodes`, plus one hop of transitive references (nodes those nodes
-link in `related`). Do **not** pre-load `docs/<component>/nodes/` wholesale "to be safe."
-If a node not on that list turns out to be necessary, stop, update the FRS
-to declare it, and surface the omission to the QA hat — silently broadening
-the load defeats the whole point.
-
-Phase 2 retrieval reads canonical the same as every other phase — there is
-no separate staging tree. The FS's `new_nodes:` frontmatter is the routing
-list for nodes the FS introduces (each carries `status: proposed` in
-canonical until Phase 3 merge flips it to `active`); the CHG node's
-`modifies[]` is the routing list for canonical nodes the FS intends to
-modify (Phase 3 applies the deltas).
-
-**ADRs.** A parallel rule. At every generator entry (Phase 0 / 1 / 2 / 3),
-the **one file** wholesale-read is [`adrs/index.md`](adrs/index.md) — by
-design it carries one line per ADR, bounded size. From the index, pick the
-ADR IDs relevant to the scope and narrow-load those pages only. Declare the
-consulted IDs in the artifact's `adrs:` frontmatter. **Individual ADR pages
-are not wholesale-loaded.** Same rule, second corpus.
-
-**Baselines.** [`glossary.md`](glossary.md) and
-[`cross-cutting-concerns.md`](cross-cutting-concerns.md) are
-snapshot-read once at every Phase 1.5 gate entry (and at Phase 0 / Phase 1
-drafting sessions that consult them for term resolution or
-baseline-category citation). The current version of each is captured in
-any Phase 1.5 Validation finding that fires (audit reproducibility set —
-see [`workflow/frs-validation-rules.md`](workflow/frs-validation-rules.md#audit-reproducibility-set)).
-Edits between runs follow [Maintaining baseline references](#maintaining-baseline-references-glossary-cross-cutting-concerns)
-below.
-
-**Tech-stack operational baseline.** [`tech-stack.md`](tech-stack.md) is
-the project's living operational reference — pinned stack versions,
-application layout, operational commands, environments, runtime state,
-milestone progress. **Wholesale-read at Phase 3 implementation entry**
-alongside the ADR index and the FS; **not snapshot-read at Phase 1.5**
-(its mutability is intentional and decoupled from requirements
-validation). Updated at Phase 3 merge when its sections change — see
-[`workflow/maintenance-discipline.md → Tech-stack touch at merge`](workflow/maintenance-discipline.md).
-Stack *decisions* still author ADRs; tech-stack reflects the operational
-state those decisions reduce to.
-
-**Test artifact rule books.**
-[`workflow/test-data-generation.md`](workflow/test-data-generation.md) is
-wholesale-read at Phase 2 Test plan ingest (to populate every TC's
-`## Test Data` section) and at Phase 3 Test suite codegen (to interpolate
-directive tokens into test runner code).
-[`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md) is
-wholesale-read at Phase 3 Test suite codegen (action-inference, code
-emission, full spec template). Both are bounded-size reference docs —
-same retrieval posture as the Phase 1.5 rule books.
-
-**Maintenance operation references.** Six bounded-size reference docs
-peer to the rule books above. Each is wholesale-read **only** when the
-matching operation fires; otherwise unread.
-
-- [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md) —
-  Phase 3 merge, ADR lifecycle events, or any canonical node edit (the
-  tiered touch).
-- [`workflow/baseline-references.md`](workflow/baseline-references.md) —
-  add / change / retire / drift-detection ops on
-  [`glossary.md`](glossary.md) or
-  [`cross-cutting-concerns.md`](cross-cutting-concerns.md). Runs between
-  Phase 1.5 gates, never during one.
-- [`workflow/authoring-adr.md`](workflow/authoring-adr.md) — authoring an
-  ADR (standalone, from an FRS, or from an FS).
-- [`workflow/derived-reports.md`](workflow/derived-reports.md) —
-  regenerate the BUSINESS / TECHNICAL / `<kind>` overview.
-- [`workflow/legacy-absorption.md`](workflow/legacy-absorption.md) —
-  `absorb-legacy-doc` pass on `docs-backup/` artifacts.
-- [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md) —
-  defining a new node type, refining a template, coining a new
-  derived-report type.
-
-**Exceptions.** Two, both at Phase 0 or Phase 1:
-- Change-request KB scan — walks `docs/<component>/nodes/**` to find what an FRS
-  *should* declare. See [`workflow/design.md`](workflow/design.md).
-- ADR-index scan — always-on, every phase. The index file is the
-  wholesale-read target; individual ADRs are not.
+See [`workflow/retrieval-discipline.md`](workflow/retrieval-discipline.md)
+for the full procedure, timing table, and the two canonical exceptions.
 
 ### Pre-FRS exploration
 
@@ -387,18 +352,7 @@ into wasted nodes or wasted code. Phase 0 → 1 → 1.5 can usually share one
 session — the milestone scoping, FRS authoring, and validation gate are
 tightly related and short.
 
-#### Anti-Pattern: "The Informed Skip"
-
-Convincing yourself the context reset isn't needed because the current
-session has "good context" — usually the validated FRS set is still in
-view, or the Phase 1.5 findings are fresh, and a `/clear` feels wasteful.
-The reset exists precisely because retained context drifts silently
-across phases: Phase 2 needs the FRS as input but not the validation
-deliberations; Phase 3 needs the FS as input but not the Phase 2
-alternatives. The "good context" you preserve becomes Phase 2's silent
-broadening of `touches_nodes` or Phase 3's silent canonical edit. **The
-rule is non-skippable, every time.** Detail in
-[`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules).
+See [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip).
 
 ### Author self-review (before each phase's exit gate)
 
@@ -465,7 +419,7 @@ TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
   `FLW-NNN#edge-N`, `FLW-NNN#fault-N`). The dual trace makes coverage
   auditable from both directions.
 - **Test specs are disposable artifacts.** Generated from TC
-  files at Phase 3 (Stage 3 QA) and landed in
+  files at Phase 3 ([`test-suite-codegen.md`](workflow/test-suite-codegen.md)) and landed in
   `tests/{test_dir}/<feature>/` on the FS's implementation branch.
   Hand edits to spec files are lost on regeneration — fix the TC,
   regenerate.
@@ -534,56 +488,33 @@ drift-report taxonomy, and the hard rules across all ops.
 
 ### In-flight nodes (`status: proposed`)
 
-New DDD nodes drafted during Phase 2 land directly in canonical
-`docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed` in
-frontmatter. The 3-file lifecycle touch fires at that ingest — `created` log
-entry, `proposed` row in the per-type index. Phase 3 merge flips
-`proposed → active` and fires a `status-change` log entry. DDD node
-lifecycle: `proposed → active → superseded | deprecated`.
+New nodes drafted at Phase 2 land in canonical with `status: proposed`.
+Existing canonical nodes are never modified at Phase 2 — the FS emits a
+CHG-NNN node instead, applied at Phase 3. Cross-FS dependencies use
+`depends_on_specs:`; Phase 3 enforces merge order. Abandoned FSs flip their
+proposed nodes `proposed → deprecated`.
 
-**Existing canonical nodes are not modified at Phase 2.** When an FS's
-FRS declares `touches_nodes`, the FS emits a CHG-NNN node (milestone-
-scoped, permanent at
-`milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`)
-that documents the intended delta in its `modifies[]` / `removes[]` /
-`supersedes[]` fields. The delta is *applied* at Phase 3 — never at
-Phase 2 — so canonical nodes never carry partially-applied changes
-while an FS is in flight. Phase 3 fires `updated` / `superseded` /
-`status-change` log entries on the canonical targets at apply time and
-flips the CHG's status `approved → merged` in place.
-
-**Cross-FS dependencies.** An FS may read a `proposed` sibling-FS node
-via `depends_on_specs:`. An FS may **not** include a `proposed`
-sibling-FS node in its `touches_nodes` / CHG `modifies[]` — proposed
-nodes are provisional, not modify targets. Phase 3 enforces merge
-order: every spec in `depends_on_specs:` must have `merged: true`
-before this FS's Phase 3 begins.
-
-**FS abandonment.** If an FS is abandoned before reaching Phase 3, each
-of its new canonical nodes flips `proposed → deprecated` (never
-deleted; the append-only log keeps the history); the index row moves
-to the Superseded/deprecated section. IDs are not reused.
-Bidirectional `related:` back-links to a deprecated proposed node
-remain (existing deprecated-node pattern).
-
-**Workflow self-extension during Phase 2.** Planning sometimes surfaces
-the need to extend the workflow itself — a new node type the current
-13 don't model, a new derived-report type the existing BUSINESS /
-TECHNICAL templates don't carry, or a doc template that needs
-refinement before the in-flight FS can use it. When it does, the
-extension lands in the methodology **before** the new artifact, not
-after — same discipline as [Brownfield muscle](#brownfield-muscle)
-surfacing-not-absorbing. See [Evolving the workflow](#evolving-the-workflow).
+See [`workflow/in-flight-nodes.md`](workflow/in-flight-nodes.md) for the
+full CHG mechanics, cross-FS dependency rules, abandonment procedure, and
+the workflow self-extension note.
 
 ### Derived reports
 
-Curated wiki-derived views live (lazily) under `docs/overview/`. The wiki
-— nodes, ADRs, FRSs, milestones, discoveries — is the source of truth;
+Curated wiki-derived views live (lazily) under `reports/` (workspace root).
+`docs/ROADMAP.md` is **project state** — milestones in-flight, stuck signals —
+and stays under `docs/`; it is NOT an audience overview report.
+The wiki — nodes, ADRs, FRSs, milestones, discoveries — is the source of truth;
 reports are build artifacts. Two report types ship with the scaffolding:
-[`BUSINESS.md`](overview/BUSINESS.md) for product / business stakeholders
-and [`TECHNICAL.md`](overview/TECHNICAL.md) for engineering / architecture.
+`reports/BUSINESS.md` for product / business stakeholders
+and `reports/TECHNICAL.md` for engineering / architecture.
 Regenerate on demand; never patch a report directly. No `index.md` /
-`log.md` pair under `docs/overview/`.
+`log.md` pair under `reports/`.
+
+**KB absorption.** When report synthesis surfaces a concept with no canonical
+KB node, trigger `absorb-concept` —
+see [`workflow/absorb-concept.md`](workflow/absorb-concept.md). Author a
+RESEARCH staging node first; promote to the appropriate canonical type after
+review.
 
 See [`workflow/derived-reports.md`](workflow/derived-reports.md) for the
 regeneration procedure (`Pulls from:` contract, walk the indexes first,
@@ -662,7 +593,7 @@ derived-report types can be coined as the project's needs evolve. The
 discipline: extend before invent, refine before coin, and land the
 extension in the methodology *before* the artifact that motivates it.
 Phase 2 planning sometimes surfaces the need; see
-[In-flight nodes (`status: proposed`)](#in-flight-nodes-status-proposed)
+[`workflow/in-flight-nodes.md`](workflow/in-flight-nodes.md)
 for the surface-don't-absorb posture this section mirrors.
 
 See [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md)
@@ -696,86 +627,17 @@ superseded`).
 
 ## Knowledge base layout
 
-DDD content lives in **component-qualified canonical wikis** at
+DDD content lives in component-qualified canonical wikis at
 `docs/<component>/nodes/`. New nodes land there at Phase 2 with
 `status: proposed`; Phase 3 flips them to `active`. The only
-milestone-scoped DDD artifact is the CHG-NNN change-map at
-`milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`,
-which documents modify-intent against existing canonical nodes and
-stays permanently in the milestone folder (never promoted).
+milestone-scoped DDD artifact is the CHG-NNN change-map (permanent in
+the milestone folder — never promoted). When a new component is introduced,
+run [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md)
+before Phase 2 ingest.
 
-When a new component is introduced, run
-[`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md)
-**before** Phase 2 ingest to declare the component and create its type folders.
-
-```
-docs/<component>/nodes/             # canonical wiki (one per component)
-  actors/             ACT-NNN-*.md  (or {PREFIX}-ACT-NNN-*.md for prefixed components)
-  entities/           ENT-NNN-*.md
-  commands/           CMD-NNN-*.md  # write operations (state changes)
-  queries/            QRY-NNN-*.md  # read operations (lazy)
-  flows/              FLW-NNN-*.md
-  states/             STA-NNN-*.md
-  decisions/          DEC-NNN-*.md
-  integrations/       INT-NNN-*.md
-  modules/            MOD-NNN-*.md  # bounded context (engineering-facing)
-  screens/            SCR-NNN-*.md  # conceptual UI surface
-  contracts/          CON-NNN-*.md  # inter-component surface — HTTP / events / queue / gRPC
-                                    # (discriminated by frontmatter protocol:)
-  permissions/        PERM-NNN-*.md # first-class authorization rules
-  services/           SVC-NNN-*.md  # deployable unit (lazy; multi-service projects only)
-  functional-areas/   FA-NNN-*.md   # cross-MOD product slice (lazy)
-  events/             EVT-NNN-*.md  # async/distributed events — Kafka + RabbitMQ (lazy)
-```
-
-The lazy folders (`queries/`, `modules/`, `screens/`, `contracts/`,
-`permissions/`, `services/`, `functional-areas/`, `events/`) are created **lazily
-on first Phase 2 ingest of that type.** **MOD** is the bounded-context
-node (engineering-facing); cross-MOD product slices are **FA** nodes;
-deployable units realizing a MOD are **SVC** nodes. **CMD vs QRY**: a
-command changes state and has postconditions / domain events; a query
-reads state and produces a projection with no side effects. Read
-operations belong in QRY — never shoehorn them into CMD. **CON** is
-the unified contract surface — HTTP routes, event topics, queues, gRPC
-methods — discriminated by `protocol:` frontmatter; superseded the
-prior EP (endpoint) prefix on 2026-05-14. **EVT** is the async-event
-catalog — distributed events published to Kafka topics or RabbitMQ
-exchanges; in-process framework-local events are NOT EVT nodes (they stay in
-CMD's "Domain events raised" subsection). Every EVT node requires a
-`linked_contract: CON-NNN` pointing at its transport surface.
-
-ID prefixes are intentionally short — they appear in every cross-reference.
-
-There is no canonical `docs/<component>/nodes/changes/` folder — CHG-NNN nodes live
-permanently under the milestone's FS folder. See
-[In-flight nodes (`status: proposed`)](#in-flight-nodes-status-proposed)
-for how new nodes and CHGs interact across Phase 2 and Phase 3.
-
-If your existing nodes use different filenames, prefixes, or folder structure,
-**keep your existing convention.** The templates are scaffolding for new nodes;
-they should not retrofit existing ones.
-
-### External research (parallel to nodes)
-
-`docs/research/` is a parallel canonical tree for **external / competitive
-research** — vendor docs, industry papers, competitor wikis, domain
-whitepapers — that inform future ADRs and FRSs. It is not DDD content
-and does not live under `docs/<component>/nodes/`.
-
-```
-docs/research/                    # canonical research tree (lazy)
-  index.md                        # Karpathy-style content catalog
-  log.md                          # append-only chronological record
-  RESEARCH-NNN-<slug>.md          # individual pages, narrow-loaded
-```
-
-Lazy-create the folder + `index.md` + `log.md` pair on first
-`RESEARCH-NNN` instance, per
-[`workflow/maintenance-discipline.md → Lazy creation`](workflow/maintenance-discipline.md).
-RESEARCH entries are *cited references*: ADRs and FRSs link by ID
-rather than restating content. Lifecycle: `raw` → `synthesized` →
-`superseded`. Template:
-[`_templates/RESEARCH.md`](_templates/RESEARCH.md).
+See [`KB-LAYOUT.md`](KB-LAYOUT.md) for the full type-folder tree,
+lazy-creation rules, node-type discriminators, and the external research
+tree layout.
 
 ---
 
@@ -806,36 +668,9 @@ per-pass absorption procedure.
 
 ## Migration to a VCS / issue-tracking platform
 
-When the team adopts an issue tracker (GitLab, GitHub, Azure DevOps,
-Jira, etc.), map the filesystem artifacts as follows:
-
-| Filesystem                                                          | Issue tracker concept                               |
-| ------------------------------------------------------------------- | --------------------------------------------------- |
-| `docs/milestones/M-NN-<slug>/M-NN-<slug>.md`                        | Platform milestone                                  |
-| `docs/milestones/M-NN-<slug>/frs/FRS-NNN-*.md`                      | Issue labeled `FRS`, linked to the milestone        |
-| `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md`         | Issue labeled `Feature Spec`, linked to the milestone |
-| `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/**`  | Stays in repo — CHG permanent home                  |
-| `docs/milestones/M-NN-<slug>/discovery/**`                          | Stays in repo — working notes                       |
-| `docs/milestones/M-NN-<slug>/id-claims.md`                          | Stays in repo — claim ledger                        |
-| `docs/<component>/nodes/**`                                         | Stays in repo — wiki is the right home              |
-| `docs/<component>/adrs/**`                                          | Stays in repo — wiki is the right home              |
-| `docs/research/**`                                                  | Stays in repo — wiki is the right home              |
-| `docs/discovery/open-questions/**`                                  | Stays in repo — per-OQ files + index + log          |
-| `docs/discovery/open-questions.md`                                  | Stays in repo — frozen legacy log (pre-cut-over OQs) |
-
-Nodes, ADRs, discoveries, and per-FS CHG nodes remain filesystem-based
-even after platform adoption. Issues are for trackable work; everything
-under `nodes/`, `adrs/`, and the per-milestone `discovery/`,
-`specs/<FS>/nodes/changes/`, `id-claims.md` is durable knowledge that
-stays in the repo.
-
-**Deprecated paths.** The previous top-level `docs/frs/`, `docs/specs/`, and
-`docs/discovery/<scope>.md` (per-feature) trees no longer exist — everything
-moves under `docs/milestones/M-NN-<slug>/`. At the original discovery root,
-two artifacts remain: the per-OQ folder `docs/discovery/open-questions/`
-(authoritative for new OQs) and the frozen legacy file
-`docs/discovery/open-questions.md` (pre-2026-05-13 entries; migrates
-opportunistically when touched).
+See [`workflow/vcs-migration.md`](workflow/vcs-migration.md) for the
+filesystem-to-issue-tracker mapping table, deprecated paths, and platform
+adoption guidance.
 
 ---
 
@@ -846,22 +681,14 @@ from the doctrinal anti-patterns in [`PRINCIPLES.md`](PRINCIPLES.md). When
 a mistake here overlaps a doctrinal anti-pattern, the doctrinal statement
 wins — fix the rule, do not rephrase it locally.
 
-- **Treating `## Cross-cutting practices` as a per-flow rule book.** Each
-  sub-section there is the always-on summary; the per-op procedure lives
-  in the matching `workflow/<op>.md`. When the operation fires, load the
-  per-op file — do not improvise from the summary alone.
-- **Adding a new rule to `## Cross-cutting practices` when it actually
-  belongs to one flow.** "Cross-cutting" means *applies to all three
-  flows*. If a proposed rule only fires inside Phase 2 (or Phase 3, or
-  bug-fix), it belongs in the per-flow file. Mis-homing the rule makes
-  every phase reader pay the cost.
-- **Treating the `## Process Flow` dot graph as the procedure.** It is a
-  shape mnemonic; the procedural detail per phase lives in
-  [`workflow/design.md`](workflow/design.md),
-  [`workflow/plan.md`](workflow/plan.md), and
-  [`workflow/implementation.md`](workflow/implementation.md). The graph
-  helps recognize which file to load next; it does not substitute for
-  loading it.
+**❌ Treat `## The Process` sub-sections as per-flow procedure** — each sub-section is the always-on summary; the per-op procedure lives in the matching `workflow/<op>.md`.
+**✅ Load the per-op file when the operation fires** — do not improvise from the summary alone.
+
+**❌ Add a new rule to `## The Process` when it only fires inside one phase** — "cross-cutting" means applies to all three flows; phase-specific rules bloat every reader's load.
+**✅ Place phase-specific rules in the matching flow file** — `workflow/design.md`, `workflow/plan.md`, or `workflow/implementation.md`.
+
+**❌ Treat the `## Process Flow` dot graph as the procedure** — it is a shape mnemonic, not a step list.
+**✅ Load the correct flow file for the current phase** — the graph tells you which file to open; it does not substitute for opening it.
 
 ## Red Flags
 
@@ -869,55 +696,50 @@ File-specific *never*s — distinct from the always-on hard rules in
 [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules) and the doctrinal
 refusals in [`PRINCIPLES.md`](PRINCIPLES.md).
 
-- **"I'll skip the context reset just this once."** Reroute to
-  [`### Anti-Pattern: "The Informed Skip"`](#anti-pattern-the-informed-skip)
-  and reload — the `/clear` rule has no exceptions.
-- **"I'll defer the cross-FRS sweep to Phase 2."** Phase 1.5's Pass-2
-  sweep is the only place cross-FRS conflicts are caught cheaply; once
-  Phase 2 begins, conflicts become silent canonical drift. The sweep
-  runs at the gate, not at convenience.
-- **"The index summary isn't detailed enough — let me glob the folder."**
-  If the index is genuinely insufficient, fix the index. Skipping it to
-  glob defeats the retrieval discipline and the
-  [`PRINCIPLES.md`](PRINCIPLES.md) anti-pattern on wholesale-reading.
-- **"This rule applies to my current flow only — I'll inline it
-  there."** Re-check: if the rule is doctrinal, route it through
-  [`PRINCIPLES.md`](PRINCIPLES.md); if it's cross-cutting and
-  operational, it belongs here; if it's flow-specific, it belongs in
-  the flow file. Inline-everywhere is silent drift.
+**Never:**
+- Skip the context reset — reroute to [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip) and reload; the `/clear` rule has no exceptions.
+- Defer the Phase 1.5 cross-FRS sweep — it is the only place cross-FRS conflicts are caught cheaply; once Phase 2 begins, conflicts become silent canonical drift.
+- Glob the folder because the index summary feels thin — fix the index instead; skipping it defeats retrieval discipline and violates the [`PRINCIPLES.md`](PRINCIPLES.md) anti-pattern on wholesale-reading.
+- Inline a rule without checking its scope — re-check: if the rule is doctrinal, route it through [`PRINCIPLES.md`](PRINCIPLES.md); if it's cross-cutting and operational, it belongs here; if it's flow-specific, it belongs in the flow file.
 
 ## Integration
 
-- **Required before:** [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules)
-  — every hard rule binds the actions this file orchestrates. Load
-  hard rules first; this file points at the per-phase procedure they
-  authorize.
-- **Required before:** [`PRINCIPLES.md`](PRINCIPLES.md) — the
-  doctrinal *why* behind every cross-cutting practice cited here.
-- **Routes to (per phase):**
-  - Phase 0 / 1 / 1.5 → [`workflow/design.md`](workflow/design.md)
-  - Phase 2 (FS + node ingest, then test plan ingest) →
-    [`workflow/plan.md`](workflow/plan.md)
-  - Phase 3 (merge + code + QA + test suite codegen) →
-    [`workflow/implementation.md`](workflow/implementation.md)
-  - Bug fix track → [`workflow/bug-fix.md`](workflow/bug-fix.md)
-- **Maintenance ops fired during phases:**
-  [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md),
-  [`workflow/authoring-adr.md`](workflow/authoring-adr.md),
-  [`workflow/legacy-absorption.md`](workflow/legacy-absorption.md),
-  [`workflow/baseline-references.md`](workflow/baseline-references.md),
-  [`workflow/derived-reports.md`](workflow/derived-reports.md),
-  [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md),
-  [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md).
-- **Rule books wholesale-read at gates and ingests:**
-  [`workflow/frs-validation-rules.md`](workflow/frs-validation-rules.md),
-  [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md),
-  [`workflow/coverage-matrix.md`](workflow/coverage-matrix.md),
-  [`workflow/test-data-generation.md`](workflow/test-data-generation.md),
-  [`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md),
-  [`workflow/review.md`](workflow/review.md),
-  [`workflow/lint.md`](workflow/lint.md),
-  [`workflow/regenerate-roadmap.md`](workflow/regenerate-roadmap.md).
-- **Sibling reference:** [`BOUNDARY.md`](BOUNDARY.md) — engine-vs-project
-  classification when proposing a new rule;
-  [`LAYOUT.md`](LAYOUT.md) — folder map.
+**Required before:** [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules) — every hard rule
+binds the actions this file orchestrates. Load hard rules first; this file points at the
+per-phase procedure they authorize.
+
+**Required before:** [`PRINCIPLES.md`](PRINCIPLES.md) — the doctrinal *why* behind every
+cross-cutting practice cited here.
+
+**Routes to (per phase):**
+- Phase 0 / 1 / 1.5 → [`workflow/design.md`](workflow/design.md)
+- Phase 2 (FS + node ingest, then test plan ingest) → [`workflow/plan.md`](workflow/plan.md)
+- Phase 3 — Merge + Code → [`workflow/implementation.md`](workflow/implementation.md)
+- Phase 3 — Test suite codegen → [`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md) (same session, load after Stage 2 Code)
+- Phase 3 — QA Gate → [`workflow/qa-gate.md`](workflow/qa-gate.md) (same session, load after test codegen)
+- Bug fix track → [`workflow/bug-fix.md`](workflow/bug-fix.md)
+
+**Maintenance ops fired during phases:** [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md),
+[`workflow/authoring-adr.md`](workflow/authoring-adr.md),
+[`workflow/legacy-absorption.md`](workflow/legacy-absorption.md),
+[`workflow/baseline-references.md`](workflow/baseline-references.md),
+[`workflow/derived-reports.md`](workflow/derived-reports.md),
+[`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md),
+[`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md),
+[`workflow/phase-state.md`](workflow/phase-state.md),
+[`workflow/discuss.md`](workflow/discuss.md) (conditional: between Phase 1.5 and `/clear`
+when deferred FRS findings carry high architectural impact),
+[`workflow/verify.md`](workflow/verify.md) (optional: at Phase 3 exit / milestone close
+when milestone has ≥3 FSs or Phase 3 QA was tightly scoped).
+
+**Rule books wholesale-read at gates and ingests:** [`workflow/frs-validation-rules.md`](workflow/frs-validation-rules.md),
+[`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md),
+[`workflow/coverage-matrix.md`](workflow/coverage-matrix.md),
+[`workflow/test-data-generation.md`](workflow/test-data-generation.md),
+[`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md),
+[`workflow/review.md`](workflow/review.md),
+[`workflow/lint.md`](workflow/lint.md),
+[`workflow/regenerate-roadmap.md`](workflow/regenerate-roadmap.md).
+
+**Sibling reference:** [`BOUNDARY.md`](BOUNDARY.md) — engine-vs-project classification
+when proposing a new rule; [`LAYOUT.md`](LAYOUT.md) — folder map.

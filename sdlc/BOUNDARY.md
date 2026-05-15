@@ -321,11 +321,10 @@ changes:
 - **`workflow/implementation.md`** — Stage 2 "Convention ADRs to
   consult" rewritten as an `adrs/index.md` lookup (any ADR tagged
   `convention`). Build command genericized; the command's project home is
-  now `docs/tech-stack.md § Operational commands`. Stage 3 "Code-quality
-  gates" section replaced with a generic pointer to the project's
-  code-quality ADR; the verbatim gate list no longer lives in the flow
-  file. QA checklist Playwright assumption replaced with a generic
-  reference to the project-owned test-runner cookbook.
+  now `docs/tech-stack.md § Operational commands`. Stage 3 QA (code-quality
+  gates, ADR-conformance check, status flips) extracted to
+  [`workflow/qa-gate.md`](workflow/qa-gate.md); `implementation.md` now
+  covers Stage 1 Merge + Stage 2 Code only.
 - **`_templates/FS.md`** — Implementation-tasks cohort hint
   genericized to point at `workflow/plan.md` and the project's
   cohort-ordering ADR rather than naming framework-specific layers or

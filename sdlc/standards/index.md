@@ -5,7 +5,7 @@
 > to identify relevant standards, then narrow-load the individual standard
 > pages declared in the consuming artifact's `standards:` frontmatter.
 >
-> See [`../WORKFLOW.md → Retrieval discipline`](../WORKFLOW.md#retrieval-discipline)
+> See [`../workflow/retrieval-discipline.md`](../workflow/retrieval-discipline.md)
 > and [`../workflow/authoring-adr.md`](../workflow/authoring-adr.md) (the
 > Standard / ADR / DEC discriminator lives there).
 >

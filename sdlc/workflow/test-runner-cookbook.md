@@ -2,7 +2,7 @@
 
 > **Type:** Project-owned test-runner cookbook. Consulted at Phase 3
 > (Test suite codegen). See
-> [`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
+> [`test-suite-codegen.md`](test-suite-codegen.md)
 > for how codegen consumes this file. Codifies the action inference
 > table (step text → runner verb), code emission table (verb →
 > runner call), selector resolution, value substitution, URL
@@ -349,7 +349,7 @@ tests/{test_dir}/{feature}/{use-case}.spec.ts
 
 where `{test_dir}` is resolved from `tests/playwright.config.ts`
 (`testDir` setting) and `{feature}` matches the FS folder slug. See
-[`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
+[`test-suite-codegen.md`](test-suite-codegen.md)
 for the resolution rules and the one-time `playwright.config.ts`
 bootstrap step.
 
@@ -368,10 +368,10 @@ change, change the TC and regenerate.
 - **Required before:** [`../BOUNDARY.md`](../BOUNDARY.md) — the
   test-runner choice (Playwright) sits in the project-owned axis; a
   future testing-convention ADR formalizes the choice.
-- **Required before:** [`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
+- **Required before:** [`test-suite-codegen.md`](test-suite-codegen.md)
   — Phase 3 caller; codegen reads this file to convert TC steps to
   Playwright.
-- **Caller:** [`implementation.md`](implementation.md) — Phase 3 Test
+- **Caller:** [`test-suite-codegen.md`](test-suite-codegen.md) — Phase 3 Test
   suite codegen.
 - **Adjacent (not callers but consulted):**
   [`test-data-generation.md`](test-data-generation.md) — provides the

@@ -148,7 +148,7 @@ The master catalog [`docs/home.md`](../home.md) is **derived**, not
 hand-maintained per event. Its node-type and ADR tables regenerate on
 demand from the per-type indexes (`docs/<component>/nodes/<type>/index.md` and
 `docs/<component>/adrs/index.md`) — same treatment as the derived
-reports at `docs/overview/` (see
+reports at `reports/` (see
 [`derived-reports.md`](derived-reports.md) for the parallel procedure).
 The Planning Artifacts section in `home.md` (milestones, FRSs, feature
 specs, discovery) stays hand-maintained until per-type indexes exist for
