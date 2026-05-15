@@ -18,15 +18,15 @@ where full coverage discipline applies.
 
 **Do NOT use when:** the work is Test Data generation (use
 [`test-data-generation.md`](test-data-generation.md) — generates the
-concrete values for the TCs this matrix identifies), Playwright code
-emission (use [`action-to-playwright.md`](action-to-playwright.md) —
+concrete values for the TCs this matrix identifies), runner code
+emission (use [`test-runner-cookbook.md`](test-runner-cookbook.md) —
 maps step text to runnable code), or the artifact is not a TC under
 an FS's `test-plans/<use-case>/` folder (this matrix governs TC
 emission only; ADR / node / FRS validation has its own rule book).
 
 **Vs. sibling files:** [`test-data-generation.md`](test-data-generation.md)
 governs the values; this file governs whether a given TC should exist
-at all. [`action-to-playwright.md`](action-to-playwright.md) governs
+at all. [`test-runner-cookbook.md`](test-runner-cookbook.md) governs
 how a TC's steps become executable code. The three are the **TC
 authoring trio** at Phase 2 / Phase 3 — matrix (completeness) → test
 data (values) → action map (code).
@@ -236,12 +236,12 @@ by saying "the FRS doesn't mention it" — the matrix is what the source leaves 
 - **Adjacent (not callers but consulted):**
   [`test-data-generation.md`](test-data-generation.md) — once a TC is
   emitted, this file's sibling generates the values;
-  [`action-to-playwright.md`](action-to-playwright.md) — Phase 3
+  [`test-runner-cookbook.md`](test-runner-cookbook.md) — Phase 3
   codegen consumes the matrix-emitted TC files;
   [`frs-validation-rules.md`](frs-validation-rules.md) — a bundling
   finding may force an FRS split that changes which matrix tables
   apply to which FRS.
 - **Sibling rule books:**
   [`test-data-generation.md`](test-data-generation.md),
-  [`action-to-playwright.md`](action-to-playwright.md),
+  [`test-runner-cookbook.md`](test-runner-cookbook.md),
   [`frs-validation-rules.md`](frs-validation-rules.md).

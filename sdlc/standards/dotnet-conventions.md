@@ -9,7 +9,7 @@ superseded_by: null
 tags: [placeholder, dotnet, application-layer]
 scope: engine
 source: seed
-related_adrs: [ADR-004, ADR-010]
+related_adrs: []
 ---
 
 # STD-002: Engine-level .NET implementation conventions
@@ -29,11 +29,10 @@ project uses.
 
 ## Standards
 
-**Placeholder — currently empty.** Populate during the next FRS that touches
-application-layer code. Project-specific .NET conventions currently live in
-[ADR-004](../../docs/adrs/ADR-004-application-layer-conventions.md) and
-[ADR-010](../../docs/adrs/ADR-010-cqrs-without-mediator.md); harvesting to
-engine level happens when this standard is first populated.
+**Placeholder — currently empty.** Populate when the first FRS touches
+application-layer code. Project-specific .NET conventions live in the
+project's application-layer convention ADRs; harvesting to engine level
+happens when this standard is first populated.
 
 ## Consequences
 

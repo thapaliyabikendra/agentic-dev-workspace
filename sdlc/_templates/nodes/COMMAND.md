@@ -70,8 +70,8 @@ command that mutates state already touched by another command.
 
 ## Domain events raised
 
-> In-process (local) ABP events only. Async/distributed events published to
-> Kafka or RabbitMQ → coin an EVT-NNN node instead.
+> In-process (local) framework events only. Async/distributed events
+> published to a message broker → coin an EVT-NNN node instead.
 
 Events emitted on successful completion. Required events have a known
 consumer in this milestone.

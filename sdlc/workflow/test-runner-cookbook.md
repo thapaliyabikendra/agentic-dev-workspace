@@ -1,20 +1,24 @@
-# Action to Playwright Code Mapping
+# Test-Runner Cookbook
 
 > **Type:** Project-owned test-runner cookbook. Consulted at Phase 3
 > (Test suite codegen). See
 > [`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
 > for how codegen consumes this file. Codifies the action inference
-> table (step text → Playwright verb), code emission table (verb →
-> `await page.<x>()`), selector resolution, value substitution, URL
+> table (step text → runner verb), code emission table (verb →
+> runner call), selector resolution, value substitution, URL
 > resolution, the full spec-file template, and the
 > "every-step-produces-output" rule (no silent drops).
 >
-> **Status — working assumption.** Playwright is this project's test
-> runner; the workflow flow files reference this file generically as
-> "the project's test-runner cookbook." A project on a different runner
-> replaces or supplements this file. A future testing-convention ADR
-> will formalize the choice — see
+> **Scope — project-owned.** This file is authored and maintained by
+> the project, not the engine. The workflow files reference it by the
+> stable filename `test-runner-cookbook.md`; a project on a different
+> runner replaces this file's content while keeping the filename. A
+> testing-convention ADR should formalize the runner choice — see
 > [`../BOUNDARY.md`](../BOUNDARY.md).
+>
+> **This file's content uses Playwright / TypeScript as its working
+> example.** Replace with your stack's equivalent when adopting the
+> engine on a different runner.
 
 ## When to Use
 

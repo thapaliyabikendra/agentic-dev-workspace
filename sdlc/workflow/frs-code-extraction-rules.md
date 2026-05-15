@@ -13,7 +13,7 @@
 
 **Use when:** the milestone scope explicitly cites existing application
 source code as input (brownfield path), an FRS candidate is being
-seeded from a `*.tsx` / `*.ts` / `*.cs` source rather than from prose,
+seeded from source files (e.g. `*.tsx`, `*.ts`, `*.cs`, `*.py`) rather than from prose,
 or a mixed-source extraction encounters a conflict between prose and
 code that needs a tagging decision.
 
@@ -33,11 +33,9 @@ then gate → classify (there).
 How to mine the existing application's source code for FRS candidates
 without leaking implementation detail into the FRS itself.
 
-> **Worked example below.** The signal table and the `Module.Area.Name`
-> derivations are written against a React / TypeScript frontend because
-> that is this project's stack. The *conventions* are stack-agnostic —
-> adapt the signal categories (form / mutation / validator / role check /
-> route) to the primitives of your frontend (or backend) stack.
+> **Stack-neutral signal table.** The signal categories below apply to
+> any frontend or backend stack. Parenthetical examples in each row
+> illustrate the pattern for common stacks — adapt to your own.
 
 The principle: **code reveals structure, prose reveals intent.** Extract
 structure aggressively, but flag every business rule, edge path, fault
@@ -59,19 +57,19 @@ wiki at [`../nodes/`](../nodes/) (where Phase 2 writes new nodes with
 
 | Signal in code | Lands in |
 |---|---|
-| `<form>` + `onSubmit` handler | One FRS candidate (one user-journey → Use case + Behavior). |
-| `<input>`, `<select>`, `<textarea>` inside a form | Form fields go into a canonical Entity (ENT) or Flow (FLW) node (existing, or new with `status: proposed` at Phase 2 ingest), not into the FRS body directly. The FRS Behavior references the node ID. |
-| Prop types / TypeScript interfaces on form | Strengthen the data shape of the canonical ENT — translate to business language; never leak `string`, `boolean`, etc., to the FRS or the node body. |
-| Non-form `<button onClick={...}>` triggering async work | Candidate operation. Use case + Behavior. |
-| `fetch` / `axios` / `useMutation` / `useQuery` / `trpc.xxx.mutate` | System boundary; the FRS Behavior names the fault path (network failure, auth failure); the FLW node carries the `fault` scenario in its Test plan view. |
-| Validation schemas (zod, yup, joi, class-validator) | Business rules in FRS Behavior or in the canonical ENT, tagged `[inferred from code]`. |
-| Inline `if` / `throw` / `return error` in submit paths | Fault paths in FRS Behavior; tagged `[inferred from code]`. |
-| Error UI (`<ErrorMessage>`, `setError`, try/catch) | Fault paths in FRS Behavior. |
-| Role / permission checks (`hasRole`, `user.isAdmin`, `Can` components) | Actors + Preconditions in the FRS, with the actor ID resolving to an ACT-NNN node (existing canonical, or new canonical with `status: proposed` at Phase 2 ingest). Tagged `[inferred from code]`. |
-| Route definitions (`<Route path>`, file-based routing) | Module-grouping hint — informs whether a milestone needs splitting (see [`design.md → Phase 0 Scope check`](design.md#before-any-questions)). |
+| Form submission trigger (e.g. HTML/React: `<form onSubmit>`, Django: `<form method="POST">`, .NET: `[HttpPost]` action) | One FRS candidate (one user-journey → scope + Behavior). |
+| Form field declarations inside a form (inputs, selects, textareas) | Form fields go into a canonical Entity (ENT) or Flow (FLW) node (existing, or new with `status: proposed` at Phase 2 ingest), not into the FRS body directly. The FRS Behavior references the node ID. |
+| Data shape / schema types on form or handler (e.g. TypeScript interfaces, Python dataclasses, .NET DTOs) | Strengthen the data shape of the canonical ENT — translate to business language; never leak type primitives to the FRS or the node body. |
+| Non-form action trigger (e.g. button click → async operation) | Candidate operation. Scope + Behavior. |
+| Async / system-boundary call (e.g. React: `fetch` / `useMutation`; Django: `requests`; .NET: `HttpClient`) | System boundary; the FRS Behavior names the fault path (network failure, auth failure); the FLW node carries the `fault` scenario in its Test plan view. |
+| Validation schema (e.g. JS: `zod`, `yup`, `joi`; .NET: `class-validator`; Python: Pydantic validators) | Business rules in FRS Behavior or in the canonical ENT, tagged `[inferred from code]`. |
+| Inline error / early return in submit paths (`if` / `throw` / `return error`) | Fault paths in FRS Behavior; tagged `[inferred from code]`. |
+| Error UI (inline error component, `try/catch` display block) | Fault paths in FRS Behavior. |
+| Role / permission check (guard clause on actor identity, e.g. `hasRole`, `isAdmin`, `Can`) | Actors + Preconditions in the FRS, with the actor ID resolving to an ACT-NNN node (existing canonical, or new canonical with `status: proposed` at Phase 2 ingest). Tagged `[inferred from code]`. |
+| Route definition (path-based or file-based routing) | Module-grouping hint — informs whether a milestone needs splitting (see [`design.md → Phase 0 Scope check`](design.md#before-any-questions)). |
 | Loading / pending / submitting state | Hints at the trigger → postcondition path; lands in Behavior. |
-| Notification calls (`toast`, `notify`, queue dispatchers) | Behavior — the FRS describes the actor outcome ("the actor is informed of the outcome"); the FLW node carries the notification mechanics. |
-| Guard clauses with literal-value checks (early return on null, edge values) | Edge paths in Behavior; tagged `[inferred from code]`. |
+| Notification / feedback call (toast, alert, queue dispatch) | Behavior — the FRS describes the actor outcome ("the actor is informed of the outcome"); the FLW node carries the notification mechanics. |
+| Guard clauses with edge/null value checks (early return on null or out-of-range values) | Edge paths in Behavior; tagged `[inferred from code]`. |
 
 **Output of extraction per candidate:** Use case title; source location
 (file path + logical name — see below); pre-populated Behavior items
@@ -164,15 +162,14 @@ question in the candidate's per-FRS discovery.
 ## One-hop import traversal
 
 When a code source imports another **local file** (relative path like
-`./checklist-store`, `../hooks/useFoo`, not a third-party package like
-`react` or `@tanstack/query`), read the imported file and apply the
-signal table to it as well.
+`./checklist-store`, `../hooks/useFoo`, not a third-party package), read
+the imported file and apply the signal table to it as well.
 
 - **Cap depth at 1.** Do not recurse into files imported by the imported
   file.
-- **Skip third-party imports** (anything from `node_modules`, anything
-  starting with `@scope/` or a bare package name like `react`, `lodash`,
-  `@tanstack/react-query`).
+- **Skip third-party imports** (anything from a package registry — e.g.
+  `node_modules`, pip, NuGet — identified by a bare package name, scoped
+  namespace, or package-manager path).
 - **Skip type-only imports** when they're trivially aliases
   (`import type { Foo } from './types'` where `types.ts` is just type
   aliases). Read them only if they contain validation schemas or
@@ -225,7 +222,7 @@ after stakeholder confirmation — see
 
 | Version | Date | Source |
 |---------|------|--------|
-| 1.0 | 2026-05-11 | Absorbed from the shared FRS code-extraction reference (v3.0) during workflow absorption, remapped to the project's 8-section FRS template and `source_ref` frontmatter convention. Subagent dispatch contract, `source_manifest` payload shape, "frs-template.md Canonical Section List" hardcode, and runbook phase references dropped — the project is solo-dev filesystem-based with a different orchestration shape. Signal mapping, logical source names, translation discipline, one-hop traversal, mixed-source reconciliation, and code-only caveat retained. |
+| 1.0 | 2026-05-11 | Absorbed from the shared FRS code-extraction reference (v3.0) during workflow absorption, remapped to the project's FRS template and `source_ref` frontmatter convention. Subagent dispatch contract, `source_manifest` payload shape, "frs-template.md Canonical Section List" hardcode, and runbook phase references dropped — the project is filesystem-based with a different orchestration shape. Signal mapping, logical source names, translation discipline, one-hop traversal, mixed-source reconciliation, and code-only caveat retained. |
 
 ---
 

@@ -9,7 +9,7 @@ superseded_by: null
 tags: [placeholder, ddd, domain-layer]
 scope: engine
 source: seed
-related_adrs: [ADR-003]
+related_adrs: []
 ---
 
 # STD-001: Engine-level DDD constraints
@@ -31,17 +31,15 @@ regardless of stack, framework, or persistence choice.
 ## Standards
 
 **Placeholder — currently empty.** Populate during the next FRS that touches
-the domain layer. Until then, project-specific DDD shape lives in
-[ADR-003](../../docs/adrs/ADR-003-domain-layer-conventions.md) and is the
-operative source for this workspace.
+the domain layer. Until then, the project's domain-layer convention ADR
+(find it by searching the ADR index for the tag `domain-layer`) is the
+operative source.
 
-When this standard is populated, the engine-level rules harvested from
-ADR-003 (and any peer ADRs in the ADR-003..ADR-008 convention set that
-turn out to be engine-level rather than project-specific) migrate here.
-ADR-003 stays in `docs/app/adrs/` (or the relevant component's `adrs/`) if its rules turn out to be project-specific;
-otherwise it gets superseded by this standard via the cross-type
-supersession path documented in
-[`../workflow/authoring-adr.md → Cross-type supersession`](../workflow/authoring-adr.md#cross-type-supersession-adr-supersedes-dec-or-vice-versa).
+When this standard is populated, engine-level rules harvested from the
+project's domain-layer convention ADR(s) migrate here. Project-specific
+rules stay in `docs/<component>/adrs/`; those that prove engine-level are
+superseded by this standard via the cross-type supersession path documented
+in [`../workflow/authoring-adr.md → Cross-type supersession`](../workflow/authoring-adr.md#cross-type-supersession-adr-supersedes-dec-or-vice-versa).
 
 ## Consequences
 

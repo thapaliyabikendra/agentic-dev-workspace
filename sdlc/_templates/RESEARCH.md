@@ -1,6 +1,6 @@
 ---
 id: RESEARCH-NNN
-title: <Short noun-phrase naming what was researched, e.g. "EFMS hybrid fraud detection engine">
+title: <Short noun-phrase naming what was researched, e.g. "Payment gateway retry semantics">
 source_url_or_path: <URL or repo-relative path to the primary external source; multiple sources go under ## Sources>
 status: raw                   # raw | synthesized | superseded
 confidence: medium            # low | medium | high — agent's confidence in the source's authority and the synthesis quality

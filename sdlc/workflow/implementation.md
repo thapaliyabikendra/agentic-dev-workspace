@@ -77,7 +77,7 @@ digraph implementation_flow {
     stage1   [shape=box,   label="Stage 1 — Merge\nflip proposed → active\napply CHG deltas\nflip CHG approved → merged"];
     s1exit   [shape=diamond, label="Stage 1 exit\ncriteria green?"];
     stage2   [shape=box,   label="Stage 2 — Code\n(against now-active canonical)"];
-    stage3tc [shape=box,   label="Stage 3a — Test suite codegen\n(Playwright from TC files)"];
+    stage3tc [shape=box,   label="Stage 3a — Test suite codegen\n(from TC files)"];
     stage3qa [shape=diamond, label="Stage 3b — QA gate\n(ADR-conformance + tests green)?"];
 
     out_done [shape=doublecircle, label="FS implemented\nFRSs implemented\nMilestone done?"];
@@ -426,9 +426,9 @@ Solo doesn't mean QA is skipped — it means the QA hat is the same human at
 a deliberate moment. Before flipping the FS to `implemented`, complete the
 QA verification checklist in the spec.
 
-QA runs in two parts: first **Test suite codegen** (generate Playwright
-specs from the Phase 2 TC files), then the **QA verification checklist**
-(the spec runs green plus every other criterion).
+QA runs in two parts: first **Test suite codegen** (generate test specs
+from the Phase 2 TC files per the test-runner cookbook), then the **QA
+verification checklist** (the spec runs green plus every other criterion).
 
 #### Test suite codegen
 
@@ -444,7 +444,7 @@ implementation branch.
   frontmatter is set.
 - The UI for this FS exists and is running locally (Stage 2 Code is
   complete or substantially complete for the FS's Implementation tasks).
-- The developer has run an explorer pass (Playwright codegen,
+- The developer has run an explorer pass (runner explorer tooling,
   `data-testid` audit, or manual inspection) and replaced the
   `(discovered by explorer)` selectors in each TC's Steps table with
   concrete CSS or role-based selectors.
@@ -457,13 +457,14 @@ implementation branch.
 **Inputs:**
 
 - TC files under the FS's `test-plans/` folder.
-- `tests/playwright.config.{ts,js,mjs}` — the `testDir` setting resolves
-  to `{test_dir}`. If `playwright.config.ts` does not exist, this is the
-  **one-time Playwright bootstrap** moment: the first FS to reach Phase 3
-  scaffolds `tests/` with `playwright.config.ts`, `package.json`,
-  `.gitignore`, and (optionally) a `tests/.env.example` for
-  `TEST_EMAIL` / `TEST_PASSWORD`. Add the bootstrap as an Implementation
-  task in the FS rather than treating it as ambient work.
+- The runner config file (e.g., `playwright.config.ts`) — the `testDir`
+  setting resolves to `{test_dir}`. If the config does not exist, this is
+  the **one-time test runner bootstrap** moment: the first FS to reach
+  Phase 3 scaffolds the `tests/` directory with the runner's config,
+  package descriptor, `.gitignore`, and (optionally) a `tests/.env.example`
+  for credential env vars. See the test-runner cookbook for the exact
+  files. Add the bootstrap as an Implementation task in the FS rather than
+  treating it as ambient work.
 - Environment variables: `TEST_EMAIL`, `TEST_PASSWORD`, plus any
   feature-specific secrets the TC's Test Data declares. Sourced from
   `tests/.env` (gitignored) or the developer's shell — never hardcoded.
@@ -471,16 +472,17 @@ implementation branch.
 **Codegen rules:**
 
 See
-[`action-to-playwright.md`](action-to-playwright.md) for the
+[`test-runner-cookbook.md`](test-runner-cookbook.md) for the
 action-inference table, code emission table, selector resolution,
 value substitution, auth/SSO patterns, and the full spec file template
 including the mandatory `createdRecords + afterEach` cleanup pattern.
 The discipline:
 
-- One `.spec.ts` per use-case sub-folder.
-- One `test()` per TC, in TC number order.
-- Raw Playwright calls only. No page objects. No helper wrappers. No
-  `page.waitForTimeout()`. No retry logic.
+- One test spec per use-case sub-folder (file name and extension per the
+  cookbook).
+- One test case per TC, in TC number order.
+- Raw runner calls only — per the cookbook's code emission table. No page
+  objects. No helper wrappers. No polling waits. No retry logic.
 - Every step produces a code line or a `// TODO` — no silent drops.
 - Every test has at least one `expect()`; if a TC has zero assertions
   emit `// TODO: no assertions found — add expected result to TC`.
@@ -492,11 +494,12 @@ The discipline:
 **Output target:**
 
 ```
-tests/{test_dir}/<feature>/<use-case>.spec.ts
+tests/{test_dir}/<feature>/<use-case>.<ext>
 ```
 
-where `<feature>` matches the FS folder slug and `<use-case>` matches
-the kebab-case verb of the TC sub-folder.
+where `<feature>` matches the FS folder slug, `<use-case>` matches the
+kebab-case verb of the TC sub-folder, and `.<ext>` is the file extension
+defined by the test-runner cookbook (e.g. `.spec.ts` for Playwright).
 
 **Branch strategy.** Phase 3 already runs on the FS's implementation
 branch. Spec files land on the same branch alongside production code —
@@ -566,12 +569,12 @@ step based on the 3-block return, using these outcome handles):
 After Test suite codegen produces the specs:
 
 - Every linked Flow scenario mapped to a passing test (runner conventions
-  live in the testing-convention ADR once authored — the project's working
-  assumption is Playwright). An executed scenario without a corresponding
-  test does not count. With this absorption, "mapped to a passing test"
-  means: a `.spec.ts` exists under `tests/{test_dir}/<feature>/<use-case>.spec.ts`,
-  its corresponding TC's `Traces to:` line includes the scenario anchor,
-  and the test runs green under `npx playwright test`.
+  live in the testing-convention ADR once authored; consult the
+  project-owned test-runner cookbook for file-path and invocation
+  conventions). An executed scenario without a corresponding test does not
+  count. "Mapped to a passing test" means: a test file exists at the path
+  the cookbook specifies, its corresponding TC's `Traces to:` line includes
+  the scenario anchor, and the test runs green.
 - Every FRS acceptance criterion verified.
 - **ADR-conformance check** — code conforms to every `accepted` ADR
   declared in the FS's `adrs:` plus convention-tagged ADRs from the index.
@@ -593,12 +596,9 @@ superseding ADR. The gates live in the ADR rather than this flow file so
 the workflow stays project-agnostic and the gate list evolves where it
 belongs.
 
-> **This project:** see
-> ADR-008 — twelve gates
-> covering AppService thinness, explicit UoW, outbox ordering,
-> aggregate encapsulation, single AutoMapper profile, lookup
-> constants, LINQ projection, bulk inserts, localization,
-> authorization, XML documentation, and single-responsibility methods.
+> **Your project:** Look up the ADR tagged `code-quality` in
+> `docs/<component>/adrs/index.md` and note its ID here as a session
+> reference. The gate list lives only in that ADR.
 
 Any relaxation of a gate requires authoring an ADR that supersedes the
 code-quality ADR — not a quiet exception. See
@@ -709,7 +709,7 @@ Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
 - **Required before (entry):** [`plan.md`](plan.md) — produces the
   approved FS + proposed nodes + approved CHG this flow consumes.
 - **Rule books wholesale-read during this flow:**
-  [`action-to-playwright.md`](action-to-playwright.md) (Stage 3a Test
+  [`test-runner-cookbook.md`](test-runner-cookbook.md) (Stage 3a Test
   suite codegen),
   [`test-data-generation.md`](test-data-generation.md) (Stage 3a
   directive interpolation),

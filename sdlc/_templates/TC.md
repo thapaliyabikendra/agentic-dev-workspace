@@ -6,7 +6,7 @@ status: drafted               # drafted | resolved | skipped
 feature: <feature kebab-case, matches the FS folder slug>
 use_case: <add | edit | delete | display | toggle | view | ...>
 priority: <High | Medium | Low>
-category: Functional          # Playwright type — Functional | Edge | Fault
+category: Functional          # test category — Functional | Edge | Fault
 tags: [@smoke, @<feature>, @TC-NNN]
 traces_to: []                 # [AC-NN, FLW-NNN#happy, FLW-NNN#edge-N, FLW-NNN#fault-N]
 created: YYYY-MM-DD

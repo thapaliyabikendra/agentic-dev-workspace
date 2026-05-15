@@ -32,8 +32,7 @@ the cross-cutting practices every flow inherits.
 
 ---
 
-Brownfield project, solo human across BA / BEA / Developer / QA hats, filesystem-based
-(no GitLab yet). Workflow aligns operations to Karpathy's Ingest/Query pattern: the
+Workflow aligns operations to Karpathy's Ingest/Query pattern: the
 FRS flow Queries the canonical DDD wiki to validate requirements; the FS flow
 Ingests new DDD nodes directly into the canonical wiki at `docs/<component>/nodes/` with
 `status: proposed`, and emits a milestone-scoped CHG node when existing canonical
@@ -60,7 +59,7 @@ digraph workflow_phases {
     out_frs   [shape=doublecircle, label="Validated FRSs\n+ OQs"];
     out_fs    [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
     out_tc    [shape=doublecircle, label="TC files staged"];
-    out_impl  [shape=doublecircle, label="Active canonical\n+ code + Playwright specs"];
+    out_impl  [shape=doublecircle, label="Active canonical\n+ code + test specs"];
 
     inputs -> phase0;
     phase0 -> out_ms;
@@ -127,7 +126,7 @@ criteria. The two test operations (`generate-test-plan`,
 `generate-test-suite`) live inside the Plan and Implementation flows
 respectively — same session, same context, no separate flow file. The
 sections below this point (Cross-cutting practices, Knowledge base
-layout, Migration to GitLab) apply to all three flows.
+layout, Migration to VCS platform) apply to all three flows.
 
 **Maintenance operations** sit alongside the phase flows but are not
 tied to phases: `authoring-adr` (see [Authoring an ADR](#authoring-an-adr))
@@ -227,8 +226,8 @@ state those decisions reduce to.
 [`workflow/test-data-generation.md`](workflow/test-data-generation.md) is
 wholesale-read at Phase 2 Test plan ingest (to populate every TC's
 `## Test Data` section) and at Phase 3 Test suite codegen (to interpolate
-directive tokens into Playwright code).
-[`workflow/action-to-playwright.md`](workflow/action-to-playwright.md) is
+directive tokens into test runner code).
+[`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md) is
 wholesale-read at Phase 3 Test suite codegen (action-inference, code
 emission, full spec template). Both are bounded-size reference docs —
 same retrieval posture as the Phase 1.5 rule books.
@@ -452,7 +451,7 @@ FLW-NNN#happy / #edge / #fault   (behavioral spec, canonical wiki)
         ↓ Traces to:
 TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
         ↓ generate-test-suite
-<use-case>.spec.ts               (Playwright code, tests/ folder at Phase 3)
+<use-case>.<ext>                  (test spec, tests/ folder at Phase 3)
 ```
 
 - **FLW nodes are the behavioral source of truth.** Scenarios live as
@@ -465,11 +464,11 @@ TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
   <row>`) AND FLW-side scenario anchors (`FLW-NNN#happy`,
   `FLW-NNN#edge-N`, `FLW-NNN#fault-N`). The dual trace makes coverage
   auditable from both directions.
-- **Playwright specs are disposable artifacts.** Generated from TC
-  files at Phase 3 (Stage 3 QA) and landed at
-  `tests/{test_dir}/<feature>/<use-case>.spec.ts` on the FS's
-  implementation branch. Hand edits to spec files are lost on
-  regeneration — fix the TC, regenerate.
+- **Test specs are disposable artifacts.** Generated from TC
+  files at Phase 3 (Stage 3 QA) and landed in
+  `tests/{test_dir}/<feature>/` on the FS's implementation branch.
+  Hand edits to spec files are lost on regeneration — fix the TC,
+  regenerate.
 
 **TC files do not participate in the tiered touch.** They stay
 milestone-scoped (no canonical promotion at Phase 3 merge); no
@@ -482,7 +481,7 @@ section IS the TC index for that FS.
   recipe for the `## Test Data` section in every TC; directive
   vocabulary that crosses the Phase 2 → Phase 3 boundary
   (`violatesMaxLength(N)`, `duplicate(value)`, `{timestamp}`, `{uuid}`).
-- [`workflow/action-to-playwright.md`](workflow/action-to-playwright.md) —
+- [`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md) —
   recipe for Phase 3 codegen; action-inference table, selector
   resolution, value substitution, full spec file template, mandatory
   `createdRecords + afterEach` cleanup pattern.
@@ -741,7 +740,7 @@ the unified contract surface — HTTP routes, event topics, queues, gRPC
 methods — discriminated by `protocol:` frontmatter; superseded the
 prior EP (endpoint) prefix on 2026-05-14. **EVT** is the async-event
 catalog — distributed events published to Kafka topics or RabbitMQ
-exchanges; in-process ABP local events are NOT EVT nodes (they stay in
+exchanges; in-process framework-local events are NOT EVT nodes (they stay in
 CMD's "Domain events raised" subsection). Every EVT node requires a
 `linked_contract: CON-NNN` pointing at its transport surface.
 
@@ -805,27 +804,30 @@ per-pass absorption procedure.
 
 ---
 
-## Migration to GitLab later
+## Migration to a VCS / issue-tracking platform
 
-| Filesystem                                                          | GitLab                                       |
-| ------------------------------------------------------------------- | -------------------------------------------- |
-| `docs/milestones/M-NN-<slug>/M-NN-<slug>.md`                        | GitLab Milestone                             |
-| `docs/milestones/M-NN-<slug>/frs/FRS-NNN-*.md`                      | Issue labeled `FRS`, linked to the milestone |
+When the team adopts an issue tracker (GitLab, GitHub, Azure DevOps,
+Jira, etc.), map the filesystem artifacts as follows:
+
+| Filesystem                                                          | Issue tracker concept                               |
+| ------------------------------------------------------------------- | --------------------------------------------------- |
+| `docs/milestones/M-NN-<slug>/M-NN-<slug>.md`                        | Platform milestone                                  |
+| `docs/milestones/M-NN-<slug>/frs/FRS-NNN-*.md`                      | Issue labeled `FRS`, linked to the milestone        |
 | `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md`         | Issue labeled `Feature Spec`, linked to the milestone |
-| `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/**`  | Stays in repo — CHG permanent home           |
-| `docs/milestones/M-NN-<slug>/discovery/**`                          | Stays in repo — working notes                |
-| `docs/milestones/M-NN-<slug>/id-claims.md`                          | Stays in repo — claim ledger                 |
-| `docs/<component>/nodes/**`                                                     | Stays in repo — wiki is the right home       |
-| `docs/<component>/adrs/**`                                                      | Stays in repo — wiki is the right home       |
-| `docs/research/**`                                                  | Stays in repo — wiki is the right home       |
-| `docs/discovery/open-questions/**`                                  | Stays in repo — per-OQ files + index + log   |
+| `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/**`  | Stays in repo — CHG permanent home                  |
+| `docs/milestones/M-NN-<slug>/discovery/**`                          | Stays in repo — working notes                       |
+| `docs/milestones/M-NN-<slug>/id-claims.md`                          | Stays in repo — claim ledger                        |
+| `docs/<component>/nodes/**`                                         | Stays in repo — wiki is the right home              |
+| `docs/<component>/adrs/**`                                          | Stays in repo — wiki is the right home              |
+| `docs/research/**`                                                  | Stays in repo — wiki is the right home              |
+| `docs/discovery/open-questions/**`                                  | Stays in repo — per-OQ files + index + log          |
 | `docs/discovery/open-questions.md`                                  | Stays in repo — frozen legacy log (pre-cut-over OQs) |
 
 Nodes, ADRs, discoveries, and per-FS CHG nodes remain filesystem-based
-even after GitLab adoption. Issues are for trackable work; everything under
-`nodes/`, `adrs/`, and the per-milestone `discovery/`,
-`specs/<FS>/nodes/changes/`, `id-claims.md` is durable knowledge that stays
-in the repo.
+even after platform adoption. Issues are for trackable work; everything
+under `nodes/`, `adrs/`, and the per-milestone `discovery/`,
+`specs/<FS>/nodes/changes/`, `id-claims.md` is durable knowledge that
+stays in the repo.
 
 **Deprecated paths.** The previous top-level `docs/frs/`, `docs/specs/`, and
 `docs/discovery/<scope>.md` (per-feature) trees no longer exist — everything
@@ -912,7 +914,7 @@ refusals in [`PRINCIPLES.md`](PRINCIPLES.md).
   [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md),
   [`workflow/coverage-matrix.md`](workflow/coverage-matrix.md),
   [`workflow/test-data-generation.md`](workflow/test-data-generation.md),
-  [`workflow/action-to-playwright.md`](workflow/action-to-playwright.md),
+  [`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md),
   [`workflow/review.md`](workflow/review.md),
   [`workflow/lint.md`](workflow/lint.md),
   [`workflow/regenerate-roadmap.md`](workflow/regenerate-roadmap.md).

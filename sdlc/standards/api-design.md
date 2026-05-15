@@ -9,7 +9,7 @@ superseded_by: null
 tags: [placeholder, api, http]
 scope: engine
 source: seed
-related_adrs: [ADR-020]
+related_adrs: []
 ---
 
 # STD-003: Engine-level API design rules
@@ -29,10 +29,10 @@ or gateway sits in front.
 
 ## Standards
 
-**Placeholder — currently empty.** Populate during the next FRS that touches
-an HTTP boundary. Project-specific HTTP-boundary shape currently lives in
-[ADR-020](../../docs/adrs/ADR-020-http-response-envelope-and-pagination-convention.md);
-harvesting to engine level happens when this standard is first populated.
+**Placeholder — currently empty.** Populate when the first FRS touches
+an HTTP boundary. Project-specific HTTP-boundary shape lives in the
+project's API/HTTP convention ADRs; harvesting to engine level happens
+when this standard is first populated.
 
 ## Consequences
 

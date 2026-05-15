@@ -42,6 +42,10 @@ phase, and points to the canonical home for each procedural detail.
 - **One question per turn during FRS / FS drafting.**
 - **TaskCreate mirrors phase task lists; durable status lives in artifacts.** One task = one
   observable outcome. Mark `in_progress` on start, `completed` immediately. Session-scoped only.
+- **For multi-stage plans, open a progress checklist and track each stage.**
+  Any plan that spans more than one phase or cohort must begin with a checkbox
+  list of all stages; mark each stage `[x]` before advancing to the next.
+  Procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
 
 ## Project framing
 

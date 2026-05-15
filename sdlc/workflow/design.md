@@ -278,7 +278,7 @@ later.
 - [ ] **QA-hat review.** Walk each FRS's referenced and produced Flow
       scenarios (happy / edge / fault). Each scenario is independently
       testable. Any scenario that cannot be expressed as a test runner
-      assertion (Playwright — see the testing-convention ADR once authored)
+      assertion (see the testing-convention ADR for the chosen runner)
       is flagged in "Brownfield impact" or sent back for clarification. The
       Flow scenarios *are* the test plan — do not draft a parallel test-plan
       artifact.

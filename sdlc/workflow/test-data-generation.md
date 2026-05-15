@@ -6,7 +6,7 @@
 > for how Test Data entries are emitted into each TC's `## Test Data`
 > section, and
 > [`implementation.md → Test suite codegen`](implementation.md#test-suite-codegen)
-> for how those entries are interpolated into Playwright code.
+> for how those entries are interpolated into test runner code.
 > Codifies the four placeholder tokens (`{timestamp}`, `{counter}`,
 > `{uuid}`, `{tcNumber}`), the directive vocabulary for matrix-driven
 > TCs (`violatesMaxLength`, `duplicate`, `invalidFormat`, etc.), and
@@ -16,26 +16,26 @@
 
 **Use when:** Phase 2 test-plan ingest is populating the `## Test
 Data` section of a freshly emitted TC, Phase 3 codegen is
-interpolating concrete values into a `.spec.ts` file, or a TC
+interpolating concrete values into a test spec file, or a TC
 self-check is validating that unique fields carry `{timestamp}` /
 `{uuid}` per the happy-path uniqueness rule.
 
 **Do NOT use when:** the work is identifying which TCs should exist
 at all (use [`coverage-matrix.md`](coverage-matrix.md) — completeness
-check, not values), mapping a TC step to Playwright code (use
-[`action-to-playwright.md`](action-to-playwright.md) — code emission,
+check, not values), mapping a TC step to runner code (use
+[`test-runner-cookbook.md`](test-runner-cookbook.md) — code emission,
 not value generation), or the artifact is not a TC under an FS's
 `test-plans/<use-case>/` folder (this file applies only to the Test
 Data section of TC files).
 
 **Vs. sibling files:** [`coverage-matrix.md`](coverage-matrix.md)
 identifies *which* TCs to emit; this file generates *the values*
-inside each emitted TC. [`action-to-playwright.md`](action-to-playwright.md)
+inside each emitted TC. [`test-runner-cookbook.md`](test-runner-cookbook.md)
 generates *the code* that consumes those values. The three are the
 **TC authoring trio** at Phase 2 / Phase 3.
 
 Used at Phase 2 to populate the `## Test Data` section of every TC, and at
-Phase 3 to interpolate concrete values into Playwright `.spec.ts` files.
+Phase 3 to interpolate concrete values into test spec files.
 This file is the recipe that turns a field's constraints (from the
 data-model fact sheet, sourced from scoped `nodes/entities/ENT-NNN-*.md`
 files in the active FS) plus the TC's intent (happy-path /
@@ -45,7 +45,7 @@ Test Data entry.
 This file does not generate values for itself. Phase 2 walks the rules
 below per field, per TC; the values land in each TC's `## Test Data`
 section. Phase 3 reads those entries and substitutes runtime values
-into the generated `.spec.ts`.
+into the generated test spec.
 
 ---
 
@@ -263,7 +263,7 @@ Pre-existing State stays prose-only at Phase 2. Phase 3 codegen emits
 these as TODO comments in the spec's `afterEach` (or a `beforeEach`,
 once the team's fixture pattern lands) for the developer to wire to
 fixtures or seed scripts. The codegen does NOT auto-create database
-state — see [`action-to-playwright.md → afterEach cleanup rules`](action-to-playwright.md#aftereach-cleanup-rules).
+state — see [`test-runner-cookbook.md → afterEach cleanup rules`](test-runner-cookbook.md#aftereach-cleanup-rules).
 
 ---
 
@@ -373,10 +373,10 @@ hours or days later as opaque CI failure.
   [`implementation.md`](implementation.md) (Phase 3 codegen).
 - **Adjacent (not callers but consulted):**
   [`coverage-matrix.md`](coverage-matrix.md) — identifies which TCs
-  need values; [`action-to-playwright.md`](action-to-playwright.md) —
+  need values; [`test-runner-cookbook.md`](test-runner-cookbook.md) —
   consumes the templated tokens at codegen time and substitutes
   runtime expressions.
 - **Sibling rule books:**
   [`coverage-matrix.md`](coverage-matrix.md),
-  [`action-to-playwright.md`](action-to-playwright.md),
+  [`test-runner-cookbook.md`](test-runner-cookbook.md),
   [`frs-validation-rules.md`](frs-validation-rules.md).

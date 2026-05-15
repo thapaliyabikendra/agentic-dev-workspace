@@ -369,10 +369,9 @@ scan `docs/<component>/adrs/index.md` for the ADR tagged
 and consult its cohort table. Each task references the relevant
 convention ADR by ID rather than restating the convention.
 
-> **This project:** the cohort table lives in
-> ADR-009 —
-> four cohorts (Domain → Application → Persistence → Web/Host) tied to
-> the ABP layered solution.
+> **Your project:** Look up the ADR tagged `task-ordering` in
+> `docs/<component>/adrs/index.md` and note its ID and cohort names here
+> as a session reference.
 
 A typical task shape is one line per task per cohort, e.g., `T1 (Cohort A)
 — Add ENT-007 <aggregate> + paired <Aggregate>Manager in <project's
@@ -513,8 +512,8 @@ same session, no context reset.
   the milestone's `id-claims.md` and any TCs already staged in sibling FSs.
   Filename: `TC-NNN-<slug>.md`. Header line: `# TC-NNN: <Title> (<Category>)`.
 - The TC's `**Tags:**` line carries `@smoke @<feature> @TC-NNN` — the
-  feature tag is the kebab-case FS slug, used by Playwright for
-  `--grep @<feature>` filtering at run time.
+  feature tag is the kebab-case FS slug, used by the test runner for
+  feature-tag filtering at run time.
 - TC IDs are sequential across the entire feature (across all use-case
   sub-folders), not per sub-folder. Pass-0 (section-walkthrough) TCs
   come first, then Pass-2 (matrix-driven) TCs.
@@ -536,19 +535,17 @@ all of those cohorts — an `add` use case usually walks the full cohort
 chain top-to-bottom. Do not claim alignment between the two
 vocabularies that does not exist.
 
-#### Section walkthrough (adapted to this project's FRS sections)
+#### Section walkthrough
 
-This project's FRS template uses named sections (`Use case`, `Behavior`,
-`Acceptance criteria`, `Preconditions`, `Out of scope`, `Test plan
-view`, `Brownfield impact`, `Validation findings`) — not numbered
-sections. Walk each FRS in the FS in this order, plus the canonical FLW
-nodes:
+Walk each FRS section in the FS in the order your project's FRS template
+defines (see `sdlc/_templates/FRS.md` for the engine default; your
+project may add or rename sections). For each section, plus the canonical
+FLW nodes:
 
-1. **`## Use case`** — context only; no TCs.
-2. **`## Behavior`** — the main flow, alternative paths, exception
-   handling, business rules, and edge cases live here as paragraphs
-   (this project's template does NOT split them into separate sections).
-   Walk every observable condition:
+1. **Scope section** — context only; no TCs.
+2. **Behavior section** — the main flow, alternative paths, exception
+   handling, business rules, and edge cases. Walk every observable
+   condition:
    - **Happy path TC** — one per primary success flow described.
      Tag `@smoke`. Priority High. Traces to the AC-IDs from the
      Acceptance criteria section that map to the flow + the scoped
@@ -565,16 +562,16 @@ nodes:
      **Guard TC** that explicitly asserts absence. Negative properties
      are NEVER covered by the happy-path TC; absence requires its own
      assertion.
-3. **`## Acceptance criteria`** — every AC-ID must trace to at least
+3. **Acceptance criteria section** — every AC-ID must trace to at least
    one TC by the end of the walkthrough. Pure restatements of flow
    steps are typically already covered by the happy-path or
    alternative-path TC — note the trace, do not duplicate. ACs framed
    as observable conditions (`After X, the user sees Y`) translate
    directly into a Steps row.
-4. **`## Preconditions`** — feeds the Preconditions section of every
+4. **Preconditions section** — feeds the Preconditions section of every
    TC; not its own TC source. The current user's role, tenant, and
    any required pre-existing data come from here.
-5. **`## Out of scope`** — items here are NOT test targets. If an
+5. **Out-of-scope section** — items here are NOT test targets. If an
    out-of-scope item could plausibly appear as a defect (e.g. an
    "annotation tool" that should NOT exist in a read-only modal),
    emit at most one low-priority **Guard TC** that asserts its
@@ -643,7 +640,7 @@ see that file's preamble.
 #### Selector posture
 
 Every TC's `Selector` column is **`(discovered by explorer)`** at
-Phase 2. This project drives test plan ingest from the FRS and scoped
+Phase 2. The workflow drives test plan ingest from the FRS and scoped
 nodes — not from existing UI code. Concrete selectors land at Phase 3
 (Test suite codegen) when the developer runs an explorer pass against
 the implemented UI.

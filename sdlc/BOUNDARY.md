@@ -178,59 +178,51 @@ without modification.
 
 ---
 
-## Project-specific (stays with this team)
+## Project-specific (illustrative — fill in with your project's choices)
 
-These are assumptions, vocabulary, or tooling choices that other teams may
-not share.
+These are the categories of assumption, vocabulary, or tooling choice that
+vary across projects. Replace each `<placeholder>` with your project's
+actual choice when adopting the engine.
 
 ### Domain context
 
-- Trade Finance vocabulary (the implicit domain in this workspace; surfaces
+- `<your domain>` vocabulary (the implicit domain in this workspace; surfaces
   in any FRS, node, or spec that lands).
-- Specific business invariants once they exist in `docs/<component>/nodes/` (none yet).
+- Specific business invariants once they exist in `docs/<component>/nodes/`.
 
 ### Toolchain assumptions
 
-- **Lovable UI prototype as Phase 0 input.** Other teams without Lovable
-  will need a different prototyping entry — wireframe-driven discovery is
-  the noted alternative.
-- **GitLab migration target.** [`WORKFLOW.md`](WORKFLOW.md#migration-to-gitlab-later)
-  has a GitLab mapping table; teams on other forges (GitHub, Azure DevOps,
-  Bitbucket) would need an adapted mapping.
-- **Playwright as the test runner** — the project's working assumption;
-  this migrates to a (future) testing-convention ADR once authored.
-  Another team's runner swap then becomes editing one ADR rather than
-  threading the choice through workflow files. **Phase A note
-  (2026-05-11):** `workflow/action-to-playwright.md` now carries a
-  status header labelling it as the project-owned test-runner
-  cookbook; flow files reference it generically.
-- **ABP / .NET task-ordering cohorts** — `[Phase A — Resolved
-  2026-05-11]` Cohort table extracted from `workflow/plan.md` into
-  [`adrs/ADR-009`](../docs/<component>/adrs/ADR-009-implementation-task-cohort-ordering.md).
-  Flow files now reference the cohort-ordering ADR by index lookup.
-- **ABP-specific code-quality gates** — `[Phase A — Resolved
-  2026-05-11]` The twelve gates previously inlined in
-  `workflow/implementation.md` Stage 3 are now referenced by index
-  lookup against [`adrs/ADR-008`](../docs/<component>/adrs/ADR-008-code-quality-gates.md);
-  the verbatim gate list lives only in the ADR.
+- **`<your UI prototyping tool>` as Phase 0 input.** Wireframe-driven
+  discovery is one alternative; adapt to whichever input format the
+  milestone scoping phase consumes.
+- **`<your VCS/CI platform>` as migration target.** [`WORKFLOW.md`](WORKFLOW.md)
+  has a platform-mapping table; adapt it to your forge (GitLab, GitHub,
+  Azure DevOps, Bitbucket, etc.).
+- **`<your test runner>` as the test runner** — formalize the choice in a
+  testing-convention ADR once authored; then `workflow/test-runner-cookbook.md`
+  becomes the implementation of that ADR's choice. Another team's runner
+  swap becomes editing one ADR and replacing the cookbook.
+- **`<your framework>`'s task-ordering cohorts** — extract the cohort table
+  into a convention ADR (tag it `task-ordering`). Flow files reference the
+  ADR by index lookup; the verbatim cohort table lives only in the ADR.
+- **`<your framework>`-specific code-quality gates** — extract the gate list
+  into a convention ADR (tag it `code-quality`). Flow files reference the
+  ADR by index lookup; the verbatim gate list lives only in the ADR.
 - **Cross-cutting concerns template** — `[Phase A — Resolved
-  2026-05-11]` `docs/cross-cutting-concerns.md` was being treated as
-  both template and project seed. Template extracted to
+  2026-05-11]` Template extracted to
   [`_templates/CROSS-CUTTING-CONCERNS.md`](_templates/CROSS-CUTTING-CONCERNS.md)
-  with `[bracketed slot]` placeholders for the five project-specific
-  values (retention years, timezone ×2, audit-read role, primary
-  language); live file is now an explicit seed.
-- **Glossary template** — `[Phase A — Resolved 2026-05-11]` Same
-  treatment as cross-cutting-concerns. Template extracted to
-  [`_templates/GLOSSARY.md`](_templates/GLOSSARY.md); live
-  `docs/glossary.md` is the project seed.
+  with `[bracketed slot]` placeholders for project-specific values; the
+  live `docs/cross-cutting-concerns.md` is the project seed.
+- **Glossary template** — `[Phase A — Resolved 2026-05-11]` Template
+  extracted to [`_templates/GLOSSARY.md`](_templates/GLOSSARY.md); the
+  live `docs/glossary.md` is the project seed.
 
 ### Role / capacity assumptions
 
 - "One human plays all roles — BA, BEA, Developer, QA." Teams with
   dedicated QA or BA roles will reassign hats, not eliminate them.
-- Manager builds the Lovable prototype. In other teams this may be a
-  product owner, BA, or designer.
+- The Phase 0 prototyper role is team-assigned (product owner, BA,
+  designer, or manager — depends on who owns the prototype).
 
 ### ADR content
 
@@ -284,8 +276,8 @@ Topic-by-topic classification:
 | CHG status vocabulary | **engine-prescribed** | `draft → approved → merged`. CHG nodes are milestone-scoped (never canonical); status transitions edit the file in place at its milestone path. |
 | Standard status vocabulary | **engine-prescribed** | Same as ADR. |
 | Phase 1.5 gate snapshots (CCC + ADR index + standards index) | **engine-prescribed** | All three baselines snapshot at gate entry; `_version` fields captured. |
-| Test runner choice | **project-time** | Currently Playwright; lives in a project-owned cookbook. |
-| Stack / framework choice | **project-time** | Decision captured as project ADRs (e.g., ADR-002 ABP); current operational state captured in `docs/tech-stack.md`. |
+| Test runner choice | **project-time** | Captured in a project-owned test-runner cookbook (`workflow/test-runner-cookbook.md` by convention); formalized in a testing-convention ADR once authored. |
+| Stack / framework choice | **project-time** | Decision captured as project ADRs; current operational state captured in `docs/tech-stack.md`. |
 | Brownfield-vs-greenfield posture | **project-time** | Set in CLAUDE.md `project_type:`. |
 | Component structure (`docs/<component-slug>/`) | **engine-recommended** | Engine defines the `COMPONENT.md` format and folder convention (see [`LAYOUT.md § Component structure`](LAYOUT.md#component-structure-docs)). Projects may omit components (keeping the flat `docs/<component>/nodes/` structure) when they have only one deployable component. Projects must not reuse component-slug names across projects within the same workspace. Bootstrap procedure: [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md). |
 | Standalone component ID prefix | **engine-recommended** | When the component layer is adopted, each standalone component must declare a globally unique 2–4 char uppercase `id_prefix` in `COMPONENT.md`. Brownfield-imported legacy components are exempt. The engine defines the format; the project chooses the prefix values. |
@@ -322,56 +314,49 @@ The workflow scaffolding layer is now genuinely project-agnostic. Concrete
 changes:
 
 - **`workflow/plan.md`** — Implementation-task cohort section replaced
-  with a generic pointer to the project's cohort-ordering ADR (this
-  project: ADR-009). Coverage matrix rows that named `ConcurrencyStamp`
-  and `IMultiTenant` rewritten in framework-neutral terms.
+  with a generic pointer to the project's cohort-ordering ADR. Section
+  walkthrough genericized to use `<scope-section>` / `<behavior-section>`
+  / etc. labels in place of named template headings. Coverage matrix rows
+  rewritten in framework-neutral terms.
 - **`workflow/implementation.md`** — Stage 2 "Convention ADRs to
   consult" rewritten as an `adrs/index.md` lookup (any ADR tagged
-  `convention`). Build command genericized (was `dotnet build`); the
-  command's project home is now `docs/tech-stack.md § Operational
-  commands` (added 2026-05-13 — the Phase A genericization moved the
-  command out of the flow file but left no concrete project home until
-  `docs/tech-stack.md` landed). Stage 3 "Code-quality gates" section
-  replaced with a single pointer to the project's code-quality ADR
-  (this project: ADR-008); the verbatim twelve-gate list no longer
-  lives in the flow file.
+  `convention`). Build command genericized; the command's project home is
+  now `docs/tech-stack.md § Operational commands`. Stage 3 "Code-quality
+  gates" section replaced with a generic pointer to the project's
+  code-quality ADR; the verbatim gate list no longer lives in the flow
+  file. QA checklist Playwright assumption replaced with a generic
+  reference to the project-owned test-runner cookbook.
 - **`_templates/FS.md`** — Implementation-tasks cohort hint
   genericized to point at `workflow/plan.md` and the project's
-  cohort-ordering ADR rather than naming ABP and ADR-002..ADR-008.
-- **`workflow/frs-code-extraction-rules.md`** — React/TypeScript
-  signal table now labelled explicitly as a worked example; logical
-  name examples replaced with generic
-  `Admin.Settings.*` / `Onboarding.Checklist.*` placeholders. Heading
-  and intro reference "the existing application's source code"
-  generically.
+  cohort-ordering ADR rather than naming framework-specific layers or
+  ADR IDs.
+- **`workflow/frs-code-extraction-rules.md`** — Signal table generalized
+  to stack-neutral categories with parenthetical stack examples; worked-
+  example callout updated. Logical name examples use generic
+  `Admin.Settings.*` / `Onboarding.Checklist.*` placeholders.
 - **`workflow/frs-validation-rules.md`** — "Branch Maker / Branch
   Checker" bundling example rewritten as "maker action / checker
   action"; "Bank Admin" language-trap example rewritten as
-  "administrator"; React/TS reference genericized.
-- **`workflow/design.md`** — Brownfield code-mining pointer
-  genericized.
-- **`workflow/action-to-playwright.md`** — header reclassifies the
-  file as the project-owned test-runner cookbook; flow files reference
-  it generically.
-- **`adrs/ADR-009`** — new convention ADR. Holds the four-cohort
-  task-ordering table that previously lived in `workflow/plan.md`.
+  "administrator".
+- **`workflow/design.md`** — Brownfield code-mining pointer genericized.
+- **`workflow/test-runner-cookbook.md`** — renamed from
+  `action-to-playwright.md`; all engine references updated to the
+  generic filename. File is the project-owned test-runner cookbook;
+  the engine references it by this stable name.
 - **`_templates/CROSS-CUTTING-CONCERNS.md`** — new template, holds the
-  category structure with `[bracketed slot]` placeholders for the
-  five project-specific values (retention years, timezone ×2,
-  audit-read role, primary language).
+  category structure with `[bracketed slot]` placeholders for
+  project-specific values.
 - **`_templates/GLOSSARY.md`** — new template, mirror of the live
   glossary's structure with seeding instructions.
 
-Verification: a grep across `WORKFLOW.md`, `workflow/`, `_templates/`,
-and `CLAUDE.md` for the project-specific terms listed in
-[`docs/project.md § Phase A Boundary Verification`](../docs/project.md#phase-a-boundary-verification)
-shows every remaining match inside one of three controlled holes: a
-labelled worked example (the React / TypeScript section of
-`frs-code-extraction-rules.md`), a labelled `> **This project:**`
-callout (`plan.md` and `implementation.md` point at ADR-009 and
-ADR-008 by ID), or an illustrative slot-value example in
-`_templates/CROSS-CUTTING-CONCERNS.md` (shown as fill-in examples).
-No project term appears as unflagged scaffolding prose.
+Verification: `sdlc/` contains no unflagged project-specific terms.
+The three former controlled holes (stack-specific worked example in
+`frs-code-extraction-rules.md`; `> **This project:**` callouts in
+`plan.md` and `implementation.md`; hardcoded filename
+`action-to-playwright.md` throughout engine files) have all been
+resolved. The signal table is stack-neutral; callouts use
+`> **Your project:**` stubs; the cookbook is referenced by the generic
+filename `test-runner-cookbook.md`.
 
 ---
 
@@ -391,7 +376,7 @@ No project term appears as unflagged scaffolding prose.
   cross-cutting integration artifacts (LDAP, SMTP, SSO, concurrent
   login) that any team can reference and adapt.
 - **Testing-convention ADR.** Author the ADR that names the project's
-  test runner. After it exists, `action-to-playwright.md` is one of
+  test runner. After it exists, `test-runner-cookbook.md` is one of
   several possible cookbooks the ADR can point at.
 - **Pilot with one other team.** Confirm the boundary that Phase A
   enforced survives a second user before declaring the bundle

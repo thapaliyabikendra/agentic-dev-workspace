@@ -184,10 +184,10 @@ Solo means QA hat ≠ skipped. Before marking this spec `implemented`:
 - [ ] Every FRS acceptance criterion traces to at least one TC via the
       TC's `**Traces to:**` line.
 - [ ] Every FLW scenario (happy / edge / fault) traces to at least one TC.
-- [ ] Playwright spec files generated under `tests/{test_dir}/<feature>/`
-      and run green (`npx playwright test`) for every use case with
-      resolved selectors. See
-      [`../workflow/implementation.md → Test suite codegen`](../workflow/implementation.md#test-suite-codegen).
+- [ ] Test spec files generated under `tests/{test_dir}/<feature>/`
+      and run green for every use case with resolved selectors. See
+      [`../workflow/test-runner-cookbook.md`](../workflow/test-runner-cookbook.md)
+      and [`../workflow/implementation.md → Test suite codegen`](../workflow/implementation.md#test-suite-codegen).
 - [ ] Every node in `new_nodes:` has had its canonical status flipped
       `proposed → active`, with a `status-change` log entry fired and the
       per-type index row re-synced.
