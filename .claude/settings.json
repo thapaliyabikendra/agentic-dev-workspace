@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(**/secrets/*)",
+      "Read(**/*credential*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "NotebookEdit",
+      "EnterWorktree",
+      "ExitWorktree",
+      "CronCreate",
+      "CronDelete",
+      "CronList",
+      "TeamCreate",
+      "TeamDelete"
+    ]
+  },
+  "disabledMcpjsonServers": [
+    "claude_ai_Canva",
+    "claude_ai_Gmail",
+    "claude_ai_Google_Calendar",
+    "claude_ai_Google_Drive",
+    "claude_ai_GitLab"
+  ],
+  "statusLine": {
+    "type": "command",
+    "command": "node .claude/hooks/statusline.js"
+  }
+}

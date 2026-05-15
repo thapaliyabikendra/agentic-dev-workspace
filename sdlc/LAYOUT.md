@@ -1,0 +1,312 @@
+# LAYOUT.md — Workspace layout
+
+This file is the **canonical folder map** for the workspace — where every
+artifact type lives, which folders are lazy, and what the component-vs-shared
+split looks like under `docs/`. Consulted whenever a new file's destination
+is in question or a new component is being scaffolded.
+
+## When to Use
+
+**Use when:** scaffolding a new component, moving an artifact between
+folders, deciding where a new artifact type lives, or auditing the
+filesystem before a maintenance op fires.
+
+**Do NOT use when:** drafting a per-phase artifact (load the relevant
+`workflow/*.md`), classifying a rule on the engine-vs-project axis (load
+[`BOUNDARY.md`](BOUNDARY.md)), or resolving an ID-collision conflict
+(load [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md)).
+
+**Vs. sibling files:** [`WORKFLOW.md`](WORKFLOW.md) describes the
+*pipeline*; this file describes the *filesystem*; [`BOUNDARY.md`](BOUNDARY.md)
+describes the *classification*. Same workspace, three different cross-sections.
+
+---
+
+Target filesystem structure for the planning workspace. Workflow
+scaffolding (`WORKFLOW.md`, `PRINCIPLES.md`, `LAYOUT.md`, `BOUNDARY.md`,
+`SETUP.md`, `workflow/`, `_templates/`) lives under `/sdlc/`; project
+knowledge (`home.md`, `discovery/`, `milestones/`, plus one folder per
+component declared in `docs/project.md § Components`) lives under `/docs/`.
+Most subfolders under `docs/` are created lazily as the first artifact
+of each kind lands. Component structure replaces the prior flat `docs/nodes/`
+and `docs/adrs/` trees — see `## Component structure (docs/)` below.
+
+Companion to [`WORKFLOW.md`](WORKFLOW.md) (which carries the phase
+flows, cross-cutting practices, and the single-tree DDD discipline with
+`status: proposed`/`active` in-flight signalling) and
+[`../docs/home.md`](../docs/home.md) (the derived index of every
+artifact). When in doubt about where a new file goes, check here first.
+
+```
+/                          ← workspace root
+  CLAUDE.md                ← session-loaded project memory
+  /sdlc                    workflow engine — team-agnostic scaffolding
+    WORKFLOW.md            ← workflow index + cross-cutting practices
+    PRINCIPLES.md          ← core principles + anti-patterns
+    LAYOUT.md              ← this file
+    BOUNDARY.md            ← engine vs. project boundary map
+    SETUP.md               ← onboarding a new project on the engine
+    /workflow              per-flow instructions + operation rule books
+      design.md            ← phases 0, 1, 1.5 (generate-frs, Validation/Query)
+      plan.md              ← phase 2 (generate-feat-spec, Ingest)
+      implementation.md    ← phase 3 (implement-feat, Merge + Code)
+                           plus rule books (frs-validation-rules.md,
+                           frs-code-extraction-rules.md,
+                           test-data-generation.md,
+                           action-to-playwright.md) and maintenance-op
+                           references (maintenance-discipline.md,
+                           baseline-references.md, authoring-adr.md,
+                           derived-reports.md, legacy-absorption.md,
+                           evolving-the-workflow.md, coverage-matrix.md, bug-fix.md)
+    /_templates            scaffolding for new artifacts and nodes
+                           includes INDEX.md and LOG.md for per-type pairs;
+                           16 node templates (ACTOR, ENTITY, COMMAND, QUERY,
+                           FLOW, STATE, DECISION, INTEGRATION + MODULE,
+                           SCREEN, CONTRACT, PERMISSION, CHANGE, SERVICE,
+                           FUNCTIONAL-AREA, EVENT — SERVICE/FUNCTIONAL-AREA opt-in
+                           for multi-service topologies; CONTRACT supersedes
+                           the prior ENDPOINT template 2026-05-14);
+                           plus OVERVIEW-BUSINESS.md and
+                           OVERVIEW-TECHNICAL.md for derived stakeholder
+                           reports
+  /docs                    project knowledge base
+    home.md              ← index of ADRs / FRSs / milestones / specs / nodes
+    glossary.md            ← project-owned domain vocabulary baseline
+    cross-cutting-concerns.md ← project-owned NFR baseline categories
+    /adrs                  architectural commitments (Karpathy-style wiki)
+      index.md             ← the one file generators wholesale-read
+      log.md               ← append-only chronological record of ADR events
+      ADR-NNN-*.md         ← individual pages, narrow-loaded
+    /discovery
+      open-questions.md    ← frozen legacy log (pre-2026-05-13 OQs)
+      /open-questions      ← per-OQ folder (new OQs land here)
+        index.md           ← OQ catalog (Karpathy-style)
+        log.md             ← OQ lifecycle log
+        OQ-NNN-*.md        ← individual OQ files
+    /milestones            milestone-as-container — everything for one milestone
+      /M-NN-<slug>
+        M-NN-<slug>.md     ← milestone portal doc
+        id-claims.md       ← per-milestone ID reservation ledger (lazy)
+        /discovery
+          milestone-scope.md   ← milestone-level (level: milestone)
+          FRS-NNN-*.md         ← per-FRS (level: frs), one per FRS
+        /frs
+          FRS-NNN-<slug>.md    ← one per user-journey
+        /specs
+          /FS-NNN-<slug>
+            FS-NNN.md
+            /nodes
+              /changes           ← CHG-NNN nodes, permanent milestone home
+                CHG-NNN-<slug>.md ← never promoted to canonical
+            /test-plans          ← TC files drafted at Phase 2 Test plan ingest
+              /<use-case>        ← display | add | edit | delete | toggle | view | ...
+                TC-NNN-<slug>.md ← stays milestone-scoped, not promoted
+    /nodes                 CANONICAL DDD wiki — Phase 2 ingest writes new nodes
+                           here (status: proposed); Phase 3 merge flips them to
+                           active and applies CHG deltas to existing targets
+      /actors              ACT-NNN-*.md  + index.md + log.md
+      /entities            ENT-NNN-*.md  + index.md + log.md
+      /commands            CMD-NNN-*.md  + index.md + log.md
+      /queries             QRY-NNN-*.md  + index.md + log.md   (lazy)
+      /flows               FLW-NNN-*.md  + index.md + log.md
+      /states              STA-NNN-*.md  + index.md + log.md
+      /decisions           DEC-NNN-*.md  + index.md + log.md
+      /integrations        INT-NNN-*.md  + index.md + log.md
+      /modules             MOD-NNN-*.md  + index.md + log.md   (lazy)
+      /screens             SCR-NNN-*.md  + index.md + log.md   (lazy)
+      /contracts           CON-NNN-*.md  + index.md + log.md   (lazy)
+                           (renamed from /endpoints 2026-05-14; carries
+                           HTTP / events / queues / gRPC contracts —
+                           discriminated by frontmatter protocol:)
+      /permissions         PERM-NNN-*.md + index.md + log.md   (lazy)
+      /services            SVC-NNN-*.md  + index.md + log.md   (lazy;
+                           multi-service projects only — one per
+                           deployable unit)
+      /functional-areas    FA-NNN-*.md   + index.md + log.md   (lazy;
+                           cross-MOD product slices)
+      /events              EVT-NNN-*.md  + index.md + log.md   (lazy;
+                           async/distributed events — Kafka + RabbitMQ;
+                           linked_contract: CON-NNN required)
+                           (no /changes — CHG nodes live in milestone folder)
+    /research              external / competitive research (lazy)
+                           RESEARCH-NNN-*.md + index.md + log.md;
+                           cited by future ADRs and FRSs by ID.
+                           Not DDD content — parallel canonical tree
+                           to /nodes. Template:
+                           sdlc/_templates/RESEARCH.md
+    /overview              derived reports (lazy)
+                           BUSINESS.md + TECHNICAL.md ship as the
+                           first two report types; new types follow
+                           the same template + regeneration contract.
+                           Regenerated on demand from the wiki — see
+                           sdlc/workflow/derived-reports.md
+    /compliance            project-owned compliance artifacts (lazy)
+    /requirements          project-owned upstream requirements (lazy)
+  /tests                   Playwright suite (lazy — bootstrapped by
+                           first FS to reach Phase 3 Stage 3).
+                           playwright.config.ts at the root;
+                           {test_dir}/<feature>/<use-case>.spec.ts
+                           generated by Phase 3 Test suite codegen
+                           from the FS-staged TC files.
+```
+
+## Component structure (docs/)
+
+A **component** is a named grouping of KB artifacts corresponding to one independently
+deployable unit. Every project declares its components in `docs/<component-slug>/COMPONENT.md`.
+
+Component types:
+- **standalone** — a single deployable unit; owns its own `adrs/` + `nodes/` sub-tree
+- **shared** — cross-component concerns (glossary, cross-cutting, tech-stack);
+  `shared/adrs/` holds only ADRs that span ≥2 components
+
+Projects with a single deployable component may omit the component layer and keep the
+flat `docs/nodes/` structure (engine-recommended — see [`BOUNDARY.md`](BOUNDARY.md)).
+
+**Component structure docs/ folder map:**
+
+```
+docs/
+  home.md                    ← derived project catalog (cross-component)
+  milestones/                  ← project-level planning
+  discovery/                   ← project-level open questions
+  shared/                      ← shared component
+    COMPONENT.md
+    adrs/                      ← only ADRs spanning ≥2 components; starts empty
+    glossary.md
+    cross-cutting-concerns.md
+    tech-stack.md
+    overview/                  ← derived architecture reports
+  <component-slug>/            ← standalone component
+    COMPONENT.md               ← declares id_prefix
+    adrs/                      ← ADRs whose decisions constrain only this component
+    nodes/
+      <type>/
+        index.md               ← per-type index (component-scoped)
+        log.md                 ← per-type log (component-scoped)
+        {PREFIX}-{TYPE}-{NNN}-<slug>.md  ← canonical node files (prefixed IDs)
+```
+
+**COMPONENT.md frontmatter:**
+
+```yaml
+id: <COMPONENT_SLUG>
+title: <Human title>
+type: standalone | shared
+id_prefix: <PREFIX>          # 2-4 uppercase chars; required for standalone
+description: <one line>
+depends_on: []               # other component slugs this component references
+created: YYYY-MM-DD
+```
+
+**ADR discriminator (component vs shared):**
+- Component ADR: decision constrains nodes within ONE component only
+- Shared ADR: decision constrains interfaces or conventions visible to ≥2 components
+
+Node ID uniqueness is global. `docs/home.md` is the cross-component ID
+high-water-mark reference (regenerated on demand from all component indexes).
+
+**Standalone component ID prefix convention.** Every standalone component declares
+a 2–4 character uppercase prefix code in its `COMPONENT.md` (`id_prefix: FDE`).
+All canonical DDD nodes created within that component are named `{PREFIX}-{TYPE}-{NNN}`
+starting at 001. The prefix is global — no two components in the same workspace share
+a prefix. The `shared/` component and any brownfield-imported legacy component (e.g.,
+`app`) are exempt: they retain their original type-only IDs for backward compatibility.
+New components created from scratch must always use prefixed IDs.
+
+Template: [`_templates/COMPONENT.md`](_templates/COMPONENT.md).
+Bootstrap procedure: [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md).
+
+**Component inventory (this project):** see [`docs/project.md § Components`](../docs/project.md#components).
+The table there carries component slugs, types, ID prefixes, titles, and ADR ranges —
+the single source of truth for anything downstream that needs to reference concrete component paths.
+
+---
+
+## Multi-Repo Strategy
+
+Projects that separate planning, API, and UI into independent git repositories
+follow this layout. Each subdirectory is its own `.git` root with its own remote.
+`project.md` lives only in `docs/` (the planning workspace's knowledge base).
+
+### Directory layout
+
+```
+<workspace-root>/               ← planning workspace (this repo)
+<workspace-root>/docs/          ← docs/wiki repo
+<workspace-root>/api/           ← API repo (.NET/ABP or equivalent)
+<workspace-root>/ui/            ← frontend repo
+```
+
+Each subdirectory has its own `.git`, remote, and CI pipeline.
+
+### Repo registry
+
+The authoritative registry lives in `docs/project.md § Repo layout`. The table
+there maps concern → local path → remote URL. Template row:
+
+| Concern | Local path | Remote |
+|---|---|---|
+| Planning / DDD knowledge base | `<workspace-root>/` | `github.com/<org>/<workspace-repo>` |
+| Docs / Wiki | `<workspace-root>/docs/` | `github.com/<org>/<docs-repo>` |
+| API | `<workspace-root>/api/` | `github.com/<org>/<api-repo>` |
+| UI | `<workspace-root>/ui/` | `github.com/<org>/<ui-repo>` |
+
+Add or remove rows to match the project's actual repo count.
+
+### Commit rule
+
+> Confirm the working directory is the **target repo** before every commit.
+> Never commit child-repo changes from within the workspace root.
+
+Each child directory has its own `.git`; git will not traverse upward past a
+`.git` boundary, but accidental `git add` from the wrong directory can stage
+unintended files. Verify with `git status` before staging.
+
+### Verification checklist
+
+Run once after initial repository setup:
+
+- [ ] `git status` in each repo is clean after the initial commit
+- [ ] `git remote -v` shows a distinct URL per repo
+- [ ] A test commit in a child repo does **not** appear in
+      `<workspace-root>/` git log
+- [ ] Sessions opened in each subdirectory load **only** that repo's
+      `CLAUDE.md` (if present); `project.md` is only in `docs/`
+
+---
+
+## Deprecated layout
+
+Top-level `docs/frs/`, `docs/specs/`, and per-feature
+`docs/discovery/<scope>.md` no longer exist — everything moves under
+`docs/milestones/M-NN-<slug>/`. At the root discovery path two artifacts
+remain: `docs/discovery/open-questions.md` (frozen pre-2026-05-13 legacy
+log) and `docs/discovery/open-questions/` (per-OQ folder, authoritative
+for new OQ-NNN files).
+
+---
+
+## Integration
+
+- **Required before:** [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules)
+  — the hard rules govern where artifacts land and which lifecycle
+  events fire when they do.
+- **Sibling references:**
+  - [`WORKFLOW.md`](WORKFLOW.md) — the phase pipeline; this file's
+    folder destinations are where phase outputs land.
+  - [`BOUNDARY.md`](BOUNDARY.md) — engine-vs-project axis; component
+    structure decisions cite the `Component structure` classification
+    there.
+- **Routes to (when scaffolding a new component):**
+  [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md)
+  — the procedure that creates a component folder per the
+  `## Component structure (docs/)` map above.
+- **Cited by:**
+  - [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md)
+    — per-type `index.md` / `log.md` paths under
+    `docs/<component>/nodes/<type>/` come from here.
+  - [`workflow/plan.md`](workflow/plan.md) — Phase 2 node ingest
+    target paths under `docs/<component>/nodes/<type>/`.
+  - [`workflow/implementation.md`](workflow/implementation.md) —
+    Phase 3 reads canonical from these paths.

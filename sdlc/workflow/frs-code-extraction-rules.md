@@ -1,0 +1,259 @@
+# FRS Code Extraction Rules
+
+> **Type:** Workflow reference. Consulted at Phase 0 / Phase 1 when the
+> milestone scope starts from the existing application's source code
+> (the brownfield path). See [`design.md`](design.md) for phase
+> mechanics; this file is the rule book it consults. Codifies the
+> signal-to-FRS mapping, logical source names, code → business
+> translation discipline, one-hop import traversal, and the
+> `[inferred from code]` tagging rule that the Phase 1.5 validation
+> gate enforces downstream.
+
+## When to Use
+
+**Use when:** the milestone scope explicitly cites existing application
+source code as input (brownfield path), an FRS candidate is being
+seeded from a `*.tsx` / `*.ts` / `*.cs` source rather than from prose,
+or a mixed-source extraction encounters a conflict between prose and
+code that needs a tagging decision.
+
+**Do NOT use when:** the FRS source is prose-only (skip the signal
+table; the `[inferred from code]` tag does not apply), the artifact is
+already past Phase 1 (the gate at Phase 1.5 enforces the tag — see
+[`frs-validation-rules.md`](frs-validation-rules.md)), or the extraction
+is happening at Phase 2 or later (Phase 2 ingests pre-tagged FRS rows;
+it does not re-derive them from code).
+
+**Vs. sibling files:** [`frs-validation-rules.md`](frs-validation-rules.md)
+classifies a tagged item's severity at the Phase 1.5 gate; this file
+governs how the tag gets attached in the first place. The two operate
+at adjacent points in the same brownfield path: extract → tag (here),
+then gate → classify (there).
+
+How to mine the existing application's source code for FRS candidates
+without leaking implementation detail into the FRS itself.
+
+> **Worked example below.** The signal table and the `Module.Area.Name`
+> derivations are written against a React / TypeScript frontend because
+> that is this project's stack. The *conventions* are stack-agnostic —
+> adapt the signal categories (form / mutation / validator / role check /
+> route) to the primitives of your frontend (or backend) stack.
+
+The principle: **code reveals structure, prose reveals intent.** Extract
+structure aggressively, but flag every business rule, edge path, fault
+path, actor, or precondition you infer from code alone with
+`[inferred from code — confirm with stakeholder]`. The Phase 1.5
+validation gate enforces the tag — see
+[`frs-validation-rules.md → [inferred from code] propagation`](frs-validation-rules.md#inferred-from-code-propagation-brownfield).
+
+---
+
+## Signal-to-FRS mapping
+
+For each code source, walk these signals top-to-bottom. A single file may
+produce multiple FRS candidates (multiple user-journeys). Target columns
+refer to the project's FRS template
+([`../_templates/FRS.md`](../_templates/FRS.md)) and the canonical DDD
+wiki at [`../nodes/`](../nodes/) (where Phase 2 writes new nodes with
+`status: proposed` and Phase 3 flips them to `active`).
+
+| Signal in code | Lands in |
+|---|---|
+| `<form>` + `onSubmit` handler | One FRS candidate (one user-journey → Use case + Behavior). |
+| `<input>`, `<select>`, `<textarea>` inside a form | Form fields go into a canonical Entity (ENT) or Flow (FLW) node (existing, or new with `status: proposed` at Phase 2 ingest), not into the FRS body directly. The FRS Behavior references the node ID. |
+| Prop types / TypeScript interfaces on form | Strengthen the data shape of the canonical ENT — translate to business language; never leak `string`, `boolean`, etc., to the FRS or the node body. |
+| Non-form `<button onClick={...}>` triggering async work | Candidate operation. Use case + Behavior. |
+| `fetch` / `axios` / `useMutation` / `useQuery` / `trpc.xxx.mutate` | System boundary; the FRS Behavior names the fault path (network failure, auth failure); the FLW node carries the `fault` scenario in its Test plan view. |
+| Validation schemas (zod, yup, joi, class-validator) | Business rules in FRS Behavior or in the canonical ENT, tagged `[inferred from code]`. |
+| Inline `if` / `throw` / `return error` in submit paths | Fault paths in FRS Behavior; tagged `[inferred from code]`. |
+| Error UI (`<ErrorMessage>`, `setError`, try/catch) | Fault paths in FRS Behavior. |
+| Role / permission checks (`hasRole`, `user.isAdmin`, `Can` components) | Actors + Preconditions in the FRS, with the actor ID resolving to an ACT-NNN node (existing canonical, or new canonical with `status: proposed` at Phase 2 ingest). Tagged `[inferred from code]`. |
+| Route definitions (`<Route path>`, file-based routing) | Module-grouping hint — informs whether a milestone needs splitting (see [`design.md → Phase 0 Scope check`](design.md#before-any-questions)). |
+| Loading / pending / submitting state | Hints at the trigger → postcondition path; lands in Behavior. |
+| Notification calls (`toast`, `notify`, queue dispatchers) | Behavior — the FRS describes the actor outcome ("the actor is informed of the outcome"); the FLW node carries the notification mechanics. |
+| Guard clauses with literal-value checks (early return on null, edge values) | Edge paths in Behavior; tagged `[inferred from code]`. |
+
+**Output of extraction per candidate:** Use case title; source location
+(file path + logical name — see below); pre-populated Behavior items
+(each tagged `[inferred from code]`); inferred actor list; pre-populated
+`touches_nodes` claim when existing canonical nodes match the domain
+(check `docs/<component>/nodes/*/index.md`); pre-populated `produces_nodes` claim for
+nodes the candidate will introduce at Phase 2 Ingest. **Tag every claim
+that came from code — no exceptions.**
+
+## Anti-Pattern: "The Code-First FRS"
+
+Reading a `*.tsx` source aggressively, producing a polished FRS draft
+from it (Use case + Actors + Behavior + AC all populated), and then
+**stripping or omitting the `[inferred from code — confirm with
+stakeholder]` tag** on the populated items because the draft "reads
+well as-is" or because the human author can vouch for the intent. The
+cost: the Phase 1.5 gate has no signal to fire on (no tag → no `OQ`
+trigger), the FRS enters Phase 2 with code-inferred business rules
+masquerading as stakeholder-confirmed ones, and the brownfield
+"surface, never absorb" rule is silently violated at extraction time.
+**Tagging is unconditional; if it came from code alone, the tag goes
+on, full stop.** The tag is stripped only after the corresponding OQ
+resolves to Confirm or Revise — never at extraction. Doctrinal anchor:
+[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — every
+artifact has an ID and links upstream + downstream; un-tagged
+code-inferred items break the upstream link to stakeholder intent.
+
+---
+
+## Logical source names
+
+In addition to the file path, emit a **logical name** for each source —
+a stable, refactor-resilient identifier composed as
+`<Module>.<Area>.<Name>`:
+
+- `Admin.Settings.Update`
+- `Admin.Settings.Store`
+- `Onboarding.Checklist.Verify`
+
+The logical name is independent of the file's path on disk; renaming or
+moving the file does not break traceability. Both the file path and the
+logical name go into the canonical node's `source_ref` frontmatter
+(the node is canonical from Phase 2 ingest onward):
+
+```yaml
+source_ref:
+  - path: modules/admin/settings/UpdateSettings.tsx
+    logical: Admin.Settings.Update
+  - path: modules/admin/settings/settingsStore.ts
+    logical: Admin.Settings.Store
+```
+
+**How to derive a logical name:**
+
+- `<Module>` — project-level module the file participates in (typically
+  the directory name two levels up, normalised to PascalCase:
+  `admin/settings` → `Admin.Settings`).
+- `<Area>` — functional grouping within the module (typically the
+  immediate parent directory or the file's purpose category:
+  `Settings`, `Checklist`, `Store`).
+- `<Name>` — the operation, store, or component name (typically the
+  default export or principal component name without the file
+  extension).
+
+When the directory structure doesn't cleanly yield the components, use a
+best-effort PascalCase composition and surface the choice in the FRS's
+Brownfield impact section so a reviewer can sanity-check.
+
+---
+
+## Translation discipline (code → business language)
+
+The extraction output should already be one translation step away from
+business language:
+
+| Code surface | Drop in extraction output |
+|---|---|
+| Type names (`string`, `number`, `Date`) | "free text", "numeric", "date" — or omit |
+| Validator names (`.email()`, `.min(3)`, `regex(...)`) | "must be a valid email", "must contain at least 3 characters" |
+| Field names (`firstName`, `dob`) | Title case with spaces: "First Name", "Date of Birth" |
+| Component names (`<UserForm>`, `<AdminPanel>`) | Operation name: "User Registration", "Admin Configuration" |
+| Endpoint paths (`/api/v1/users`) | Drop entirely — they belong in the feature spec or tech spec, not the FRS |
+| Error codes (`ERR_AUTH_FAILED`, HTTP status codes) | Exception name: "Unauthorised Access", "Operation Could Not Complete" |
+
+If you cannot translate a piece of code into business language, leave the
+question in the candidate's per-FRS discovery.
+
+---
+
+## One-hop import traversal
+
+When a code source imports another **local file** (relative path like
+`./checklist-store`, `../hooks/useFoo`, not a third-party package like
+`react` or `@tanstack/query`), read the imported file and apply the
+signal table to it as well.
+
+- **Cap depth at 1.** Do not recurse into files imported by the imported
+  file.
+- **Skip third-party imports** (anything from `node_modules`, anything
+  starting with `@scope/` or a bare package name like `react`, `lodash`,
+  `@tanstack/react-query`).
+- **Skip type-only imports** when they're trivially aliases
+  (`import type { Foo } from './types'` where `types.ts` is just type
+  aliases). Read them only if they contain validation schemas or
+  value-bearing constants.
+
+Every traversed file contributes to the canonical node's `source_ref`
+(each with file path and logical name).
+
+---
+
+## Mixed-source reconciliation
+
+When both code and prose are provided (the typical brownfield case):
+
+- **Code → structure**: form fields, fault paths, the operation
+  manifest, actor inference from role checks.
+- **Prose → intent**: Use case, why-it-matters, policy rules that drive
+  business behaviour, actors named explicitly by stakeholder.
+- **Conflicts** (e.g., prose says "only managers can submit" but code
+  has no role check, or code branches on a condition prose never
+  mentions): raise an `OQ-NNN` under `docs/discovery/open-questions/`
+  with `origin: frs-authoring, origin_ref: FRS-NNN` (cited from the
+  per-FRS discovery); **do NOT silently choose one source.** This is
+  the project's "Brownfield conflicts are surfaced, not absorbed"
+  hard rule applied at extraction time.
+
+Prose-only or code-only inputs each have their own gaps. Mixed sources
+usually produce the strongest FRS — but only when conflicts are surfaced
+rather than smoothed over.
+
+---
+
+## Code-only caveat
+
+When code is the sole source (no prose, no meeting notes, no brief), be
+**aggressive about surfacing open questions.** Code reveals structure
+(what operations exist, what fields they take) but rarely intent (why,
+policy, edge-case handling).
+
+Every business-level item inferred from code alone is tagged
+`[inferred from code — confirm with stakeholder]` and raised as an
+`OQ-NNN` under `docs/discovery/open-questions/` with
+`origin: frs-authoring, origin_ref: FRS-NNN`. The tag is stripped only
+after stakeholder confirmation — see
+[`frs-validation-rules.md → [inferred from code] propagation`](frs-validation-rules.md#inferred-from-code-propagation-brownfield).
+
+---
+
+## Revision history
+
+| Version | Date | Source |
+|---------|------|--------|
+| 1.0 | 2026-05-11 | Absorbed from the shared FRS code-extraction reference (v3.0) during workflow absorption, remapped to the project's 8-section FRS template and `source_ref` frontmatter convention. Subagent dispatch contract, `source_manifest` payload shape, "frs-template.md Canonical Section List" hardcode, and runbook phase references dropped — the project is solo-dev filesystem-based with a different orchestration shape. Signal mapping, logical source names, translation discipline, one-hop traversal, mixed-source reconciliation, and code-only caveat retained. |
+
+---
+
+## Integration
+
+- **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
+  — "Existing nodes are authoritative" and "Reference, never copy"
+  govern the `touches_nodes` / `produces_nodes` claims this file
+  pre-populates.
+- **Required before:** [`../WORKFLOW.md → Legacy absorption`](../WORKFLOW.md#legacy-absorption)
+  — "Surface conflicts, never absorb" is the doctrinal anchor of the
+  mixed-source reconciliation rule.
+- **Caller:** [`design.md → Phase 1`](design.md#phase-1--frs-authoring)
+  (and Phase 0 scoping when source code is the milestone-scoping
+  signal) — fires this rule book when an FRS candidate is being
+  derived from source.
+- **Adjacent (not callers but consulted):**
+  [`frs-validation-rules.md`](frs-validation-rules.md) — enforces the
+  `[inferred from code]` tag at the Phase 1.5 gate;
+  [`legacy-absorption.md`](legacy-absorption.md) — when the source is
+  documented legacy material rather than live code, route there
+  instead.
+- **Routes findings to:** OQ-NNN files under
+  [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+  with `origin: frs-authoring` when stakeholder confirmation is owed
+  for a code-inferred item.
+- **Sibling rule books:**
+  [`frs-validation-rules.md`](frs-validation-rules.md),
+  [`coverage-matrix.md`](coverage-matrix.md),
+  [`test-data-generation.md`](test-data-generation.md),
+  [`lint.md`](lint.md).

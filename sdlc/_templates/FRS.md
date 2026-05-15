@@ -1,0 +1,139 @@
+---
+id: FRS-NNN
+title: <One-sentence user-journey, imperative voice>
+status: draft                 # draft | reviewed | approved | implemented
+milestone: M-NN               # filled at Phase 0 — milestone is authored first
+discovery: ../discovery/FRS-NNN-<slug>.md
+touches_nodes: []             # canonical DDD node IDs this FRS modifies or extends; modifications captured by the FS's CHG and applied at Phase 3
+produces_nodes: []            # new DDD node IDs this FRS introduces; written directly to canonical at Phase 2 with status: proposed; flipped to active at Phase 3 merge
+adrs: []                      # ADR IDs consulted while drafting (carried from Discovery + dialog)
+related_frs: []
+resolves: []                  # OQ-NNN IDs this FRS closes (most often the OQs the FRS itself surfaced earlier, or pre-existing OQs the FRS finally answers); reciprocal — each OQ's `resolved_by:` cites this FRS
+created: YYYY-MM-DD
+---
+
+# FRS-NNN: <Title>
+
+## Use case
+
+One paragraph. What does the actor want to accomplish, and why? This FRS
+must describe **exactly one user-journey** — one externally observable
+behavior the actor can complete end-to-end. CRUD-level decomposition is too
+fine; "the whole onboarding experience" is too coarse.
+
+## Actors
+
+- ACT-NNN — <role> (if canonical); or "new actor, will be introduced as
+  ACT-NNN in canonical at Phase 2 with status: proposed"
+
+## Preconditions
+
+- …
+
+## Behavior
+
+Describe the user-journey behaviorally. Reference existing canonical nodes
+where they apply (ENT-NNN, CMD-NNN, FLW-NNN). Detailed behavior belongs in
+the canonical nodes themselves (existing nodes, or new nodes written
+directly to canonical at Phase 2 with `status: proposed` for the IDs in
+`produces_nodes`), not duplicated here.
+
+## Acceptance criteria
+
+Observable, testable. Each must map to a Flow scenario (happy / edge / fault)
+in the relevant FLW node — either an existing canonical FLW, or a new FLW
+written to canonical at Phase 2 with `status: proposed`.
+
+- [ ] …
+- [ ] …
+
+## Test plan view
+
+A view onto the Flow nodes' scenarios — **never restate them here.** List
+each Flow this FRS produces or touches, the IDs of the three scenarios
+that cover it, and (after Phase 2 Test plan ingest) the TC IDs that
+verify each scenario.
+
+The TC ID columns are filled at Phase 2 by
+[`../workflow/plan.md → Test plan ingest`](../workflow/plan.md#test-plan-ingest-after-fs-validation);
+the spec files are generated at Phase 3 by
+[`../workflow/implementation.md → Test suite codegen`](../workflow/implementation.md#test-suite-codegen).
+Both operations consume FLW scenario anchors via the TC's `Traces to:`
+line — that is the source-of-truth link between this FRS, the FLW node
+scenarios, and the TC files. FLW nodes remain the behavioral spec; TCs
+are the executable interpretation.
+
+| Flow | Happy | Edge | Fault | Happy TCs | Edge TCs | Fault TCs |
+| ---- | ----- | ---- | ----- | --------- | -------- | --------- |
+| FLW-NNN | FLW-NNN#happy | FLW-NNN#edge | FLW-NNN#fault |  |  |  |
+
+**TC columns are filled at Phase 2, not Phase 1.** At Phase 1 authoring
+time the TC columns are empty placeholders; the test plan ingest writes
+them after the FS validation loop passes. Existing FRSs authored before
+this template change are not retrofitted — the columns simply stay
+empty on those.
+
+**Coverage gate fires at Phase 2 exit, not Phase 1 exit.** At Phase 1
+authoring time, FLW IDs for `produces_nodes` are *claims* — the node
+doesn't exist yet; it will be written to canonical at Phase 2 Ingest with
+`status: proposed`. The Phase 1.5 QA-hat check is forward-looking: "can
+each scenario be expressed as a testable assertion?", not "is it written
+down?" The actual existence check — that every cell points to a real
+`FLW-NNN#happy`/`#edge`/`#fault` anchor — runs against the proposed
+canonical FLW node at Phase 2 exit (when it has been ingested), and again
+after Phase 3 merge flips it to `active`.
+
+For `touches_nodes` references that point at existing canonical FLWs, the
+anchors already exist — check them now. For `produces_nodes` claims, fill
+the IDs intentionally; the canonical node (status: proposed) will have to
+match at Phase 2.
+
+## Brownfield impact
+
+Drafting-time, author-noticed conflicts. Filled during Phase 1 as you write
+the FRS.
+
+- Modifies: ENT-NNN, FLW-NNN
+- Conflicts with existing nodes (must resolve before approval): cite
+  the raised `OQ-NNN` for each (`origin: frs-authoring,
+  origin_ref: this FRS`). Do not restate the conflict here; the OQ
+  file carries the full body.
+- Conflicts with existing ADRs (must resolve before approval): cite the
+  raised `OQ-NNN` for each. Each conflict either updates the ADR (via
+  the supersession procedure) or the FRS is reshaped to honor the ADR.
+  Silent absorption is not an option.
+- Counterexamples in existing code (existing implementations that contradict
+  the assumed pattern). Address them — explain why they're outliers, or
+  weaken the assumption. Do not absorb silently.
+- New ADRs produced by this FRS (if the dialog surfaced an architectural
+  choice): ADR-NNN (`frs_origin: this FRS`).
+- Open Questions raised by this FRS: list `OQ-NNN` IDs. The OQ files live
+  under `docs/discovery/open-questions/` (template:
+  [`../_templates/OPEN-QUESTION.md`](OPEN-QUESTION.md)). Each carries
+  `origin: frs-authoring` and `origin_ref: <this FRS ID>`.
+- Deviations from a [`cross-cutting-concerns.md`](../cross-cutting-concerns.md)
+  baseline category: if this FRS deviates from a baseline (stricter
+  retention, different audit shape, custom session policy), file the
+  deviation as an ADR and list the ADR ID here. Do not absorb deviations
+  as paragraphs in the FRS body — the baseline is the source of truth;
+  ADRs capture operation-specific overrides.
+
+## Validation findings
+
+Filled at Phase 1.5 (Validation Gate). Empty table is allowed if every
+check fired clean. See [`../workflow/design.md → Phase 1.5`](../workflow/design.md#phase-15--validation-gate)
+for the per-FRS and cross-FRS checks that populate this section.
+
+| Finding | Type | Resolution | Rationale |
+| ------- | ---- | ---------- | --------- |
+|         | existence \| sanity \| adr-conflict \| cross-frs | resolved \| deferred |  |
+
+Each unresolved (`resolution: deferred`) finding cites the raised
+`OQ-NNN` in its Rationale column. The OQ file under
+`docs/discovery/open-questions/` carries the full body with
+`origin: validation-gate, origin_ref: <this FRS>`. The finding text is
+not duplicated into the OQ; reference by ID.
+
+## Out of scope
+
+- …

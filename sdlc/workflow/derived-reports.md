@@ -1,0 +1,177 @@
+# Derived reports
+
+> On-demand regeneration operation for curated wiki-derived views
+> under `docs/overview/`. Each report has a stable name, a template
+> declaring its `Pulls from:` source list, and a regeneration prompt.
+> Reports are **build artifacts** — never hand-edited, never
+> participating in tiered touch. Sibling to [`lint.md`](lint.md)
+> (drift detection) and [`regenerate-roadmap.md`](regenerate-roadmap.md)
+> (roadmap-specific regen procedure).
+
+## When to Use
+
+**Use when:** a stakeholder review is approaching and a fresh
+audience-appropriate overview is needed, the wiki has changed
+materially since the last regen and a refreshed snapshot is owed, or
+a new report type is being defined (see
+[Defining a new report type](#defining-a-new-report-type) below).
+
+**Do NOT use when:** a report misstates a fact (fix the source —
+nodes, ADRs, FRSs — and regenerate; never patch the report itself),
+the artifact needing regen is `docs/overview/ROADMAP.md` (use the
+specialised procedure in [`regenerate-roadmap.md`](regenerate-roadmap.md)
+instead — it covers the five Stuck classes this rule book does not),
+the work is a canonical-node edit (use
+[`maintenance-discipline.md`](maintenance-discipline.md)), or the
+work is drift detection (use [`lint.md`](lint.md)).
+
+**Vs. sibling files:** [`lint.md`](lint.md) is the *detection*
+counterpart to this *regeneration* operation;
+[`regenerate-roadmap.md`](regenerate-roadmap.md) is the specialised
+sibling for the ROADMAP report (covers the five Stuck classes plus
+its own template). [`maintenance-discipline.md`](maintenance-discipline.md)
+governs canonical-node edits — this file explicitly does NOT apply to
+canonical content, only to derived views.
+
+Curated wiki-derived views live (lazily) under `docs/overview/`. Each
+report has a **stable name**, a **template** that declares its `Pulls
+from:` source list, and a **regeneration prompt**. The wiki — nodes,
+ADRs, FRSs, milestones, discoveries — is the source of truth; the
+report is a build artifact. If a report misstates a fact, fix the
+source and regenerate; never patch the report.
+Reference-never-copy applies one step up: link by ID, no paraphrased
+node bodies.
+
+The shipped report types:
+
+- [`BUSINESS.md`](../overview/BUSINESS.md) — for product / business
+  stakeholders. What's being built, for whom, in what order, why.
+  Template: [`_templates/OVERVIEW-BUSINESS.md`](../_templates/OVERVIEW-BUSINESS.md).
+- [`TECHNICAL.md`](../overview/TECHNICAL.md) — for engineering /
+  architecture stakeholders. Architecture commitments, module map,
+  integrations, contract surface, authorization. Template:
+  [`_templates/OVERVIEW-TECHNICAL.md`](../_templates/OVERVIEW-TECHNICAL.md).
+- [`ROADMAP.md`](../overview/ROADMAP.md) — for planning. Milestones in
+  flight, FRSs / FSs in flight, shipped, and the five **stuck-signal**
+  classes (stale FRSs, stale OQs, stalled milestones, stuck CHGs,
+  blocked-by-OQ artifacts). Template:
+  [`_templates/OVERVIEW-ROADMAP.md`](../_templates/OVERVIEW-ROADMAP.md).
+  Detailed procedure: [`regenerate-roadmap.md`](regenerate-roadmap.md).
+  Helper: [`../scripts/regenerate-roadmap.sh`](../scripts/regenerate-roadmap.sh).
+
+Additional report types follow the same contract — see
+[Defining a new report type](#defining-a-new-report-type) below.
+
+**Regenerate on demand only.** No tiered touch, no Phase-3 hook, no
+automatic milestone-close trigger. The expected prompt is "regenerate
+the `<kind>` overview" (e.g., "regenerate the business overview").
+Every report carries `generated_at:` and `source_commit:` frontmatter
+so readers see the snapshot date and underlying wiki state.
+
+## Procedure on regenerate
+
+1. Copy the audience-appropriate template from `_templates/` (e.g.,
+   [`OVERVIEW-BUSINESS.md`](../_templates/OVERVIEW-BUSINESS.md),
+   [`OVERVIEW-TECHNICAL.md`](../_templates/OVERVIEW-TECHNICAL.md), or a
+   `REPORT-<KIND>.md` template for newer report types).
+2. Walk the template's "Pulls from" list. Read the Karpathy indexes
+   first (`docs/<component>/adrs/index.md`, per-type node `index.md`,
+   master [`home.md`](../home.md)); narrow-load only the source pages
+   whose summaries match the section being filled. Same retrieval
+   discipline as Phase 2 / Phase 3 — see
+   [`../WORKFLOW.md → Retrieval discipline`](../WORKFLOW.md#retrieval-discipline).
+3. Fill each section with one-line summaries that **link by ID**. Drop
+   any section whose source rows are empty rather than leaving a
+   `_none yet_` placeholder for a populated wiki.
+4. Update `generated_at:` and `source_commit:` at the top.
+5. Overwrite `docs/overview/<KIND>.md`. This is a derived report, not a
+   log — no append-only history kept.
+
+**No `index.md` / `log.md` pair for `docs/overview/`.** Reports are
+derived; the canonical per-type indexes they read from already carry
+the wiki-side history. The tiered touch rule in
+[`maintenance-discipline.md`](maintenance-discipline.md) applies to
+canonical content only.
+
+## Anti-Pattern: "The Report Patch"
+
+A derived report misstates a fact (a node summary in BUSINESS.md is
+out of date, a TECHNICAL.md module count is off, a ROADMAP.md row
+mis-labels a milestone status), the operator opens `docs/overview/`
+directly, edits the rendered file in place, and commits the patch.
+The temptation: the source fix is "involved" (touch the node, update
+its `index.md` row, append `log.md`); the report fix is one line.
+The cost: the report drifts from its source-of-truth wiki, the
+generator's `Pulls from:` contract becomes a lie, the next
+regeneration **silently reverts** the patch (because the source still
+says the wrong thing) and the operator blames the generator. **Fix
+the source, then regenerate.** A report patch is a maintenance
+shortcut that destroys the derived-vs-canonical boundary the report
+machinery depends on. Doctrinal anchor:
+[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
+"Reference, never copy"; a derived report that has been hand-edited
+is no longer a reference — it has become an independent (and stale)
+copy of wiki content.
+
+## Defining a new report type
+
+Coin a new report type when a stakeholder audience needs a curated
+wiki-derived view that the existing BUSINESS / TECHNICAL templates
+don't carry. Discriminator:
+
+- The audience is distinct (not already served by BUSINESS or TECHNICAL).
+- The view crosses multiple node types and/or ADRs — a single
+  per-type `index.md` doesn't suffice.
+- The content is fully derivable from existing wiki frontmatter,
+  bodies, and indexes — no hand-curation needed at gen-time.
+
+If derivation requires the human to fill gaps from memory, the wiki is
+the gap. Fix the wiki first (add the missing nodes, ADRs, or
+frontmatter), then add the report type.
+
+**Procedure:**
+
+1. Add a template at `_templates/REPORT-<KIND>.md` (or
+   `OVERVIEW-<KIND>.md` for stakeholder overviews — keep the naming
+   precedent set by BUSINESS / TECHNICAL).
+2. The template's first section is `Pulls from:` — a YAML list naming
+   the source `index.md` files, frontmatter fields, and any ADR ID
+   ranges the generator must consult. This is the contract; the
+   generator reads only what `Pulls from:` declares.
+3. Define the regeneration prompt verb: "regenerate the `<kind>`
+   overview." Stable across runs.
+4. The rendered output lands at `docs/overview/<KIND>.md`. Build
+   artifact — never hand-edited, never tracked with an
+   `index.md`/`log.md` pair.
+
+Worked example — an ARCHITECTURE report queried from MOD + INT + ADR
+nodes is a valid third report type whenever architecture-level wiki
+coverage is dense enough to derive from. It is NOT the same as a
+hand-authored `docs/architecture.md` file at the docs root — that
+would be a silent legacy-to-canonical write (see
+[`../PRINCIPLES.md → Anti-patterns to refuse`](../PRINCIPLES.md)).
+
+---
+
+## Integration
+
+- **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
+  — "Reference, never copy" is the doctrinal anchor of the "fix the
+  source, regenerate the report" discipline.
+- **Required before:** [`../WORKFLOW.md → Retrieval discipline`](../WORKFLOW.md#retrieval-discipline)
+  — Karpathy-index-first reading order applies during regeneration.
+- **Required before:** [`maintenance-discipline.md`](maintenance-discipline.md)
+  — explicit boundary: tiered touch governs canonical content only;
+  derived reports are excluded.
+- **Reads:** per-type `index.md` files (APP, FDE, Shared);
+  per-component `adrs/index.md`; master `home.md`. Specific
+  `Pulls from:` lists live in each template under `_templates/`.
+- **Adjacent (not callers but consulted):**
+  [`regenerate-roadmap.md`](regenerate-roadmap.md) — specialised
+  regen for ROADMAP.md with the five Stuck classes;
+  [`lint.md`](lint.md) — drift detection that can surface
+  regen-worthy state.
+- **Sibling rule books:**
+  [`lint.md`](lint.md),
+  [`regenerate-roadmap.md`](regenerate-roadmap.md),
+  [`maintenance-discipline.md`](maintenance-discipline.md).
