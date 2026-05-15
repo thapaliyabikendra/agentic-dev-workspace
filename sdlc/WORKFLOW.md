@@ -88,6 +88,23 @@ hard rules; [`PRINCIPLES.md`](PRINCIPLES.md) carries the doctrinal *why*;
 this file carries the *what* and the *when* of the phase pipeline plus
 the cross-cutting practices every flow inherits.
 
+### Router vs. reader discipline
+
+`WORKFLOW.md` is an **index**, not content. When you need to know which
+flow file to load next, read only `## Phase flows` (the 7-row table). The
+body sections below it (`## The Process`, `## Maintenance discipline`, etc.)
+are on-demand reference — load a specific section only when that
+cross-cutting practice is the active question, not at phase entry as a
+matter of course.
+
+Concretely:
+- Phase entry → read `## Phase flows` table only → load the named flow file.
+- Cross-cutting question (e.g., "what is the retrieval discipline?") → load
+  the specific subsection of `## The Process` that answers it, or load the
+  canonical op file it points to.
+- Full WORKFLOW.md read: warranted only when proposing a new rule that may
+  live here vs. in a per-op file.
+
 ---
 
 ## Process Flow

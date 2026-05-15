@@ -141,6 +141,29 @@ contract — distinct from the Layer 1 subagent return shape above). See
 [`sdlc/workflow/agent-contracts.md`](sdlc/workflow/agent-contracts.md) for the
 marker table and syntax rules.
 
+## Advisor call gate
+
+The `advisor()` tool forwards the full conversation context to a second
+model. Cost is proportional to context size — it is the single most
+expensive action per call. Apply this gate before calling:
+
+**Call advisor when:**
+- The task is genuinely ambiguous: multiple valid interpretations exist
+  and picking the wrong one carries real downstream cost.
+- About to commit to a structural change in a shared governance file
+  (`CLAUDE.md`, `WORKFLOW.md`, any `index.md`) where a wrong move
+  causes workspace-wide drift.
+- Stuck after 2+ failed tool approaches with no clear next step.
+
+**Skip advisor when:**
+- The answer is clearly located in one canonical file already read.
+- The task is a well-scoped single-source question (e.g., "document
+  phase X", "summarize the gate rules").
+- The only open question is user preference (use `AskUserQuestion`).
+
+Rule of thumb: if you can name the file and section that answers the
+question before calling advisor, skip the call and read that section.
+
 ## When in doubt
 
 - Unclear requirement → stop and ask.

@@ -37,6 +37,19 @@ FRSs **before** any node lands in canonical.
 This flow covers Phases 0, 1, and 1.5. They typically share one session because
 the work is tightly related and short.
 
+### Minimal read set per task type
+
+Load only what the task type requires. Do not pre-load speculatively.
+
+| Task type | Load in full | Load by section only | Skip entirely |
+|---|---|---|---|
+| **Meta question** ("what is the process", "document phase X") | `design.md` | `frs-validation-rules.md` §Severity + §Bundling detection (lines 1–140) | `KB-LAYOUT.md`, `retrieval-discipline.md`, `FRS.md` template, `WORKFLOW.md` body |
+| **Actual Phase 0 execution** | `design.md` | `WORKFLOW.md` §Phase flows (router only) | `KB-LAYOUT.md`, `retrieval-discipline.md`, `FRS.md` template |
+| **Actual Phase 1 execution** | `design.md` | ADR index (one-line scan) | `KB-LAYOUT.md`, `retrieval-discipline.md` |
+| **Actual Phase 1.5 execution** | `design.md`, `frs-validation-rules.md` | `glossary.md`, `cross-cutting-concerns.md` (snapshot at gate entry) | `KB-LAYOUT.md`, `WORKFLOW.md` body |
+
+For `frs-validation-rules.md` partial reads: §Severity classification ends at the gate-verdict block (~line 110 of the file). §Bundling detection follows immediately. Read offset 0, limit 140 for meta questions; read the full file only at an actual Phase 1.5 gate.
+
 ## Process Flow
 
 ```dot

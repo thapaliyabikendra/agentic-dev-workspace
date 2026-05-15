@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch",
-      "WebSearch"
+      "EnterPlanMode", 
+      "ExitPlanMode"
     ],
     "deny": [
       "Read(.env)",
@@ -18,7 +18,16 @@
       "CronDelete",
       "CronList",
       "TeamCreate",
-      "TeamDelete"
+      "TeamDelete",
+      "Bash",
+      "ScheduleWakeup",
+      "ShareOnboardingGuide",
+      "Skill",
+      "WebFetch",
+      "WebSearch",
+      "RemoteTrigger", 
+      "PushNotification",
+      "Monitor"
     ]
   },
   "disabledMcpjsonServers": [
