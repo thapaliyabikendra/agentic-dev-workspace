@@ -36,3 +36,14 @@ Placeholder. Populate when the first node-type contract needs codification.
 
 Introduced `sdlc/_templates/PROJECT.md` as the canonical project configuration
 manifest template. Projects seed `docs/project.md` from this template.
+
+## [2026-05-15] created | STD-005 ABP framework coding conventions
+
+Absorbed from `guidelines/abp-guidelines.md`. Covers 9 rules: built-in entity
+catalog check (Rule 1), entity base-class declaration with rationale (Rule 2),
+DTO audit-level mirroring (Rule 3), query input/output wrappers (Rule 4),
+companion entity pattern for ABP built-in extensions (Rule 5), PascalCase
+property naming (Rule 6), C# enums for bounded-value fields (Rule 7), no data
+annotations on domain entities (Rule 8), and file/folder/type-suffix/DB-object
+naming conventions (Rule 9). Status: accepted. Validation hooks fire at Phase
+1.5, Phase 2, and Phase 3 merge gate.

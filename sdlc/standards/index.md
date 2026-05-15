@@ -38,6 +38,7 @@
 | [STD-002](dotnet-conventions.md) | Engine-level .NET implementation conventions — Result Pattern, exception policy, async naming (placeholder pending first FRS that touches application-layer code) | proposed | placeholder, dotnet, application-layer | seed |
 | [STD-003](api-design.md) | Engine-level API design rules — verb / status code, REST/RPC choice rationale, pagination shape (placeholder pending first FRS that touches an HTTP boundary) | proposed | placeholder, api, http | seed |
 | [STD-004](node-definitions.md) | Engine-level per-node-type contract guarantees — what each node type's frontmatter and body must carry (placeholder pending first contract codification) | proposed | placeholder, methodology, node-types | seed |
+| [STD-005](STD-005-abp-coding-conventions.md) | ABP framework coding conventions — built-in entity catalog check, base-class declarations, DTO audit mirroring, query wrappers, companion entity pattern, PascalCase naming, C# enums for bounded values, no data annotations on domain entities, file/folder/type-suffix and DB naming | accepted | abp, dotnet, entity, dto, naming, conventions, validation | guidelines/abp-guidelines.md |
 
 ---
 
