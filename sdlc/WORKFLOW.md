@@ -76,12 +76,9 @@ cross-cutting practice that spans flows, deciding which flow file to load
 next, or proposing a new rule that may need to live here vs. in a per-op
 file.
 
-**Do NOT use when:** drafting a specific phase artifact — load the per-flow
-file ([`workflow/design.md`](workflow/design.md),
-[`workflow/plan.md`](workflow/plan.md),
-[`workflow/implementation.md`](workflow/implementation.md),
-[`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md),
-[`workflow/qa-gate.md`](workflow/qa-gate.md)) instead.
+**Do NOT use when:** drafting a specific phase artifact — consult
+[`workflow/index.md`](workflow/index.md) to find the right flow or op file,
+then load that file instead.
 
 **Vs. sibling files:** [`CLAUDE.md`](../CLAUDE.md) carries the always-on
 hard rules; [`PRINCIPLES.md`](PRINCIPLES.md) carries the doctrinal *why*;
@@ -197,7 +194,7 @@ alone; all share the tiered touch discipline from
 ### Reference, never copy
 
 Specs and node bodies link by ID; they do not paraphrase. Stated under
-[The phases → three principles](#the-phases) above; see also
+[Overview → three principles](#overview) above; see also
 [`PRINCIPLES.md`](PRINCIPLES.md).
 
 ### Node content ownership

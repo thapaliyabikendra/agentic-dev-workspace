@@ -14,9 +14,9 @@ resolve disputes about what a rule actually demands.
 ## When to Use
 
 **Use when:** evaluating any cross-cutting practice, resolving a doctrine
-question, or determining whether a proposed approach violates the rule
-set. Load this file alongside [`CLAUDE.md`](../CLAUDE.md) whenever a
-phase context resets.
+question, determining whether a proposed approach violates the rule
+set, or when CLAUDE.md or a workflow file references a named anti-pattern
+here. Load on demand — not automatically with every session.
 
 **Do NOT use when:** looking up coding conventions, stack choices, or
 implementation constraints — those live in `docs/<component>/adrs/` or
@@ -34,7 +34,6 @@ is the always-on summary.
 ## Core principles
 
 - Leverage inherent model intelligence by omitting foundational explanations.
-- Use YAML frontmatter for structured metadata (machine-readable) and the body for narrative content (human-readable).
 
 ## Practices to keep
 
@@ -74,15 +73,10 @@ is the always-on summary.
   resolve upward. Procedural detail in
   [`sdlc/WORKFLOW.md → Legacy absorption`](WORKFLOW.md) and
   [`sdlc/workflow/legacy-absorption.md`](workflow/legacy-absorption.md).
-- **Standalone component ID prefix convention.** Every standalone component
-  declares a 2–4 character uppercase prefix in its `COMPONENT.md`
-  (`id_prefix: FDE`). All canonical DDD nodes created within that component
-  are named `{PREFIX}-{TYPE}-{NNN}` starting at 001. Examples: `FDE-FLW-001`,
-  `FDE-CON-001`, `FDE-SVC-001`. The prefix is global — no two components in
-  the same workspace share a prefix. The `shared/` component and any
-  brownfield-imported legacy component (e.g., `app`) are exempt: they retain
-  their original type-only IDs for backward compatibility. New components
-  created from scratch must always use prefixed IDs. Procedural detail in
+- **Standalone component ID prefix convention.** Component ID prefixes are
+  globally unique across the workspace — no two components share one. This
+  prevents cross-component ID collisions and makes any node ID self-locating.
+  Procedural detail in
   [`LAYOUT.md § Component structure`](LAYOUT.md#component-structure-docs)
   and [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md).
 - **If it can drift, the operation isn't atomic enough.** When the engine
@@ -163,6 +157,9 @@ at the foot of this file.
 - **❌ Editing a canonical node outside an active Phase 3 merge of an approved FS.** Process violation; the canonical node would diverge from what an approved CHG says it should be.
   **✅ Record the intent in a CHG node first** (under the active milestone's `specs/FS-NNN.../nodes/changes/`, `status: draft`). Apply the delta to the canonical target only at Phase 3 merge. Do not edit the canonical target directly — including during brownfield research passes or Phase 2 absorption.
 
+- **❌ "The Helpful Continuation" — treating remembered context from a prior session as a substitute for loading the current flow file.** "Good context" from the previous session is not a signal to skip the reload; retained context drifts silently across phases.
+  **✅ Run `/clear` at every flow boundary and reload the next flow file only.** Context that survives a phase boundary is a bug, not a feature.
+
 ## Anti-Pattern: "Doctrinal Override by Convenience"
 
 The framing that every entry in `## Anti-patterns to refuse` shares: a
@@ -205,9 +202,10 @@ what a rule is actually demanding.
 
 ## Integration
 
-- **Required before:** [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules)
-  — load Hard rules first; this file expands the *why* behind each rule
-  and provides the named anti-patterns that other files cite.
+- **Relationship to CLAUDE.md:** [`CLAUDE.md ## Hard rules`](../CLAUDE.md#hard-rules)
+  is the always-on summary — auto-loaded every session. This file is the
+  doctrinal expansion — load it when a rule's basis is in dispute, a named
+  anti-pattern is being applied, or a workflow file references a rule by name.
 - **Required after:** [`sdlc/WORKFLOW.md`](WORKFLOW.md) — once doctrine
   is in scope, WORKFLOW.md routes to the phase-specific procedural
   details and to the per-operation files under

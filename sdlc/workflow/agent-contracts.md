@@ -18,9 +18,8 @@ declare a return shape or emit a completion marker; extending the orchestrator
 outcome-routing table; or verifying that an existing operation's marker string
 matches the canonical regex.
 
-**Do NOT use when:** you only need the dispatch rules — those live in
-[`CLAUDE.md → When to Use (inline subagent dispatch)`](../../CLAUDE.md#when-to-use-inline-subagent-dispatch)
-and are not duplicated here.
+**Do NOT use when:** you only need the dispatch shapes or quality tests and no contract
+definition work is happening — jump directly to [`## Dispatch shapes`](#dispatch-shapes).
 
 ---
 
@@ -135,22 +134,35 @@ routes to the `BLOCKED` handle above.
 
 ---
 
-## Existing dispatch shapes (from CLAUDE.md)
+## Dispatch shapes
 
-Cross-reference only — not duplicated here. See
-[`CLAUDE.md → When to Use (inline subagent dispatch)`](../../CLAUDE.md#when-to-use-inline-subagent-dispatch)
-for the four dispatch shapes (Forked / Dispatcher / Background / Multi-phase),
-the dispatch quality tests (Isolability / One concern / Tool floor / Parallelism
-rule), and the mutation verification posture for write-capable dispatches.
+Four canonical shapes for inline subagent dispatch:
+
+- **Forked** — one `Agent(subagent_type=Explore, ...)`; read-heavy self-contained task
+  (codebase scan, doc dig).
+- **Dispatcher** — ≥ 2 `Agent(...)` in one message (parallel); main session synthesizes.
+  Right for the Phase 1.5 gate and the Phase 3 ADR-conformance check.
+- **Background** — `Agent(..., run_in_background=true)`; output is a write, not a sync reply.
+- **Multi-phase** — sequential `Agent(...)` calls; each phase's summary feeds the next dispatch.
+
+Don't dispatch for trivial work, for tasks needing user clarification mid-run, or when the
+deliverable IS the prose (FRS / FS / OQ authoring — main session).
+
+### Dispatch quality tests
+
+Apply before any dispatch:
+
+- **Isolability**: can you write the success criterion before dispatching? If not, keep it in the main session.
+- **One concern**: each subagent gets one verb on one scoped set of files. Two verbs = two dispatches.
+- **Tool floor**: default to read-only (Read / Grep / Glob). Promote to Edit / Write only when the task explicitly demands a mutation.
+- **Parallelism rule**: fan out N subagents in parallel when their work is file-disjoint and order-independent. Serialize when subagents share files or when one output feeds another's input. Gate checks (Phase 1.5 + Phase 3) are the canonical parallel instances.
 
 ---
 
 ## Integration
 
 - **Canonical Layer 1 home:** This file — [`## Contract Layer 1`](#contract-layer-1--subagent-dispatch-return-shape).
-- **Dispatch shape taxonomy:**
-  [`CLAUDE.md → When to Use (inline subagent dispatch)`](../../CLAUDE.md#when-to-use-inline-subagent-dispatch) —
-  load before dispatching.
+- **Dispatch shape taxonomy:** [`## Dispatch shapes`](#dispatch-shapes) in this file — load before dispatching.
 - **Phase flow files that emit Layer 2 markers:**
   - [`workflow/plan.md`](plan.md) — emits `## PLANNING COMPLETE`
   - [`workflow/discuss.md`](discuss.md) — emits `## DISCUSSION COMPLETE`
