@@ -402,19 +402,7 @@ that node" — the default. Pinning is for cases like "the FRS depended
 on ENT-007 as of v3 — if it's moved on, surface that," and gets the
 stale-version lint pass below.
 
-**Lint surface.** [`lint.md`](lint.md) carries a `stale-version-ref`
-debt class — a citing artifact (FRS / FS / ADR) declares `ENT-007@v3`
-while ENT-007 is currently at `v5`. The lint flags the gap; the
-resolution is either updating the citation (when the new version is
-compatible) or surfacing the conflict (when it isn't).
-
-**Pre-commit / pre-merge advisory.**
-[`../scripts/check-version-bump.sh`](../scripts/check-version-bump.sh)
-scans staged or ranged canonical-node edits and reports
-`BUMP_MISSING:` for any node whose body / cross-reference frontmatter
-changed but whose `version:` integer did not move. The script is
-advisory — it does not block commits; it is a soft second pair of
-eyes for the bump rule.
+**Lint surface and pre-commit advisory.** See [`lint.md → stale-version-ref`](lint.md#stale-version-ref) for how stale pinned cross-references are detected and the pre-commit advisory script.
 
 **ADRs / FRSs / FSs do not carry `version:`.** ADRs have their own
 lifecycle (`proposed → accepted → deprecated | superseded`); FRSs and

@@ -218,6 +218,14 @@ Resolution paths:
 The class waits for a real pinned reference to exist before it fires;
 unversioned cross-refs (`ENT-007` without `@v<M>`) are not in scope.
 
+**Pre-commit / pre-merge advisory.**
+[`../../scripts/check-version-bump.sh`](../../scripts/check-version-bump.sh)
+scans staged or ranged canonical-node edits and reports
+`BUMP_MISSING:` for any node whose body / cross-reference frontmatter
+changed but whose `version:` integer did not move. The script is
+advisory — it does not block commits; it is a soft second pair of
+eyes for the bump rule.
+
 ### `index-entry-missing`
 
 **Detection.** A node file in `docs/<component>/nodes/<type>/` (or an ADR file in

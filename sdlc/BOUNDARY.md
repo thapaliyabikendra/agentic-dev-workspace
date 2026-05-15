@@ -308,79 +308,11 @@ before adding it to any rule book.
 
 ---
 
-## Phase A — Done (in-place genericization, 2026-05-11)
+## Change history
 
-The workflow scaffolding layer is now genuinely project-agnostic. Concrete
-changes:
+**Phase A — Done (2026-05-11):** In-place genericization complete. Engine scaffolding contains no project-specific content. See git history for details.
 
-- **`workflow/plan.md`** — Implementation-task cohort section replaced
-  with a generic pointer to the project's cohort-ordering ADR. Section
-  walkthrough genericized to use `<scope-section>` / `<behavior-section>`
-  / etc. labels in place of named template headings. Coverage matrix rows
-  rewritten in framework-neutral terms.
-- **`workflow/implementation.md`** — Stage 2 "Convention ADRs to
-  consult" rewritten as an `adrs/index.md` lookup (any ADR tagged
-  `convention`). Build command genericized; the command's project home is
-  now `docs/tech-stack.md § Operational commands`. Stage 3 QA (code-quality
-  gates, ADR-conformance check, status flips) extracted to
-  [`workflow/qa-gate.md`](workflow/qa-gate.md); `implementation.md` now
-  covers Stage 1 Merge + Stage 2 Code only.
-- **`_templates/FS.md`** — Implementation-tasks cohort hint
-  genericized to point at `workflow/plan.md` and the project's
-  cohort-ordering ADR rather than naming framework-specific layers or
-  ADR IDs.
-- **`workflow/frs-code-extraction-rules.md`** — Signal table generalized
-  to stack-neutral categories with parenthetical stack examples; worked-
-  example callout updated. Logical name examples use generic
-  `Admin.Settings.*` / `Onboarding.Checklist.*` placeholders.
-- **`workflow/frs-validation-rules.md`** — "Branch Maker / Branch
-  Checker" bundling example rewritten as "maker action / checker
-  action"; "Bank Admin" language-trap example rewritten as
-  "administrator".
-- **`workflow/design.md`** — Brownfield code-mining pointer genericized.
-- **`workflow/test-runner-cookbook.md`** — renamed from
-  `action-to-playwright.md`; all engine references updated to the
-  generic filename. File is the project-owned test-runner cookbook;
-  the engine references it by this stable name.
-- **`_templates/CROSS-CUTTING-CONCERNS.md`** — new template, holds the
-  category structure with `[bracketed slot]` placeholders for
-  project-specific values.
-- **`_templates/GLOSSARY.md`** — new template, mirror of the live
-  glossary's structure with seeding instructions.
-
-Verification: `sdlc/` contains no unflagged project-specific terms.
-The three former controlled holes (stack-specific worked example in
-`frs-code-extraction-rules.md`; `> **This project:**` callouts in
-`plan.md` and `implementation.md`; hardcoded filename
-`action-to-playwright.md` throughout engine files) have all been
-resolved. The signal table is stack-neutral; callouts use
-`> **Your project:**` stubs; the cookbook is referenced by the generic
-filename `test-runner-cookbook.md`.
-
----
-
-## Phase B — Deferred (repo split, next-quarter scope)
-
-- **Repo split.** Extract the team-agnostic items (`WORKFLOW.md`,
-  `workflow/`, `_templates/`, the maintenance and authoring procedures
-  in `WORKFLOW.md`) into a `claude-sdlc/` (or similarly named) bundle.
-  Project-specific content (`adrs/`, `milestones/`, `nodes/`,
-  `cross-cutting-concerns.md`, `glossary.md`, the project CLAUDE.md
-  layer) stays here.
-- **Skill bundle layering.** The team-agnostic bundle is the base;
-  per-team knowledge skills layer project context on top. Decide
-  layering mechanism (git submodule / subtree / packaged kit / Claude
-  skill) when the split happens.
-- **Shared integration designs repo.** A separate location for
-  cross-cutting integration artifacts (LDAP, SMTP, SSO, concurrent
-  login) that any team can reference and adapt.
-- **Testing-convention ADR.** Author the ADR that names the project's
-  test runner. After it exists, `test-runner-cookbook.md` is one of
-  several possible cookbooks the ADR can point at.
-- **Pilot with one other team.** Confirm the boundary that Phase A
-  enforced survives a second user before declaring the bundle
-  reusable. This is the empirical test for the four boundary cases
-  above.
+**Phase B — Deferred (next-quarter scope):** Repo split (`claude-sdlc/` + per-project overlay), skill bundle layering, shared integration designs repo, testing-convention ADR, and one-team pilot remain pending.
 
 ---
 

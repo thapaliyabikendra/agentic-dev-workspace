@@ -43,7 +43,7 @@ baseline-category citation). The current version of each is captured in
 any Phase 1.5 Validation finding that fires (audit reproducibility set —
 see [`frs-validation-rules.md`](frs-validation-rules.md#audit-reproducibility-set)).
 Edits between runs follow
-[Maintaining baseline references](../WORKFLOW.md#maintaining-baseline-references-glossary-cross-cutting-concerns).
+[Maintaining baseline references](./baseline-references.md).
 
 ## Tech-stack operational baseline
 

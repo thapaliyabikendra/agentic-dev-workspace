@@ -86,6 +86,67 @@ non-skippable.
 3. [`## Phase 1.5 — Validation Gate`](#phase-15--validation-gate) — Pass 1
    per-FRS gate + Pass 2 cross-FRS sweep; exits this flow.
 
+## Pre-FRS artifact types
+
+Two artifact families serve pre-commitment thinking. They live by
+different disciplines.
+
+**Survey** — `docs/milestones/M-NN/discovery/`, template
+[`../_templates/SURVEY.md`](../_templates/SURVEY.md). Procedural artifact
+consumed by Phase 0 milestone scoping and Phase 1 FRS authoring (and
+the absorption workflow). Closed `kind:` enum (`new-feature` |
+`change-request` | `absorb-legacy-doc`), mandatory sections per kind,
+2-file touch. Use Surveys when the workflow expects them — i.e., as
+inputs to Phase 0 / Phase 1 / absorption.
+
+**Exploration** — `docs/exploration/`, template
+[`../_templates/EXPLORATION.md`](../_templates/EXPLORATION.md). Free-form
+working knowledge. Minimal mandatory frontmatter (id, title, status,
+created), optional everything else, 1-file routine touch, no log.md.
+Use Explorations any time you're thinking on paper outside the
+milestone path: propositions, spikes, bug investigations, option
+weighing, anything.
+
+Related surfaces:
+
+- **OQ-NNN** (`docs/discovery/open-questions/`) — first-class artifacts for
+  answerable open questions. Use when the question needs a resolver artifact
+  (DEC / ADR / FRS) before work can continue. 3-file lifecycle touch.
+  See [`../_templates/OPEN-QUESTION.md`](../_templates/OPEN-QUESTION.md).
+- **ADR / DEC** — commitments. Promote to ADR when cross-cutting; DEC when
+  node-local. See [`authoring-adr.md`](authoring-adr.md).
+
+### Shape detection (Exploration only)
+
+Exploration has no `kind:` field. The artifact's shape is detected
+from frontmatter presence, not declared:
+
+- `hypothesis:` present → spike-shaped. The workflow gates any related
+  ADR's `proposed → accepted` flip on `outcome:` being filled.
+- `affects_nodes:` present → bug-shaped. The template offers suggested
+  body sections; none are mandatory.
+- Neither present → free-form note. No special workflow.
+
+### Cross-linking
+
+Exploration → commitment:
+
+- The consumer (milestone / FRS / ADR) declares
+  `from_exploration: [EXP-<slug>]` in its frontmatter.
+- The Exploration declares `adopted_into: [<consumer-id>]`.
+
+Surveys do not need this cross-linking — they're consumed by the
+procedure that authored them; the consumption is implicit in the
+milestone path.
+
+### When in doubt
+
+If you're not sure whether a note is a Survey or an Exploration: it's
+an Exploration. Surveys exist only when Phase 0 / Phase 1 / absorption
+explicitly call for one.
+
+---
+
 ## Phase 0 — Milestone Scoping
 
 **Prerequisite:** The milestone folder must be pre-created by running
@@ -269,7 +330,12 @@ later.
 
 ### Checklist — Phase 1 exit (before Phase 1.5)
 
-- [ ] Author self-review pass run (see [Cross-cutting practices](../WORKFLOW.md#cross-cutting-practices)).
+- [ ] Author self-review pass — look at each FRS with fresh eyes:
+  1. Placeholder scan — any "TBD", incomplete sections, or vague requirements?
+  2. Internal consistency — does the FRS contradict itself or upstream inputs (discovery, nodes)?
+  3. Scope — each FRS covers exactly one user-journey, independently testable?
+  4. Ambiguity — any criterion interpretable to build the wrong thing? Pick one interpretation and make it explicit.
+  Fix inline. No separate review file, no dispatched reviewer.
 - [ ] Each FRS covers exactly one user-journey, independently testable.
 - [ ] No duplicate FRSs within the milestone.
 - [ ] No silent gaps.
@@ -341,7 +407,7 @@ conflict; cross-FRS sweep; baseline-snapshot capture per
 check) run as **parallel** inline `Agent(subagent_type=Explore, ...)`
 dispatches in a single message, each returning the 3-block contract
 (`## Findings / ## Risks / ## Open questions`). Contract canonical home:
-[`../WORKFLOW.md → Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates)
+[`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)
 — do not restate the contract here.
 
 **Parent-side routing on dispatch return** (orchestrator decides next

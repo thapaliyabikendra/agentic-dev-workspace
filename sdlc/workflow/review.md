@@ -187,7 +187,7 @@ missed something; surface it via
 When a review pass is dispatched as an inline subagent (per
 [`../../CLAUDE.md ## When to Use`](../../CLAUDE.md#when-to-use-inline-subagent-dispatch)
 and the gate dispatch shape at
-[`../WORKFLOW.md ### Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates)),
+[`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)),
 the subagent returns the canonical 3-block contract (`## Findings /
 ## Risks / ## Open questions`). The orchestrator then routes the
 return per this rubric. The vocabulary below is the parent-side
@@ -226,7 +226,7 @@ The rubric consumes the 3-block return; it does not modify it.
   filing headings cite IDs explicitly.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) — the
   two-heading split is now a doctrinal rule (2026-05-13 DEC audit).
-- **Required before:** [`../WORKFLOW.md ### Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates)
+- **Required before:** [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)
   — canonical home for the 3-block return contract this file's
   parent-side rubric consumes.
 - **Caller:** [`design.md`](design.md) (Phase 1.5 QA dispatch when run

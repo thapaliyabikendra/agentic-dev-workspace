@@ -26,8 +26,22 @@ and are not duplicated here.
 
 ## Contract Layer 1 — Subagent dispatch return shape
 
-**Canonical home:** [`sdlc/WORKFLOW.md → Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates).
-Reproduced here as a readable reference only — the canonical home wins on any discrepancy.
+**Canonical home:** This file. The gate-specific preamble, return contract, mutation verification, and orchestrator outcome routing are all authoritative here.
+
+### Gate-specific preamble
+
+Gate checks that fan out to multiple specialist passes — **Phase 1.5
+validation** (FRS validation, ADR conformance, baseline snapshot,
+standard-conflict check) and the **Phase 3 QA hat ADR-conformance
+check** (against the FS's declared `adrs:`) — run as **parallel** inline
+`Agent(subagent_type=Explore, ...)` dispatches in a single message,
+followed by synthesis in the main session.
+
+Every dispatch must be self-contained: include the goal, the exact
+files in scope, the conventions to follow, and the expected return
+shape (JSON schema, structured list, file paths only). Free-form prose
+returns force the orchestrator to re-read and re-interpret, erasing
+the token savings.
 
 ### Return shape (3-block format)
 
@@ -60,6 +74,18 @@ The orchestrator classifies each subagent return into one of four handles:
 
 `BLOCKED` is the only handle that halts the phase flow. `DONE_WITH_CONCERNS`
 accumulates into the exit gate summary — it does not stop progress.
+
+### Mutation verification (write-capable dispatches only)
+
+After any write-capable subagent returns:
+
+1. The orchestrator confirms the change — a diff, a grep, or a re-read
+   of one canary file. Do not trust the return message alone; subagents
+   reliably report success on edits they partially or incorrectly applied.
+2. On wrong or empty result: do not retry the same dispatch blindly.
+   Either re-dispatch to a stronger model or split the task into smaller,
+   more mechanical units. A failed weak-model call followed by a
+   successful strong-model call is signal about task shape, not a defeat.
 
 ---
 
@@ -121,9 +147,7 @@ rule), and the mutation verification posture for write-capable dispatches.
 
 ## Integration
 
-- **Canonical Layer 1 home:**
-  [`sdlc/WORKFLOW.md → Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates) —
-  the source of truth for the return shape and mutation verification procedure.
+- **Canonical Layer 1 home:** This file — [`## Contract Layer 1`](#contract-layer-1--subagent-dispatch-return-shape).
 - **Dispatch shape taxonomy:**
   [`CLAUDE.md → When to Use (inline subagent dispatch)`](../../CLAUDE.md#when-to-use-inline-subagent-dispatch) —
   load before dispatching.

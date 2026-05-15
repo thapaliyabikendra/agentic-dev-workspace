@@ -52,7 +52,7 @@ Copy [`sdlc/_templates/PROJECT.md`](_templates/PROJECT.md) to
   Step 5; keep the two files in sync.
 - **Phase A grep terms** — project-specific search terms used to verify
   no project content has leaked into `sdlc/` engine files
-  (see [`sdlc/BOUNDARY.md § Phase A`](BOUNDARY.md#phase-a--done-in-place-genericization-2026-05-11)).
+  (see [`sdlc/BOUNDARY.md § Change history`](BOUNDARY.md#change-history)).
 - **Milestones** — stub one row per planned milestone; expand as planning
   progresses.
 

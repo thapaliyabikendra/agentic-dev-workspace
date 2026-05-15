@@ -20,6 +20,58 @@ Do NOT begin until:
 
 ---
 
+## Traceability chain
+
+The test artifacts form a three-link chain from behavioral spec to
+executable code:
+
+```
+FLW-NNN#happy / #edge / #fault   (behavioral spec, canonical wiki)
+        ↓ Traces to:
+TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
+        ↓ generate-test-suite
+<use-case>.<ext>                  (test spec, tests/ folder at Phase 3)
+```
+
+- **FLW nodes are the behavioral source of truth.** Scenarios live as
+  named anchors (`#happy`, `#edge-N`, `#fault-N`) inside the canonical
+  FLW node body and are referenced — never restated — by both TCs and
+  the FRS's `## Test plan view` table.
+- **TC files are the executable interpretation.** Drafted at Phase 2
+  under each FS's `test-plans/<use-case>/` folder. Each TC's
+  `**Traces to:**` line carries both FRS-side IDs (`AC-NN`, `Matrix:
+  <row>`) AND FLW-side scenario anchors (`FLW-NNN#happy`,
+  `FLW-NNN#edge-N`, `FLW-NNN#fault-N`). The dual trace makes coverage
+  auditable from both directions.
+- **Test specs are disposable artifacts.** Generated from TC files at
+  Phase 3 ([`test-suite-codegen.md`](test-suite-codegen.md)) and landed in
+  `tests/{test_dir}/<feature>/` on the FS's implementation branch.
+  Hand edits to spec files are lost on regeneration — fix the TC,
+  regenerate.
+
+**TC files do not participate in the tiered touch.** They stay
+milestone-scoped (no canonical promotion at Phase 3 merge); no
+`docs/test-plans/index.md` or `log.md` exists. The FS's `## Test plan`
+section IS the TC index for that FS.
+
+**Two workflow references support this chain:**
+
+- [`test-data-generation.md`](test-data-generation.md) — recipe for the
+  `## Test Data` section in every TC; directive vocabulary that crosses
+  the Phase 2 → Phase 3 boundary (`violatesMaxLength(N)`, `duplicate(value)`,
+  `{timestamp}`, `{uuid}`).
+- [`test-runner-cookbook.md`](test-runner-cookbook.md) — recipe for Phase 3
+  codegen; action-inference table, selector resolution, value substitution,
+  full spec file template, mandatory `createdRecords + afterEach` cleanup
+  pattern.
+
+These two refs are wholesale-read during their respective operations
+(this file reads `test-data-generation.md`; Phase 3 Test suite codegen reads
+both). They are peers of [`frs-validation-rules.md`](frs-validation-rules.md)
+and [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md).
+
+---
+
 ## Overview
 
 **Operation:** `generate-test-plan`

@@ -376,7 +376,12 @@ Zero Blockers and zero Majors is the exit bar; Minors are noted, not blocking.
 **Targeted repair, not full re-draft.** Fix only the flagged items and re-check only
 those — not the whole FS.
 
-- [ ] Author self-review pass run (see [Cross-cutting practices](../WORKFLOW.md#cross-cutting-practices)).
+- [ ] Author self-review pass — look at the FS with fresh eyes:
+  1. Placeholder scan — any "TBD", incomplete sections, or vague requirements?
+  2. Internal consistency — does the FS contradict itself or upstream inputs (FRSs, nodes)?
+  3. Scope — single coherent slice? No scope creep from adjacent FRSs?
+  4. Ambiguity — any task interpretable to build the wrong thing? Pick one interpretation and make it explicit.
+  Fix inline. No separate review file, no dispatched reviewer.
 - [ ] Every FRS acceptance criterion appears in the Coverage table **exactly once**.
       Criteria that cannot be mapped to a Flow scenario are raised as `OQ-NNN` files under
       `docs/discovery/open-questions/` with `origin: fs-authoring, origin_ref: FS-NNN,

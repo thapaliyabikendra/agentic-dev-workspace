@@ -227,62 +227,8 @@ for the full procedure, timing table, and the two canonical exceptions.
 
 ### Pre-FRS exploration
 
-Two artifact families serve pre-commitment thinking. They live by
-different disciplines.
-
-**Survey** — `docs/milestones/M-NN/discovery/`, template
-[`_templates/SURVEY.md`](_templates/SURVEY.md). Procedural artifact
-consumed by Phase 0 milestone scoping and Phase 1 FRS authoring (and
-the absorption workflow). Closed `kind:` enum (`new-feature` |
-`change-request` | `absorb-legacy-doc`), mandatory sections per kind,
-2-file touch. Use Surveys when the workflow expects them — i.e., as
-inputs to Phase 0 / Phase 1 / absorption.
-
-**Exploration** — `docs/exploration/`, template
-[`_templates/EXPLORATION.md`](_templates/EXPLORATION.md). Free-form
-working knowledge. Minimal mandatory frontmatter (id, title, status,
-created), optional everything else, 1-file routine touch, no log.md.
-Use Explorations any time you're thinking on paper outside the
-milestone path: propositions, spikes, bug investigations, option
-weighing, anything.
-
-Related surfaces:
-
-- **OQ-NNN** (`docs/discovery/open-questions/`) — first-class artifacts for
-  answerable open questions. Use when the question needs a resolver artifact
-  (DEC / ADR / FRS) before work can continue. 3-file lifecycle touch.
-  See [`_templates/OPEN-QUESTION.md`](_templates/OPEN-QUESTION.md).
-- **ADR / DEC** — commitments. Promote to ADR when cross-cutting; DEC when
-  node-local. See [`workflow/authoring-adr.md`](workflow/authoring-adr.md).
-
-#### Shape detection (Exploration only)
-
-Exploration has no `kind:` field. The artifact's shape is detected
-from frontmatter presence, not declared:
-
-- `hypothesis:` present → spike-shaped. The workflow gates any related
-  ADR's `proposed → accepted` flip on `outcome:` being filled.
-- `affects_nodes:` present → bug-shaped. The template offers suggested
-  body sections; none are mandatory.
-- Neither present → free-form note. No special workflow.
-
-#### Cross-linking
-
-Exploration → commitment:
-
-- The consumer (milestone / FRS / ADR) declares
-  `from_exploration: [EXP-<slug>]` in its frontmatter.
-- The Exploration declares `adopted_into: [<consumer-id>]`.
-
-Surveys do not need this cross-linking — they're consumed by the
-procedure that authored them; the consumption is implicit in the
-milestone path.
-
-#### When in doubt
-
-If you're not sure whether a note is a Survey or an Exploration: it's
-an Exploration. Surveys exist only when Phase 0 / Phase 1 / absorption
-explicitly call for one.
+> Survey vs. Exploration discriminator, shape detection, and cross-linking discipline.
+> Full procedure: [`workflow/design.md → Pre-FRS artifact types`](workflow/design.md#pre-frs-artifact-types).
 
 ### Bugs
 
@@ -299,50 +245,9 @@ becomes bad code.
 
 ### Inline dispatch shape for gates
 
-Gate checks that fan out to multiple specialist passes — **Phase 1.5
-validation** (FRS validation, ADR conformance, baseline snapshot,
-standard-conflict check) and the **Phase 3 QA hat ADR-conformance
-check** (against the FS's declared `adrs:`) — run as **parallel** inline
-`Agent(subagent_type=Explore, ...)` dispatches in a single message,
-followed by synthesis in the main session. Subagent rules per
-CLAUDE.md → "Inline subagent dispatch has a fixed contract."
-
-Every dispatch must be self-contained: include the goal, the exact
-files in scope, the conventions to follow, and the expected return
-shape (JSON schema, structured list, file paths only). Free-form prose
-returns force the orchestrator to re-read and re-interpret, erasing
-the token savings. The contract below is the canonical instance of
-this pattern.
-
-**Return contract for every dispatch:**
-
-```
-## Findings
-- <severity>: <finding> (file:line)
-
-## Risks
-- <severity>: <risk>
-
-## Open questions
-- <question> (raise as OQ-NNN if blocking)
-```
-
-≤ 400 words per dispatch. Cite by file path — do not restate rule
-books. The main session merges findings into a single Validation
-findings document (Phase 1.5) or a single QA-gate result (Phase 3) —
-never concatenates raw subagent reports.
-
-**Mutation verification (write-capable dispatches only):**
-
-After any write-capable subagent returns:
-
-1. The orchestrator confirms the change — a diff, a grep, or a re-read
-   of one canary file. Do not trust the return message alone; subagents
-   reliably report success on edits they partially or incorrectly applied.
-2. On wrong or empty result: do not retry the same dispatch blindly.
-   Either re-dispatch to a stronger model or split the task into smaller,
-   more mechanical units. A failed weak-model call followed by a
-   successful strong-model call is signal about task shape, not a defeat.
+> Gate-specific dispatcher preamble, return contract (3-block format, ≤400 words), mutation
+> verification, and orchestrator outcome routing.
+> Canonical home: [`workflow/agent-contracts.md → Contract Layer 1`](workflow/agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape).
 
 ### Context resets
 
@@ -356,17 +261,8 @@ See [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip).
 
 ### Author self-review (before each phase's exit gate)
 
-After writing an FRS set or an FS, look at the output with fresh eyes:
-
-1. Placeholder scan — any "TBD", incomplete sections, or vague requirements?
-2. Internal consistency — does the artifact contradict itself or upstream
-   inputs (discovery, FRSs, nodes)?
-3. Scope — for FRSs: each one atomic? for FS: single coherent slice?
-4. Ambiguity — could any criterion or task be interpreted to build the wrong
-   thing? If so, pick one interpretation and make it explicit.
-
-Fix inline. No separate review file, no dispatched reviewer — just the same
-hat you wore writing it, looking again.
+> Four-point self-review checklist (placeholder scan, consistency, scope, ambiguity).
+> Inlined at Phase 1 exit in [`workflow/design.md`](workflow/design.md#checklist--phase-1-exit-before-phase-15) and Phase 2 exit in [`workflow/plan.md`](workflow/plan.md#6-fs-validation-loop).
 
 ### User-review handoff
 
@@ -397,94 +293,24 @@ implemented without doing this pass.
 
 ### Test artifacts traceability
 
-The test artifacts form a three-link chain from behavioral spec to
-executable code:
-
-```
-FLW-NNN#happy / #edge / #fault   (behavioral spec, canonical wiki)
-        ↓ Traces to:
-TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
-        ↓ generate-test-suite
-<use-case>.<ext>                  (test spec, tests/ folder at Phase 3)
-```
-
-- **FLW nodes are the behavioral source of truth.** Scenarios live as
-  named anchors (`#happy`, `#edge-N`, `#fault-N`) inside the canonical
-  FLW node body and are referenced — never restated — by both TCs and
-  the FRS's `## Test plan view` table.
-- **TC files are the executable interpretation.** Drafted at Phase 2
-  under each FS's `test-plans/<use-case>/` folder. Each TC's
-  `**Traces to:**` line carries both FRS-side IDs (`AC-NN`, `Matrix:
-  <row>`) AND FLW-side scenario anchors (`FLW-NNN#happy`,
-  `FLW-NNN#edge-N`, `FLW-NNN#fault-N`). The dual trace makes coverage
-  auditable from both directions.
-- **Test specs are disposable artifacts.** Generated from TC
-  files at Phase 3 ([`test-suite-codegen.md`](workflow/test-suite-codegen.md)) and landed in
-  `tests/{test_dir}/<feature>/` on the FS's implementation branch.
-  Hand edits to spec files are lost on regeneration — fix the TC,
-  regenerate.
-
-**TC files do not participate in the tiered touch.** They stay
-milestone-scoped (no canonical promotion at Phase 3 merge); no
-`docs/test-plans/index.md` or `log.md` exists. The FS's `## Test plan`
-section IS the TC index for that FS.
-
-**Two workflow references support this chain:**
-
-- [`workflow/test-data-generation.md`](workflow/test-data-generation.md) —
-  recipe for the `## Test Data` section in every TC; directive
-  vocabulary that crosses the Phase 2 → Phase 3 boundary
-  (`violatesMaxLength(N)`, `duplicate(value)`, `{timestamp}`, `{uuid}`).
-- [`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md) —
-  recipe for Phase 3 codegen; action-inference table, selector
-  resolution, value substitution, full spec file template, mandatory
-  `createdRecords + afterEach` cleanup pattern.
-
-These two refs are wholesale-read during their respective operations
-(Phase 2 Test plan ingest reads `test-data-generation.md`; Phase 3
-Test suite codegen reads both). They are peers of
-[`workflow/frs-validation-rules.md`](workflow/frs-validation-rules.md)
-and
-[`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md).
+> FLW→TC→spec chain, TC-file discipline, rule-book read timing.
+> Full procedure: [`workflow/test-plan-ingest.md → Traceability chain`](workflow/test-plan-ingest.md#traceability-chain).
+> Rule books: [`workflow/test-data-generation.md`](workflow/test-data-generation.md) (Phase 2 TC authoring),
+> [`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md) (Phase 3 codegen).
 
 ### Maintenance discipline
 
-Every lifecycle event on a **canonical** node or ADR touches **three** files
-— the artifact, the per-type `index.md`, the per-type `log.md`. No
-exceptions. The touch fires at the lifecycle event itself, event-driven:
-at Phase 2 ingest for a new node's `created` event; at Phase 3 merge for
-the new node's `proposed → active` `status-change` event and for the CHG's
-applied `modifies` / `removes` / `supersedes` (which fire `updated` /
-`superseded` / `status-change` against the canonical target). The master
-catalog [`home.md`](home.md) is derived from the per-type indexes —
-not hand-maintained per event.
-
-> **Canonical home.**
-> [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md)
-> is the canonical home for the **closed operation vocabulary**
-> (`created`, `status-change`, `superseded`, `deprecated`, `linked`,
-> `updated`), the 3-file / (3+N) tier-touch procedure, the log entry
-> format, the lazy-creation rule, and the light-touch fallback. This
-> section is the always-loaded summary, not the procedure — when an
-> operation fires, load that file.
+> Every lifecycle event on a canonical node or ADR touches three files (artifact + per-type
+> `index.md` + per-type `log.md`). `home.md` is derived from per-type indexes, not hand-maintained.
+> Canonical home (vocabulary, tier-touch procedure, log format, lazy-creation rule, fallback):
+> [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
 ### Maintaining baseline references (glossary, cross-cutting concerns)
 
-[`docs/glossary.md`](glossary.md) and
-[`docs/cross-cutting-concerns.md`](cross-cutting-concerns.md) are
-**project-owned baselines** — domain vocabulary and NFR defaults that
-every FRS inherits. They sit outside the canonical DDD wiki and outside
-the ADR commitment store. An FRS deviation from a baseline category
-becomes an ADR; the baseline file does not absorb the deviation.
-
-Lifecycle ops (add / change / retire / drift detection) run **between**
-Phase 1.5 gates, never during one — the gate snapshots both files at
-entry. Cross-cutting numbering is permanent (never renumber). These
-baselines do **not** participate in the tiered touch.
-
-See [`workflow/baseline-references.md`](workflow/baseline-references.md)
-for full procedures, version-bump classification (breaking / non-breaking),
-drift-report taxonomy, and the hard rules across all ops.
+> Project-owned NFR baselines (`docs/glossary.md`, `docs/cross-cutting-concerns.md`) that
+> every FRS inherits. Lifecycle ops run between Phase 1.5 gates (never during); not part of
+> the tiered touch. Full procedures:
+> [`workflow/baseline-references.md`](workflow/baseline-references.md).
 
 ### In-flight nodes (`status: proposed`)
 

@@ -59,7 +59,7 @@ one component plus a shared area:
 
 - **APP component** ([`docs/app/`](docs/app/)) — .NET/ABP application: commands,
   entities, flows, integrations, states, decisions, and more. ADRs at
-  [`docs/app/adrs/`](docs/app/adrs/) (ADR-001..031).
+  [`docs/app/adrs/`](docs/app/adrs/) — no ADRs authored yet; folder created at first component bootstrap.
 - **Shared** ([`docs/shared/`](docs/shared/)) — glossary, cross-cutting-concerns,
   tech-stack, and any future cross-component ADRs.
 
@@ -133,7 +133,7 @@ Dispatch quality tests (apply before any dispatch):
 - **Tool floor**: default to read-only (Read / Grep / Glob). Promote to Edit / Write only when the task explicitly demands a mutation.
 - **Parallelism rule**: fan out N subagents in parallel when their work is file-disjoint and order-independent. Serialize when subagents share files or when one output feeds another's input. Gate checks (Phase 1.5 + Phase 3) are the canonical parallel instances.
 
-Full contract: [`sdlc/WORKFLOW.md → Inline dispatch shape for gates`](sdlc/WORKFLOW.md#inline-dispatch-shape-for-gates).
+Full contract: [`sdlc/workflow/agent-contracts.md → Contract Layer 1`](sdlc/workflow/agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape).
 
 **Completion markers.** When an operation completes successfully, it emits a
 `## COMPLETION_MARKER` H2 string detectable via regex (Layer 2 of the agent

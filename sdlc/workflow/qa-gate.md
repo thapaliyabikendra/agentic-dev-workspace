@@ -83,7 +83,7 @@ The ADR-conformance check dispatches parallel
 `Agent(subagent_type=Explore, ...)` subagents, each returning the 3-block
 contract (`## Findings / ## Risks / ## Open questions`). Contract canonical
 home:
-[`../WORKFLOW.md → Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates).
+[`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape).
 
 **DONE** → 0 Findings or only Minor — proceed to complete the QA
 verification checklist above.
@@ -136,7 +136,7 @@ single-FS milestones where the QA checklist already walked all criteria.
 - **Called from:** [`test-suite-codegen.md`](test-suite-codegen.md) — runs immediately
   after the generation report is emitted. No `/clear` between them; all three Phase 3
   files share one session.
-- **Required before:** [`../WORKFLOW.md → Inline dispatch shape for gates`](../WORKFLOW.md#inline-dispatch-shape-for-gates)
+- **Required before:** [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)
   — the ADR-conformance check dispatch contract lives there.
 - **Maintenance ops that may fire:**
   [`authoring-adr.md`](authoring-adr.md) (QA gate surfaces an ADR deviation requiring

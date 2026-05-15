@@ -532,7 +532,7 @@ Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
   the per-type index.md before globbing" governs context loading.
 - **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase
   pipeline, retrieval discipline,
-  [`../WORKFLOW.md → Maintenance discipline`](../WORKFLOW.md#maintenance-discipline)
+  [`Maintenance discipline`](./maintenance-discipline.md)
   for the 3-file lifecycle touch fired here.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   doctrinal anti-patterns this stage enforces ("Silent node or ADR

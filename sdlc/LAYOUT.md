@@ -109,33 +109,7 @@ artifact). When in doubt about where a new file goes, check here first.
             /test-plans          ← TC files drafted at Phase 2 Test plan ingest
               /<use-case>        ← display | add | edit | delete | toggle | view | ...
                 TC-NNN-<slug>.md ← stays milestone-scoped, not promoted
-    /nodes                 CANONICAL DDD wiki — Phase 2 ingest writes new nodes
-                           here (status: proposed); Phase 3 merge flips them to
-                           active and applies CHG deltas to existing targets
-      /actors              ACT-NNN-*.md  + index.md + log.md
-      /entities            ENT-NNN-*.md  + index.md + log.md
-      /commands            CMD-NNN-*.md  + index.md + log.md
-      /queries             QRY-NNN-*.md  + index.md + log.md   (lazy)
-      /flows               FLW-NNN-*.md  + index.md + log.md
-      /states              STA-NNN-*.md  + index.md + log.md
-      /decisions           DEC-NNN-*.md  + index.md + log.md
-      /integrations        INT-NNN-*.md  + index.md + log.md
-      /modules             MOD-NNN-*.md  + index.md + log.md   (lazy)
-      /screens             SCR-NNN-*.md  + index.md + log.md   (lazy)
-      /contracts           CON-NNN-*.md  + index.md + log.md   (lazy)
-                           (renamed from /endpoints 2026-05-14; carries
-                           HTTP / events / queues / gRPC contracts —
-                           discriminated by frontmatter protocol:)
-      /permissions         PERM-NNN-*.md + index.md + log.md   (lazy)
-      /services            SVC-NNN-*.md  + index.md + log.md   (lazy;
-                           multi-service projects only — one per
-                           deployable unit)
-      /functional-areas    FA-NNN-*.md   + index.md + log.md   (lazy;
-                           cross-MOD product slices)
-      /events              EVT-NNN-*.md  + index.md + log.md   (lazy;
-                           async/distributed events — Kafka + RabbitMQ;
-                           linked_contract: CON-NNN required)
-                           (no /changes — CHG nodes live in milestone folder)
+    /nodes                 CANONICAL DDD wiki — see KB-LAYOUT.md for type-folder tree
     /research              external / competitive research (lazy)
                            RESEARCH-NNN-*.md + index.md + log.md;
                            cited by future ADRs and FRSs by ID.
