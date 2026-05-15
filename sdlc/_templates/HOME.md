@@ -70,22 +70,11 @@ generated_at: YYYY-MM-DD
 
 ---
 
-## Nodes — FDE component
-
-> Source: `docs/fraud-detection-engine/nodes/<type>/index.md` per type.
-
-| Type | Total | Proposed | Active | Deprecated |
-| ---- | ----- | -------- | ------ | ---------- |
-| (populate when FDE nodes are added) | | | | |
-
----
-
 ## ADRs
 
 | Component | Total | Accepted | Deprecated | Superseded |
 | --------- | ----- | -------- | ---------- | ---------- |
 | APP | 0 | 0 | 0 | 0 |
-| FDE | 0 | 0 | 0 | 0 |
 | Shared | 0 | 0 | 0 | 0 |
 
 ---

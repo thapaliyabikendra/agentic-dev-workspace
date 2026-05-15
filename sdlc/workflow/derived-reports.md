@@ -169,7 +169,7 @@ would be a silent legacy-to-canonical write (see
 - **Required before:** [`maintenance-discipline.md`](maintenance-discipline.md)
   — explicit boundary: tiered touch governs canonical content only;
   derived reports are excluded.
-- **Reads:** per-type `index.md` files (APP, FDE, Shared);
+- **Reads:** per-type `index.md` files (APP, Shared);
   per-component `adrs/index.md`; master `home.md`. Specific
   `Pulls from:` lists live in each template under `_templates/`.
 - **Adjacent (not callers but consulted):**

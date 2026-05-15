@@ -16,10 +16,10 @@ phase, and points to the canonical home for each procedural detail.
 
 ## Hard rules
 
-- **The DDD knowledge base in `docs/app/nodes/` and `docs/fraud-detection-engine/nodes/` is the source of truth for behavior.**
+- **The DDD knowledge base in `docs/app/nodes/` is the source of truth for behavior.**
   If a node and a spec disagree, the node wins or both get reconciled before code is written.
 - **Three sources of truth for governance: STD / ADR / DEC.** Engine-level → `sdlc/standards/`;
-  component ADRs → `docs/<component>/adrs/` (APP: `docs/app/adrs/`; FDE: `docs/fraud-detection-engine/adrs/`);
+  component ADRs → `docs/<component>/adrs/` (APP: `docs/app/adrs/`);
   cross-component ADRs → `docs/shared/adrs/`;
   node-local → inline or `docs/<component>/nodes/decisions/`.
   Full discriminator: [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).
@@ -38,7 +38,7 @@ phase, and points to the canonical home for each procedural detail.
   `related:` changes = (3 + N). Procedure: [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md).
 - **Read the per-type `index.md` before globbing.** `docs/<component>/nodes/<type>/index.md` lists
   every page with summary, tags, status, source. Glob only when the component or type is unknown.
-  For APP nodes: `docs/app/nodes/<type>/index.md`. For FDE nodes: `docs/fraud-detection-engine/nodes/<type>/index.md`.
+  For APP nodes: `docs/app/nodes/<type>/index.md`.
 - **One question per turn during FRS / FS drafting.**
 - **TaskCreate mirrors phase task lists; durable status lives in artifacts.** One task = one
   observable outcome. Mark `in_progress` on start, `completed` immediately. Session-scoped only.
@@ -55,21 +55,17 @@ scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
 
 Brownfield planning workspace. Workflow scaffolding (templates, flow
 files, indexes) is in place. The DDD knowledge base is organized into
-two components:
+one component plus a shared area:
 
 - **APP component** ([`docs/app/`](docs/app/)) — .NET/ABP application: commands,
   entities, flows, integrations, states, decisions, and more. ADRs at
   [`docs/app/adrs/`](docs/app/adrs/) (ADR-001..031).
-- **FDE component** ([`docs/fraud-detection-engine/`](docs/fraud-detection-engine/)) —
-  Kafka/Flink/Druid streaming pipeline. ADRs at
-  [`docs/fraud-detection-engine/adrs/`](docs/fraud-detection-engine/adrs/) (ADR-032..037).
 - **Shared** ([`docs/shared/`](docs/shared/)) — glossary, cross-cutting-concerns,
   tech-stack, and any future cross-component ADRs.
 
-Component descriptors: [`docs/app/COMPONENT.md`](docs/app/COMPONENT.md),
-[`docs/fraud-detection-engine/COMPONENT.md`](docs/fraud-detection-engine/COMPONENT.md).
+Component descriptors: [`docs/app/COMPONENT.md`](docs/app/COMPONENT.md).
 `docs/milestones/` holds planning artifacts for all milestones (currently
-M-01 Unified Watchlist and M-02 Fraud Detection Engine).
+M-01 Unified Watchlist).
 Application code does not yet exist. See
 [`docs/home.md`](docs/home.md) for current artifact counts.
 
@@ -93,11 +89,9 @@ Templates: [`sdlc/_templates/`](sdlc/_templates/).
 Component bootstrap: [`sdlc/workflow/new-component-bootstrap.md`](sdlc/workflow/new-component-bootstrap.md).
 Generators wholesale-read per-type indexes (component-qualified — check all relevant components):
 - APP ADRs: [`docs/app/adrs/index.md`](docs/app/adrs/index.md)
-- FDE ADRs: [`docs/fraud-detection-engine/adrs/index.md`](docs/fraud-detection-engine/adrs/index.md)
 - Shared ADRs: [`docs/shared/adrs/index.md`](docs/shared/adrs/index.md)
 - Engine standards: [`sdlc/standards/index.md`](sdlc/standards/index.md)
 - APP nodes: `docs/app/nodes/<type>/index.md`
-- FDE nodes: `docs/fraud-detection-engine/nodes/<type>/index.md`
 
 Multi-repo directory layout, repo registry template, commit rule, and verification checklist: [`sdlc/LAYOUT.md § Multi-Repo Strategy`](sdlc/LAYOUT.md#multi-repo-strategy).
 Milestone state tracking: [`sdlc/_templates/MILESTONE-STATE.md`](sdlc/_templates/MILESTONE-STATE.md) (template),
