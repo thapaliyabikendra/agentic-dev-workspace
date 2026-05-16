@@ -36,7 +36,8 @@ file entirely and proceed to FRS authoring.
 invokes the research gate from Phase 1. [`authoring-adr.md`](authoring-adr.md)
 governs any ADR produced as a research output.
 [`maintenance-discipline.md`](maintenance-discipline.md) governs the
-3-file lifecycle touch when RESEARCH artifacts are created.
+3-file touch when RESEARCH artifacts are created (research is one of the
+two surviving `log.md` surfaces — canonical nodes/ADRs/CCCs use 2-file).
 
 ## Process Flow
 

@@ -39,9 +39,10 @@ heading; promote to standalone only on a trigger from *Inline vs
 standalone DEC*).
 
 **Vs. sibling files:** [`maintenance-discipline.md`](maintenance-discipline.md)
-is the rule book for the 3-file lifecycle touch this procedure fires
-on every ADR `created` / `linked` / `status-change` / `superseded`
-event. [`legacy-absorption.md`](legacy-absorption.md) routes legacy
+is the rule book for the 2-file touch this procedure fires on every ADR
+edit (`created` / `linked` / `status-change` / `superseded` are observable
+via the index row's Status column + git history; no `adrs/log.md`).
+[`legacy-absorption.md`](legacy-absorption.md) routes legacy
 convention/architecture docs into the ADR procedure here.
 [`evolving-the-workflow.md`](evolving-the-workflow.md) governs the
 case where the *type system itself* is being extended (rare, distinct
@@ -193,8 +194,8 @@ node's file. Promote to **standalone** (a file under
 **Promotion paths:**
 - **Inline → standalone**: cut from host node's `## Decisions` block; create
   `docs/<component>/nodes/decisions/DEC-NNN-<slug>.md`; fire the 2-file node touch
-  (file + decisions/index.md — DEC is a canonical node; no log.md fires); replace
-  the inline content with a one-line link: `See [DEC-NNN](../decisions/DEC-NNN-<slug>.md)`.
+  (file + decisions/index.md); replace the inline content with a one-line link:
+  `See [DEC-NNN](../decisions/DEC-NNN-<slug>.md)`.
 - **Standalone → ADR**: see *Cross-type supersession* below. Worked example:
   DEC-009 → ADR-029 (2026-05-13).
 - **DEC → Standard**: rare — usually means the rule was misclassified as
@@ -225,13 +226,13 @@ same operation as the scope-expansion edit.
 1. **Standalone.** A new architectural commitment with no FRS context —
    e.g., "Use Playwright for E2E tests with the page-object pattern." No
    in-flight feature. Pick the next `ADR-NNN`, copy
-   [`_templates/ADR.md`](../_templates/ADR.md), fill, update
-   `docs/<component>/adrs/index.md`, and append a `created` entry to
-   `docs/<component>/adrs/log.md`. (`docs/home.md`'s ADR table is derived
-   from the per-component indexes — regenerated on demand, not hand-edited.)
-   Standalone ADRs have no Phase 1 / Phase 2 handoff to ride on, so author
-   them directly as `accepted` once you're committed; use `proposed` only if
-   you want a deliberate "sit with this for a week" gap before accepting.
+   [`_templates/ADR.md`](../_templates/ADR.md), fill, and update
+   `docs/<component>/adrs/index.md` (2-file touch — no `adrs/log.md`).
+   (`docs/home.md`'s ADR table is derived from the per-component indexes —
+   regenerated on demand, not hand-edited.) Standalone ADRs have no
+   Phase 1 / Phase 2 handoff to ride on, so author them directly as
+   `accepted` once you're committed; use `proposed` only if you want a
+   deliberate "sit with this for a week" gap before accepting.
 
 2. **From an FRS** (Phase 1). The clarifying dialog surfaces a previously
    implicit architectural choice. Record as an ADR alongside the FRS draft.
@@ -259,17 +260,15 @@ same operation as the scope-expansion edit.
 3. Update `docs/<component>/adrs/index.md` — add one row to the Active ADRs
    table per the schema in [`retrieval-discipline.md § Index row schemas`](retrieval-discipline.md#index-row-schemas)
    (title ≤120 chars; Source cell mapping per the schema).
-4. Append a `created` entry to `docs/<component>/adrs/log.md` — see
-   [`maintenance-discipline.md`](maintenance-discipline.md) for format.
-   (`docs/home.md` is derived from the per-component ADR indexes — it
-   regenerates on demand, not per event. Do not hand-edit its ADR table.)
+4. (No `adrs/log.md` entry — chronological audit is git history. The 2-file
+   touch is the ADR + its `adrs/index.md` row.) (`docs/home.md` is derived
+   from the per-component ADR indexes — it regenerates on demand, not per
+   event. Do not hand-edit its ADR table.)
 5. Link from origin if applicable: set `frs_origin` / `fs_origin` on the ADR,
-   and add the ADR ID to the origin artifact's `adrs:` frontmatter. When the
-   back-link lands, append a `linked` entry to `docs/<component>/adrs/log.md`.
+   and add the ADR ID to the origin artifact's `adrs:` frontmatter.
 6. If superseding: set `supersedes:` on the new ADR, set `superseded_by:` on
-   the old one, move the old one's index row from Active to
-   Superseded/deprecated, and append `superseded` entries to `docs/<component>/adrs/log.md`
-   for both ADRs.
+   the old one, and move the old one's index row from Active to
+   Superseded/deprecated. Re-sync the row's Status column to `superseded`.
 7. If the ADR resolves one or more `OQ-NNN`: add the OQ ID(s) to the ADR's
    `resolves:` frontmatter (add the field if absent — it accepts a list
    of OQ-NNN, DEC-NNN, or FRS-NNN IDs the ADR closes). For each resolved
@@ -300,8 +299,8 @@ the DEC** rather than editing the DEC in place. The mechanics:
 - The DEC's status flips `active → superseded`.
 - The DEC's index row moves from Active to Superseded/deprecated in
   `docs/<component>/nodes/decisions/index.md` (the Status column re-sync
-  captures the status-change — no separate DEC log entry). The ADR's
-  `log.md` gets a `created` entry that names the supersession.
+  captures the status-change). The ADR's body names the superseded DEC;
+  the cross-type audit trail is the two index rows + git history.
 - The DEC body is retained for audit — add a banner at the top pointing
   at the superseding ADR. The canonical rationale, alternatives, and
   consequences live in the ADR going forward; the DEC page is read-only.
@@ -332,11 +331,11 @@ Same mechanics, fields swapped. Precedent: ADR-029 superseding DEC-009
 
 Status moves are explicit edits, not implicit. The user-review handoff at
 Phase 1 or Phase 2 exit is the moment to flip a `proposed` ADR to `accepted`
-if it was authored during that phase. Every status move appends a
-`status-change` entry to `docs/<component>/adrs/log.md` and re-syncs the row
-in `docs/<component>/adrs/index.md`. (`docs/home.md` is derived from the
-per-component ADR indexes — regenerated on demand, not hand-edited per
-event.) See [`maintenance-discipline.md`](maintenance-discipline.md).
+if it was authored during that phase. Every status move re-syncs the row's
+Status column in `docs/<component>/adrs/index.md` (2-file touch — no
+`adrs/log.md`). (`docs/home.md` is derived from the per-component ADR
+indexes — regenerated on demand, not hand-edited per event.) See
+[`maintenance-discipline.md`](maintenance-discipline.md).
 
 ---
 

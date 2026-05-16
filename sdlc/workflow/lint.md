@@ -109,8 +109,8 @@ For each debt class below:
 When all four classes are walked, emit a one-line summary report to the
 session (or to the user) listing findings as
 `<debt-class> | <artifact-id> | <one-line detail>`. The report itself is
-not persisted — the OQ-NNN entries and `log.md` rows it produces are the
-durable record.
+not persisted — the OQ-NNN entries and `index.md` row updates it
+produces are the durable record.
 
 ## Debt classes — initial set
 

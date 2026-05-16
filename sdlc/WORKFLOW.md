@@ -312,11 +312,12 @@ implemented without doing this pass.
   `adrs/index.md` and `nodes/<type>/index.md` carry one row per page with a
   one-line summary, tags, and source — enough for an LLM to route to the
   right page without opening it. These are the files generators wholesale-read.
-- **Per-type `log.md`** — append-only chronological event records, one entry
-  per lifecycle event. Applies to **ADRs** (`adrs/log.md`) and **research**
-  (`docs/research/log.md`) only. Node lifecycle events are recorded by
-  re-syncing the Status column in the per-type `index.md`; no per-type node
-  `log.md` fires. See [Maintenance discipline](#maintenance-discipline).
+- **Surviving `log.md` companions** — append-only chronological event records,
+  one entry per lifecycle event. Apply to **research** (`docs/research/log.md`)
+  and **standards** (`sdlc/standards/log.md`) only. Canonical lifecycle events
+  (nodes, ADRs, CCCs) are recorded by re-syncing the Status column in the
+  per-type `index.md`; no canonical `log.md` fires. See
+  [Maintenance discipline](#maintenance-discipline).
 
 ### Test artifacts traceability
 
@@ -327,12 +328,11 @@ implemented without doing this pass.
 
 ### Maintenance discipline
 
-> Node edits (routine or lifecycle): **2-file touch** (node + per-type `index.md`); Status
-> changes are reflected by re-syncing the `index.md` Status column. No per-type node `log.md`
-> fires. ADR routine edits: 2-file touch (ADR + `adrs/index.md`). ADR lifecycle events:
-> **3-file touch** (ADR + `adrs/index.md` + `adrs/log.md`). `home.md` is derived from
-> per-type indexes, not hand-maintained.
-> Canonical home (vocabulary, tier-touch procedure, log format, lazy-creation rule, fallback):
+> All canonical edits (node, ADR, CCC, routine or lifecycle): **2-file touch**
+> (artifact + per-type `index.md`); status changes are reflected by re-syncing
+> the `index.md` Status column. No per-canonical-type `log.md` (retired
+> 2026-05-16). `home.md` is derived from per-type indexes, not hand-maintained.
+> Canonical home (vocabulary, tier-touch procedure, lazy-creation rule, fallback):
 > [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
 ### Maintaining baseline references (glossary, CCC)

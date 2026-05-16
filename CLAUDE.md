@@ -35,11 +35,11 @@ relevant flow file are loaded. Applies across sessions.
    mark each stage `[x]` before advancing. Cohort definition + node-ingest
    / CHG rules: [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md).
    Progress-checklist procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
-8. Tiered touch for canonical edits. Nodes = 2-file (node + per-type
-   `index.md`). ADR routine = 2-file (ADR + `adrs/index.md`). ADR
-   lifecycle = 3-file (+ `adrs/log.md`). `related:` changes = base + N.
-   Per-type node `log.md` was dropped 2026-05-16 — see
-   [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md) § Rule history.
+8. Tiered touch for canonical edits. All canonical artifacts use the
+   2-file touch: node / ADR / CCC + per-type `index.md`. `related:`
+   changes = base + N. Canonical `log.md` retired 2026-05-16 (covers
+   nodes, ADRs, and CCCs) — surviving logs are research and standards.
+   See [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md) § Rule history.
 9. Read the per-type `index.md` before globbing. Glob only when
    component/type is unknown. Path: `docs/<component>/nodes/<type>/index.md`.
 10. One question per turn during FRS / FS drafting.

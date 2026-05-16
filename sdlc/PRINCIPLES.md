@@ -136,8 +136,8 @@ at the foot of this file.
 - **❌ Embedding structured metadata in prose, or narrative prose in frontmatter.** Crossing the line lets the two drift silently.
   **✅ IDs, statuses, links, and dates belong in YAML frontmatter; rationale, behavior, and explanation belong in the body.**
 
-- **❌ Silent node or ADR edits — no `index.md` re-sync (nodes) or no `adrs/log.md` entry (ADR lifecycle events).** Indexes are a source of truth only as long as nothing slips past them.
-  **✅ For nodes: run the 2-file touch atomically (node + per-type `index.md`). For ADR lifecycle events: run the 3-file touch (ADR + `adrs/index.md` + `adrs/log.md`).** If you can't re-sync the index (or write the log entry for an ADR event), the edit isn't ready. See [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
+- **❌ Silent canonical edits — no `index.md` re-sync after a node, ADR, or CCC change.** Indexes are a source of truth only as long as nothing slips past them.
+  **✅ Run the 2-file touch atomically: artifact + per-type `index.md`.** If you can't re-sync the index, the edit isn't ready. Chronological audit lives in git history — no per-canonical-type `log.md` (retired 2026-05-16). See [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
 - **❌ Coining a new node type when only one node would ever live under it.** Fragments the index without buying retrieval clarity.
   **✅ Extend an existing type, or capture the content as an ADR (cross-cutting) or DEC (node-scoped).** Apply the ADR-vs-DEC discriminator and the type-extension discriminator together. See [`WORKFLOW.md → Evolving the workflow → Defining a new node type`](WORKFLOW.md).

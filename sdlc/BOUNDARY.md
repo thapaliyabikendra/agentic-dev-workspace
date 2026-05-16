@@ -93,7 +93,7 @@ without modification.
   (per-FRS existence/sanity/ADR-conflict checks + milestone cross-FRS
   sweep). Phase 1.5 existence-scan includes `proposed` in-flight nodes
   from sibling FSs.
-- **Per-type `index.md` convention for nodes; `index.md` + `log.md` pair for ADRs.** Each canonical node-type folder owns a Karpathy-style content catalog (`index.md`). ADR folders additionally carry an append-only chronological event record (`log.md`). **Node touch is 2-file (node + per-type `index.md`); ADR lifecycle events are 3-file (ADR + `adrs/index.md` + `adrs/log.md`).** Procedure documented in
+- **Per-type `index.md` convention for canonical artifacts.** Each canonical node-type folder, the ADR folders, and `docs/shared/ccc/` own a Karpathy-style content catalog (`index.md`). **All canonical edits fire the 2-file touch (artifact + per-type `index.md`);** chronological audit is git history of the artifact and its index row. Procedure documented in
   [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
 ### ADR Wiki
@@ -104,9 +104,8 @@ without modification.
   borrowed from the DEC node template.
 - The Karpathy-style index at [`adrs/index.md`](../docs/<component>/adrs/index.md) — the one
   file generators wholesale-read; individual ADR pages stay narrow-load.
-- The companion append-only [`adrs/log.md`](../docs/<component>/adrs/log.md) — chronological
-  event record paired with the index. Same pattern used for every node-type
-  folder.
+  Chronological audit is git history; no companion `log.md` (retired
+  2026-05-16).
 - The three-trigger authoring procedure (standalone / from FRS / from FS)
   documented in [`workflow/authoring-adr.md`](workflow/authoring-adr.md).
 - The three-way Standard / ADR / DEC discriminator (lives in
@@ -148,7 +147,7 @@ without modification.
 - Validation gates, context resets, retrieval discipline, traceability,
   brownfield muscle, OQ-NNN open questions as a first-class artifact
   type with per-OQ files + index + log.
-- **Maintenance discipline** — the tiered touch rule (node = 2-file: node + per-type `index.md`; ADR lifecycle event = 3-file: ADR + `adrs/index.md` + `adrs/log.md`; master README is derived and regenerated on demand).
+- **Maintenance discipline** — the tiered touch rule (all canonical artifacts — node, ADR, CCC — fire the 2-file touch: artifact + per-type `index.md`; master README is derived and regenerated on demand).
   See [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 - **Derived stakeholder overviews.** The two-template pattern
   (BUSINESS / TECHNICAL), the wiki-as-source rule, and the
@@ -260,7 +259,7 @@ Topic-by-topic classification:
 | Inline DEC `## Decisions` heading on node templates | **engine-prescribed** | Every node-type template carries the heading; inline placement is the default. |
 | Inline-vs-standalone DEC choice for a specific decision | **engine-recommended** | Discriminator in `workflow/authoring-adr.md` defaults to inline; project applies it. |
 | Standard-vs-ADR boundary on existing content | **project-time** | Existing project ADRs that turn out to be engine-level migrate opportunistically; no bulk lift. |
-| Tiered touch on edits and lifecycle events | **engine-prescribed** | Node edits: 2-file (node + per-type `index.md`). ADR lifecycle events: 3-file (ADR + `adrs/index.md` + `adrs/log.md`). Event-driven — fires at the lifecycle event itself: Phase 2 ingest `created`, Phase 3 merge `status-change` (`proposed → active`) and CHG-applied `updated`/`superseded`/`status-change`. |
+| Tiered touch on edits and lifecycle events | **engine-prescribed** | All canonical edits (node, ADR, CCC): 2-file (artifact + per-type `index.md`). Event-driven — fires at the lifecycle event itself: Phase 2 ingest `created`, Phase 3 merge `status-change` (`proposed → active`) and CHG-applied `updated`/`superseded`/`status-change`. Chronological audit is git history; no per-canonical-type `log.md` (retired 2026-05-16). |
 | DDD node status vocabulary | **engine-prescribed** | `proposed → active → superseded \| deprecated`. FS-generated nodes pass through `proposed` (Phase 2 → Phase 3 merge flip); brownfield-absorbed nodes start at `active` directly (Phase-3-equivalent in discipline). |
 | ADR status vocabulary | **engine-prescribed** | `proposed → accepted → deprecated \| superseded`. |
 | DEC status vocabulary | **engine-prescribed** | `proposed → active → superseded \| deprecated`. Parity with other DDD nodes — standalone DECs go canonical at Phase 2 with `proposed`; flip to `active` at Phase 3 merge. Inline DECs have no independent status (they ride the host node's lifecycle). |

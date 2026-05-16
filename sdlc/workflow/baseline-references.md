@@ -39,9 +39,8 @@ the 4-way STD / ADR / CCC / DEC discriminator in
 [`authoring-adr.md`](authoring-adr.md).
 
 **Vs. sibling files:** [`maintenance-discipline.md`](maintenance-discipline.md)
-governs the per-type tiered touch on canonical nodes and ADRs; CCC ops
-mirror the ADR tiered-touch pattern (routine = 2-file; lifecycle event
-= 3-file); the glossary remains outside that pattern.
+governs the 2-file touch on canonical nodes, ADRs, and CCCs uniformly;
+the glossary remains outside that pattern.
 [`authoring-adr.md`](authoring-adr.md) is where an FRS deviation from
 a CCC baseline gets recorded;
 [`legacy-absorption.md`](legacy-absorption.md) can produce baseline
@@ -66,10 +65,10 @@ operation isn't atomic enough.*
 CCC tree at [`docs/shared/ccc/`](../../docs/shared/ccc/) are
 **project-owned baselines** — domain vocabulary and NFR defaults that
 every FRS inherits. The glossary is a flat document (no per-type
-`index.md`); the CCC store is a structured tree with `index.md`,
-`log.md`, and per-CCC files. Neither absorbs FRS deviations — an FRS
-override of a CCC baseline becomes an ADR back-linked to the CCC via
-`related: [CCC-NNN]`.
+`index.md`); the CCC store is a structured tree with `index.md` and
+per-CCC files (no companion `log.md` — retired 2026-05-16). Neither
+absorbs FRS deviations — an FRS override of a CCC baseline becomes an
+ADR back-linked to the CCC via `related: [CCC-NNN]`.
 
 Lifecycle operations run **between** Phase 1.5 gates, never during one.
 
@@ -90,15 +89,13 @@ Lifecycle operations run **between** Phase 1.5 gates, never during one.
   2. Create `docs/shared/ccc/CCC-NNN-<slug>.md` with `status: proposed`.
      Keep the Baseline section ≤140 chars; surface open questions as
      `OQ-NNN` under `docs/discovery/open-questions/` rather than guessing.
-  3. Fire the **3-file lifecycle touch** (`created`):
+  3. Fire the **2-file touch**:
      a. The new CCC file.
      b. Add a row to `docs/shared/ccc/index.md` (Active table) — `Updated` = today.
-     c. Append a `created` entry to `docs/shared/ccc/log.md`.
 
-  **Verify:** grep `docs/shared/ccc/index.md` for the new ID; grep
-  `docs/shared/ccc/log.md` for the `created` entry.
-  **On failure:** if any of the 3-file set is missing, the event is
-  half-fired — complete before declaring done
+  **Verify:** grep `docs/shared/ccc/index.md` for the new ID.
+  **On failure:** if the index row is missing, the touch is half-fired —
+  complete before declaring done
   (see [`maintenance-discipline.md`](maintenance-discipline.md)).
 
 ## Op 2: Change
@@ -112,24 +109,19 @@ breaking change.
   Classify the change:
   - **Non-breaking (clarification)** — wording tightened, examples
     added, obligation made more explicit without changing assumptions.
-    Fire the **2-file routine touch**: CCC file + re-sync the row in
-    `docs/shared/ccc/index.md` (`Updated` = today). No log entry.
+    Fire the **2-file touch**: CCC file + re-sync the row in
+    `docs/shared/ccc/index.md` (`Updated` = today).
   - **Breaking** — Baseline narrows, contradicts, or removes an
     obligation existing FRSs may have relied on (e.g., tightening
     retention windows). Every FRS citing the CCC should be re-audited.
-    Fire the **3-file lifecycle touch** with an `updated` log entry
-    (op vocabulary per `maintenance-discipline.md` — `status-change`
-    is reserved for `status:` transitions, not content edits): CCC
-    file + `docs/shared/ccc/index.md` (re-sync) +
-    `docs/shared/ccc/log.md` (append). The log entry names the
-    affected FRS sections and recommends Phase 1.5 re-validation.
+    Same **2-file touch** (no separate log file — git history captures
+    the chronological audit). The CCC's `Revision history` section
+    names the affected FRS sections and recommends Phase 1.5
+    re-validation.
 
-  Pure typo fixes do not fire a log entry but do re-sync `Updated` in
-  the index row.
-
-  **Verify:** for a non-breaking change, confirm the index row's
-  `Updated` field re-synced. For a breaking change, confirm the log
-  entry is appended and names the affected FRSs.
+  **Verify:** confirm the index row's `Updated` field re-synced. For a
+  breaking change, confirm the CCC's Revision history names the
+  affected FRSs.
   **On failure:** complete the missing file before closing.
 
 ## Op 3: Retire
@@ -144,18 +136,17 @@ breaking change.
 - *Cross-cutting concerns.* Flip CCC frontmatter:
   `status: deprecated` (no successor) or `status: superseded` +
   `superseded_by: CCC-NNN` (when a replacement CCC exists). Then fire
-  the **3-file lifecycle touch** (`deprecated` or `superseded`):
+  the **2-file touch**:
   a. The CCC file (update frontmatter, note reason in Revision history).
   b. Move the row in `docs/shared/ccc/index.md` from Active to the
-     Superseded/deprecated table.
-  c. Append a `deprecated` or `superseded` entry to
-     `docs/shared/ccc/log.md`.
+     Superseded/deprecated table; Status column re-syncs.
 
   **Never delete a CCC file or reuse its ID.** The ID and file remain
   in place with the retired status.
 
   **Verify:** confirm the index row is in the Superseded/deprecated
-  table; confirm the log entry is appended.
+  table; confirm the CCC's frontmatter and Revision history capture the
+  retirement.
   **On failure:** complete the missing file before closing.
 
 ## Op 4: Drift detection
@@ -194,16 +185,15 @@ FRS edits.
   always-snapshot-read baseline injectable. Anchor:
   [`retrieval-discipline.md § Baselines`](retrieval-discipline.md#baselines).
 - **Every meaningful CCC edit re-syncs the `Updated` field** in the
-  index row. Breaking changes and lifecycle events also append a log
-  entry (3-file touch). The `Updated` stamp and log entries are the
-  Phase 1.5 audit trail.
+  index row. The `Updated` stamp plus git history are the Phase 1.5
+  audit trail (canonical `log.md` retired 2026-05-16).
 - **Never edit FRS bodies from a drift report.** Surface the finding;
   the FRS author chooses the resolution.
 
 The glossary remains outside the tiered-touch pattern (no companion
-`index.md` or `log.md`). CCC ops mirror the ADR tiered-touch split:
-routine edits = 2-file (CCC + index re-sync); lifecycle events =
-3-file (CCC + index + log). Full tiered-touch mechanics:
+`index.md` or `log.md`). All CCC edits — routine or lifecycle — fire the
+2-file touch (CCC + index re-sync); chronological audit is git history.
+Full tiered-touch mechanics:
 [`maintenance-discipline.md`](maintenance-discipline.md).
 
 ---

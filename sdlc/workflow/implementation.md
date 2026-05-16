@@ -27,15 +27,14 @@ the CHG's status `approved → merged` in place. The CHG file itself stays
 at its milestone path — never promoted. Then implements the code that
 the now-active canonical nodes describe.
 
-Node lifecycle events (status flips, supersession, content updates)
-fire the 2-file node touch — they do **not** append a per-type node
-`log.md` entry. The audit trail is the index row's Status column +
-git history. ADR lifecycle events fired during implementation still
-follow the 3-file ADR touch (`adrs/log.md` entry). See
+All canonical lifecycle events during implementation (node status flips,
+supersession, content updates; ADR status changes) fire the 2-file touch.
+The audit trail is the index row's Status column + git history; no
+canonical `log.md` (retired 2026-05-16). See
 [`maintenance-discipline.md`](maintenance-discipline.md).
 
 <HARD-GATE>
-Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green — every new node flipped `proposed → active`, every CHG delta applied to canonical with the matching per-type `index.md` rows re-synced (and any ADR lifecycle events logged to `adrs/log.md`), every CHG flipped `approved → merged`. Coding against a still-`proposed` node, or against a CHG-targeted canonical node that hasn't yet received its delta, breaks the source-of-truth invariant the Merge stage exists to maintain.
+Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green — every new node flipped `proposed → active`, every CHG delta applied to canonical with the matching per-type `index.md` rows re-synced (including any ADR status changes), every CHG flipped `approved → merged`. Coding against a still-`proposed` node, or against a CHG-targeted canonical node that hasn't yet received its delta, breaks the source-of-truth invariant the Merge stage exists to maintain.
 (Cross-cutting rules: see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Tiered touch for canonical edits".)
 </HARD-GATE>
 
@@ -268,9 +267,9 @@ For **every new node** in the FS's `new_nodes:` (already at
    `docs/home.md` is derived from the per-type indexes — it regenerates
    on demand, not per merge.
 
-   No per-type node `log.md` entry fires; the index row's Status column
+   No canonical `log.md` entry fires; the index row's Status column
    plus git history are the audit trail. See
-   [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--per-type-node-logmd-dropped-2026-05-16).
+   [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16).
 
 For **every CHG-NNN** in the FS's `changes:`:
 
@@ -443,11 +442,10 @@ No silent flips.
             is terminal (`superseded` / `deprecated`), row moved to the
             Superseded/deprecated section.
 - [ ] For every ADR whose status changes during implementation
-      (3-file ADR lifecycle touch):
-      - [ ] `status-change` (or `superseded` / `deprecated`) entry appended
-            to `adrs/log.md`.
-      - [ ] `adrs/index.md` row updated (moved to the Superseded/deprecated
-            section if applicable).
+      (2-file ADR touch):
+      - [ ] ADR frontmatter `status:` updated on the file.
+      - [ ] `adrs/index.md` row's Status column re-synced (moved to the
+            Superseded/deprecated section if applicable).
       - [ ] If superseding: successor ADR authored via the full procedure
             in [`authoring-adr.md → Steps`](authoring-adr.md#steps-all-triggers).
 
@@ -613,7 +611,7 @@ Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
 - **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase
   pipeline, retrieval discipline,
   [`Maintenance discipline`](./maintenance-discipline.md)
-  for the 2-file node touch (and 3-file ADR lifecycle touch) fired here.
+  for the 2-file touch (node, ADR, CCC) fired here.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   doctrinal anti-patterns this stage enforces ("Silent node or ADR
   edits"; "Editing a canonical node outside an active Phase 3 merge";

@@ -46,7 +46,10 @@ on first Phase 2 ingest of that type.**
 Each node-type folder gets only an `index.md` companion (no `log.md`) — per the
 2026-05-16 rule change in
 [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
-Per-type node logging was dropped; ADR and research `log.md` files are retained.
+All canonical `log.md` companions (nodes, ADRs, CCCs) were retired on
+2026-05-16; chronological audit is git history. Research
+(`docs/research/log.md`) and standards (`sdlc/standards/log.md`) logs are
+retained.
 
 ## Node-type discriminators
 
@@ -103,12 +106,13 @@ and does not live under `docs/<component>/nodes/`.
 ```
 docs/research/                    # canonical research tree (lazy)
   index.md                        # Karpathy-style content catalog
-  log.md                          # append-only chronological record
+  log.md                          # append-only chronological record (retained)
   RESEARCH-NNN-<slug>.md          # individual pages, narrow-loaded
 ```
 
-Lazy-create the folder + `index.md` + `log.md` pair on first
-`RESEARCH-NNN` instance, per
+Research is one of the two surviving `log.md` surfaces (the other is
+`sdlc/standards/log.md`). Lazy-create the folder + `index.md` + `log.md`
+pair on first `RESEARCH-NNN` instance, per
 [`workflow/maintenance-discipline.md → Lazy creation`](workflow/maintenance-discipline.md).
 RESEARCH entries are *cited references*: ADRs and FRSs link by ID
 rather than restating content. Lifecycle: `raw` → `synthesized` →
@@ -126,9 +130,11 @@ content and does not live under `docs/<component>/nodes/`.
 ```
 docs/shared/ccc/                # canonical CCC tree
   index.md                      # Karpathy-style content catalog
-  log.md                        # append-only chronological record
   CCC-NNN-<slug>.md             # individual pages, narrow-loaded
 ```
+
+No `ccc/log.md` — chronological audit is git history (canonical `log.md`
+retired 2026-05-16).
 
 CCC entries are *cited references*: FRSs and ADRs link by ID rather than
 restating content. Lifecycle: `proposed → accepted → superseded |

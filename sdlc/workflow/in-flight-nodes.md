@@ -11,9 +11,9 @@ frontmatter. The 2-file node touch fires at that ingest — node file +
 `proposed` row in the per-type `index.md`. Phase 3 merge flips
 `proposed → active` by editing the node's frontmatter and re-syncing the
 per-type `index.md` Status column. DDD node lifecycle:
-`proposed → active → superseded | deprecated`. (Node lifecycle events do
-not fire a `log.md` entry — see
-[`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--per-type-node-logmd-dropped-2026-05-16).)
+`proposed → active → superseded | deprecated`. (Canonical lifecycle events
+do not fire a `log.md` entry — see
+[`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16).)
 
 ## CHG mechanics
 
@@ -71,5 +71,5 @@ WORKFLOW.md carries the always-loaded summary; this file is the full procedure.
 
 **Related:** [`../KB-LAYOUT.md`](../KB-LAYOUT.md) — where in the folder
 tree proposed nodes land; [`maintenance-discipline.md`](maintenance-discipline.md) —
-the 2-file node touch (and 3-file ADR lifecycle touch) that fires at
-`created` and `status-change` events.
+the 2-file touch (node, ADR, CCC uniformly) that fires at `created` and
+`status-change` events.

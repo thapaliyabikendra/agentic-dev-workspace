@@ -188,8 +188,9 @@ then let the regeneration surface it.
   "Reference, never copy" and the tiered touch rule govern every step.
 - **Required before:**
   [`maintenance-discipline.md`](maintenance-discipline.md) —
-  the 2-file touch procedure for creating canonical nodes (and 3-file for
-  ADRs).
+  the 2-file touch procedure for creating canonical nodes, ADRs, and CCCs.
+  Research (`docs/research/`) retains its 3-file touch (file + `index.md` +
+  `log.md`) — it is one of the two surviving `log.md` surfaces.
 - **Trigger source:**
   [`derived-reports.md`](derived-reports.md) — calls this operation
   when synthesis surfaces a new concept.

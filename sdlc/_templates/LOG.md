@@ -9,14 +9,13 @@
 > the **bottom** of the Entries section; the last 5 are visible via
 > `grep "^## \[" log.md | tail -5`.
 
-> **Note (2026-05-16):** Per-type node `log.md` was dropped on 2026-05-16
-> (see `maintenance-discipline.md` → Rule history). This template no longer
-> applies to canonical node-type folders (Actors, Entities, Commands, Flows,
-> States, Decisions, Integrations, etc.).
+> **Note (2026-05-16):** Canonical `log.md` was retired on 2026-05-16 for all
+> canonical artifacts — nodes, ADRs, and CCCs (see `maintenance-discipline.md`
+> → Rule history). This template now applies only to the two surviving log
+> surfaces below.
 
 **Replace `<Type>` and `<scope>` above** with the applicable area and folder path:
 
-- **ADRs** — component-level: `docs/<component>/adrs/`; cross-component: `docs/shared/adrs/`
 - **Research** — `docs/research/`
 - **Engine-level standards** — `sdlc/standards/`
 

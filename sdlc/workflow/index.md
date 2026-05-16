@@ -45,7 +45,7 @@ The QA track is **trigger-independent** — three flows that consume dev-track o
 | File | One-line summary | When to load |
 |------|-----------------|--------------|
 | [authoring-adr.md](authoring-adr.md) | Land an ADR — pick artifact type, file it, wire cross-references, run supersession path | Phase 0/1/2 or standalone when an architectural commitment needs recording |
-| [maintenance-discipline.md](maintenance-discipline.md) | Type-split touch rule for canonical edits (node = 2-file always; ADR routine = 2-file; ADR lifecycle = 3-file; (base+N) for related). Per-type node `log.md` dropped 2026-05-16. | Any canonical-node or ADR edit |
+| [maintenance-discipline.md](maintenance-discipline.md) | 2-file touch rule for canonical edits (node, ADR, CCC uniformly = artifact + per-type `index.md`; (base+N) for related edges). Canonical `log.md` retired 2026-05-16. | Any canonical-node, ADR, or CCC edit |
 | [discuss.md](discuss.md) | Pre-plan discussion — captures architectural decisions after Phase 1.5 gate closure; outputs durable files that survive `/clear` | After Phase 1.5 exit, before `/clear` + `plan.md` |
 | [in-flight-nodes.md](in-flight-nodes.md) | CHG mechanics, cross-FS dependencies, abandonment procedure for `status: proposed` nodes | Phase 2/3 when authoring or merging an FS that touches canonical nodes |
 | [research.md](research.md) | Resolves `blocking-frs` OQs before FRS body sections can be authored | Phase 1 (internal) when ≥1 OQ classified `blocking-frs` |

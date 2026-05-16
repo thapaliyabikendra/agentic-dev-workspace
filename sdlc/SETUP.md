@@ -70,17 +70,15 @@ docs/
   shared/
     COMPONENT.md             ← from sdlc/_templates/COMPONENT.md (shared variant)
     glossary.md              ← from sdlc/_templates/GLOSSARY.md
-    ccc/                     ← per-CCC pages (one file per concern); seed per Step 6
-      index.md               ← Karpathy-style index of CCC pages; seed shape per `_templates/INDEX.md`
-                                with the CCC-specific columns (Stack, Updated) from this engine's
-                                reference at `docs/shared/ccc/index.md`
-      log.md                 ← append-only CCC lifecycle log; entry format per
-                                `_templates/LOG.md` and `workflow/maintenance-discipline.md`
+    ccc/                     ← lazy-created on first CCC (see Step 6); no log.md
+                                (canonical `log.md` retired 2026-05-16)
     tech-stack.md            ← author manually per `BOUNDARY.md` § Engine-vs-project axis
                                 (no template; 8-section structure is engine-prescribed)
-    adrs/
+    adrs/                    ← cross-component ADR store (≥2-component ADRs only)
       index.md               ← from sdlc/_templates/INDEX.md  (ADR variant)
-      log.md                 ← from sdlc/_templates/LOG.md    (ADR variant)
+                                (no log.md — canonical `log.md` retired 2026-05-16)
+                                Component-scoped `docs/<component>/adrs/index.md` is
+                                lazy-created on first component ADR — do not pre-seed.
   home.md                    ← stub; will be derived once nodes exist
 ```
 
@@ -104,18 +102,20 @@ Add at minimum:
 - The project's primary domain terms (aggregates, bounded contexts).
 - Any abbreviations used in node IDs or ADR titles.
 
-### 6. Populate `docs/shared/ccc/`
+### 6. Populate `docs/shared/ccc/` (lazy — only as FRSs surface real baselines)
 
-Seed one `CCC-NNN-<slug>.md` page per NFR baseline category using
+The CCC tree is lazy-created on first CCC, same as ADR folders. **Do not
+pre-seed empty placeholder CCCs at setup.** Let FRSs surface concrete NFR
+baselines, then author the corresponding CCC at that point using
 [`sdlc/_templates/CROSS-CUTTING-CONCERNS.md`](_templates/CROSS-CUTTING-CONCERNS.md)
-as the per-CCC template. Use the cross-cutting constants already recorded
-in `docs/project.md § Cross-Cutting Constants` to seed the baseline prose.
-For each new CCC:
+as the per-CCC template. For each new CCC:
 
-1. Copy the template to `docs/shared/ccc/CCC-NNN-<slug>.md`.
-2. Add a row to `docs/shared/ccc/index.md` (Active table).
-3. Append a `created` entry to `docs/shared/ccc/log.md` per the
-   maintenance-discipline log format.
+1. Create `docs/shared/ccc/CCC-NNN-<slug>.md` from the template. If this
+   is the first CCC, also create `docs/shared/ccc/index.md` from
+   [`sdlc/_templates/INDEX.md`](_templates/INDEX.md) (CCC variant — columns:
+   `ID | Status | Title | Stack | Tags | Source | Updated`).
+2. Add a row to `docs/shared/ccc/index.md` (Active table). 2-file touch —
+   no `ccc/log.md` (canonical `log.md` retired 2026-05-16).
 
 Anything project-specific that deviates from a CCC baseline gets its own
 ADR back-linked via `related: [CCC-NNN]` in the ADR's frontmatter — the

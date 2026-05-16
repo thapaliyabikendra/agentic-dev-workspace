@@ -431,8 +431,8 @@ later.
       not silently absorbed. (Validation findings from the gate land in a
       separate section at Phase 1.5; do not pre-empt.)
 - [ ] Any ADR authored during Phase 1 dialog is filed under
-      `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed in `adrs/index.md`, logged with
-      a `created` entry in `adrs/log.md`, and back-linked from the FRS via `adrs:`.
+      `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed in `adrs/index.md`
+      (2-file touch — no `adrs/log.md`), and back-linked from the FRS via `adrs:`.
       (`docs/home.md` is derived from the per-component ADR indexes — regenerated on
       demand, not hand-edited per ADR event.) See
       [`maintenance-discipline.md`](maintenance-discipline.md).

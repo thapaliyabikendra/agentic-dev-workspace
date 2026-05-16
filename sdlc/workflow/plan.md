@@ -338,11 +338,11 @@ the FRS is underspecified — surface it, do not paper over.
 - [ ] Row added to `docs/<component>/nodes/<type>/index.md` showing Status = `proposed`.
       Create the file from [`../_templates/INDEX.md`](../_templates/INDEX.md) if this is
       the first node of the type. The `id-claims.md` row for this node (see §2) carries
-      the originating FS/FRS audit trail; no per-type node `log.md` fires (see
-      [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--per-type-node-logmd-dropped-2026-05-16)).
+      the originating FS/FRS audit trail; no canonical `log.md` fires (see
+      [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16)).
 - [ ] Bidirectional `related:` back-links fired against each target in this node's
-      `related:` list (the (2 + N) touch for node targets; (3 + N) if any target is an
-      ADR — see `maintenance-discipline.md`).
+      `related:` list (the (2 + N) touch — every target fires its own 2-file
+      touch regardless of canonical type — see `maintenance-discipline.md`).
 
 **For `touches_nodes` (existing canonical nodes the FS intends to modify): do NOT write
 to canonical at Phase 2.** The canonical file is left untouched; the CHG node records
@@ -554,9 +554,9 @@ close.
       filed as an ADR (with `related: [CCC-NNN]`) whose ID is in `adrs:`.
 - [ ] Every architecture decision has been routed: ADR, DEC, or inline.
 - [ ] Any ADR promoted from this FS is filed under
-      `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed, logged with a `created` entry,
-      has `fs_origin: FS-NNN`, and is back-linked from the FS's `adrs:` list.
-- [ ] Any pre-existing ADR newly consumed by this FS has a `linked` entry in `adrs/log.md`.
+      `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed in `adrs/index.md`
+      (2-file touch — no `adrs/log.md`), has `fs_origin: FS-NNN`, and is
+      back-linked from the FS's `adrs:` list.
 - [ ] `depends_on_specs:` declares every sibling FS whose proposed nodes this FS references.
 - [ ] FS frontmatter: `merged: false`, `merge_sha:` left blank.
 - [ ] FS frontmatter: `test_plan_path:` left blank — filled by Test plan ingest.

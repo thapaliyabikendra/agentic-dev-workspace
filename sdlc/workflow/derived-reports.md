@@ -107,7 +107,7 @@ out of date, a TECHNICAL.md module count is off), the operator opens
 `reports/` directly, edits the rendered file in place, and commits the
 patch.
 The temptation: the source fix is "involved" (touch the node, update
-its `index.md` row, append `log.md`); the report fix is one line.
+its `index.md` row); the report fix is one line.
 The cost: the report drifts from its source-of-truth wiki, the
 generator's `Pulls from:` contract becomes a lie, the next
 regeneration **silently reverts** the patch (because the source still

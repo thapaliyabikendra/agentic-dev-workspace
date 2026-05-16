@@ -159,8 +159,7 @@ docs/
     adrs/                      ← only ADRs spanning ≥2 components; starts empty
     glossary.md
     ccc/                       ← per-CCC NFR baseline files (replaces flat cross-cutting-concerns.md)
-      index.md                 ← Karpathy catalog
-      log.md                   ← append-only chronological log
+      index.md                 ← Karpathy catalog (no log.md — retired 2026-05-16)
       CCC-NNN-*.md             ← individual CCC pages
     tech-stack.md
   <component-slug>/            ← standalone component
