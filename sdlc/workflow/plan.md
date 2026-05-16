@@ -1,6 +1,6 @@
 ---
 name: generate-feat-spec
-description: "Use when Phase 1.5 has closed and you need to author a Feature Spec, ingest new DDD nodes to canonical (status: proposed), emit CHG nodes for canonical modifications, and run the FS validation loop. Do NOT use for Test plan ingest (test-plan-ingest.md) or implementation (implementation.md)."
+description: "Use when Phase 1.5 has closed and you need to author a Feature Spec, ingest new DDD nodes to canonical (status: proposed), emit CHG nodes for canonical modifications, and run the FS validation loop. Do NOT use for Test plan ingest (test-plan-ingest.md) or implementation (implementation.md). Discoverability alias: authoring-fs."
 ---
 
 # Plan Flow
@@ -78,6 +78,34 @@ nodes (that is Phase 3's job).
 **Vs. sibling files:** [`design.md`](design.md) Queries canonical;
 [`implementation.md`](implementation.md) Merges + Codes; this file Ingests. The three
 are file-disjoint mode boundaries; each requires a `/clear` at entry.
+
+---
+
+## Section routing
+
+If you've loaded this file for a specific issue mid-Phase-2 (rather
+than at Phase 2 entry), read the linked section only. The HARD-GATE
+callout at the top and
+[Anti-Pattern: "The Obvious Path"](#anti-pattern-the-obvious-path)
+carry the doctrinal frame the per-op sections assume — first-time
+readers should re-read those on each new Phase 2.
+
+| Operation | Sections to read |
+|---|---|
+| Phase 2 entry (first time) | [Checklist](#checklist) → [Process Flow](#process-flow) → [The Process](#the-process) |
+| Resume mid-FS authoring | [The Process → Authoring sequence](#authoring-sequence--3-4-5-interleave) + the §3/§4/§5 sub-sections |
+| Context loading question | [The Process → 1. Context loading](#1-context-loading) |
+| ID-claim collision / cross-FS modify-intent conflict | [The Process → 2. ID-claim protocol](#2-id-claim-protocol) |
+| New-node canonical ingest mechanics | [The Process → 3. New node canonical ingest](#3-new-node-canonical-ingest) |
+| CHG emission (FS modifies a `touches_nodes`) | [The Process → 4. CHG node emission](#4-chg-node-emission) |
+| FS body authoring (Architecture / Data / Interface / Tasks) | [The Process → 5. FS authoring](#5-fs-authoring) |
+| Checking Phase 2 exit readiness | [Checklist](#checklist) + [The Process → 6. FS validation loop](#6-fs-validation-loop) |
+| Common Phase 2 mistakes (mid-flow check) | [Common Mistakes](#common-mistakes) + [Red Flags](#red-flags) |
+| Cross-file dependencies / handoff to QA or Phase 3 | [Integration](#integration) |
+
+If your operation is not in the table or you are entering Phase 2 for
+the first time, read the full file in order: Overview → Anti-Pattern
+→ When to Use → Checklist → Process Flow → The Process.
 
 ---
 

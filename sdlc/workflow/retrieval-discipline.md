@@ -8,11 +8,41 @@ description: "When and what to load at each phase entry. The primary token lever
 The primary token lever. Skill prompts compact at the margin; not re-deriving
 the corpus each session is the 10× win.
 
-## Flow-file section routing
+## Section routing
+
+This file is itself section-routable. The Title above and the
+[Executor contract](#executor-contract-for-section-routed-flow-files)
+below are this file's doctrinal preamble — always read on first phase
+entry of a milestone. The returning reader who knows which phase is
+firing reads only the sections the table names.
+
+| Operation | Sections to read |
+|---|---|
+| Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Baselines](#baselines) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| Phase 1.5 entry (Validation gate) | [Baselines](#baselines) + [STDs and CCCs](#stds-and-cccs) (Phase 1.5 row of the matrix) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| Phase 2 entry (Ingest) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 2 row + [Index opt-out](#index-opt-out)) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| Phase 3 entry (Merge + Code) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 3 row) + [Tech-stack operational baseline](#tech-stack-operational-baseline) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| QA track entry (test-plan-ingest / test-suite-codegen / qa-gate) | [QA-track retrieval](#qa-track-retrieval) (per `qa_phase`) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| Index row schema lookup (any phase) | [ADRs → Index row schemas](#index-row-schemas) |
+| ADR / DEC body-budget or title-cap question | [ADRs](#adrs) |
+| Maintenance op firing (load-on-trigger) | [Maintenance operation references](#maintenance-operation-references) — jump to the firing op's row |
+
+Returning-reader savings depend on **executor compliance**: if a session
+loads the whole file by default after the second phase entry of a
+milestone, the routing table provides nothing. The
+[Executor contract](#executor-contract-for-section-routed-flow-files)
+below makes section-routing the *intended* read pattern for this file
+and the other flow files that declare a routing table.
+
+If your operation is not in the table, read the file in full.
+
+## Executor contract for section-routed flow files
 
 Flow files in `sdlc/workflow/` that carry a `## Section routing` table
-near the top — currently [`implementation.md`](implementation.md) and
-[`maintenance-discipline.md`](maintenance-discipline.md) — may be
+near the top — currently [`design.md`](design.md), [`plan.md`](plan.md),
+[`implementation.md`](implementation.md),
+[`maintenance-discipline.md`](maintenance-discipline.md), and this file
+([`retrieval-discipline.md`](retrieval-discipline.md)) — may be
 **section-routed** at entry. The first-time reader consumes the file top
 to bottom (title, hard-gate, when-to-use, anti-pattern); the returning
 reader who knows which operation is firing reads only the sections the
@@ -23,7 +53,8 @@ Wholesale-read is the safe default. Section-route only when:
 1. The flow file declares a `## Section routing` table.
 2. Your operation appears as a row in that table.
 3. You've already consumed the file's doctrinal preamble at least once
-   this milestone (hard-gate, anti-pattern, when-to-use).
+   this milestone (hard-gate, anti-pattern, when-to-use; for this file,
+   Title + this Executor contract).
 
 Convention sections the routing table calls out as "skim once per
 session" are not optional — read them on first session entry.

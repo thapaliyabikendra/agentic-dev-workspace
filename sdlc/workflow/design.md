@@ -50,6 +50,31 @@ Load only what the task type requires. Do not pre-load speculatively.
 
 For `frs-validation-rules.md` partial reads: §Severity classification ends at the gate-verdict block (~line 110 of the file). §Bundling detection follows immediately. Read offset 0, limit 140 for meta questions; read the full file only at an actual Phase 1.5 gate.
 
+## Section routing
+
+If you've loaded this file for a specific phase (rather than starting
+Phase 0 fresh and running through to 1.5), read the linked section only.
+The HARD-GATE callout at the top and [Process Flow](#process-flow)
+carry the doctrinal frame the per-phase sections assume — first-time
+readers should skim those regardless.
+
+| Operation | Sections to read |
+|---|---|
+| Phase 0 entry (milestone scoping) | [Phase 0 — Milestone Scoping](#phase-0--milestone-scoping) |
+| Phase 1 entry (FRS authoring) | [Phase 1 — FRS Authoring](#phase-1--frs-authoring) |
+| Phase 1.5 entry (Validation gate) | [Phase 1.5 — Validation Gate](#phase-15--validation-gate) + [`frs-validation-rules.md`](frs-validation-rules.md) |
+| Phase 1.5 Pass 1 only (per-FRS) | [Pass 1 — Per-FRS gate](#pass-1--per-frs-gate-runs-after-each-frs-is-authored) |
+| Phase 1.5 Pass 2 only (cross-FRS sweep) | [Pass 2 — Milestone cross-FRS sweep](#pass-2--milestone-cross-frs-sweep-runs-once-after-all-frss-in-the-milestone-are-per-frs-gated) |
+| Survey / Exploration / OQ artifact question | [Pre-FRS artifact types](#pre-frs-artifact-types) |
+| What sibling files to load per task type | [When to Use → Minimal read set per task type](#minimal-read-set-per-task-type) |
+| Cross-file dependencies / handoff question | [Integration](#integration) |
+
+If your operation is not in the table, or you are entering Phase 0/1
+end-to-end for the first time, read the full file. The minimal-read-set
+table above the routing table tells you which sibling files to pair with
+this one for the task at hand — the two tables are complementary
+(routing = intra-file; minimal read set = cross-file).
+
 ## Process Flow
 
 ```dot
