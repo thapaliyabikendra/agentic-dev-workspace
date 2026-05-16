@@ -391,6 +391,7 @@ forward; the grandfather is one-shot. Per-rule introduction dates:
 - `ac-single-outcome`, `deferred-finding-raises-oq`,
   `nfr-baseline-trace` — 2026-05-16.
 - `R-WITHIN-FRS-RULE-RESTATEMENT` — 2026-05-17.
+- `protocol-surface-leak` — 2026-05-17.
 
 ### Rule: ac-single-outcome
 
@@ -476,6 +477,48 @@ forbid.
 | BR-03 says "passwords must be ≥ 12 characters"; AC says "the system rejects passwords shorter than 12 characters"; Use case paragraph also says "users must choose a password of at least 12 characters" | Minor: within-frs-rule-restatement (state once in BR-03; cite from Use case + AC) |
 | BR-03 says "passwords must be ≥ 12 characters"; AC-01 says "AC-01 — actor submits a 10-character password → system rejects with the message defined in BR-03" | Pass (AC cites BR-03 and adds testable specificity — legitimate role-specific phrasing) |
 
+### Rule: protocol-surface-leak
+
+| Trigger | Protocol-wire surface appears inline in the FRS body's **operation-specifying** sections (Behavior, Postconditions, Business rules, Edge cases, Acceptance criteria). Detected patterns include: HTTP status-code tokens (`HTTP\s+\d{3}` — "HTTP 200", "HTTP 400"), HTTP verb-with-path tokens (`(GET\|POST\|PUT\|PATCH\|DELETE)\s+/\S+`), query-string syntax (`\?\w+=`), fenced JSON / XML response shapes (a ``` fence whose body contains `{` or `<`), OAuth2 / OpenIddict protocol literals (`grant_type=password`, `error:\s*["'][\w_]+["']`), and error-code string identifiers (`IdentityErrors\.\w+`, `ERR_\w+`, `EmailNotConfirmed`-style ABP error strings). **Scope explicitly excludes** the Validation findings table (which is a meta-audit log of past leaks — legitimate to name the leaked surface there) and the Out of scope section when the literal is a *deferred-feature identifier* rather than specifying this FRS's behavior (e.g., "Token refresh (`grant_type=refresh_token`) → future milestone" is a Pass; "Out of scope: HTTP 400 fault paths" is a leak). |
+| ------- | --- |
+| Type | `sanity` |
+| Severity | **Major** |
+| Resolution | Author or extend a `CON-NNN` node carrying the protocol surface (route, request / response schema, status codes, error-code map). Recast the FRS body in terms of business outcomes ("registration is rejected as a duplicate-email outcome"; "the actor is redirected to the login page"). Reference `CON-NNN` from the FRS where wire-level detail is needed; integration tests verify the wire mapping. |
+| Rationale prefix | `"Major: protocol-surface-leak — …"` |
+
+**Exemptions.**
+
+- **Trigger-line surface identifier.** A single HTTP verb-with-path token MAY
+  appear once in the Use case Trigger line as a compact surface identifier
+  (e.g., "the browser issues a GET against `/api/account/confirm-email`").
+  The Trigger is the one sanctioned home; further occurrences trigger the
+  rule.
+- **CON-NNN reference is the cure.** Inline references to a `CON-NNN` node
+  in adjacent prose (e.g., "wire surface canonical in CON-002") are not a
+  leak — they are how the rule is satisfied. The rule fires on inline
+  protocol-surface *tokens*, not on `CON-NNN` *citations*.
+- **ABP public-API symbol names** (ABP classes, methods, interfaces,
+  configuration option keys, entity property names) remain governed by
+  ADR-001 and do not trigger this rule. Routes, status codes, payload
+  shapes, and error-code string literals do, even when they appear next
+  to an ADR-001-covered symbol.
+
+**Doctrinal anchor.** Formalizes the "Common language traps" guidance
+(see [§ Common language traps](#common-language-traps) — the second
+trap, "The API will return a 404 if the user is not found", is now
+enforced rather than aspirational) and the
+[`frs-code-extraction-rules.md → Translation discipline`](frs-code-extraction-rules.md#translation-discipline-code--business-language)
+table's "drop entirely" entries for endpoint paths, status codes, and
+payload shapes.
+
+| Violation example | Classification |
+|---|---|
+| FRS AC: "Submitting a duplicate email → HTTP 400, error code `IdentityErrors.DuplicateEmail`" | Major: protocol-surface-leak (status code + error-code literal; relocate to CON-NNN, recast AC as "registration is rejected as a duplicate-email outcome — see CON-NNN") |
+| FRS Behavior: fenced ```json block with `access_token` / `refresh_token` fields | Major: protocol-surface-leak (response-shape JSON in FRS body; move to CON-NNN response shape table) |
+| FRS Trigger: "POSTs to `/api/account/register`" + FRS Behavior: "the actor calls `POST /api/account/register` with…" | Major: protocol-surface-leak (verb+path appears twice; Trigger may keep it once, Behavior must drop) |
+| FRS Trigger: "the browser issues a GET against `/api/account/confirm-email`" + FRS Behavior: "wire surface canonical in CON-002" | Pass (Trigger is the sanctioned single-occurrence; Behavior cites CON by ID) |
+| FRS Behavior: "CMD-002 invokes `UserManager.ConfirmEmailAsync` and flips `IdentityUser.EmailConfirmed` to true; wire surface canonical in CON-002" | Pass (ABP method + property names covered by ADR-001; CON-002 cited for wire) |
+
 ---
 
 ## How findings appear in the FRS
@@ -507,10 +550,15 @@ Preconditions, structural before/after on CHG `modifies[]` at Phase 1,
 `adds[]` or `migration_steps[]` filled at Phase 1, illegitimate
 `created_under:` marker — per
 [`design.md → Pass 1 check 7`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored)),
-and `within-frs-rule-restatement` (a constraint appears as prose in
+`within-frs-rule-restatement` (a constraint appears as prose in
 two or more of Use case / Edge cases / Business rules / Acceptance
 criteria — per the FRS template's section-role discipline; see
-[Rule: R-WITHIN-FRS-RULE-RESTATEMENT](#rule-r-within-frs-rule-restatement)).
+[Rule: R-WITHIN-FRS-RULE-RESTATEMENT](#rule-r-within-frs-rule-restatement)),
+and `protocol-surface-leak` (HTTP routes beyond the Use case Trigger,
+HTTP status codes, payload shapes, OAuth2 / OpenIddict protocol literals,
+or error-code string literals appear inline in the FRS body instead of
+being relocated to a `CON-NNN` node — per
+[Rule: protocol-surface-leak](#rule-protocol-surface-leak)).
 Severity (Blocker / Major / Minor) and the audit reproducibility set go in
 the Rationale prefix.
 
@@ -548,6 +596,7 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
 | Version | Date | Source |
 |---------|------|--------|
 | 1.0 | 2026-05-11 | Absorbed from the shared FRS validation rules reference (v3.1) during workflow absorption, distilled to the project's FRS template and Phase 1.5 gate. Issue-tracker label automation, harness orchestrator dispatch, the 14-item Self-Review mnemonic legend, and per-section schema enforcement (Section-N references) were dropped — the project is filesystem-based with a different FRS template shape. Severity, bundling detection, NFR rubric, `[inferred from code]` propagation, OQ tag taxonomy, and audit reproducibility set retained. |
+| 1.1 | 2026-05-17 | Added `protocol-surface-leak` sanity sub-flavor (Major) — formalizes the "Common language traps" guidance for HTTP routes / status codes / payload shapes / OAuth2 literals / error-code string literals as an enforced finding. CON-NNN reference is the sanctioned cure; ABP public-API symbol names remain covered by ADR-001. Triggered by retroactive cleanup of FRS-001/002/003 (M-01 user-auth) on the same date. |
 
 ---
 

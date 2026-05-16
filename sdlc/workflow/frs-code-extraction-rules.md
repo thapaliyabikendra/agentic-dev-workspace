@@ -159,11 +159,23 @@ business language:
 | Validator names (`.email()`, `.min(3)`, `regex(...)`) | "must be a valid email", "must contain at least 3 characters" |
 | Field names (`firstName`, `dob`) | Title case with spaces: "First Name", "Date of Birth" |
 | Component names (`<UserForm>`, `<AdminPanel>`) | Operation name: "User Registration", "Admin Configuration" |
-| Endpoint paths (`/api/v1/users`) | Drop entirely — they belong in the feature spec or tech spec, not the FRS |
-| Error codes (`ERR_AUTH_FAILED`, HTTP status codes) | Exception name: "Unauthorised Access", "Operation Could Not Complete" |
+| Endpoint paths (`/api/v1/users`) | Drop from FRS body. The path lands on a `CON-NNN` node (the canonical wire surface). The FRS Use case Trigger MAY name the path **once** as a single-line surface identifier; further occurrences in Behavior / AC / BR are a `protocol-surface-leak` finding — reference `CON-NNN` by ID instead. |
+| HTTP verb + path tokens (`POST /api/v1/users`) | Same as endpoint paths — Trigger only; everywhere else, `CON-NNN`. |
+| HTTP status codes (`200`, `302`, `400`, `404`) | Drop from FRS body. Recast outcomes in business language: "the operation succeeds", "the actor is redirected", "the operation is rejected with the corresponding rejection outcome". Wire mapping (status code per outcome) lives in `CON-NNN` and is verified by integration tests. |
+| Query-string syntax (`?key=value&token=...`) | Drop syntax from FRS body. The query schema belongs in `CON-NNN`; reference by ID. |
+| Response payload shapes (fenced JSON / XML body examples) | Drop from FRS body. The response shape lives in `CON-NNN`. |
+| Protocol literals (`grant_type=password`, `error: "invalid_grant"`, `Bearer`) | Drop from FRS body. Business-level claims like "an authenticated session is established" or "authentication is rejected with the generic rejection outcome" are the FRS-level form. The protocol vocabulary lives in `CON-NNN`. |
+| Error codes (`ERR_AUTH_FAILED`, framework error-code strings like `IdentityErrors.DuplicateEmail`) | Exception name in business language: "Unauthorised Access", "Operation Could Not Complete", "Duplicate Email Outcome". The wire-level error-code literal lives in `CON-NNN`'s error map. |
 
 If you cannot translate a piece of code into business language, leave the
 question in the candidate's per-FRS discovery.
+
+The right-column relocations above are not optional style — they are
+enforced at the Phase 1.5 gate by the
+[`frs-validation-rules.md → Rule: protocol-surface-leak`](frs-validation-rules.md#rule-protocol-surface-leak)
+sanity sub-flavor (introduced 2026-05-17). ABP public-API symbol names
+(classes, methods, configuration option keys, entity property names)
+remain governed by ADR-001 and are not protocol-wire surface.
 
 ---
 

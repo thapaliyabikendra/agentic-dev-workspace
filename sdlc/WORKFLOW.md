@@ -170,8 +170,9 @@ digraph workflow_phases {
     fsval -> phase2    [label="fail — repair"];
     fsval -> out_fs    [label="pass"];
     out_fs -> phase2tp [label="/clear (QA track entry)"];
+    out_fs -> phase3a  [label="/clear (context reset)"];
     phase2tp -> out_tc;
-    out_tc -> phase3a  [label="/clear (context reset)"];
+    out_tc -> phase3b;
     phase3a -> out_impl_code;
     out_impl_code -> phase3b [label="/clear (QA track entry)"];
     phase3b -> phase3c [label="/clear"];
