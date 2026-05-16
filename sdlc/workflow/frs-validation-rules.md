@@ -42,12 +42,25 @@ governs how code-derived items become FRS rows in the first place
 items at validation time. [`design.md`](design.md) is the caller that
 fires the gate; this file is the rule book it loads.
 
-The project's Phase 1.5 gate runs five per-FRS checks
-(`existence`, `sanity`, `adr-conflict`, `standard-conflict`, `ccc-deviation`)
-plus a cross-FRS sweep. **The cross-FRS sweep is skipped when the milestone
-has fewer than 2 FRSs** — a single-FRS milestone has no cross-FRS conflicts
-to detect; append "N/A — single FRS milestone" to
-`discovery/milestone-scope.md` for audit trail.
+The project's Phase 1.5 gate runs eight per-FRS checks plus a cross-FRS
+sweep. Type taxonomy: **six first-class types** (`existence`, `sanity`,
+`adr-conflict`, `standard-conflict`, `ccc-deviation`, `chg-sanity`) that
+match the FRS template's `Validation findings` Type enum, plus **two
+sanity-sub-flavors** (`flw-coverage`, `phase-1-bare-body-shape`) added
+on 2026-05-17 — these record under `type: sanity` with the sub-flavor
+named in the Rationale prefix (e.g., `"Blocker: phase-1-bare-body-shape — …"`).
+`chg-sanity` was added on cutover with the CHG-Phase-1-birth rule
+(R-CHG-1..7). The eight checks fan out as parallel Pass 1 dispatches; the
+Pass 2 cross-FRS sweep produces `cross-frs` rows and now also catches
+**CHG-conflict** sub-flavor (sibling FRSs with conflicting Phase-1-born
+CHGs — per R-CHG-6, see [`design.md → Pass 2`](design.md#pass-2--milestone-cross-frs-sweep-runs-once-after-all-frss-in-the-milestone-are-per-frs-gated)).
+The two original sub-flavors (per R-NEW-3 / R-NEW-2 / R-NEW-2a) verify
+against real anchors rather than forward-claimed IDs — FLW + ACT now
+born at Phase 1 per R-NEW-1; the chg-sanity check verifies against the
+Phase-1-born CHG body (per R-CHG-1). **The cross-FRS sweep is skipped
+when the milestone has fewer than 2 FRSs** — a single-FRS milestone has
+no cross-FRS conflicts to detect; append "N/A — single FRS milestone"
+to `discovery/milestone-scope.md` for audit trail.
 This file
 expands those checks with **severity classification**, **bundling
 detection**, the **NFR rubric**, the **`[inferred from code]` propagation
@@ -70,9 +83,9 @@ Every Validation finding is one of:
 
 | Severity | Meaning | Examples |
 |---|---|---|
-| **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in Behavior; bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion; missing or dangling `touches_nodes` / `produces_nodes` / `adrs:` declarations that clearly apply; FRS-ID collision; FRS contradicts an `accepted` ADR without an ADR-supersession path; FRS violates an `accepted` STD whose `applies_when.stack:` intersects the FRS's `stack:` without filing a deviation ADR (`type: standard-conflict`); FRS silently overrides a CCC baseline declared in `ccc:` without a back-linked deviation ADR (`type: ccc-deviation`). |
-| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS uses a stack-narrow STD (`applies_when.stack:` intersects `stack:`) without declaring it in `standards:`; FRS cites a CCC by content (restating the baseline prose) instead of by ID. |
-| **Minor** | Style / clarity issue; does not invalidate the FRS. | Ambiguous phrasing; inconsistent terminology; AC restating a Behavior step verbatim; OQ missing a tag; non-rule trap ("no limit applies" — describes absence of a constraint rather than a constraint). |
+| **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in FLW Scenarios (uses ENT/CMD/STA/PERM-NNN IDs in Phase-1-bare body — `phase-1-bare-body-shape` violation per R-NEW-2 / R-NEW-2a); bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion or has no scenario anchor on a real FLW (`flw-coverage` per R-NEW-3); Phase-1-born FLW with no Scenarios filled (Trigger or Scenarios section empty under R-NEW-2); `produced_actor:` set but ACT file does not exist at `docs/<component>/nodes/actors/`; **`touches_nodes:` non-empty but no Phase-1-born CHG file exists at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`** (per R-CHG-1); **CHG `modifies[]` carries structural before/after at Phase 1** (Phase-2-wired content under a Phase-1-bare CHG — `phase-1-bare-body-shape` violation per R-CHG-4 / R-CHG-7); missing or dangling `produced_flw:` / `produced_actor:` / `produces_nodes:` / `touches_nodes:` / `adrs:` declarations that clearly apply; FRS-ID collision; duplicate FLW Scenario signature against canonical (existence scan widened per R-NEW-6); FRS contradicts an `accepted` ADR without an ADR-supersession path; FRS violates an `accepted` STD whose `applies_when.stack:` intersects the FRS's `stack:` without filing a deviation ADR (`type: standard-conflict`); FRS silently overrides a CCC baseline declared in `ccc:` without a back-linked deviation ADR (`type: ccc-deviation`). |
+| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS uses a stack-narrow STD (`applies_when.stack:` intersects `stack:`) without declaring it in `standards:`; FRS cites a CCC by content (restating the baseline prose) instead of by ID; **FRS-CHG mismatch** — FRS implies behavior change X but the Phase-1-born CHG's `modifies[]` doesn't describe X, or the CHG describes a modification the FRS doesn't justify (`type: chg-sanity` per R-CHG-5); **illegitimate `created_under: pre-2026-05-17` marker** on a FLW whose `created:` date is after the cutover (B5 grandfather-only marker — `type: sanity`, revise-before-Phase-2). |
+| **Minor** | Style / clarity issue; does not invalidate the FRS. | Ambiguous phrasing; inconsistent terminology; AC restating a Business rule verbatim (per `R-WITHIN-FRS-RULE-RESTATEMENT`); OQ missing a tag; non-rule trap ("no limit applies" — describes absence of a constraint rather than a constraint); **vague-but-resolvable CHG `modifies[]` delta** — Phase 2 enrichment path is clear (`type: chg-sanity` per R-CHG-5). |
 
 **Gate verdicts:**
 
@@ -117,7 +130,9 @@ A FRS describes exactly **one** user-journey / business operation. A
 bundled FRS — two operations stuffed into one spec — is a Blocker, because
 a stakeholder cannot coherently approve or reject the whole as a unit.
 
-Detect bundling by any of these signals in the FRS Behavior section:
+Detect bundling by any of these signals in the FRS Use case + the
+Phase-1-born FLW Scenarios (FLW carries journey behavior post-2026-05-17;
+the FRS Behavior section is retired):
 
 - **Multiple distinct user actions with different state transitions.**
   Example: "verify each item" → entries persisted, *and* "submit
@@ -217,6 +232,31 @@ body reads as `not enforced`, `no limit applies`, `no constraint`,
 as a Minor finding and either rewrite to a positive form or replace with
 a different inferred rule that genuinely constrains the operation.
 
+**❌ FRS adds AC-03 "actor sees retry option when upstream returns 503"
+but Phase-1-born CHG-007's `modifies[]` on FLW-001 says only "FLW-001
+gains a fault path"** — the CHG body doesn't describe the AC's behavior
+extension; reader can't audit the CHG-FRS alignment.
+**✅ Either revise the CHG `modifies[]` entry to "FLW-001 gains a fault
+path when the upstream service responds 503; the actor sees a retry
+option" — matching the AC's specificity — or revise the FRS AC if the
+CHG's vagueness is intentional.** Flag as `Major: chg-sanity — FRS adds
+fault path in AC-03 but CHG-007's modifies[] does not describe FLW-001's
+fault-path extension.` Resolution path: revise inline (FRS or CHG body,
+1-file touch carve-out per R-NEW-7 extension) or raise an OQ with
+`gate_effect: blocking` if the divergence is intentional.
+
+**Rule of thumb for chg-sanity.** The Phase-1-bare CHG body uses business
+language only — but it must coherently describe the behavior delta the
+FRS implies. If a reader of the FRS's ACs / BRs / Postconditions plus the
+target canonical node's current body can't write a one-sentence summary
+of the CHG's `modifies[]` entry that matches what's there, the delta is
+either vague (Minor: chg-sanity — Phase 2 enrichment path is clear) or
+mismatched (Major: chg-sanity — FRS-CHG divergence). The
+**sibling-FRS birth-order rule** applies per υ / M1: when this CHG
+targets a Phase-1-bare FLW / ACT born by a sibling FRS, validate against
+the current Phase-1-bare body; re-run chg-sanity only on the affected
+CHG if that sibling's body changes mid-round-trip.
+
 ---
 
 ## `[inferred from code]` propagation (brownfield)
@@ -233,8 +273,12 @@ Sections that carry the tag:
 - **Actors** — when an actor's existence comes from a role / permission
   check in code.
 - **Preconditions** — when the precondition comes from a guard clause.
-- **Behavior** — when a business rule, edge path, or fault path comes
-  from a validator, `try/catch`, `setError`, or branching condition.
+- **Business rules** — when a `BR-NN` policy claim comes from a
+  validator, `try/catch`, `setError`, or branching condition.
+- **Edge cases** — when an `EC-NN` summary at FRS level comes from a
+  branching condition or guard clause in code. (Fault-path behavior
+  lives in the Phase-1-born FLW's `#fault` Scenario, outside the FRS;
+  the `[inferred from code]` tag is FRS-scoped.)
 - **Acceptance criteria** — when the criterion's testable shape comes
   from a code assertion rather than stakeholder language.
 
@@ -331,16 +375,22 @@ independently of subsequent edits to CCC-005.
 
 ## Additional sanity rules
 
-Three rules introduced 2026-05-16 to tighten the Phase 1.5 gate's reach
-into AC discipline, deferred-finding bookkeeping, and NFR baseline
-traceability.
+Four rules tighten the Phase 1.5 gate's reach into AC discipline,
+deferred-finding bookkeeping, NFR baseline traceability, and
+within-FRS rule restatement. The first three were introduced
+2026-05-16; `R-WITHIN-FRS-RULE-RESTATEMENT` was added 2026-05-17.
 
 **Grandfather clause.** Rules in this section apply **prospectively** to
-FRSs whose Phase 1.5 gate first runs after 2026-05-16. FRSs whose gate
-already ran on or before 2026-05-16 are not retroactively re-classified —
-their existing `Validation findings` rows stand. A revision of a
-grandfathered FRS that re-triggers the gate is subject to these rules
-from the re-run forward; the grandfather is one-shot.
+FRSs whose Phase 1.5 gate first runs after the rule's introduction date.
+FRSs whose gate already ran on or before the rule's introduction date
+are not retroactively re-classified — their existing `Validation
+findings` rows stand. A revision of a grandfathered FRS that
+re-triggers the gate is subject to these rules from the re-run
+forward; the grandfather is one-shot. Per-rule introduction dates:
+
+- `ac-single-outcome`, `deferred-finding-raises-oq`,
+  `nfr-baseline-trace` — 2026-05-16.
+- `R-WITHIN-FRS-RULE-RESTATEMENT` — 2026-05-17.
 
 ### Rule: ac-single-outcome
 
@@ -376,7 +426,7 @@ silently expires.
 
 ### Rule: nfr-baseline-trace
 
-| Trigger | An NFR-shaped sentence appears in any FRS body section (Behavior, Postconditions, Auditability, Acceptance criteria) without a CCC-NNN citation in the immediate surrounding clause **or** an explicit "deviates from CCC-NNN via ADR-NNN" annotation. |
+| Trigger | An NFR-shaped sentence appears in any FRS body section (Business rules, Postconditions, Auditability, Acceptance criteria) without a CCC-NNN citation in the immediate surrounding clause **or** an explicit "deviates from CCC-NNN via ADR-NNN" annotation. |
 | ------- | --- |
 | Type | `ccc-deviation` |
 | Severity | **Minor** |
@@ -397,6 +447,35 @@ violation (duplication of authority).
 | Body says "the audit log retains operation attempts for 7 years" verbatim from CCC-004 | Major: baseline-not-cited (delete; rely on `ccc:` frontmatter) |
 | Body says "this operation extends CCC-012's retention from 7 to 25 years per ADR-014" | Pass (cited + deviation annotated) |
 
+### Rule: R-WITHIN-FRS-RULE-RESTATEMENT
+
+| Trigger | The same constraint appears as prose in **two or more** of: the FRS's narrative sections (Use case paragraph, Edge cases) **and** Business rules **and** Acceptance criteria. Distinct from baseline restatement (`baseline-not-cited`) — this rule catches duplication **within** the FRS body across section roles, not duplication across the FRS and a baseline. |
+| ------- | --- |
+| Type | `sanity` |
+| Severity | **Minor** |
+| Resolution | State the constraint once in the declarative section (`BR-NN` in Business rules), then reference `BR-NN` from the others. Use case and AC may cite the BR ID; they must not restate the BR text verbatim. If the restatement is genuinely a paraphrase that serves a distinct section role (e.g., AC making the BR testable in a specific Flow scenario), keep both — the rule fires on verbatim restatement, not on legitimate role-specific phrasing. |
+| Rationale prefix | `"Minor: within-frs-rule-restatement — …"` |
+
+Companion to the section-role discipline declared in the FRS template
+([`../_templates/FRS.md`](../_templates/FRS.md) → Business rules and
+Acceptance criteria headings). Section roles assigned 2026-05-17:
+
+- **Business rules** — declarative policy claims, each stated once.
+- **Acceptance criteria** — testable claims; cite `BR-NN`, never
+  restate.
+- **Use case / Edge cases** — narrative framing for the operation;
+  cite `BR-NN` rather than restate.
+
+The rule applies prospectively (grandfather clause below) and is Minor
+because the section-role tightening is new — pre-2026-05-17 FRSs may
+carry historical restatements that the template did not previously
+forbid.
+
+| Violation example | Classification |
+|---|---|
+| BR-03 says "passwords must be ≥ 12 characters"; AC says "the system rejects passwords shorter than 12 characters"; Use case paragraph also says "users must choose a password of at least 12 characters" | Minor: within-frs-rule-restatement (state once in BR-03; cite from Use case + AC) |
+| BR-03 says "passwords must be ≥ 12 characters"; AC-01 says "AC-01 — actor submits a 10-character password → system rejects with the message defined in BR-03" | Pass (AC cites BR-03 and adds testable specificity — legitimate role-specific phrasing) |
+
 ---
 
 ## How findings appear in the FRS
@@ -407,28 +486,55 @@ finding:
 | Finding | Type | Resolution | Rationale |
 
 `type` is one of `existence`, `sanity`, `adr-conflict`, `standard-conflict`,
-`ccc-deviation`, or `cross-frs` per the template. `standard-conflict` and
-`ccc-deviation` are first-class types (one per Pass 1 check 4 and 5
-respectively — see [`design.md → Pass 1`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored));
-`cross-frs` is the Pass 2 type. `sanity` itself expands to cover bundling
-(see above), NFR rubric failure, `baseline-not-cited` (FRS restates a
-baseline category instead of citing it), and `inferred-from-code` items
-present without a corresponding Open Question. Severity (Blocker / Major /
-Minor) and the audit reproducibility set go in the Rationale prefix.
+`ccc-deviation`, `chg-sanity`, or `cross-frs` per the template.
+`standard-conflict` and `ccc-deviation` are first-class types (one per
+Pass 1 check 4 and 5 respectively — see
+[`design.md → Pass 1`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored));
+`chg-sanity` is a first-class type (Pass 1 check 8 — fires only when the
+FRS declares non-empty `touches_nodes:`, per R-CHG-5); `cross-frs` is the
+Pass 2 type (now includes the **CHG-conflict** sub-flavor per R-CHG-6 —
+sibling-FRS-born CHGs targeting the same canonical node, contradicting
+deltas, or contradicting invariants). `sanity` itself expands to cover
+bundling (see above), NFR rubric failure, `baseline-not-cited` (FRS
+restates a baseline category instead of citing it), `inferred-from-code`
+items present without a corresponding Open Question, `flw-coverage` (an
+AC that does not map to a scenario anchor on a real FLW — per R-NEW-3,
+[`design.md → Pass 1 check 6`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored)),
+`phase-1-bare-body-shape` (a Phase-1-born FLW, ACT, or CHG whose
+body shape violates R-NEW-2 / R-NEW-2a / R-CHG-4 — forward node IDs in
+scenarios, Sequence populated at Phase 1, PERM-NNN refs in ACT
+Preconditions, structural before/after on CHG `modifies[]` at Phase 1,
+`adds[]` or `migration_steps[]` filled at Phase 1, illegitimate
+`created_under:` marker — per
+[`design.md → Pass 1 check 7`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored)),
+and `within-frs-rule-restatement` (a constraint appears as prose in
+two or more of Use case / Edge cases / Business rules / Acceptance
+criteria — per the FRS template's section-role discipline; see
+[Rule: R-WITHIN-FRS-RULE-RESTATEMENT](#rule-r-within-frs-rule-restatement)).
+Severity (Blocker / Major / Minor) and the audit reproducibility set go in
+the Rationale prefix.
 
-**`type: existence` scope.** The existence scan (`design.md → Phase 1.5
-→ Pass 1`) searches the canonical wiki and matches against every
-canonical node regardless of status — `proposed` (an in-flight sibling FS
-introduced it, but it has not yet merged), `active`, `superseded`, or
-`deprecated`. A match against a `proposed` node is still a finding; the
-`rationale:` carries the in-flight flavor ("matches proposed ENT-005
-introduced by FS-A — confirm distinctness or coordinate"). Severity is
-the same Blocker/Major/Minor triage as for matches against `active`
-nodes; the in-flight context affects the resolution path (coordinate
-with sibling FS), not the severity.
+**`type: existence` scope** (widened per R-NEW-6). The existence scan
+(`design.md → Phase 1.5 → Pass 1`) searches the canonical wiki and matches
+against every canonical node regardless of status — `proposed` (a Phase-1-born
+FLW or ACT just landed by this FRS or by an in-flight sibling FRS / FS),
+`active`, `superseded`, or `deprecated`. The scan now matches three
+signatures per FRS: (a) FRS title / actor ID / command domain; (b) **FLW
+Scenario signatures** — happy-path Given/When/Then phrasing, to catch
+duplicate Phase-1-born FLWs across FRSs that the title-only check would
+miss; (c) **ACT identity** — when `produced_actor:` is set, scan canonical
+ACT index for duplicate actor-role introductions across FRSs and verify
+the ACT file exists at the expected path. Read-only references to canonical
+FLW / ACT in FRS prose are NOT existence-checked (text grep is the audit
+hook — per M2). A match against a `proposed` node is still a finding; the
+`rationale:` carries the in-flight flavor ("matches proposed FLW-005
+introduced by FRS-007 at Phase 1 — confirm distinctness or coordinate").
+Severity is the same Blocker/Major/Minor triage as for matches against
+`active` nodes; the in-flight context affects the resolution path
+(coordinate with sibling FRS / FS), not the severity.
 
 Example Rationale:
-`"Major: baseline-not-cited — Behavior restates retention default in para 3 (baseline_version: { CCC-012: 2026-05-16 }). Replace with CCC-012 reference in the FRS's ccc: frontmatter."`
+`"Major: baseline-not-cited — Auditability restates retention default in para 3 (baseline_version: { CCC-012: 2026-05-16 }). Replace with CCC-012 reference in the FRS's ccc: frontmatter."`
 
 When `resolution: deferred`, a matching `OQ-NNN` file exists under
 [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)

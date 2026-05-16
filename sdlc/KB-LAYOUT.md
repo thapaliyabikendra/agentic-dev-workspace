@@ -8,10 +8,14 @@ description: "Canonical DDD wiki folder structure, node-type table, ID-prefix li
 DDD content lives in **component-qualified canonical wikis** at
 `docs/<component>/nodes/`. New nodes land there at Phase 2 with
 `status: proposed`; Phase 3 flips them to `active`. The only
-milestone-scoped DDD artifact is the CHG-NNN change-map at
-`milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`,
-which documents modify-intent against existing canonical nodes and
-stays permanently in the milestone folder (never promoted).
+milestone-scoped DDD artifact is the CHG-NNN change-map, born at Phase 1
+per FRS (when `touches_nodes:` is non-empty) at
+`milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+`docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`) — documents
+modify-intent against existing canonical nodes and stays permanently in
+the milestone folder (never promoted). Pre-cutover CHGs at
+`milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/` are
+grandfathered.
 
 When a new component is introduced, run
 [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md)

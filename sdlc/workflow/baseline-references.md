@@ -78,9 +78,9 @@ The Phase 1.5 validation gate snapshots
 [`docs/shared/glossary.md`](../../docs/shared/glossary.md) at gate entry and
 captures the version in any Validation finding that fires
 ([audit reproducibility set](frs-validation-rules.md#audit-reproducibility-set)).
-Drafters reference the glossary while writing the FRS Behavior section;
-the gate cross-checks that every term used in the FRS body resolves to an
-entry there. The glossary version is captured as `glossary_version` in every
+Drafters reference the glossary while writing the FRS body and the
+Phase-1-born FLW Scenarios; the gate cross-checks that every term used in
+either resolves to an entry there. The glossary version is captured as `glossary_version` in every
 Validation finding's audit reproducibility set.
 
 ## Glossary format

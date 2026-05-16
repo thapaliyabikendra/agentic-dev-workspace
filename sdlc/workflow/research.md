@@ -1,7 +1,8 @@
 # Research Gate
 
 > Operation for resolving `blocking-frs` open questions before FRS body
-> sections (Behavior, Acceptance criteria, Test plan view) can be authored.
+> sections (Use case, Acceptance criteria, Brownfield impact) and the
+> Phase-1-born FLW Scenarios can be authored.
 > Fires from inside Phase 1 when the per-FRS Survey surfaces ≥ 1 OQ-NNN
 > whose Resolution path requires a resolver artifact. Part of the workflow
 > defined in [`../WORKFLOW.md`](../WORKFLOW.md).
@@ -21,8 +22,9 @@
 
 **Use when:** the per-FRS Survey surfaces ≥ 1 OQ-NNN whose Resolution
 path (in the OQ body) requires a resolver artifact (RESEARCH doc, spike,
-or ADR) before the FRS Behavior / Acceptance criteria sections can be
-authored. Invoke by name from inside Phase 1.
+or ADR) before the FRS Use case / Acceptance criteria sections and the
+Phase-1-born FLW Scenarios can be authored. Invoke by name from inside
+Phase 1.
 
 **Trigger condition (precise):** ≥ 1 OQ raised in the Survey is
 classified `blocking-frs` — meaning the FRS body cannot be authored to
@@ -74,7 +76,7 @@ Every OQ receives exactly one tier — no dual classification.
 
 | Tier | Meaning | Action |
 |------|---------|--------|
-| `blocking-frs` | FRS Behavior / Acceptance criteria cannot be authored without this | Enter research gate |
+| `blocking-frs` | FRS Use case / Acceptance criteria or Phase-1-born FLW Scenarios cannot be authored without this | Enter research gate |
 | `blocking-fs` | FRS body can be authored; FS authoring will be blocked | Set `status: deferred`, `needed_by: phase-2`; note in FRS "Out of scope" |
 | `blocking-impl` | FRS + FS can be authored; code authoring needs resolution | Set `status: deferred`, `needed_by: phase-3`; note in FRS "Out of scope" |
 | `non-blocking` | Answerable inline or outside current scope | Inline-answer in FRS body, or close with a brief note in the OQ |
@@ -169,9 +171,11 @@ All `blocking-frs` OQs are now resolved. Resume or complete the FRS:
 - **Path A** (Survey-first): author the complete FRS at
   `docs/milestones/M-NN-<slug>/frs/FRS-NNN-<slug>.md` using
   [`../_templates/FRS.md`](../_templates/FRS.md).
-- **Path B** (skeleton-first): complete the FRS body sections (Behavior,
-  Acceptance criteria, Test plan view, Brownfield impact) on the existing
-  skeleton.
+- **Path B** (skeleton-first): complete the FRS body sections (Use case,
+  Acceptance criteria, Business rules, Brownfield impact) on the existing
+  skeleton, and author the Phase-1-born FLW (Trigger + Scenarios) per
+  R-NEW-2. The Behavior section and Test plan view table are retired
+  (per the 2026-05-17 cutover); journey behavior lives on the FLW.
 
 In both cases:
 

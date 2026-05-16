@@ -65,6 +65,7 @@ The QA track is **trigger-independent** — three flows that consume dev-track o
 |------|-----------------|--------------|
 | [retrieval-discipline.md](retrieval-discipline.md) | What to load at each phase entry — the primary token lever | Load when entering any phase or when a retrieval decision is in doubt |
 | [frs-validation-rules.md](frs-validation-rules.md) | Phase 1.5 gate — severity tiers (Blocker/Major/Minor), bundling detection, NFR rubric, OQ gate-effect taxonomy | Phase 1.5 (Validation Gate) |
+| [fs-qa-verification.md](fs-qa-verification.md) | QA-hat sweep checklist run before flipping an FS from `approved` to `implemented` — referenced from the FS template's `## QA verification` section | Phase 3 (before FS `implemented` flip) |
 | [frs-code-extraction-rules.md](frs-code-extraction-rules.md) | Mining existing source code for FRS candidates — signal-to-FRS mapping, code-to-business translation, `[inferred from code]` discipline | Phase 0/1 (brownfield path) |
 | [coverage-matrix.md](coverage-matrix.md) | TC completeness reference table — per-use-case tables for identifying which TCs apply | Phase 2 test-plan ingest |
 | [test-data-generation.md](test-data-generation.md) | Rule book for `## Test Data` sections — placeholder tokens, directive vocabulary, per-field-type generation rules | Phase 2 (TC authoring) and Phase 3 (test suite codegen) |

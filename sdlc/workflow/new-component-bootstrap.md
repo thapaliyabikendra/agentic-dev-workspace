@@ -11,17 +11,39 @@
 > set. Coining IDs (`<PREFIX>-<TYPE>-001`) without a declared prefix
 > produces collisions with future components and leaves the per-type
 > `index.md` orphaned. **Bootstrap runs before — never alongside — the
-> first node ingest for the component.** (Cross-cutting rule:
+> first node ingest for the component.** Post-2026-05-17, the "first
+> node ingest" trigger fires at **Phase 1** when a new component's
+> introducing FRS allocates FLW-NNN (and ACT-NNN, when applicable) per
+> R-NEW-1 — not at Phase 2 as before. If an FRS introduces a new
+> component, bootstrap fires before the Phase-1 FLW / ACT files are
+> written. (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 > "Every artifact has an ID and links upstream + downstream"; ID
 > protocol requires the component declaration first.)
 
 ## When to Use
 
-**Use when:** an incoming FS / FRS / absorption introduces nodes
+**Use when:** an incoming FRS / FS / absorption introduces nodes
 belonging to a component that does not yet have a `COMPONENT.md`
 file. Run this bootstrap in the same session as the work that
 motivates it; finish bootstrap before the first node ingest.
+
+**Trigger timing per phase** (post-2026-05-17):
+
+- **Phase 1 (FRS authoring)** — if the FRS introduces a new component
+  via its `produced_flw:` / `produced_actor:` (FLW-NNN / ACT-NNN
+  prefixed with the new component's `id_prefix:`), bootstrap fires
+  before the FLW / ACT files are written. This is the new earliest
+  trigger; under the pre-cutover model bootstrap fired only at Phase 2.
+- **Phase 2 (FS authoring)** — bootstrap fires if the FS introduces a
+  new component via `produces_nodes:` (ENT / CMD / STA / etc.) and the
+  component has not yet been bootstrapped at Phase 1 (i.e., the FRS
+  this FS implements did not introduce FLW or ACT into the new
+  component, but the FS does introduce a Phase-2-born node). Rare —
+  most new components are introduced by an FRS that births at least
+  one FLW.
+- **Absorption** — bootstrap fires when a legacy doc absorption brings
+  in nodes for a previously-undeclared component.
 
 **Do NOT use when:** the new artifacts belong to an existing
 component (just use that component's existing `id_prefix:` and
@@ -37,10 +59,13 @@ for an undeclared component.
 
 When adding a new standalone deployable component to the workspace:
 
-> **When this fires:** Before Phase 2 ingest whenever the incoming FS introduces
-> nodes belonging to a new component that does not yet have a `COMPONENT.md`. Run
-> this bootstrap in the same session as Phase 2 ingest; do not ingest nodes for
-> an undeclared component.
+> **When this fires:** Before the first canonical node ingest into a new
+> component path — Phase 1 (FRS authoring, when `produced_flw:` or
+> `produced_actor:` carries the new component's prefix), Phase 2 (FS
+> authoring, when `produces_nodes:` introduces Phase-2-born nodes into
+> the new component), or absorption (legacy doc bringing nodes in).
+> Run this bootstrap in the same session as the work that motivates it;
+> do not ingest nodes for an undeclared component at any phase.
 
 ---
 
@@ -151,8 +176,12 @@ component that also needs cross-component ADRs.
   creation of the per-type `index.md` on first node
   (`created` op).
 - **Callers (this file is wholesale-read by):**
+  [`design.md`](design.md) (Phase 1 FRS introduces a new component via
+  `produced_flw:` / `produced_actor:` — runs FIRST, before any Phase-1
+  FLW / ACT ingest; post-2026-05-17 earliest trigger per R-NEW-1),
   [`plan.md`](plan.md) (Phase 2 FS introduces a new component — runs
-  FIRST, before any node ingest),
+  FIRST, before any Phase-2 node ingest; fallback when the FRS did not
+  trigger bootstrap),
   [`legacy-absorption.md`](legacy-absorption.md) (an absorption pass
   brings in nodes for a previously-undeclared component).
 - **Routes to:** [`../_templates/COMPONENT.md`](../_templates/COMPONENT.md)

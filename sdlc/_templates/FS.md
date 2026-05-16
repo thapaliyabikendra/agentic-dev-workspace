@@ -6,7 +6,15 @@ milestone: M-NN               # blank for CR track (mutually exclusive with cr:)
 cr:                           # CR-NNN for CR track; blank for milestone track
 frs: [FRS-NNN, FRS-NNN]       # subset of the milestone's FRSs aggregated by this FS
 new_nodes: []                 # DDD node IDs this FS introduces — written directly to docs/nodes/<type>/ with status: proposed at Phase 2 (formerly `scoped_nodes:`)
-changes: []                   # CHG-NNN IDs emitted by this FS (empty if pure addition); CHG files live at nodes/changes/ permanently
+# consumes_chgs: list of CHG-NNN IDs this FS owns and enriches (R-CHG-3).
+# CHGs are born at Phase 1 per FRS when touches_nodes: is non-empty; the
+# FS lists them here at Phase 2. Cardinality: one CHG ⇒ at most one FS
+# (one-to-many from FS side). Default at Phase 2: consume every CHG born
+# by this FS's constituent FRSs. Subset consumption + CHG merging allowed
+# per R-CHG-3. Empty for pure-addition FSs.
+consumes_chgs: []             # CHG-NNN IDs this FS consumes from the Phase-1-born CHG set
+# `changes:` retired post-2026-05-17 cutover — replaced by `consumes_chgs:`.
+# Pre-cutover FSs with `changes:` are grandfathered.
 depends_on_specs: []          # sibling FSs whose proposed nodes this FS reads — must merge first
 service_repos: []             # workspace-relative paths of service repos this FS touches; multi-service projects only — empty for monolith. Branch-coherence check at Phase 3 verifies each is on `feat/FS-NNN-<slug>`. See sdlc/scripts/check-branch-coherence.sh.
 adrs: []                      # ADR IDs consulted (carried from FRSs + anything mid-draft)
@@ -35,8 +43,11 @@ merge_sha:                    # git sha of HEAD at the moment Phase 3 merge comp
 >
 > File location:
 > `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md`
-> CHG nodes live under `nodes/changes/` alongside this file (milestone-
-> scoped, permanent — never promoted to canonical).
+> CHG nodes live at the milestone-scoped permanent home
+> `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (sibling to `specs/`),
+> never promoted to canonical. FS-CHG coupling is by frontmatter
+> reference (`consumes_chgs:`), not filesystem nesting. Pre-cutover CHGs
+> at `specs/FS-NNN-<slug>/nodes/changes/` are grandfathered.
 
 ## Open blockers
 
@@ -108,18 +119,39 @@ promotion to canonical at Phase 3 merge, no per-type `index.md` / `log.md`.
 
 ## Change maps
 
-Filled only when any FRS in this FS lists IDs in `touches_nodes`. Empty for
-pure-addition FSs.
+Lists the CHG-NNN nodes this FS **consumes** — born at Phase 1 by the
+FS's constituent FRSs whose `touches_nodes:` is non-empty (R-CHG-1).
+Mirrors `consumes_chgs:` frontmatter. Empty for pure-addition FSs.
 
-- CHG-NNN — targets ENT-NNN, STA-NNN. <one-line summary of the delta>
+- CHG-NNN — targets ENT-NNN, STA-NNN. <one-line summary of the FS-side
+  structural enrichment added on top of the Phase-1 behavior delta>
 - CHG-NNN — targets CMD-NNN. <…>
 
-Each CHG-NNN lives **permanently** at
-`nodes/changes/CHG-NNN-<slug>.md` (relative to this FS folder). CHG nodes
-are never promoted to canonical — there is no `docs/nodes/changes/`
-subtree. Phase 3 implementation applies the CHG's `modifies[]` /
-`removes[]` / `supersedes[]` deltas to canonical targets and flips the
-CHG's status `approved → merged` in place.
+**Cardinality and merging** (R-CHG-3). One CHG belongs to at most one FS.
+Default at Phase 2: consume every CHG born by this FS's constituent FRSs.
+Two adjustments allowed:
+
+- **Subset consumption** — when splitting heuristics fire (different
+  bounded context, risk, reviewer), this FS consumes only a subset; the
+  unconsumed CHGs route to a sibling FS in the same milestone. Each CHG
+  ends up consumed by exactly one FS before milestone close.
+- **CHG merging** — at FS-authoring time, two sibling CHGs (born by
+  sibling FRSs in the same milestone) may be merged when they target the
+  same bounded context with matching risk and reviewer profile. Retain
+  one CHG ID; fold the other's `modifies[]` / invariant deltas into it;
+  flip the unused ID to `status: deprecated` (do NOT reuse). The
+  retained CHG's `source_ref:` accumulates both originating FRS IDs.
+
+Each consumed CHG lives **permanently** at
+`milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (sibling to `specs/`).
+CHG nodes are never promoted to canonical — there is no
+`docs/<component>/nodes/changes/` subtree. Phase 2 FS enrichment adds
+structural before/after on each `modifies[]` entry, fills `adds[]`
+(mirroring new node ingest), fills `migration_steps[]`. FS-validation
+exit flips each consumed CHG `draft → approved`. Phase 3 implementation
+applies the CHG's `modifies[]` / `removes[]` / `supersedes[]` deltas to
+canonical targets and flips the CHG's status `approved → merged` in
+place.
 
 ## Architecture decisions
 
@@ -176,45 +208,24 @@ cohort table.
 
 ## Dependencies and constraints
 
-- Brownfield constraints (canonical nodes this FS modifies via CHG):
-- Sibling-FS dependencies (`depends_on_specs:`):
-- External dependencies:
-- Sequencing within the FS:
+Cross-FS sequencing lives in the milestone portal's `## Sequencing notes`
+([`../../M-NN-<slug>.md`](../../M-NN-<slug>.md)) — do not restate it
+here. Frontmatter `depends_on_specs:` is the machine-readable surface.
+This section carries only FS-internal constraints that have no other home.
+
+- Brownfield constraints (canonical nodes this FS modifies via CHG): …
+- External dependencies (libraries, services outside the canonical
+  wiki): …
+- Sequencing within the FS (task-level ordering inside this FS, not
+  cross-FS): …
 
 ## QA verification (gate before `implemented`)
 
-Solo means QA hat ≠ skipped. Before marking this spec `implemented`:
+Run the shared FS QA-verification checklist before flipping this spec
+`implemented`. The rule book carries the full row set; this section
+records per-instance check state and any `n/a` annotations.
 
-- [ ] Every linked Flow scenario (happy / edge / fault) has been executed.
-- [ ] Every FRS acceptance criterion in the Coverage table has passed.
-- [ ] TC files exist for every use-case sub-folder declared in the
-      `## Test plan` section.
-- [ ] Every FRS acceptance criterion traces to at least one TC via the
-      TC's `**Traces to:**` line.
-- [ ] Every FLW scenario (happy / edge / fault) traces to at least one TC.
-- [ ] Test spec files generated under `tests/{test_dir}/<feature>/`
-      and run green for every use case with resolved selectors. See
-      [`../workflow/test-runner-cookbook.md`](../workflow/test-runner-cookbook.md)
-      and [`../workflow/test-suite-codegen.md`](../workflow/test-suite-codegen.md).
-- [ ] Every node in `new_nodes:` has had its canonical status flipped
-      `proposed → active` and the per-type index row's Status column
-      re-synced (2-file node touch — see
-      [`../workflow/maintenance-discipline.md`](../workflow/maintenance-discipline.md)).
-- [ ] Every CHG `modifies[]` entry has been applied to its canonical
-      target, with the per-type index row re-synced as needed (2-file
-      node touch).
-- [ ] Every CHG node's status flipped `approved → merged` in place at its
-      milestone path (no canonical promotion).
-- [ ] No silent edits to canonical nodes outside what `new_nodes:` or CHG
-      `modifies[]` declared, irrespective of phase.
-- [ ] No invented new nodes — every node in `new_nodes:` has a populated
-      `source_ref` that traces to a specific FRS acceptance criterion or
-      Behavior paragraph. Nodes without a clause to back them are removed
-      or promoted to a DEC.
-- [ ] No `OQ-NNN` is marked `resolved` without a non-null `resolved_by:`
-      pointing at a DEC / ADR / FRS revision / FS revision / CHG /
-      RESEARCH doc, and the resolver carries `resolves: [OQ-NNN]` reciprocally.
-- [ ] `merged: true` and `merge_sha:` set on this FS.
+See [`../workflow/fs-qa-verification.md`](../workflow/fs-qa-verification.md).
 
 ## Open questions
 

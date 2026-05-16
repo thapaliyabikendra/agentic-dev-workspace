@@ -30,17 +30,45 @@ definition work is happening — jump directly to [`## Dispatch shapes`](#dispat
 ### Gate-specific preamble
 
 Gate checks that fan out to multiple specialist passes — **Phase 1.5
-validation** (FRS validation, ADR conformance, baseline snapshot,
-standard-conflict check) and the **Phase 3 QA hat ADR-conformance
-check** (against the FS's declared `adrs:`) — run as **parallel** inline
-`Agent(subagent_type=Explore, ...)` dispatches in a single message,
-followed by synthesis in the main session.
+validation** (the eight Pass 1 checks: `existence`, `sanity`,
+`adr-conflict`, `standard-conflict`, `ccc-deviation`, `flw-coverage`,
+`phase-1-bare-body-shape`, `chg-sanity` — per
+[`design.md → Pass 1`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored))
+and the **Phase 3 QA hat ADR-conformance check** (against the FS's declared
+`adrs:`) — run as **parallel** inline `Agent(subagent_type=Explore, ...)`
+dispatches in a single message, followed by synthesis in the main session.
+The dispatches are file-disjoint over one FRS — each reads the FRS plus
+the Phase-1-born FLW (per `produced_flw:`), Phase-1-born ACT (per
+`produced_actor:`, when set), and Phase-1-born CHG (per non-empty
+`touches_nodes:` — the chg-sanity dispatch skips when `touches_nodes:`
+is empty), but each writes to a disjoint finding row.
 
 Every dispatch must be self-contained: include the goal, the exact
 files in scope, the conventions to follow, and the expected return
 shape (JSON schema, structured list, file paths only). Free-form prose
 returns force the orchestrator to re-read and re-interpret, erasing
 the token savings.
+
+### Phase 1 authoring (FRS + FLW + ACT + CHG) — main-session work
+
+Phase 1 authors up to four artifacts per user-journey: the FRS, the
+Phase-1-born FLW (per R-NEW-1 / R-NEW-2), the Phase-1-born ACT (per
+R-NEW-1 / R-NEW-2a — when the FRS introduces a new actor role), and the
+Phase-1-born CHG (per R-CHG-1..4 — when the FRS declares non-empty
+`touches_nodes:`). Default posture: **sequential authoring in one main
+session**, in the order FRS → FLW → ACT → CHG (FLW after FRS body because
+Scenarios must map back to ACs; ACT after FLW because "Flows they
+initiate" cites the just-allocated FLW-NNN; CHG last because the
+behavior-language `modifies[]` delta is grounded in the FRS's ACs / BRs
+and the target canonical node's current body — both available at this
+point). One-shot subagent dispatch covering all four is **acceptable but
+not required** — the deliverable IS the prose (per § Dispatch shapes
+"Don't dispatch when the deliverable IS the prose"), so dispatching adds
+little when the human-author session can produce the artifacts in a few
+turns. No existing contract assumes FLW, ACT, or CHG are authored at
+Phase 2 — the eight Phase 1.5 Pass 1 checks above read them from
+canonical / milestone-scoped (FLW + ACT born to canonical at Phase 1;
+CHG born to milestone-scoped `chg/` at Phase 1).
 
 ### Return shape (3-block format)
 

@@ -35,6 +35,12 @@ related: []
 >   `status: approved`. When `level: milestone`, flip to `adopted` at
 >   milestone close (see [`../workflow/close-milestone.md`](../workflow/close-milestone.md)).
 >   1-file touch — discovery surface; no `index.md` re-sync.
+>   **Frozen-historic semantics:** once `adopted`, the survey is
+>   read-only — current truth lives in the adopting FRS named in
+>   `adopted_into:`. Post-adoption edits require flipping `status:
+>   stale` first. Drift between survey and FRS body is **not** a
+>   finding; the survey is intentionally a Phase-0 snapshot. On the
+>   `adopted` flip, prepend the body banner declared below.
 > - `stale` — Survey content is no longer current; the milestone moved
 >   on without adopting it. Useful for absorption surveys overtaken by
 >   events. 1-file touch.
@@ -42,6 +48,14 @@ related: []
 >   declined to adopt it (e.g., the FRS path was abandoned). 1-file touch.
 > - `dormant` — Survey was authored speculatively and is parked pending
 >   a future milestone. 1-file touch.
+>
+> **Adopted banner** — on the `adopted` flip, prepend the survey body
+> with this banner (replacing `FRS-NNN` and `YYYY-MM-DD`):
+>
+> ```
+> > **Adopted into FRS-NNN on YYYY-MM-DD.** Current truth lives there;
+> > this file is the Phase-0 snapshot and is frozen.
+> ```
 >
 > Lightweight map of the existing system surface that upcoming requirements
 > will touch. One page or less. Anchors the milestone (when `level: milestone`)

@@ -32,8 +32,17 @@ relevant flow file are loaded. Applies across sessions.
    `id-claims.md` before incrementing. OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
    CR-NNN: standalone change-request container (not a milestone).
    See [`sdlc/workflow/change-request.md`](sdlc/workflow/change-request.md).
-7. Plans contain no syntax. Phase 2 names structures; Phase 3 writes
-   them. Multi-stage / cross-cohort plans need a progress checklist;
+7. Plans contain no syntax. Phase 1 ingests FLW (Trigger + Scenarios),
+   ACT (Description + Goals + business preconditions + flows initiated),
+   and CHG (behavior-language `modifies[]` when FRS `touches_nodes:` is
+   non-empty — one CHG per FRS) — all born to canonical / milestone with
+   `status: proposed` (FLW / ACT) or `status: draft` (CHG). Phase 2
+   names ENT / CMD / STA / CON / INT / DEC / PERM / QRY structures and
+   enriches FLW + ACT + CHG with wiring (`related:` + Sequence + … on
+   FLW / ACT; structural before/after + `adds[]` + `migration_steps[]` on
+   CHG, listed in FS `consumes_chgs:`). Phase 3 writes code, applies CHG
+   deltas, and flips `proposed → active` / `approved → merged`.
+   Multi-stage / cross-cohort plans need a progress checklist;
    mark each stage `[x]` before advancing. Cohort definition + node-ingest
    / CHG rules: [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md).
    Progress-checklist procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).

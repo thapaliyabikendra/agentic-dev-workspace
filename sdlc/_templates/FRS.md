@@ -5,8 +5,10 @@ status: draft                 # draft | reviewed | approved | implemented
 milestone: M-NN               # filled at Phase 0 — milestone is authored first (blank for CR track)
 cr:                           # filled at Phase CR-0 — CR-NNN for CR track (blank for milestone track; mutually exclusive with milestone:)
 discovery: ../discovery/FRS-NNN-<slug>.md
-touches_nodes: []             # canonical DDD node IDs this FRS modifies or extends; modifications captured by the FS's CHG and applied at Phase 3
-produces_nodes: []            # new DDD node IDs this FRS introduces; written directly to canonical at Phase 2 with status: proposed; flipped to active at Phase 3 merge
+produced_flw:                 # FLW-NNN — the one new FLW this FRS introduces. Born to canonical at Phase 1 with status: proposed (R-NEW-1). Strict 1:1 — multi-FLW production FRSs are not permitted (split into separate FRSs). Blank when no new FLW is introduced (rare — usually means a touches_nodes:-only FRS modifying existing canonical).
+produced_actor:               # ACT-NNN — the one new ACT this FRS introduces, when it introduces a new actor role. Born to canonical at Phase 1 with status: proposed (R-NEW-1). Strict 0..1 — most FRSs reuse existing actors. Blank when reusing.
+produces_nodes: []            # new DDD node IDs this FRS introduces *other than* FLW and ACT — covers ENT, CMD, STA, CON, INT, DEC, PERM, QRY. Claimed at Phase 1, written to canonical at Phase 2 with status: proposed, flipped to active at Phase 3 merge.
+touches_nodes: []             # MODIFY-INTENT ONLY. Canonical DDD node IDs this FRS modifies or extends; modifications captured by the FRS's Phase-1-born CHG (R-CHG-1: non-empty `touches_nodes:` ⇒ one CHG-NNN allocated at Phase 1 alongside the FRS, parallel to `produced_flw:` / `produced_actor:`; allocated via id-claims.md with Source = this FRS) and applied at Phase 3. Do NOT list a node here for read-only reference — if you want to cite an existing canonical FLW or ACT, name it inline in the FRS body (AC / BR / Brownfield notes). The field is modify-only by author judgment (M2).
 adrs: []                      # ADR IDs consulted while drafting (carried from Discovery + dialog)
 standards: []                 # STD IDs this FRS consumes (e.g., STD-005); narrowed at Phase 1.5 from sdlc/standards/index.md
 ccc: []                       # CCC IDs this FRS cites by category (e.g., CCC-004 Auditing); deviations from these baselines must be filed as ADRs in `adrs:`
@@ -35,8 +37,12 @@ duplicate heading).
 
 ## Actors
 
-- ACT-NNN — <role> (if canonical); or "new actor, will be introduced as
-  ACT-NNN in canonical at Phase 2 with status: proposed"
+- ACT-NNN — <role>. ID resolves to a real canonical node — either (a) an
+  existing ACT this FRS reuses (cite by ID; list in `touches_nodes:` only
+  if this FRS modifies it), or (b) the new ACT this FRS introduces,
+  declared in `produced_actor:` and born to canonical at Phase 1 with
+  `status: proposed`. No "will be introduced at Phase 2" claim language —
+  the ID is real at the moment this FRS is authored.
 
 ## Preconditions
 
@@ -54,30 +60,35 @@ may be omitted when not applicable):
   by a later operation in scope, and via which command. Omit when the
   operation is one-shot and reversibility is not in scope.
 
-## Behavior
-
-Describe the user-journey behaviorally. Reference existing canonical nodes
-where they apply (ENT-NNN, CMD-NNN, FLW-NNN). Detailed behavior belongs in
-the canonical nodes themselves (existing nodes, or new nodes written
-directly to canonical at Phase 2 with `status: proposed` for the IDs in
-`produces_nodes`), not duplicated here.
-
 ## Business rules
 
-Policy rules that govern the operation, distinct from acceptance criteria
-(ACs are testable claims; BRs are the policy the ACs verify). Number
-inline as `BR-NN`. Empty list allowed when the operation carries no
-policy beyond the canonical CCCs already cited in `ccc:`.
+**Section role — declarative policy claims, each stated once.** This
+section is the canonical home for every policy claim the operation
+honors. Number inline as `BR-NN`. The journey behavior (in the
+Phase-1-born FLW's Scenarios) MAY cite `BR-NN` inline; AC MAY cite
+`BR-NN` it verifies — neither MAY restate the BR text. Empty list
+allowed when the operation carries no policy beyond the canonical CCCs
+already cited in `ccc:`.
+
+A constraint that appears as prose in two or more of Use case / Edge
+cases / Business rules / Acceptance criteria is a within-FRS
+restatement (see
+[`../workflow/frs-validation-rules.md → R-WITHIN-FRS-RULE-RESTATEMENT`](../workflow/frs-validation-rules.md#rule-r-within-frs-rule-restatement)) —
+state once here; reference from the others.
 
 - BR-01 — …
 - BR-02 — …
 
 ## Edge cases
 
-Valid-but-unusual paths that the happy-path Behavior section does not
-cover. Number inline as `EC-NN`. Empty list allowed when no edge cases
-apply (typical for narrow CRUD-shaped operations). Distinct from fault
-paths — fault paths belong in the FLW node's `#fault` scenario.
+Valid-but-unusual paths that the Phase-1-born FLW's `#happy` Scenario
+does not cover but that the FRS author wants to surface at the spec
+level (typically because the path has policy implications visible in
+acceptance criteria). Number inline as `EC-NN`. Empty list allowed when
+no edge cases apply (typical for narrow CRUD-shaped operations).
+Distinct from fault paths — fault paths belong in the FLW node's
+`#fault` Scenario. The FLW node's `#edge` Scenario is the canonical
+home for edge-path behavior; this section is a spec-level summary.
 
 - EC-01 — …
 - EC-02 — …
@@ -105,53 +116,18 @@ is mandatory; body is one of:
 
 ## Acceptance criteria
 
-Observable, testable. Each must map to a Flow scenario (happy / edge / fault)
-in the relevant FLW node — either an existing canonical FLW, or a new FLW
-written to canonical at Phase 2 with `status: proposed`.
+**Section role — testable claims, one per Flow scenario.** Each AC is
+observable and testable, and must map to a Flow scenario
+(happy / edge / fault) on a real FLW node — either an existing
+canonical FLW (cited by ID; listed in `touches_nodes:` only when this
+FRS modifies it), or the new FLW declared in `produced_flw:` and born
+to canonical at Phase 1 with `status: proposed`. The Phase 1.5
+coverage gate verifies every AC maps to a scenario anchor on a real
+FLW (R-NEW-3). AC MAY cite the `BR-NN` it verifies; AC MUST NOT
+restate the BR text verbatim — verification ≠ duplication.
 
 - [ ] …
 - [ ] …
-
-## Test plan view
-
-A view onto the Flow nodes' scenarios — **never restate them here.** List
-each Flow this FRS produces or touches, the IDs of the three scenarios
-that cover it, and (after Phase 2 Test plan ingest) the TC IDs that
-verify each scenario.
-
-The TC ID columns are filled at Phase 2 by
-[`../workflow/plan.md → Test plan ingest`](../workflow/plan.md#test-plan-ingest-after-fs-validation);
-the spec files are generated at Phase 3 by
-[`../workflow/test-suite-codegen.md`](../workflow/test-suite-codegen.md).
-Both operations consume FLW scenario anchors via the TC's `Traces to:`
-line — that is the source-of-truth link between this FRS, the FLW node
-scenarios, and the TC files. FLW nodes remain the behavioral spec; TCs
-are the executable interpretation.
-
-| Flow | Happy | Edge | Fault | Happy TCs | Edge TCs | Fault TCs |
-| ---- | ----- | ---- | ----- | --------- | -------- | --------- |
-| FLW-NNN | FLW-NNN#happy | FLW-NNN#edge | FLW-NNN#fault |  |  |  |
-
-**TC columns are filled at Phase 2, not Phase 1.** At Phase 1 authoring
-time the TC columns are empty placeholders; the test plan ingest writes
-them after the FS validation loop passes. Existing FRSs authored before
-this template change are not retrofitted — the columns simply stay
-empty on those.
-
-**Coverage gate fires at Phase 2 exit, not Phase 1 exit.** At Phase 1
-authoring time, FLW IDs for `produces_nodes` are *claims* — the node
-doesn't exist yet; it will be written to canonical at Phase 2 Ingest with
-`status: proposed`. The Phase 1.5 QA-hat check is forward-looking: "can
-each scenario be expressed as a testable assertion?", not "is it written
-down?" The actual existence check — that every cell points to a real
-`FLW-NNN#happy`/`#edge`/`#fault` anchor — runs against the proposed
-canonical FLW node at Phase 2 exit (when it has been ingested), and again
-after Phase 3 merge flips it to `active`.
-
-For `touches_nodes` references that point at existing canonical FLWs, the
-anchors already exist — check them now. For `produces_nodes` claims, fill
-the IDs intentionally; the canonical node (status: proposed) will have to
-match at Phase 2.
 
 ## Brownfield impact
 
@@ -193,7 +169,7 @@ for the per-FRS and cross-FRS checks that populate this section.
 
 | Finding | Type | Resolution | Rationale |
 | ------- | ---- | ---------- | --------- |
-|         | existence \| sanity \| adr-conflict \| standard-conflict \| ccc-deviation \| cross-frs | resolved \| deferred |  |
+|         | existence \| sanity \| adr-conflict \| standard-conflict \| ccc-deviation \| chg-sanity \| cross-frs | resolved \| deferred |  |
 
 Each unresolved (`resolution: deferred`) finding cites the raised
 `OQ-NNN` in its Rationale column. The OQ file under

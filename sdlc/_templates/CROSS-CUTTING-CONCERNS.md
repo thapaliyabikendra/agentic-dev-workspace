@@ -22,6 +22,18 @@
    `ccc/log.md`; chronological audit is git history (canonical `log.md`
    retired 2026-05-16).
 
+Mandatory sections (every CCC carries these):
+
+- `## Baseline` — one short paragraph stating the project default.
+- `## Deviation policy` — one line naming how consumers signal a
+  deviation from the baseline. Canonical home for the deviation rule;
+  consumers (FRS / FS / survey) cite this CCC by ID rather than restating
+  the rule. The standard one-liner is: *"Deviation → ADR with
+  `related: [CCC-NNN]`; rule:
+  [`../../../sdlc/workflow/authoring-adr.md`](../../../sdlc/workflow/authoring-adr.md)."*
+  Override only when the concern carries a CCC-specific deviation path
+  (rare).
+
 Opt-in sections (add only when populated, not as empty placeholders):
 
 - `## Stack-specific notes` — UI / test / infra constraints distinct from
@@ -61,5 +73,7 @@ source: <origin reference>
 <One short paragraph stating the project's default. Keep ≤140 chars total.
 The TBD marker remains until fixed by an FRS that surfaces the specific value.>
 
-> Deviation → ADR with `related: [CCC-NNN]`; rule: [`../../../sdlc/workflow/authoring-adr.md`](../../../sdlc/workflow/authoring-adr.md).
+## Deviation policy
+
+Deviation → ADR with `related: [CCC-NNN]`; rule: [`../../../sdlc/workflow/authoring-adr.md`](../../../sdlc/workflow/authoring-adr.md).
 ```

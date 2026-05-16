@@ -43,10 +43,13 @@ is the always-on summary.
 > that are doctrinal in nature — *why* something holds, in a phrase the
 > rest of the docs cite by name.
 
-- **QA hat is a moment, not a document.** The Flow node's three scenarios
-  (happy / edge / fault) *are* the test plan. The FRS's "Test plan view"
-  section is a view onto them, not a parallel artifact. Drafting a separate
-  test plan creates a sibling that drifts.
+- **QA hat is a moment, not a document.** The Phase-1-born Flow node's three
+  scenarios (happy / edge / fault) *are* the test plan. The TC files (Phase 2
+  Test plan ingest) carry the executable interpretation via their
+  `**Traces to:**` line citing `FLW-NNN#happy` / `#edge` / `#fault` anchors —
+  the trace lives on the TC, not in the FRS. Drafting a separate test plan
+  creates a sibling that drifts; the FRS does not carry a Test plan view
+  table (retired 2026-05-17 — TC `Traces to:` is regenerable via grep).
 - **Retrieval is the token lever.** Skill compaction helps at the
   margin; not re-deriving the KB each session is the 10× win. The
   procedural rules — exactly which nodes to read at Phase 2 / Phase 3
@@ -110,7 +113,7 @@ at the foot of this file.
   **✅ Either write real trade-offs for each alternative, or omit the section.**
 
 - **❌ Typing method bodies, brace bodies, SQL, or YAML in Phase 2 because the path looks "obvious."** Plans contain no syntax — you're over the line into Phase 3.
-  **✅ Phase 2 names structures; Phase 3 writes them.** Finish the FS, ingest its new nodes (with `status: proposed`) and any CHG, then context-reset before code lands.
+  **✅ Phase 1 names FLW + ACT structures (journey + identity) and CHG behavior-deltas (modify-intent — one per FRS when `touches_nodes:` is non-empty); Phase 2 names ENT / CMD / STA / … structures and enriches FLW + ACT + CHG with wiring (Sequence on FLW; structural before/after + `adds[]` + `migration_steps[]` on CHG, listed in FS `consumes_chgs:`); Phase 3 writes them.** Finish the FS, ingest its new Phase-2 nodes (with `status: proposed`), enrich the Phase-1-born CHGs the FS consumes, then context-reset before code lands. FLW and ACT nodes are born at Phase 1 to canonical (also `status: proposed`); CHG nodes are born at Phase 1 to the milestone-scoped `chg/` home (`status: draft`); the same `proposed → active` flip happens at Phase 3 for both Phase-1- and Phase-2-born canonical nodes, and CHGs flip `approved → merged` at Phase 3.
 
 - **❌ Absorbing adjacent problems silently into a spec.** Hidden scope expansion drifts the spec from what was agreed.
   **✅ Raise an `OQ-NNN`** under `docs/discovery/open-questions/` with the appropriate `origin:` (typically `frs-authoring` or `fs-authoring`), or surface under the FRS's "Brownfield impact". Let the user decide what's in scope.
@@ -155,7 +158,7 @@ at the foot of this file.
   **✅ Every `related:` ID appears as a navigable link in the body prose** (e.g., `see INT-046 §Blast radius`), and every body reference to another node appears in `related:`. They are two surfaces of the same fact.
 
 - **❌ Editing a canonical node outside an active Phase 3 merge of an approved FS.** Process violation; the canonical node would diverge from what an approved CHG says it should be.
-  **✅ Record the intent in a CHG node first** (under the active milestone's `specs/FS-NNN.../nodes/changes/`, `status: draft`). Apply the delta to the canonical target only at Phase 3 merge. Do not edit the canonical target directly — including during brownfield research passes or Phase 2 absorption.
+  **✅ Record the intent in a CHG node first** — born at Phase 1 per FRS when `touches_nodes:` is non-empty (`milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`, `status: draft`); consumed and structurally enriched at Phase 2 by the FS via `consumes_chgs:`. Apply the delta to the canonical target only at Phase 3 merge. Do not edit the canonical target directly — including during brownfield research passes or Phase 2 absorption.
 
 - **❌ "The Helpful Continuation" — treating remembered context from a prior session as a substitute for loading the current flow file.** "Good context" from the previous session is not a signal to skip the reload; retained context drifts silently across phases.
   **✅ Run `/clear` at every flow boundary and reload the next flow file only.** Context that survives a phase boundary is a bug, not a feature.

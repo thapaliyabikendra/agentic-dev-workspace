@@ -23,12 +23,25 @@ Detail at [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip
 
 ## Overview
 
-Workflow aligns operations to Karpathy's Ingest/Query pattern: the
-FRS flow Queries the canonical DDD wiki to validate requirements; the FS flow
-Ingests new DDD nodes directly into the canonical wiki at `docs/<component>/nodes/` with
-`status: proposed`, and emits a CHG node when existing canonical nodes are touched;
-implementation Applies the CHG deltas to canonical and flips the new nodes
-`proposed → active`. The **CR track** (`change-request.md`) is a lightweight
+Workflow aligns operations to Karpathy's Ingest/Query pattern with phase-keyed
+node births. The **FRS flow** is mixed-mode: it Queries the canonical DDD wiki
+to validate requirements **and** Ingests journey + identity + modify-intent —
+the new FLW (Trigger + Scenarios, business language) born to canonical with
+`status: proposed`; when the FRS introduces a new actor role, the new ACT
+(Description + Goals + business preconditions + flows initiated) born to
+canonical with `status: proposed`; and when the FRS declares non-empty
+`touches_nodes:`, a CHG-NNN (behavior-language `modifies[]` only — one CHG
+per FRS) born to its milestone-scoped permanent home with `status: draft`.
+The **FS flow** Ingests structure + wiring: new ENT / CMD / STA / CON / INT /
+DEC / PERM / QRY nodes land in canonical with `status: proposed`, the
+Phase-1-born FLW + ACT are enriched in place with `related:` wiring +
+Sequence + Branches + Compensating actions + structural Postconditions +
+Decisions (FLW) and CMD-triggered + QRY-issued + PERM-NNN refs (ACT), and
+the FS declares `consumes_chgs:` listing the per-FRS-born CHGs it owns —
+enriching each with structural before/after on `modifies[]`, `adds[]`
+mirroring new node ingest, and `migration_steps[]`. Implementation Applies
+the CHG deltas to canonical and flips all Phase-1- and Phase-2-born canonical
+nodes `proposed → active` and consumed CHGs `approved → merged`. The **CR track** (`change-request.md`) is a lightweight
 alternative to the full dev track for isolated, standalone change requests that
 don't warrant milestone grouping — it produces a CR-scoped container instead of
 a milestone folder, skips Phase 0 and the cross-FRS sweep, and delegates to
@@ -124,9 +137,9 @@ digraph workflow_phases {
     subgraph cluster_dev {
         label="Dev track";
         phase0    [shape=box,   label="Phase 0\nMilestone Scoping"];
-        phase1    [shape=box,   label="Phase 1\nFRS Authoring"];
+        phase1    [shape=box,   label="Phase 1\nFRS + FLW + ACT\n+ CHG (if touches_nodes)\nAuthoring"];
         gate15    [shape=diamond, label="Phase 1.5\nValidation Gate?"];
-        phase2    [shape=box,   label="Phase 2\nFS + Node Ingest"];
+        phase2    [shape=box,   label="Phase 2\nFS + Node Ingest\n+ CHG consumption"];
         fsval     [shape=diamond, label="FS validation?"];
         phase3a   [shape=box,   label="Phase 3\nMerge + Code"];
     }
@@ -140,8 +153,8 @@ digraph workflow_phases {
     }
 
     out_ms        [shape=doublecircle, label="Milestone portal\n+ scope discovery"];
-    out_frs       [shape=doublecircle, label="Validated FRSs\n+ OQs"];
-    out_fs        [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
+    out_frs       [shape=doublecircle, label="Validated FRSs\n+ proposed FLW + ACT\n+ draft CHG (if any)\n+ OQs"];
+    out_fs        [shape=doublecircle, label="FS + proposed nodes\n+ consumed/enriched CHG\n(if any)"];
     out_tc        [shape=doublecircle, label="TC files staged"];
     out_impl_code [shape=doublecircle, label="Stage 2 Code complete\n(dev track exit)"];
     out_impl      [shape=doublecircle, label="Active canonical\n+ code + test specs\n+ FS implemented (after QA gate)"];
@@ -180,7 +193,7 @@ from one milestone, each aggregating a subset of the milestone's FRSs.
 
 | Flow                | File                                                                       | Operation             | Mode                  | Phases covered              |
 | ------------------- | -------------------------------------------------------------------------- | --------------------- | --------------------- | --------------------------- |
-| Design              | [`workflow/design.md`](workflow/design.md)                                 | `generate-frs`        | Validation (Query)    | 0, 1, 1.5                   |
+| Design              | [`workflow/design.md`](workflow/design.md)                                 | `generate-frs`        | Mixed (Query + Ingest) | 0, 1, 1.5                  |
 | Pre-plan            | [`workflow/discuss.md`](workflow/discuss.md)                               | `pre-plan-discuss`    | Optional              | Between 1.5 and 2           |
 | Plan                | [`workflow/plan.md`](workflow/plan.md)                                     | `generate-feat-spec`  | Ingest                | 2                           |
 | Implementation      | [`workflow/implementation.md`](workflow/implementation.md)                 | `implement-feat`      | Merge + Code          | 3                           |
@@ -362,14 +375,17 @@ implemented without doing this pass.
 ### In-flight nodes (`status: proposed`)
 
 New nodes drafted at Phase 2 land in canonical with `status: proposed`.
-Existing canonical nodes are never modified at Phase 2 — the FS emits a
-CHG-NNN node instead, applied at Phase 3. Cross-FS dependencies use
+Existing canonical nodes are never modified at Phase 2 — the FRS births a
+CHG-NNN at Phase 1 when `touches_nodes:` is non-empty (one CHG per FRS,
+milestone-scoped permanent home, behavior-language delta), the consuming
+FS lists it in `consumes_chgs:` at Phase 2 and enriches it structurally,
+and Phase 3 applies the deltas. Cross-FS dependencies use
 `depends_on_specs:`; Phase 3 enforces merge order. Abandoned FSs flip their
 proposed nodes `proposed → deprecated`.
 
 See [`workflow/in-flight-nodes.md`](workflow/in-flight-nodes.md) for the
-full CHG mechanics, cross-FS dependency rules, abandonment procedure, and
-the workflow self-extension note.
+full CHG mechanics, FS-CHG consumption rules, cross-FS dependency rules,
+abandonment procedure, and the workflow self-extension note.
 
 ### Derived reports
 
@@ -508,9 +524,11 @@ superseded`).
 DDD content lives in component-qualified canonical wikis at
 `docs/<component>/nodes/`. New nodes land there at Phase 2 with
 `status: proposed`; Phase 3 flips them to `active`. The only
-milestone-scoped DDD artifact is the CHG-NNN change-map (permanent in
-the milestone folder — never promoted). When a new component is introduced,
-run [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md)
+milestone-scoped DDD artifact is the CHG-NNN change-map, born at Phase 1
+per FRS (when `touches_nodes:` is non-empty) at
+`milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` — permanent in the
+milestone folder, never promoted to canonical. When a new component is
+introduced, run [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md)
 before Phase 2 ingest.
 
 See [`KB-LAYOUT.md`](KB-LAYOUT.md) for the full type-folder tree,

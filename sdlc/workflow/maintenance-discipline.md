@@ -53,6 +53,7 @@ those carry the doctrinal frame the per-op sections assume.
 | Canonical node edit (any) | [Files to touch on a canonical node edit](#files-to-touch-on-a-canonical-node-edit) |
 | Node `related:` add / remove | + [Bidirectional-link enforcement](#bidirectional-link-enforcement) |
 | Node semantic content change | + [Node versioning — `version: N`](#node-versioning--version-n) |
+| Phase 1.5 round-trip body edit on Phase-1-born FLW / ACT | [Phase 1.5 round-trip body-edit exception](#phase-15-round-trip-body-edit-exception) |
 | ADR edit (any) | [Files to touch on an ADR edit](#files-to-touch-on-an-adr-edit) |
 | CCC edit (any) | [Files to touch on a CCC edit](#files-to-touch-on-a-ccc-edit) |
 | Promote inline DEC → standalone | [Promoting an inline DEC to standalone](#promoting-an-inline-dec-to-standalone) |
@@ -138,8 +139,41 @@ ADRs, or CCCs — see *Rule history* below.
 **The touch is event-driven** — it fires at each edit, not at a fixed phase
 boundary. Concretely:
 
-- **Phase 2 ingest of a new node** — new row in the per-type `index.md`
-  with Status = `proposed`. The new node is written directly to
+- **Phase 1 ingest of a Phase-1-born FLW or ACT** (per R-NEW-1) — new row
+  in `nodes/flows/index.md` (for FLW) or `nodes/actors/index.md` (for
+  ACT) with Status = `proposed`. The new node is written directly to
+  `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`
+  and a Phase-1-bare body shape (per R-NEW-2 / R-NEW-2a — see
+  [`in-flight-nodes.md → FLW lifecycle`](in-flight-nodes.md)). The 2-file
+  node touch fires immediately. When a single FRS births both a FLW and
+  an ACT, that is **two independent 2-file touches** in the same
+  authoring session — they do not compound.
+- **Phase 1 birth of a Phase-1-born CHG** (per R-CHG-1) — when the FRS's
+  `touches_nodes:` is non-empty, the CHG file is written to
+  `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+  `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`) with
+  `status: draft` and a Phase-1-bare body shape (behavior-language
+  `modifies[]` only — see [`in-flight-nodes.md → CHG mechanics`](in-flight-nodes.md#chg-mechanics)).
+  The touch is **1-file** because CHG has no per-type `index.md`
+  companion today (see **CHG `index.md` gap** in the round-trip
+  exception below). This is independent from any FLW / ACT birth in the
+  same session — touches do not compound across artifact types.
+- **Phase 1.5 round-trip body edit** on a Phase-1-born FLW or ACT — see
+  [Phase 1.5 round-trip body-edit exception](#phase-15-round-trip-body-edit-exception)
+  below. This is the framework's first and only carve-out to the
+  universal 2-file rule; the scope is tight and the rule is not
+  generalizable.
+- **Phase 2 enrichment of a Phase-1-born FLW or ACT** — same file edited
+  in place, body content added (Sequence / Branches / Compensating /
+  Postconditions / Decisions on FLW; Commands triggered / Queries issued /
+  PERM-NNN refs on ACT), `related:` populated, `status:` unchanged
+  (`proposed`). The 2-file node touch fires because frontmatter `updated:`
+  and the body change are non-trivial; the index row's Status column
+  stays `proposed`. Plus the `(base + N)` expansion fires because
+  `related:` just transitioned `[] → [...]`.
+- **Phase 2 ingest of a new Phase-2-born node** (ENT / CMD / STA / CON /
+  INT / DEC / PERM / QRY) — new row in the per-type `index.md` with
+  Status = `proposed`. The new node is written directly to
   `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`;
   the 2-file node touch fires immediately. ADR `created` events fire the
   same 2-file touch on the ADR store.
@@ -159,11 +193,17 @@ boundary. Concretely:
   never deleted; IDs are not reused.
 
 CHG nodes are milestone-scoped — they live permanently at
-`milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`
-and never participate in the canonical tiered touch. There is no
-canonical `docs/<component>/nodes/changes/` subtree. The CHG's own status lifecycle
-(`draft → approved → merged`) is in-place edits to its frontmatter at
-the milestone path.
+`milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+`docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`) and never
+participate in the canonical tiered touch. There is no canonical
+`docs/<component>/nodes/changes/` subtree. CHG births at Phase 1 by the
+FRS (R-CHG-1) when `touches_nodes:` is non-empty; the touch is 1-file on
+the CHG file (no per-type `index.md` today — see **CHG `index.md` gap**
+below). CHG status lifecycle (`draft → approved → merged`, plus
+`draft → deprecated` for sibling-CHG fold / abandonment) is in-place
+edits to its frontmatter at the milestone path. Pre-cutover CHGs at
+`specs/FS-NNN-<slug>/nodes/changes/` are grandfathered and stay where
+they are.
 
 The master catalog [`docs/home.md`](../home.md) is **derived**, not
 hand-maintained per event. Its node-type and ADR tables regenerate on
@@ -207,6 +247,76 @@ Node lifecycle events (`created`, `status-change`, `superseded`,
 `deprecated`, `linked`, `renamed`) are captured by the index row's Status
 column and git history — there is no companion `log.md`. See *Rule history*
 below for the consolidation date.
+
+## Phase 1.5 round-trip body-edit exception
+
+A doctrinal carve-out (per R-NEW-7 / B3, 2026-05-17; extended to CHG per
+R-CHG-1..7) to the universal 2-file touch rule. Tightly scoped. **The
+framework's first exception to the universal 2-file rule.**
+
+**Trigger.** A Phase 1.5 round-trip on a Phase-1-born FLW, ACT, or CHG,
+where the revision is body-only and the artifact's `status:` stays
+unchanged (FLW / ACT: `proposed`; CHG: `draft`).
+
+**Action.** 1-file touch — edit the artifact body only. The per-type
+`index.md` is NOT re-synced (Status column unchanged; Title / Description
+columns are frontmatter-sourced, also unchanged). The artifact's
+`updated:` frontmatter timestamp DOES fire — it carries the revision
+date. For CHG specifically: CHG has no per-type `index.md` today (see
+**CHG index.md gap** note below); the touch is naturally 1-file
+regardless of carve-out, but the carve-out logic still applies for
+status-stability discipline.
+
+**Scope restrictions — not generalizable. ALL four must hold:**
+
+- **Only Phase-1-born artifacts (FLW / ACT / CHG).** Not Phase-2-born
+  canonical nodes (ENT / CMD / STA / CON / INT / DEC / PERM / QRY).
+- **Only during Phase 1.5 round-trip.** Not during free-form edits, not
+  during Phase 2 enrichment, not during bug fixes.
+- **Only when `status:` does not change.** Any status flip
+  (FLW / ACT `proposed → active` or `proposed → deprecated`; CHG
+  `draft → approved`, `draft → deprecated`) → 2-file touch as usual.
+- **Only when body edits do not change frontmatter fields driving index
+  columns** (title, summary, tags). Such edits → 2-file touch as usual.
+
+**Precedent risk.** Future requests "I'm just editing the body, can I use
+1-file touch?" MUST NOT cite R-NEW-7 or its R-CHG extension. The carve-out
+is scoped to Phase 1.5 round-trip on Phase-1-born FLW / ACT / CHG only;
+each extension is type-named (FLW / ACT in the original, CHG here) — not
+generalized as "any in-flight body edit." Generalizing the carve-out to
+all canonical body edits is a separate doctrinal question (deferred —
+body-edit vs. index-relevance audit not done). The carve-out exists
+because:
+
+- Phase 1.5 round-trip is the FRS revision loop; an FAIL / PASS_WITH_MAJORS
+  verdict often ripples to the canonical FLW (Scenarios revised), the
+  canonical ACT (Goals / Preconditions revised), and/or the milestone-
+  scoped CHG (`modifies[]` behavior delta revised). Worst case 4× edit
+  cost per round-trip otherwise.
+- The Phase-1-bare body shape (per R-NEW-8 / R-CHG-7) means the index
+  row (where one exists) is carrying minimal information — Status
+  `proposed` / `draft`, Title (frontmatter), one-line description
+  (frontmatter). Body content (Scenarios prose, ACT Description prose,
+  CHG `modifies[]` behavior delta) is not in the index, so a body
+  revision does not invalidate any index column.
+
+**Other status-change events keep the existing 2-file touch (or 1-file
+where no index exists):** Phase 3 activation `proposed → active` (FLW /
+ACT) / CHG `approved → merged`, FS-validation exit CHG `draft → approved`,
+full FRS abandonment FLW / ACT `proposed → deprecated` / CHG `draft →
+deprecated`, sibling-CHG fold `draft → deprecated` (R-CHG-3). See
+[`in-flight-nodes.md → Abandonment`](in-flight-nodes.md) for the
+abandonment procedure.
+
+**CHG `index.md` gap.** Today the milestone-scoped `chg/` directory has
+**no per-type `index.md`** companion — CHG births at Phase 1 fire a
+1-file touch on the CHG file alone (no index to re-sync). When the gap
+proves painful (e.g., a milestone accumulates enough CHGs that scanning
+becomes expensive), a future plan can introduce
+`milestones/M-NN-<slug>/chg/index.md` (and the parallel CR-track path);
+the 2-file touch would then become standard for CHG births. Until that
+plan lands, the 1-file touch is the procedurally correct shape for CHG
+births and Phase 1.5 round-trip body edits.
 
 ## Bidirectional-link enforcement
 

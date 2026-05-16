@@ -63,12 +63,11 @@ docs/change-requests/
     id-claims.md               # ID reservation ledger (lazy — same discipline as milestones)
     frs/
       FRS-NNN-<slug>.md        # Single FRS per CR
+    chg/                       # CR-scoped CHG nodes (lazy; created when FRS births a CHG at Phase CR-1)
+      CHG-NNN-<slug>.md        # Phase-1-born per R-CHG-1; permanent home, never promoted to canonical
     specs/
       FS-NNN-<slug>/
-        FS-NNN.md
-        nodes/
-          changes/
-            CHG-NNN-<slug>.md  # CR-scoped CHG nodes (permanent home, never promoted to canonical)
+        FS-NNN.md              # `consumes_chgs:` lists the FRS's Phase-1-born CHG (when any)
         test-plans/            # TC files (lazy; created at QA-track flow entry)
           <use-case>/
             TC-NNN-<slug>.md
@@ -76,6 +75,14 @@ docs/change-requests/
 
 New DDD nodes the FS introduces land in `docs/<component>/nodes/<type>/`
 directly (same as milestone track) with `status: proposed`.
+
+> **Pre-2026-05-17 layout (frozen reference).** Pre-cutover CR containers
+> nested CHG nodes under `specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`.
+> That layout is **grandfathered** for any pre-cutover CR — files stay where
+> they are until naturally retired (`approved → merged → archived`). New
+> CRs authored post-cutover use the layout above: `chg/` is a sibling of
+> `frs/` and `specs/`, CHGs are born at Phase CR-1 by the FRS (R-CHG-1),
+> and the consuming FS lists them in `consumes_chgs:` at Phase CR-2.
 
 ---
 
@@ -146,6 +153,31 @@ File at: `docs/change-requests/CR-NNN-<slug>/frs/FRS-NNN-<slug>.md`
 
 Add the FRS ID to the portal doc `frs:` frontmatter and body list.
 
+**FLW + ACT + CHG born at Phase CR-1 (per R-NEW-1 / R-CHG-1).** Phase CR-1
+inherits the Phase 1 rules from `design.md`: the FRS's `produced_flw:`
+scalar declares the one new FLW, born to canonical at
+`docs/<component>/nodes/flows/` with `status: proposed`; the
+`produced_actor:` scalar declares the one new ACT (when the FRS
+introduces a new actor role), born to canonical at
+`docs/<component>/nodes/actors/` with `status: proposed`; and when the
+FRS declares non-empty `touches_nodes:`, a per-FRS CHG is born to
+`docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` with
+`status: draft`. All three Phase-1-born artifacts carry Phase-1-bare
+body shape (FLW / ACT: `related: []`; CHG: behavior-language `modifies[]`
+only, no structural before/after, no `adds[]`, no `migration_steps[]`).
+Phase CR-2 enriches each in place (FLW / ACT wiring; CHG structural
+delta + `adds[]` + `migration_steps[]` via FS `consumes_chgs:`); Phase
+CR-3 flips FLW / ACT `proposed → active` and CHG `approved → merged`.
+The CR portal doc does not need to redeclare these — the FRS's
+frontmatter is the source of truth.
+
+**id-claims.md inherits R-NEW-9.** `docs/change-requests/CR-NNN-<slug>/id-claims.md`
+uses the renamed `Source` column (formerly `FS`) and the lazy-create
+timing of "first FRS or FS claim". Phase CR-1's allocation of FLW-NNN /
+ACT-NNN against the FRS-NNN as `Source` lazy-creates the file if it does
+not yet exist. Pre-cutover CR id-claims.md files keep the `FS` header
+until the next allocation against that file.
+
 ---
 
 ## Phase CR-1.5 — Per-FRS Gate (Pass 1 only)
@@ -174,8 +206,13 @@ differences from the milestone track are path substitutions:
 | Milestone path | CR path |
 |---|---|
 | `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md` | `docs/change-requests/CR-NNN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md` |
-| `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN.md` | `docs/change-requests/CR-NNN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN.md` |
+| `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` | `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` |
 | `milestone: M-NN` in FS frontmatter | `cr: CR-NNN` in FS frontmatter; leave `milestone:` blank |
+
+The CHG is **born at Phase CR-1 by the FRS** (R-CHG-1) when
+`touches_nodes:` is non-empty — not emitted at Phase CR-2 under the
+old model. Phase CR-2 lists the CHG in the FS's `consumes_chgs:` and
+enriches it structurally per [`plan.md § 4`](plan.md#4-chg-node-consumption--enrichment).
 
 Add the FS ID to the portal doc `specs:` frontmatter and body list.
 

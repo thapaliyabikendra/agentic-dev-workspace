@@ -1,17 +1,25 @@
 ---
 id: CHG-NNN
 type: change
-title: <Change-map title — FS-NNN delta, or per-touchpoint slug>
-status: draft                 # draft | approved | merged
-source_ref: []                # [{frs: FRS-NNN, fs: FS-NNN, op: modify}] · brownfield: [{absorption: <path>, op: modify}]
-target_fs: FS-NNN             # the spec that emits this change map
-adds: []                      # new canonical node IDs introduced by the FS
-modifies: []                  # [{node: ENT-NNN, before: "<summary>", after: "<summary>"}]
-removes: []                   # canonical node IDs retired
-supersedes: []                # canonical node IDs superseded; successors live in adds[]
-invariants_before: []         # cross-node invariants the system held before the merge
-invariants_after: []          # cross-node invariants the system holds after the merge
-migration_steps: []           # ordered migration / backfill steps required at merge
+title: <Change-map title — FRS-NNN delta, or per-touchpoint slug>
+status: draft                 # draft | approved | merged | deprecated
+# source_ref: list of originating FRS IDs. Phase 1 birth: single FRS-NNN
+# (the FRS whose touches_nodes: drove this CHG into existence). FS-time
+# merge (R-CHG-3 sibling-CHG fold) accumulates additional FRS IDs here.
+source_ref: []                # [{frs: FRS-NNN, op: modify}] · brownfield: [{absorption: <path>, op: modify}]
+# adds[] — Phase-2-wired only. Mirrors new canonical node IDs introduced by
+# the FS that consumes this CHG. Phase 1 author leaves empty.
+adds: []                      # new canonical node IDs introduced by the consuming FS (Phase 2 enrichment)
+# modifies[] — Phase 1 carries the behavior-language delta (business
+# language only; e.g. "FLW-001 gains a fault path when X" — no ENT/CMD/STA
+# IDs in the before/after at Phase 1). Phase 2 FS enrichment adds the
+# structural before/after on each entry.
+modifies: []                  # Phase 1: [{node: ENT-NNN, behavior_delta: "<business-language delta>"}]; Phase 2: each entry enriched with {before: "<structural>", after: "<structural>"}
+removes: []                   # canonical node IDs retired — Phase 1 when FRS explicitly retires; Phase 2 for FS-emergent retirements
+supersedes: []                # canonical node IDs superseded; successors live in adds[] (Phase 2-filled)
+invariants_before: []         # cross-node invariants before the merge — Phase 1 for milestone-level; Phase 2 for node-local
+invariants_after: []          # cross-node invariants after the merge — same posture as invariants_before
+migration_steps: []           # Phase-2-wired only. Ordered migration / backfill steps required at merge. Phase 1 author leaves empty.
 related: []
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
@@ -19,60 +27,113 @@ updated: YYYY-MM-DD
 
 # CHG-NNN: <Title>
 
+> **Lifecycle (per R-CHG-1..7, post-2026-05-17 cutover):**
+> - **Phase 1:** Born by FRS when its `touches_nodes:` is non-empty.
+>   One CHG per FRS at Phase 1 (parallel to `produced_flw:` /
+>   `produced_actor:` scalar shape). Body carries business-language
+>   `modifies[]`, optional milestone-level `invariants_before/after`,
+>   optional `removes[]` / `supersedes[]`. `status: draft`.
+> - **Phase 2:** FS author lists this CHG ID in the FS's
+>   `consumes_chgs: [CHG-NNN, ...]` frontmatter, then enriches: structural
+>   before/after on each `modifies[]` entry, fills `adds[]` (mirroring
+>   new node ingest), fills `migration_steps[]`. `status:` stays `draft`
+>   until FS-validation exit, which flips it to `approved`.
+> - **Phase 3:** Merge applies the deltas to canonical and flips
+>   `approved → merged`.
+>
+> **File location** (permanent milestone-scoped home — never promoted to
+> canonical):
+> - Milestone track: `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`
+> - CR track: `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`
+>
+> The FS-CHG coupling is by frontmatter reference (FS `consumes_chgs:`),
+> not filesystem nesting. Reverse-glob audit: grep every FS for CHG-NNN
+> in `consumes_chgs:` to find its consuming FS.
+>
+> **`target_fs:` field retired** (per R-CHG-3 / τ) — replaced by
+> `source_ref:` (FRS list) + FS `consumes_chgs:` reverse-glob. Pre-cutover
+> CHGs with `target_fs:` are grandfathered.
+
 ## Scope
 
-One or two sentences. What is this change in service of — which FRSs?
-Which canonical area?
+One or two sentences. What is this change in service of — which FRS births
+it (Phase 1), and which canonical area does it touch? The consuming FS is
+identified later by reverse-glob of `consumes_chgs:` — do not pre-name it
+at Phase 1 birth.
+
+## Modifications
+
+Mirrors `modifies:`. **Phase 1 author writes the behavior-language delta
+only** — business-language descriptions of what the canonical node's
+behavior changes to. Do NOT reach for structural detail (field names,
+method signatures, Sequence step numbers, ENT/CMD/STA IDs in
+before/after columns) — those are not yet defined. The same discipline
+that governs Phase-1 FLW Scenarios and Phase-1 ACT Preconditions applies
+here.
+
+**Phase 1 (behavior-language) example:**
+
+| Node | Behavior delta |
+| ---- | -------------- |
+| FLW-001 | Adds a fault path when the upstream service responds 503; the actor sees a retry option. |
+| ACT-001 | Preconditions add a permission requirement before initiating the flow. |
+
+**Phase 2 FS enrichment** adds the structural before/after to each row:
+
+| Node | Behavior delta | Before (structural) | After (structural) |
+| ---- | -------------- | ------------------- | ------------------ |
+| FLW-001 | <Phase-1 text, unchanged> | Sequence steps 1–4 | Sequence steps 1–4 plus new step 5 invoking CMD-007 in fault branch |
+| ACT-001 | <Phase-1 text, unchanged> | Preconditions: business-language only | Preconditions add PERM-009 ref |
 
 ## Additions
 
-Mirrors `adds:`. New canonical nodes this FS introduces. Each must already
-exist at `docs/nodes/<type>/<ID>-<slug>.md` with `status: proposed`
-(written by Phase 2 ingest before this CHG was authored). Phase 3 merge
-flips them to `status: active` alongside applying this CHG's
-`modifies[]` / `removes[]` / `supersedes[]`.
+Mirrors `adds:`. **Phase 2 FS enrichment** lists new canonical nodes the
+consuming FS introduces. Each must already exist at
+`docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`
+(written by Phase 2 ingest before this CHG's `adds[]` is populated).
+Phase 3 merge flips them to `status: active` alongside applying this
+CHG's `modifies[]` / `removes[]` / `supersedes[]`.
+
+**Phase 1 author leaves this section empty** — no new nodes exist yet.
 
 - ACT-NNN — <one line>
 - ENT-NNN — …
 
-## Modifications
-
-Mirrors `modifies:`. One row per canonical node touched, with the
-before/after delta in plain prose.
-
-| Node | Before | After |
-| ---- | ------ | ----- |
-| ENT-NNN | <invariant or field as it stood> | <invariant or field after merge> |
-| FLW-NNN | <sequence as it stood> | <sequence after merge> |
-
 ## Removals
 
-Mirrors `removes:`. Canonical nodes retired with no successor.
+Mirrors `removes:`. Canonical nodes retired with no successor. Phase 1
+when the FRS explicitly retires a node; Phase 2 for FS-emergent
+retirements.
 
 - ENT-NNN — <one-line reason>
 
 ## Supersessions
 
 Mirrors `supersedes:`. Old node → new node (the successor must appear in
-`adds:`).
+`adds:`, which is Phase-2-filled). Phase 1 may list supersessions when the
+FRS explicitly declares them; the successor side lands at Phase 2.
 
 - ENT-NNN-old → ENT-NNN-new
 
 ## Invariant delta
 
-Cross-node invariants the merge changes.
+Cross-node invariants the merge changes. Phase 1 carries milestone-level
+invariants (cross-FRS, cross-node); Phase 2 enriches with node-local
+invariants surfaced during structural authoring.
 
 - Before: …
 - After: …
 
 ## Migration steps
 
-Ordered steps required at Phase 3 merge to keep data and code consistent
-with the new canonical shape.
+**Phase 2 FS enrichment** — ordered steps required at Phase 3 merge to
+keep data and code consistent with the new canonical shape. Phase 1
+author leaves this section empty (no structural detail yet).
 
 1. …
 2. …
 
 ## Brownfield notes
 
-Existing schemas / migrations / fixtures affected by this change map:
+Existing schemas / migrations / fixtures affected by this change map.
+Optional at both phases.

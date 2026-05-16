@@ -118,7 +118,8 @@ Constraints captured in the data-model fact sheet: required, max length,
 min length, uniqueness, format (regex), whitespace-trimmed, etc. Source
 is the scoped `nodes/entities/ENT-NNN-*.md` file's `Invariants`,
 `Properties`, and `Constraints` sections, plus any field-level
-clarifications in the FRS's `## Behavior`.
+clarifications in the FRS's `## Acceptance criteria` or the
+Phase-1-born FLW's Scenarios.
 
 | TC intent | Test Data entry |
 |---|---|

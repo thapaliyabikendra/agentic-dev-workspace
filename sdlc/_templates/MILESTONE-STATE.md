@@ -76,4 +76,7 @@ The roadmap regen consumes this field as-is.
 
 **Last session completed:** (nothing yet)
 
-**Next session should start with:** Load this file; check `dev_phase`, `qa_phase`, and `next_action`; load the relevant flow file for the track being worked.
+> Next-session handoff lives in frontmatter `next_action:` — load this
+> file, check `dev_phase` / `qa_phase` / `next_action`, then load the
+> relevant flow file for the track being worked. Do not restate
+> `next_action` in this body section.

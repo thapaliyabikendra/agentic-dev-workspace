@@ -27,7 +27,7 @@ audience: planning
 - `docs/milestones/M-*/frs/FRS-*.md` — FRS status + last-edited dates.
 - `docs/milestones/M-*/specs/FS-*/FS-*.md` — FS `merged:` flag,
   `service_repos:`, `depends_on_specs:`.
-- `docs/milestones/M-*/specs/FS-*/nodes/changes/CHG-*.md` — CHG status.
+- `docs/milestones/M-*/chg/CHG-*.md` — CHG status (post-cutover; pre-cutover at `specs/FS-*/nodes/changes/CHG-*.md` grandfathered).
 - `docs/discovery/open-questions/index.md` and individual OQ pages —
   open-question state + resolution paths.
 - `docs/milestones/M-*/discovery/` — discovery and FRS-scope notes

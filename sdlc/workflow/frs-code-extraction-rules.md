@@ -52,37 +52,45 @@ For each code source, walk these signals top-to-bottom. A single file may
 produce multiple FRS candidates (multiple user-journeys). Target columns
 refer to the project's FRS template
 ([`../_templates/FRS.md`](../_templates/FRS.md)) and the canonical DDD
-wiki at [`../nodes/`](../nodes/) (where Phase 2 writes new nodes with
-`status: proposed` and Phase 3 flips them to `active`).
+wiki at [`../nodes/`](../nodes/). Birth phases are type-keyed: FLW and
+ACT are born at Phase 1 alongside their FRS (per R-NEW-1); ENT, CMD, STA,
+CON, INT, DEC, PERM, QRY are born at Phase 2; Phase 3 flips all
+proposed-state nodes to `active`.
 
 | Signal in code | Lands in |
 |---|---|
-| Form submission trigger (e.g. HTML/React: `<form onSubmit>`, Django: `<form method="POST">`, .NET: `[HttpPost]` action) | One FRS candidate (one user-journey → scope + Behavior). |
-| Form field declarations inside a form (inputs, selects, textareas) | Form fields go into a canonical Entity (ENT) or Flow (FLW) node (existing, or new with `status: proposed` at Phase 2 ingest), not into the FRS body directly. The FRS Behavior references the node ID. |
+| Form submission trigger (e.g. HTML/React: `<form onSubmit>`, Django: `<form method="POST">`, .NET: `[HttpPost]` action) | One FRS candidate (one user-journey). The Phase-1-born FLW carries the Trigger + Scenarios; the FRS body carries Use case + ACs + BRs + Brownfield impact. |
+| Form field declarations inside a form (inputs, selects, textareas) | Form fields go into a canonical Entity (ENT) node (existing, or Phase-2-born with `status: proposed` per the FRS's `produces_nodes:`), not into the FRS body directly. The FRS references the ENT ID inline. |
 | Data shape / schema types on form or handler (e.g. TypeScript interfaces, Python dataclasses, .NET DTOs) | Strengthen the data shape of the canonical ENT — translate to business language; never leak type primitives to the FRS or the node body. |
-| Non-form action trigger (e.g. button click → async operation) | Candidate operation. Scope + Behavior. |
-| Async / system-boundary call (e.g. React: `fetch` / `useMutation`; Django: `requests`; .NET: `HttpClient`) | System boundary; the FRS Behavior names the fault path (network failure, auth failure); the FLW node carries the `fault` scenario in its Test plan view. |
-| Validation schema (e.g. JS: `zod`, `yup`, `joi`; .NET: `class-validator`; Python: Pydantic validators) | Business rules in FRS Behavior or in the canonical ENT, tagged `[inferred from code]`. |
-| Inline error / early return in submit paths (`if` / `throw` / `return error`) | Fault paths in FRS Behavior; tagged `[inferred from code]`. |
-| Error UI (inline error component, `try/catch` display block) | Fault paths in FRS Behavior. |
-| Role / permission check (guard clause on actor identity, e.g. `hasRole`, `isAdmin`, `Can`) | Actors + Preconditions in the FRS, with the actor ID resolving to an ACT-NNN node (existing canonical, or new canonical with `status: proposed` at Phase 2 ingest). Tagged `[inferred from code]`. |
+| Non-form action trigger (e.g. button click → async operation) | Candidate operation. FRS Use case + FLW Trigger + FLW Scenarios. |
+| Async / system-boundary call (e.g. React: `fetch` / `useMutation`; Django: `requests`; .NET: `HttpClient`) | System boundary; the FRS Edge cases / Brownfield notes name the fault domain; the Phase-1-born FLW's `#fault` Scenario carries the observable terminal state. |
+| Validation schema (e.g. JS: `zod`, `yup`, `joi`; .NET: `class-validator`; Python: Pydantic validators) | Business rules in the FRS Business rules section or constraints on the canonical ENT (Phase-2-born), tagged `[inferred from code]`. |
+| Inline error / early return in submit paths (`if` / `throw` / `return error`) | Fault paths on the Phase-1-born FLW's `#fault` Scenario; tagged `[inferred from code]`. |
+| Error UI (inline error component, `try/catch` display block) | Fault paths on the Phase-1-born FLW's `#fault` Scenario. |
+| Role / permission check (guard clause on actor identity, e.g. `hasRole`, `isAdmin`, `Can`) | Actors + Preconditions in the FRS, with the actor ID resolving to an ACT-NNN node — either an existing canonical ACT (cited by ID) or the new ACT this FRS introduces via `produced_actor:` (Phase-1-born with `status: proposed`). Tagged `[inferred from code]`. |
 | Route definition (path-based or file-based routing) | Module-grouping hint — informs whether a milestone needs splitting (see [`design.md → Phase 0 Scope check`](design.md#before-any-questions)). |
-| Loading / pending / submitting state | Hints at the trigger → postcondition path; lands in Behavior. |
-| Notification / feedback call (toast, alert, queue dispatch) | Behavior — the FRS describes the actor outcome ("the actor is informed of the outcome"); the FLW node carries the notification mechanics. |
-| Guard clauses with edge/null value checks (early return on null or out-of-range values) | Edge paths in Behavior; tagged `[inferred from code]`. |
+| Loading / pending / submitting state | Hints at the trigger → postcondition path; lands on the Phase-1-born FLW's Scenarios (business language) and gets enriched at Phase 2 with Sequence wiring. |
+| Notification / feedback call (toast, alert, queue dispatch) | The FRS Notifications table carries the recipient / trigger / channel / reason policy; the Phase-1-born FLW's Scenarios reference the actor outcome ("the actor is informed of the outcome"). |
+| Guard clauses with edge/null value checks (early return on null or out-of-range values) | Edge paths on the Phase-1-born FLW's `#edge` Scenario; tagged `[inferred from code]`. |
 
 **Output of extraction per candidate:** Use case title; source location
-(file path + logical name — see below); pre-populated Behavior items
-(each tagged `[inferred from code]`); inferred actor list; pre-populated
-`touches_nodes` claim when existing canonical nodes match the domain
-(check `docs/<component>/nodes/*/index.md`); pre-populated `produces_nodes` claim for
-nodes the candidate will introduce at Phase 2 Ingest. **Tag every claim
-that came from code — no exceptions.**
+(file path + logical name — see below); pre-populated FLW Scenarios
+(happy / edge / fault, business language, each tagged `[inferred from
+code]`); inferred actor list resolving to ACT-NNN (existing canonical or
+new via `produced_actor:`); pre-populated `touches_nodes:` declaration
+when existing canonical nodes match the domain (check
+`docs/<component>/nodes/*/index.md`); pre-populated `produced_flw:`
+scalar (the FLW this FRS births at Phase 1 — real, not claim) and
+`produced_actor:` scalar (when introducing a new actor); pre-populated
+`produces_nodes:` **claim** for Phase-2-born nodes the candidate will
+introduce (ENT / CMD / STA / CON / INT / DEC / PERM / QRY only — claim
+language stays here because these IDs are not yet allocated). **Tag every
+inferred business-level item that came from code — no exceptions.**
 
 ## Anti-Pattern: "The Code-First FRS"
 
 Reading a `*.tsx` source aggressively, producing a polished FRS draft
-from it (Use case + Actors + Behavior + AC all populated), and then
+from it (Use case + Actors + Business rules + AC all populated), and then
 **stripping or omitting the `[inferred from code — confirm with
 stakeholder]` tag** on the populated items because the draft "reads
 well as-is" or because the human author can vouch for the intent. The

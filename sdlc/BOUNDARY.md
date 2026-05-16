@@ -53,14 +53,17 @@ without modification.
   [`WORKFLOW.md`](WORKFLOW.md).
 - The Ingest/Query operation alignment: `generate-frs` validates (Query),
   `generate-feat-spec` ingests new DDD nodes directly into canonical
-  `docs/<component>/nodes/<type>/` with `status: proposed` and emits a milestone-
-  scoped CHG when existing nodes are touched (Ingest), `implement-feat`
-  applies CHG deltas to canonical and flips proposed → active, then
-  writes code.
+  `docs/<component>/nodes/<type>/` with `status: proposed` and consumes
+  the per-FRS CHGs (born at Phase 1 per R-CHG-1 when `touches_nodes:` is
+  non-empty) via FS `consumes_chgs:` — enriching each structurally
+  (Ingest), `implement-feat` applies CHG deltas to canonical and flips
+  proposed → active and consumed CHGs approved → merged, then writes
+  code.
 - The milestone-as-container layout —
-  `docs/milestones/M-NN-<slug>/{discovery,frs,specs,id-claims.md}` —
-  with FSs and their CHG nodes (under `specs/FS-NNN/nodes/changes/`)
-  living inside.
+  `docs/milestones/M-NN-<slug>/{discovery,frs,chg,specs,id-claims.md}` —
+  with the per-FRS CHG nodes under `chg/` (sibling to `specs/`), born at
+  Phase 1 by their owning FRS and consumed at Phase 2 by the FS via
+  `consumes_chgs:`.
 - Validation gates and context-reset rule: five named `/clear` boundaries — two in the dev track (Phase 1.5→2, Phase 2→3), and three at each QA-track flow entry (from `plan.md` to `test-plan-ingest.md`, from `implementation.md` to `test-suite-codegen.md`, and from `test-suite-codegen.md` to `qa-gate.md`).
 - Author self-review + user-review handoff at phase exits.
 
@@ -71,20 +74,25 @@ without modification.
     Integration.
   - Five additions — Module (MOD), Screen (SCR), Endpoint (EP), Permission
     (PERM), Change-map (CHG). MOD subsumes both "module" and "feature
-    area"; CHG is emitted only when an FS modifies canonical nodes and
-    lives permanently in the milestone folder (never canonical).
+    area"; CHG is born at Phase 1 by the FRS when `touches_nodes:` is
+    non-empty (R-CHG-1) and lives permanently in the milestone-scoped
+    `chg/` folder (never canonical).
 - Frontmatter contract: structured `source_ref:
   [{frs, fs, op: introduce | modify}]`, `touches_nodes`, `produces_nodes`,
-  `new_nodes`, `changes`, `depends_on_specs`, `merged`, `merge_sha`,
-  `frs`, `milestone`, `related`, `adrs`, `level` (on discoveries).
+  `new_nodes`, `consumes_chgs` (replaces `changes:` post-2026-05-17 cutover;
+  pre-cutover FSs are grandfathered), `depends_on_specs`, `merged`,
+  `merge_sha`, `frs`, `milestone`, `related`, `adrs`, `level` (on
+  discoveries).
 - **One canonical tree** at `docs/<component>/nodes/<type>/` with a `status` field
-  on every node: `proposed` (Phase 2 ingest — written by an unmerged FS)
-  / `active` (Phase 3 merge has flipped, or brownfield-absorbed straight)
-  / `superseded` / `deprecated`. The only milestone-scoped DDD artifact is
-  the CHG-NNN node at
-  `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`
-  — documents modify-intent against existing canonical nodes; never
-  promoted to canonical.
+  on every node: `proposed` (Phase 2 ingest — written by an unmerged FS;
+  also Phase 1 FLW / ACT — written by the FRS) / `active` (Phase 3 merge
+  has flipped, or brownfield-absorbed straight) / `superseded` /
+  `deprecated`. The only milestone-scoped DDD artifact is the CHG-NNN
+  node at `docs/milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+  `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`) — documents
+  modify-intent against existing canonical nodes; born at Phase 1 by the
+  FRS (R-CHG-1); never promoted to canonical. Pre-cutover CHGs at
+  `specs/FS-NNN-<slug>/nodes/changes/` are grandfathered.
 - Per-milestone ID-claim ledger (`id-claims.md`) preventing sibling-FS ID
   collisions on new IDs and detecting cross-FS modify-intent collisions
   on existing IDs.

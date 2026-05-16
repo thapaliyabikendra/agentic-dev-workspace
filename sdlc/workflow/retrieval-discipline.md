@@ -20,7 +20,7 @@ firing reads only the sections the table names.
 
 | Operation | Sections to read |
 |---|---|
-| Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Baselines](#baselines) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Templates loaded at Phase 1 authoring](#templates-loaded-at-phase-1-authoring) + [Baselines](#baselines) + [ADRs](#adrs) + [Exceptions](#exceptions) |
 | Phase 1.5 entry (Validation gate) | [Baselines](#baselines) + [STDs and CCCs](#stds-and-cccs) (Phase 1.5 row of the matrix) + [ADRs](#adrs) + [Exceptions](#exceptions) |
 | Phase 2 entry (Ingest) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 2 row + [Index opt-out](#index-opt-out)) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) + [Exceptions](#exceptions) |
 | Phase 3 entry (Merge + Code) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 3 row) + [Tech-stack operational baseline](#tech-stack-operational-baseline) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) + [Exceptions](#exceptions) |
@@ -81,12 +81,22 @@ milestone-scope discovery's "Existing nodes scanned" section and in FRS
 ### Phase 2/3 — ingest and merge reads
 
 When entering Phase 2 (Ingest) or Phase 3 (Merge + Code), read
-**only** the nodes the milestone's FRSs declare in `touches_nodes` and
-`produces_nodes`, plus one hop of transitive references (nodes those nodes
-link in `related`). Do **not** pre-load `docs/<component>/nodes/` wholesale "to be safe."
-If a node not on that list turns out to be necessary, stop, update the FRS
-to declare it, and surface the omission to the QA hat — silently broadening
-the load defeats the whole point.
+**only** the nodes the milestone's FRSs declare in `produced_flw:`,
+`produced_actor:`, `touches_nodes:`, and `produces_nodes:` — plus one
+hop of transitive references (nodes those nodes link in `related`). Do
+**not** pre-load `docs/<component>/nodes/` wholesale "to be safe." If a
+node not on that list turns out to be necessary, stop, update the FRS to
+declare it, and surface the omission to the QA hat — silently broadening
+the load defeats the whole point. (Phase 2 specifically: see also
+[`plan.md § 4a Retroactive touches_nodes: loop-back`](plan.md#4a-retroactive-touches_nodes-loop-back-r-new-10)
+when the gap is a modify-intent.)
+
+**Phase 2 reloads Phase-1-born FLW + ACT from disk, not from session
+memory.** Each FRS's `produced_flw:` and `produced_actor:` scalars point
+at canonical files born at Phase 1; the `/clear` between Phase 1.5 and
+Phase 2 enforces that these files are re-read from disk for enrichment,
+never reconstructed from Phase 1 deliberations. Per
+[`plan.md` HARD-GATE](plan.md).
 
 Phase 2 retrieval reads canonical the same as every other phase — there is
 no separate staging tree. The FS's `new_nodes:` frontmatter is the routing
@@ -94,6 +104,39 @@ list for nodes the FS introduces (each carries `status: proposed` in
 canonical until Phase 3 merge flips it to `active`); the CHG node's
 `modifies[]` is the routing list for canonical nodes the FS intends to
 modify (Phase 3 applies the deltas).
+
+### Templates loaded at Phase 1 authoring
+
+Phase 1 now authors up to four artifacts (FRS, FLW, ACT — the last when a
+new actor role is introduced — and CHG — when `touches_nodes:` is
+non-empty). The four templates are loaded at Phase 1 entry alongside the
+discovery reads above:
+
+- [`../_templates/FRS.md`](../_templates/FRS.md) — FRS template.
+- [`../_templates/nodes/FLOW.md`](../_templates/nodes/FLOW.md) — FLOW
+  template, with phase-keyed authoring notes per R-NEW-2 (Phase 1 fills
+  Trigger + Scenarios + optional Brownfield only; Phase 2 enriches with
+  Sequence, Branches, Compensating actions, Postconditions, Decisions).
+- [`../_templates/nodes/ACTOR.md`](../_templates/nodes/ACTOR.md) — ACTOR
+  template, with phase-keyed authoring notes per R-NEW-2a (Phase 1 fills
+  Description + Goals + business Preconditions + Flows initiated only;
+  Phase 2 enriches with Commands triggered + Queries issued + PERM-NNN
+  refs).
+- [`../_templates/nodes/CHANGE.md`](../_templates/nodes/CHANGE.md) —
+  CHANGE template, with phase-keyed authoring notes per R-CHG-4 (Phase 1
+  fills behavior-language `modifies[]` + optional milestone-level
+  `invariants_before/after` + optional `removes[]` / `supersedes[]`;
+  Phase 2 FS enrichment fills structural before/after on `modifies[]`,
+  `adds[]`, `migration_steps[]`). **Conditional load:** only when any
+  FRS authored in this session declares non-empty `touches_nodes:` —
+  pure-addition FRSs do not need CHANGE.md.
+
+The STD index and CCC index are **NOT** narrow-loaded at Phase 1 — the
+STD-conformance and CCC-deviation Pass 1 checks fire at Phase 1.5. Phase 1
+FRS + FLW + ACT + CHG authoring uses business language only;
+node-ID-bearing content (CMD/STA/PERM IDs in FLW Scenarios; structural
+before/after on CHG `modifies[]`; etc.) is gated to Phase 2 by the
+templates' authoring notes.
 
 ## ADRs
 

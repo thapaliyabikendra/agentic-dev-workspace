@@ -15,7 +15,7 @@ Jira, etc.), map the filesystem artifacts as follows:
 | `docs/milestones/M-NN-<slug>/M-NN-<slug>.md`                        | Platform milestone                                  |
 | `docs/milestones/M-NN-<slug>/frs/FRS-NNN-*.md`                      | Issue labeled `FRS`, linked to the milestone        |
 | `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md`         | Issue labeled `Feature Spec`, linked to the milestone |
-| `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/**`  | Stays in repo — CHG permanent home                  |
+| `docs/milestones/M-NN-<slug>/chg/**`                                | Stays in repo — CHG permanent home (post-cutover; pre-cutover `specs/FS-NNN/nodes/changes/**` grandfathered) |
 | `docs/milestones/M-NN-<slug>/discovery/**`                          | Stays in repo — working notes                       |
 | `docs/milestones/M-NN-<slug>/id-claims.md`                          | Stays in repo — claim ledger                        |
 | `docs/<component>/nodes/**`                                         | Stays in repo — wiki is the right home              |
@@ -24,11 +24,11 @@ Jira, etc.), map the filesystem artifacts as follows:
 | `docs/discovery/open-questions/**`                                  | Stays in repo — per-OQ files + index + log          |
 | `docs/discovery/open-questions.md`                                  | Stays in repo — frozen legacy log (pre-cut-over OQs) |
 
-Nodes, ADRs, discoveries, and per-FS CHG nodes remain filesystem-based
+Nodes, ADRs, discoveries, and per-FRS CHG nodes remain filesystem-based
 even after platform adoption. Issues are for trackable work; everything
-under `nodes/`, `adrs/`, and the per-milestone `discovery/`,
-`specs/<FS>/nodes/changes/`, `id-claims.md` is durable knowledge that
-stays in the repo.
+under `nodes/`, `adrs/`, and the per-milestone `discovery/`, `chg/`
+(post-cutover; `specs/<FS>/nodes/changes/` for pre-cutover grandfathered
+CHGs), `id-claims.md` is durable knowledge that stays in the repo.
 
 ## Deprecated paths
 

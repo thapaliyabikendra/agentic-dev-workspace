@@ -127,7 +127,8 @@ Run the user-review handoff before flipping these statuses.
 
 - FS → `merged: true`, `merge_sha: <HEAD sha>`, `status: implemented`.
 - Each FRS in the FS's `frs:` → `implemented`.
-- Every CHG node in the FS's `changes:` → `status: merged`.
+- Every CHG node in the FS's `consumes_chgs:` (or `changes:` for
+  pre-cutover FSs — grandfathered) → `status: merged`.
 - Milestone → `done` when all its specs are `merged: true` and
   `status: implemented`.
 

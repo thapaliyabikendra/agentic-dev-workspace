@@ -41,10 +41,11 @@ M-NN-<slug>/
     FRS-NNN-<slug>.md    # per-FRS discovery (level: frs), one per FRS
   frs/
     FRS-NNN-<slug>.md    # one per user-journey
+  chg/                   # lazy; created when any FRS births a CHG at Phase 1 (touches_nodes non-empty)
+    CHG-NNN-<slug>.md    # per-FRS-born CHG per R-CHG-1; milestone-scoped permanent home (pre-cutover CHGs at specs/FS-NNN/nodes/changes/ grandfathered)
   specs/
     FS-NNN-<slug>/
-      FS-NNN.md
-      nodes/changes/CHG-NNN-<slug>.md  # if FS modifies canonical nodes; milestone-scoped permanent home
+      FS-NNN.md          # `consumes_chgs:` lists the FRS's Phase-1-born CHGs (when any) — see R-CHG-3
       # (new DDD nodes the FS introduces live at docs/nodes/<type>/ directly, status: proposed at Phase 2)
 ```
 
@@ -89,4 +90,8 @@ Phase 3 because of `depends_on_specs:`")? If none, write "None."
 
 ## Out of scope for this milestone
 
-- …
+What this milestone explicitly defers lives in the milestone survey's
+"Deferred" section — the survey is the canonical home for scope
+negation. See
+[`discovery/milestone-scope.md → Deferred`](discovery/milestone-scope.md#deferred-explicitly-out-of-scope-for-this-survey).
+Do not restate the deferred items here.

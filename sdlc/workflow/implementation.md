@@ -20,7 +20,8 @@ separates this file from each QA-track flow.
 "Merge" here is the apply-deltas-and-flip-statuses operation, not a file copy. The new nodes the FS introduced are already
 canonical (written at Phase 2 with `status: proposed`); this flow flips
 them to `active` and re-syncs each node's per-type `index.md` row Status
-column. For each CHG node listed in the FS's `changes:`, this flow
+column. For each CHG node listed in the FS's `consumes_chgs:` (or
+`changes:` for pre-cutover FSs — grandfathered), this flow
 applies the CHG's `modifies[]` / `removes[]` / `supersedes[]` deltas to
 the canonical targets (re-syncing the affected index rows), then flips
 the CHG's status `approved → merged` in place. The CHG file itself stays
@@ -80,8 +81,12 @@ Applies CHG deltas + Flips statuses + Writes code; (QA track flows, independent 
   `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md` with
   `merged: false` in frontmatter. Every new node in the FS's `new_nodes:`
   is already present in canonical `docs/<component>/nodes/<type>/` with
-  `status: proposed`. If the FS has CHGs, each lives at its milestone
-  path: `nodes/changes/CHG-NNN-<slug>.md` with `status: approved`.
+  `status: proposed`. If the FS lists CHGs in `consumes_chgs:`, each
+  lives at the milestone-scoped path
+  `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+  `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`; pre-cutover
+  at `specs/FS-NNN-<slug>/nodes/changes/` is grandfathered) with
+  `status: approved`.
 - The FS's `depends_on_specs:` list (if any) — every spec in that list must
   already have `merged: true`. If a dependency is unmerged, this FS's Phase 3
   is **blocked** until the dependency merges.
@@ -202,14 +207,17 @@ Read **only** what the FS declares:
 
 1. Open the FS at
    `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md`. Collect:
-   `new_nodes:`, `changes:`, `adrs:`, `standards:`, `ccc:`, `depends_on_specs:`.
+   `new_nodes:`, `consumes_chgs:` (`changes:` for pre-cutover FSs —
+   grandfathered), `adrs:`, `standards:`, `ccc:`, `depends_on_specs:`.
 2. Read every new canonical node under `docs/<component>/nodes/<type>/` whose ID
    appears in the FS's `new_nodes:` (all carry `status: proposed`). These
    are the definitions the FS introduces; Phase 3 flips them to `active`.
-3. For every CHG-NNN in `changes:`, read the CHG file at
-   `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/`. Each
-   `modifies[]` entry names a canonical target — read those canonical
-   files too. Each `adds[]` entry references a node already in
+3. For every CHG-NNN in `consumes_chgs:`, read the CHG file at
+   `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+   `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`;
+   pre-cutover at `specs/FS-NNN-<slug>/nodes/changes/` is grandfathered).
+   Each `modifies[]` entry names a canonical target — read those
+   canonical files too. Each `adds[]` entry references a node already in
    `new_nodes:` (already in canonical, status: proposed); no separate
    read needed.
 4. Read `docs/<component>/adrs/index.md` — one-line summaries only.
@@ -271,7 +279,14 @@ For **every new node** in the FS's `new_nodes:` (already at
    plus git history are the audit trail. See
    [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16).
 
-For **every CHG-NNN** in the FS's `changes:`:
+**Cardinality preflight** (per R-CHG-3). Before applying any CHG delta,
+glob `consumes_chgs:` across every FS in this milestone — verify each
+milestone-scoped CHG appears in exactly one FS's `consumes_chgs:`
+(unless flipped to `deprecated` by sibling-CHG fold). Double-consumption
+aborts merge.
+
+For **every CHG-NNN** in the FS's `consumes_chgs:` (`changes:` for
+pre-cutover FSs):
 
 1. For each entry in the CHG's `adds[]`: the new node is already canonical
    (status flipped to `active` in the loop above) — mark satisfied. The
@@ -294,17 +309,20 @@ For **every CHG-NNN** in the FS's `changes:`:
 Finally, flip the CHG node itself:
 
 - [ ] In the CHG file at
-      `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`,
-      flip frontmatter `status: approved → status: merged`.
+      `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
+      `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`;
+      pre-cutover at `specs/FS-NNN-<slug>/nodes/changes/` is
+      grandfathered), flip frontmatter `status: approved → status:
+      merged`.
 - [ ] CHG files stay at the milestone path permanently — they are NOT
-      promoted to canonical. No `docs/<component>/nodes/changes/` subtree exists; no
-      canonical touch fires against the CHG itself.
+      promoted to canonical. No `docs/<component>/nodes/changes/`
+      subtree exists; no canonical touch fires against the CHG itself.
 
 The CHG file under the milestone folder is **kept as permanent history.**
-Do not delete `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`
-after applying its deltas. The `status: merged` marker is the signal that
-the deltas have already been applied; future readers consult the file as the
-durable audit trail of this FS's modifications to canonical.
+Do not delete the CHG file after applying its deltas. The
+`status: merged` marker is the signal that the deltas have already been
+applied; future readers consult the file as the durable audit trail of
+this FS's modifications to canonical.
 
 ### Checklist — Stage 1 Merge exit (before Stage 2)
 

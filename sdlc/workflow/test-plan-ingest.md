@@ -12,7 +12,13 @@ the FS and FRS frontmatter to record the test plan. It is the first flow of the 
 <HARD-GATE>
 Do NOT begin until:
 1. The FS validation loop in [`plan.md`](plan.md) has passed (zero Blockers, zero Majors).
-2. Every new FLW node introduced by this FS has all three scenarios (happy / edge / fault) filled.
+2. Every FLW node referenced by this FS's FRS scope (whether FRS-introduced at Phase 1
+   via the FRS's `produced_flw:` scalar or pre-existing canonical) has all three scenarios
+   (happy / edge / fault) filled AND is Phase-2-wired (`related:` populated, Sequence
+   filled — per R-NEW-8 discriminator; the `created_under: pre-2026-05-17` audit marker
+   exempts a grandfather FLW from the body-shape discriminator). The entry contract from
+   `plan.md` (FS validation passed) already implies Phase-2-wired; this gate restates it
+   for defense-in-depth.
 3. Every new ENT node introduced by this FS carries field-level constraints (required,
    max length, format, uniqueness, FK, cascade, enum/lookup, multi-tenancy, concurrency).
 </HARD-GATE>
@@ -34,8 +40,10 @@ TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
 
 - **FLW nodes are the behavioral source of truth.** Scenarios live as
   named anchors (`#happy`, `#edge-N`, `#fault-N`) inside the canonical
-  FLW node body and are referenced — never restated — by both TCs and
-  the FRS's `## Test plan view` table.
+  FLW node body and are referenced — never restated — by TCs via their
+  `**Traces to:**` line. (The FRS Test plan view table is retired per
+  2026-05-17 cutover; reverse trace is regenerable via `grep` on TC
+  `Traces to:` lines.)
 - **TC files are the executable interpretation.** Drafted at Phase 2
   under each FS's `test-plans/<use-case>/` folder. Each TC's
   `**Traces to:**` line carries both FRS-side IDs (`AC-NN`, `Matrix:
@@ -78,9 +86,11 @@ and [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md).
 
 **Inputs:**
 - Every FRS in the FS's `frs:` list.
-- Every new FLW node introduced by this FS (at
-  `docs/<component>/nodes/flows/FLW-NNN-<slug>.md`, `status: proposed`).
-- Every new ENT node introduced by this FS (data-model fact sheet source).
+- Every FLW node referenced by this FS — both the FRS-introduced FLW at Phase 1 (declared
+  in each FRS's `produced_flw:` scalar, at `docs/<component>/nodes/flows/FLW-NNN-<slug>.md`
+  with `status: proposed`, Phase-2-wired by the time this flow runs) and any existing
+  canonical FLW listed in the FRSs' `touches_nodes:`.
+- Every new ENT node introduced by this FS (data-model fact sheet source; Phase-2-born).
 - The Coverage Matrix ([`coverage-matrix.md`](coverage-matrix.md)).
 - [`test-data-generation.md`](test-data-generation.md) — rule book for the
   `## Test Data` section in each TC file.
@@ -92,7 +102,9 @@ and [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md).
 - The FS's `test_plan_path:` frontmatter set to `test-plans/`.
 - The FS's `## Test plan` section populated, grouped by use-case sub-folder.
 - TC ID rows in the milestone's `id-claims.md`, one per emitted TC.
-- The FRS's `## Test plan view` table — Happy TCs / Edge TCs / Fault TCs columns filled.
+- (Retired) The FRS's `## Test plan view` table is no longer populated — the
+  table was dropped 2026-05-17. TC coverage trace lives on each TC's
+  `**Traces to:**` line; reverse-index is a `grep` against TC files.
 
 **TC files stay milestone-scoped.** No promotion to canonical at Phase 3 merge. No
 per-type `index.md` / `log.md` pair. The FS's `## Test plan` section is the sole index.
@@ -201,20 +213,24 @@ each section:
 
 **1. Scope section** — context only; no TCs.
 
-**2. Behavior section** — the main flow, alternative paths, exception handling, business
-rules, and edge cases. Walk every observable condition:
+**2. FLW Scenarios + FRS Business rules + FRS Edge cases** — journey
+behavior lives on the Phase-1-born FLW (Trigger + happy / edge / fault
+Scenarios); the FRS Business rules and Edge cases sections carry the
+policy-level summary. Walk every observable condition across both:
 
 - **Happy path TC** — one per primary success flow. Tag `@smoke`. Priority High. Traces
   to the AC-IDs from the Acceptance criteria section that map to the flow + the scoped
   `FLW-NNN#happy` anchor.
-- **Alternative-path TCs** — one per alternative behavior (e.g. "if X then Y; otherwise
-  Z"). Traces to relevant AC-IDs and the `FLW-NNN#edge-N` anchor.
-- **Exception TCs** — one per failure / error condition the Behavior section names.
-  Traces to the AC-ID asserting the observable failure outcome and the
+- **Alternative-path TCs** — one per alternative behavior surfaced in the FLW's `#edge`
+  Scenario or the FRS Edge cases section. Traces to relevant AC-IDs and the
+  `FLW-NNN#edge-N` anchor.
+- **Exception TCs** — one per failure / error condition the FLW's `#fault` Scenario
+  names. Traces to the AC-ID asserting the observable failure outcome and the
   `FLW-NNN#fault-N` anchor.
 - **Negative-property TCs** — for SHALL-NOT / read-only / "no input fields" / "no
-  submission controls" statements, emit a dedicated **Guard TC** that explicitly asserts
-  absence. Negative properties are NEVER covered by the happy-path TC.
+  submission controls" statements surfaced in the FRS Business rules section, emit a
+  dedicated **Guard TC** that explicitly asserts absence. Negative properties are NEVER
+  covered by the happy-path TC.
 
 **3. Acceptance criteria section** — every AC-ID must trace to at least one TC. Pure
 restatements of flow steps are typically already covered by the happy-path TC — note the
@@ -329,8 +345,9 @@ removal.
 - [ ] The FS's `test_plan_path:` frontmatter is set to `test-plans/`.
 - [ ] The FS's `## Test plan` section lists every emitted TC, grouped by use-case
       sub-folder.
-- [ ] The FRS's `## Test plan view` table has the Happy TCs / Edge TCs / Fault TCs
-      columns filled (for FRSs authored against the current template).
+- [ ] (Retired) FRS Test plan view table — not applicable for FRSs authored
+      against the post-2026-05-17 template. Skip this row; the trace lives on
+      each TC's `**Traces to:**` line.
 
 Once this checklist passes, run the user-review handoff before the context reset for
 Phase 3.

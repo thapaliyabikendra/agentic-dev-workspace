@@ -141,7 +141,7 @@ echo ""
 echo "| CHG | Status | Last edit | Age (days) |"
 echo "| --- | ------ | --------- | ---------- |"
 found=0
-for c in docs/milestones/M-*/specs/FS-*/nodes/changes/CHG-*.md; do
+for c in docs/milestones/M-*/chg/CHG-*.md docs/milestones/M-*/specs/FS-*/nodes/changes/CHG-*.md docs/change-requests/CR-*/chg/CHG-*.md; do
     [[ -f "$c" ]] || continue
     status=$(read_yaml_field "$c" status)
     if [[ "$status" == "approved" ]]; then
