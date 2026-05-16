@@ -313,7 +313,7 @@ process in [`evolving-the-workflow.md`](evolving-the-workflow.md).
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Canonical edits use tiered touch" anchors the `index-entry-missing`
+  — "Tiered touch for canonical edits" anchors the `index-entry-missing`
   routing path (direct tiered touch, no OQ).
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) — gating
   vocabulary anchor for the Anti-Pattern above.

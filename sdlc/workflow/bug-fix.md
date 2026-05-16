@@ -10,8 +10,8 @@ under-specified" — not a milestone-scoping problem.
 > lightweight option *because* it still honors the maintenance
 > discipline — silent canonical edits are not the discount; they are a
 > different (broken) path. (Cross-cutting rules: see
-> [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Canonical
-> edits use tiered touch".)
+> [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Tiered
+> touch for canonical edits".)
 
 ## When to Use
 
@@ -168,7 +168,7 @@ escalation-specific case, `escalated_from: docs/exploration/EXP-<slug>.md`).
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Canonical edits use tiered touch" is the doctrinal anchor of this
+  — "Tiered touch for canonical edits" is the doctrinal anchor of this
   flow's HARD-GATE.
 - **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase
   pipeline (`### Bugs` cross-cutting practice), retrieval discipline,

@@ -14,8 +14,8 @@
 > the workflow with parallel types that only differ in name.
 > (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-> "Existing nodes are authoritative. Adapt the template to existing
-> files — do not retrofit.")
+> "Existing nodes are authoritative — adapt the template, don't
+> retrofit.")
 
 ## When to Use
 
@@ -169,9 +169,8 @@ maintained.
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Existing nodes are authoritative. Adapt the template to existing
-  files — do not retrofit." is the doctrinal anchor of this flow's
-  HARD-GATE.
+  — "Existing nodes are authoritative — adapt the template, don't
+  retrofit." is the doctrinal anchor of this flow's HARD-GATE.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   "Coining a new artifact type when an existing one would carry the
   data" is the named anti-pattern.

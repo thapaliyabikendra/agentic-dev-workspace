@@ -8,6 +8,30 @@ description: "When and what to load at each phase entry. The primary token lever
 The primary token lever. Skill prompts compact at the margin; not re-deriving
 the corpus each session is the 10× win.
 
+## Flow-file section routing
+
+Flow files in `sdlc/workflow/` that carry a `## Section routing` table
+near the top — currently [`implementation.md`](implementation.md) and
+[`maintenance-discipline.md`](maintenance-discipline.md) — may be
+**section-routed** at entry. The first-time reader consumes the file top
+to bottom (title, hard-gate, when-to-use, anti-pattern); the returning
+reader who knows which operation is firing reads only the sections the
+routing table names for that operation.
+
+Wholesale-read is the safe default. Section-route only when:
+
+1. The flow file declares a `## Section routing` table.
+2. Your operation appears as a row in that table.
+3. You've already consumed the file's doctrinal preamble at least once
+   this milestone (hard-gate, anti-pattern, when-to-use).
+
+Convention sections the routing table calls out as "skim once per
+session" are not optional — read them on first session entry.
+
+This rule is the executor-side contract that makes the routing tables
+in the flow files realize their token savings. Without it, the tables
+are decorative.
+
 ## Nodes
 
 ### Phase 0/1 — discovery reads
@@ -111,6 +135,30 @@ Phase-by-phase retrieval matrix:
 | 3     | wholesale | wholesale | Same as Phase 2, plus convention-tagged STDs not yet in FS. |
 | QA gate | wholesale | wholesale | Drives STD-conformance + CCC-deviation subagent dispatches alongside the existing ADR-conformance check. |
 
+### Index opt-out
+
+The CCC index is the only opt-out-able corpus. When the consuming
+artifact declares `ccc: []` in frontmatter, **skip the CCC index load
+at Phase 2 and Phase 3 entry**. The empty declaration is the executor's
+commitment that no CCC applies to this work.
+
+- **Scope.** Phase 2 / Phase 3 entry only. The Phase 1.5 snapshot and
+  the QA-gate wholesale-read remain non-negotiable — those gates do
+  independent verification, not trust of the FS's declaration.
+- **STD and ADR indexes do NOT opt out.** Both corpora have
+  convention-tag fallbacks (STDs tagged `convention` / `task-ordering` /
+  `code-quality`; ADRs tagged `convention`) that the executor must
+  discover from the index even when the consuming artifact missed
+  declaring them. With CCCs there is no convention-tag fallback — the
+  FS's `ccc:` list is the complete authority.
+- **Cost.** CCC index is ~820 tokens at 13 entries today; the opt-out
+  recovers that on every Phase 2 / 3 entry where `ccc:` is empty.
+  Catalog growth makes this lever bigger over time.
+
+If `ccc:` is present but non-empty, load the index normally and
+narrow-load each declared CCC's Baseline section as per the matrix
+above.
+
 ## Baselines
 
 `docs/shared/glossary.md` is snapshot-read once at every Phase 1.5 gate
@@ -196,7 +244,7 @@ Each is wholesale-read **only** when the matching operation fires; otherwise unr
 Each QA flow starts a fresh session (its own `/clear` boundary). Load only
 what the flow needs at entry; do not carry forward dev-track reads.
 
-### test-plan-ingest (`active_phase: qa-plan`)
+### test-plan-ingest (`qa_phase: qa-plan`)
 
 Load the FS, every FRS declared in the FS's `frs:` frontmatter, each FRS's
 referenced FLW nodes (scenario anchors), and each FRS's referenced ENT nodes
@@ -205,7 +253,7 @@ allocation. Wholesale-read [`coverage-matrix.md`](coverage-matrix.md) and
 [`test-data-generation.md`](test-data-generation.md) rule books. Do **not**
 load production code at this phase.
 
-### test-suite-codegen (`active_phase: qa-suite`)
+### test-suite-codegen (`qa_phase: qa-suite`)
 
 Load the FS, all TC files under `test-plans/`, the runner config (e.g.,
 `playwright.config.ts`), and `tests/.env.example` if present.
@@ -214,7 +262,7 @@ Wholesale-read [`test-runner-cookbook.md`](test-runner-cookbook.md) and
 Production code may be loaded **only** for selector discovery (a
 post-implementation explorer pass) — not for behavioral context.
 
-### qa-gate (`active_phase: qa-gate`)
+### qa-gate (`qa_phase: qa-gate`)
 
 Load the FS, every ADR declared in the FS's `adrs:` frontmatter plus any
 convention-tagged ADRs identified from `docs/<component>/adrs/index.md`,
@@ -232,7 +280,9 @@ Always-on index reads (every phase consumes these as one-line summaries;
 individual pages are narrow-loaded):
 - ADR index — `docs/<component>/adrs/index.md` + `docs/shared/adrs/index.md`.
 - STD index — `sdlc/standards/index.md`.
-- CCC index — `docs/shared/ccc/index.md`.
+- CCC index — `docs/shared/ccc/index.md` (except at Phase 2 / Phase 3
+  entry when the consuming artifact declares `ccc: []` — see
+  [§ Index opt-out](#index-opt-out)).
 
 Phase 0 / Phase 1 only:
 - Change-request KB scan — reads per-type `docs/<component>/nodes/<type>/index.md`

@@ -6,7 +6,7 @@ Load and update this operation whenever:
 - Entering a new phase on a milestone (lazy-create if absent)
 - Closing a session mid-phase (record what completed, what is next)
 - Opening a new session on an in-flight milestone (read before any phase work)
-- Transitioning between phases (flip `active_phase`, append Phase history row)
+- Transitioning between phases (flip `dev_phase` or `qa_phase`, append Phase history row)
 
 ## Do NOT use when
 
@@ -29,15 +29,15 @@ Load and update this operation whenever:
 ```
 Milestone opened
       ↓
-Lazy-create MILESTONE-STATE.md (copy template, fill milestone_id, set active_phase: 0)
+Lazy-create MILESTONE-STATE.md (copy template, fill milestone_id, set dev_phase: 0, qa_phase: not-started)
       ↓
 Read at session start (always — do not rely on in-session memory)
       ↓
-Work the phase (design / plan / implementation)
+Work the phase (design / plan / implementation, or QA-track flow)
       ↓
 Update during session (session_notes, accumulated_context as artifacts land)
       ↓
-Update at phase transition (flip active_phase, phase_entered, next_action; append Phase history row)
+Update at phase transition (flip dev_phase or qa_phase, phase_entered, next_action; append Phase history row)
       ↓
 Update at session close (record "completed X, next Y" in Session continuity)
 ```
@@ -52,7 +52,7 @@ Update at session close (record "completed X, next Y" in Session continuity)
 
 1. Copy `sdlc/_templates/MILESTONE-STATE.md` to `docs/milestones/M-NN-<slug>/MILESTONE-STATE.md`.
 2. Fill `milestone_id` with the milestone's ID.
-3. Set `active_phase: 0` and `phase_entered` to today's date.
+3. Set `dev_phase: 0`, `qa_phase: not-started`, and `phase_entered` to today's date.
 4. Set `next_action` to the first concrete step for this milestone.
 5. Leave all other sections at their template defaults.
 
@@ -63,27 +63,32 @@ No tiered touch — this file is not a canonical DDD artifact. No index.md or lo
 **Trigger:** Any session beginning work on a milestone.
 
 1. Read `docs/milestones/M-NN-<slug>/MILESTONE-STATE.md`.
-2. Note `active_phase`, `next_action`, blocking OQ-NNN IDs, and cross-FS dependencies.
-3. Load the flow file that corresponds to `active_phase`:
-   - Phase 0 / 1 / 1.5 → `design.md`
-   - Phase 2 → `plan.md`
-   - Phase 3 → `implementation.md`
-   - `qa-plan` → `test-plan-ingest.md`
-   - `qa-suite` → `test-suite-codegen.md`
-   - `qa-gate` → `qa-gate.md`
+2. Note `dev_phase`, `qa_phase`, `next_action`, blocking OQ-NNN IDs, and cross-FS dependencies.
+3. Identify which track this session works in (the user's intent decides — both tracks may be live):
+   - Dev-track session → load the flow file matching `dev_phase`:
+     - Phase 0 / 1 / 1.5 → `design.md`
+     - Phase 2 → `plan.md`
+     - Phase 3 → `implementation.md`
+   - QA-track session → load the flow file matching `qa_phase`:
+     - `qa-plan` → `test-plan-ingest.md`
+     - `qa-suite` → `test-suite-codegen.md`
+     - `qa-gate` → `qa-gate.md`
 4. Proceed with phase or flow work. Do **not** rely on in-session memory as a substitute for reading this file.
 
 ### Update at phase transition
 
-**Trigger:** Moving from one `active_phase` to the next (e.g., Phase 1 → 1.5, Phase 1.5 → 2).
+**Trigger:** Moving from one phase to the next on either track (e.g., Phase 1 → 1.5
+on dev; qa-suite → qa-gate on QA).
 
-1. Flip `active_phase` to the new phase number.
+1. Flip the affected field — `dev_phase` for dev-track transitions, `qa_phase` for
+   QA-track transitions. The other field's value is independent and is not changed.
 2. Set `phase_entered` to today's date.
 3. Set `next_action` to the first concrete step in the new phase.
 4. Append a row to `## Phase history`:
    ```
-   | YYYY-MM-DD | <from> | <to> | <one-sentence session summary> |
+   | YYYY-MM-DD | <track> | <from> | <to> | <one-sentence session summary> |
    ```
+   Track is `dev` or `qa`.
 5. Clear `session_notes` (stale mid-phase notes belong in history, not the live field).
 6. Remind user: a `/clear` is required before loading the next flow file on any of these
    five transitions (per CLAUDE.md Hard rules):
@@ -118,17 +123,18 @@ No tiered touch — this file is not a canonical DDD artifact. No index.md or lo
 | Field              | Type    | Allowed values                   | Meaning                                             |
 | ------------------ | ------- | -------------------------------- | --------------------------------------------------- |
 | `milestone_id`     | string  | `M-NN-<slug>`                    | Milestone identifier                                |
-| `active_phase`     | string  | `0 \| 1 \| 1.5 \| 2 \| 3 \| qa-plan \| qa-suite \| qa-gate` | Current phase this milestone is in                  |
-| `phase_entered`    | date    | `YYYY-MM-DD`                     | Date the current phase began                        |
+| `dev_phase`        | string  | `0 \| 1 \| 1.5 \| 2 \| 3 \| done` | Current dev-track phase                            |
+| `qa_phase`         | string  | `not-started \| qa-plan \| qa-suite \| qa-gate \| done` | Current QA-track flow                  |
+| `phase_entered`    | date    | `YYYY-MM-DD`                     | Date the current (most-recently-entered) phase began |
 | `next_action`      | string  | Free text                        | Immediate next step; updated at every transition    |
 | `progress_percent` | integer | `0–100`                          | Rough milestone completion estimate                 |
 | `session_notes`    | string  | Free text                        | Working field; cleared at session close             |
 
-> **Dev-track vs. QA-track orthogonality.** Dev-track phases (`0` through `3`) and QA-track flow
-> values (`qa-plan`, `qa-suite`, `qa-gate`) are orthogonal — a milestone may be
-> `active_phase: 3` (implementation in flight) while the QA track has not yet run, or
-> `active_phase: qa-gate` (QA-track final flow in flight) while dev-track is otherwise complete.
-> The QA track runs independently of dev-track phases.
+> **Dev-track vs. QA-track orthogonality.** The two `*_phase` fields are
+> independent — a milestone may sit at `dev_phase: 3` (implementation in flight)
+> while `qa_phase: not-started`, or `qa_phase: qa-gate` (QA-track final flow in
+> flight) while dev-track is otherwise complete. Sessions advance one track at a
+> time; the other field's value is not changed in the same transition.
 
 ---
 

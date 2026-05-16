@@ -81,6 +81,13 @@ Every OQ receives exactly one tier — no dual classification.
 Only `blocking-frs` OQs enter the research gate. The other tiers are
 recorded in the Survey; the OQ files are updated immediately.
 
+> **Note — vocabulary scope.** The 4-tier classification above is **procedural,
+> not a stored field**: it routes to `status:` + `needed_by:` per the action
+> column. Validation-gate and FS-authoring OQs use a different vocabulary
+> (`gate_effect: blocking | post-approval`) recorded directly in OQ frontmatter
+> — see [`frs-validation-rules.md → OQ gate-effect taxonomy`](frs-validation-rules.md#oq-gate-effect-taxonomy).
+> The two never coexist on one OQ.
+
 ---
 
 ## Step R-2 — Choose artifact type per blocking OQ

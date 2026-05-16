@@ -287,6 +287,22 @@ lifecycle state, not a gate-effect.
 | Validation-gate OQ with `status: open` and no `gate_effect` set | Minor (default to `blocking` if intent unclear; surface for re-tagging). |
 | OQ with `status: deferred` and no target milestone or rationale in `needed_by:` | Minor. |
 
+### Vocabulary contrast (gate_effect vs. Survey-tier)
+
+The OQ template carries `gate_effect:` **only** when `origin ∈ {validation-gate,
+fs-authoring}` (per [`../_templates/OPEN-QUESTION.md`](../_templates/OPEN-QUESTION.md)).
+Survey OQs (`origin: frs-authoring`) instead use the 4-tier classification in
+[`research.md → Step R-1`](research.md#step-r-1--oq-classification-in-per-frs-survey)
+— `blocking-frs` / `blocking-fs` / `blocking-impl` / `non-blocking` — which is
+**procedural, not a stored field**: it routes to `status:` + `needed_by:` per
+the action column there. The two vocabularies never coexist on one OQ; they
+apply to different `origin:` values.
+
+| OQ origin | Vocabulary | Where stored |
+|---|---|---|
+| `frs-authoring` (Survey) | 4-tier (blocking-frs/fs/impl/non-blocking) | Routed to `status:` + `needed_by:` per [`research.md`](research.md#step-r-1--oq-classification-in-per-frs-survey); not a stored field |
+| `validation-gate`, `fs-authoring` | `gate_effect:` (blocking / post-approval) | Stored in OQ frontmatter |
+
 ---
 
 ## Audit reproducibility set
@@ -320,13 +336,15 @@ finding:
 
 | Finding | Type | Resolution | Rationale |
 
-`type` is one of `existence`, `sanity`, `adr-conflict`, or `cross-frs`
-per the template. This file expands what `sanity` covers — bundling
+`type` is one of `existence`, `sanity`, `adr-conflict`, `standard-conflict`,
+`ccc-deviation`, or `cross-frs` per the template. `standard-conflict` and
+`ccc-deviation` are first-class types (one per Pass 1 check 4 and 5
+respectively — see [`design.md → Pass 1`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored));
+`cross-frs` is the Pass 2 type. `sanity` itself expands to cover bundling
 (see above), NFR rubric failure, `baseline-not-cited` (FRS restates a
 baseline category instead of citing it), and `inferred-from-code` items
-present without a corresponding Open Question all land as `type: sanity`.
-Severity (Blocker / Major / Minor) and the audit reproducibility set go
-in the Rationale prefix.
+present without a corresponding Open Question. Severity (Blocker / Major /
+Minor) and the audit reproducibility set go in the Rationale prefix.
 
 **`type: existence` scope.** The existence scan (`design.md → Phase 1.5
 → Pass 1`) searches the canonical wiki and matches against every

@@ -245,13 +245,32 @@ Across milestones, IDs are globally unique.
 
 ---
 
-> **Authoring sequence (sections 3–5).** Sections §3 (new-node ingest), §4 (CHG emit),
-> and §5 (FS authoring) **interleave in practice**. You draft the FS shell first
-> (frontmatter + empty section headers), name structures as you fill the body, ingest
-> each new node as it's named, and emit the CHG when the FS's first `touches_nodes`
-> reference is set. The linear presentation below is for completeness, not execution
-> order — the Process Flow diagram above shows the actual interleave (`fsauthor + new-node
-> ingest` in one box, CHG conditional from that box).
+### Authoring sequence — §3, §4, §5 interleave
+
+**Do not execute §3 → §4 → §5 in linear order.** The three sections
+interleave in practice. The linear presentation below is for
+completeness, not execution order. Authoring sequence:
+
+1. **Draft the FS shell first** — frontmatter (with the FS-NNN ID
+   claimed in §2) plus empty section headers. This shell lets §3's
+   `source_ref: [{frs:, fs:, op:}]` reference resolve in-flow even
+   though the FS body is still empty.
+2. **Name a structure in the FS body**, then immediately ingest the
+   matching new node to canonical with `status: proposed` (§3).
+   Fire the 2-file node touch as part of that ingest. Repeat per
+   structure named.
+3. **Emit the CHG node** (§4) the first time the FS sets a
+   `touches_nodes` reference. The CHG file is created once and grows
+   in place as further modify-intents are surfaced.
+4. **Fill the remaining FS sections** (§5 — Architecture decisions,
+   Data model, Interface contracts, Tasks, etc.) using the now-canonical
+   node IDs as references rather than restating their behavior.
+
+The Process Flow diagram above shows this as the `cluster_interleave`
+subgraph (`fsauthor + new-node ingest` in one box, CHG conditional from
+that box). **First-time authors who linearize §3 → §4 → §5 hit the
+forward-reference problem:** a node with `fs: FS-NNN` written before
+the FS shell exists.
 
 ### 3. New node canonical ingest
 
@@ -353,11 +372,21 @@ Blockers and zero Majors. Phase 3 flips `approved → merged` after applying the
 The CHG file stays at the milestone path permanently — no canonical
 `docs/<component>/nodes/changes/` subtree exists.
 
-**Default granularity: one CHG per FS.** Split into multiple CHGs only when the FS has
-multiple unrelated canonical modifications that warrant separate review — for example,
-when modifications target unrelated bounded contexts that will be reviewed by different
-stakeholders, or when one delta is reversible-safe (config) and another is destructive
-(schema migration). Note the split in the FS's "Change maps" section.
+**Default granularity: one CHG per FS.** Split into multiple CHGs only when one of the
+splitting criteria below fires. Note the split in the FS's "Change maps" section.
+
+| Situation | Same bounded context? | Same risk profile? | Same reviewer? | Decision |
+|---|---|---|---|---|
+| Two ENT edits in the `orders` module, both data-shape changes | ✅ | ✅ | ✅ | **One CHG** |
+| One ENT edit + one CMD edit, same module, same reviewer | ✅ | ✅ | ✅ | **One CHG** (the type difference is not load-bearing) |
+| Config flag delta + DB schema migration on same FS | ✅ | ❌ (reversible vs destructive) | ✅ | **Split** — risk profiles differ; rollback procedure differs |
+| Edits in `orders` MOD + edits in `billing` MOD | ❌ | — | typically ❌ | **Split** — unrelated bounded contexts; different stakeholder review |
+| One critical-path security edit + one cosmetic copy change | ✅ | ❌ | typically ❌ | **Split** — critical-path delta deserves its own review record |
+
+The driving heuristic: a CHG should be **atomically reviewable** — a reviewer
+should be able to approve or reject it without paging in a second
+unrelated context. If you can't summarize the CHG in one sentence
+without "and also," split it.
 
 If the FS introduces only new nodes (no `touches_nodes`), do **not** emit a CHG. Pure
 additions are already audited by the new nodes' `source_ref`, their `id-claims.md` rows,

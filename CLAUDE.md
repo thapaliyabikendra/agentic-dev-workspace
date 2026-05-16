@@ -1,139 +1,113 @@
-# CLAUDE.md — Project Memory
+# CLAUDE.md — Project memory
 
-This file is the entry point to project memory — auto-loaded into every
-Claude session. It states which rules bind every action regardless of
-phase, and points to the canonical home for each procedural detail.
-
-> **Every rule has one canonical home.** CLAUDE.md lists pointers and
-> the rules that bind every Claude action regardless of phase. Procedural
-> details live in [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md); anti-patterns
-> and the "why" live in [`sdlc/PRINCIPLES.md`](sdlc/PRINCIPLES.md). When this file
-> and a canonical doc disagree, the canonical doc wins — flag the drift.
-
-> **HARD-GATE:** Do NOT begin a new phase until `## Hard rules` below and
-> the relevant flow file have been loaded into this session. Applies
-> regardless of perceived context from a prior session.
+Every rule has one canonical home. If this file and a canonical doc
+disagree, the canonical doc wins — flag the drift.
 
 ## Hard rules
 
-- **The DDD knowledge base in `docs/app/nodes/` is the source of truth for behavior.**
-  If a node and a spec disagree, the node wins or both get reconciled before code is written.
-- **Four sources of truth for governance: STD / ADR / CCC / DEC.** Engine-level → `sdlc/standards/`
-  (stack-conditional applicability declared in `applies_when:` frontmatter rather than by repo location);
-  project-wide NFR baselines → `docs/shared/ccc/` (CCC defines the default; ADRs capture operation-specific
-  deviations and back-link to the CCC);
-  component ADRs → `docs/<component>/adrs/` (APP: `docs/app/adrs/`);
-  cross-component ADRs → `docs/shared/adrs/`;
-  node-local → inline or `docs/<component>/nodes/decisions/`.
-  Full discriminator: [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).
-- **Reference, never copy.** Specs link to nodes and ADRs by ID.
-- **Existing nodes are authoritative.** Adapt the template to existing files — do not retrofit.
-- **Clear the session at every flow boundary.** Moving design → plan or plan → implementation
-  requires `/clear` and reload of the next flow file only. Phases inside one flow can share a session.
-  **QA-track flows count as independent flow boundaries** — `/clear` is required entering each of
-  `test-plan-ingest.md`, `test-suite-codegen.md`, and `qa-gate.md`, and between each. The QA track
-  is trigger-independent: it consumes dev-track outputs on its own cadence, never shares sessions
-  with dev-track flows or with each other.
-- **Every artifact has an ID and links upstream + downstream.** IDs: `ADR-NNN`, `FRS-NNN`,
-  `M-NN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`, `OQ-NNN`, node IDs (all `-NNN`). Check per-type
-  indexes and `id-claims.md` before incrementing. OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
-- **Plans contain no syntax; implementation design IS the plan.** Phase 2 names structures;
-  Phase 3 writes them. Node-ingest + CHG rules: [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md).
-- **Canonical edits use tiered touch.** Nodes = 2-file (node + per-type `index.md`) always;
-  ADR routine = 2-file (ADR + adrs/index.md); ADR lifecycle event = 3-file (+ `adrs/log.md`);
-  `related:` changes = (base + N). Per-type node `log.md` was dropped 2026-05-16 (see
-  [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md) → Rule history).
-- **Read the per-type `index.md` before globbing.** `docs/<component>/nodes/<type>/index.md` lists
-  every page with summary, tags, status, source. Glob only when the component or type is unknown.
-  For APP nodes: `docs/app/nodes/<type>/index.md`.
-- **One question per turn during FRS / FS drafting.**
-- **TaskCreate mirrors phase task lists; durable status lives in artifacts.** One task = one
-  observable outcome. Mark `in_progress` on start, `completed` immediately. Session-scoped only.
-- **For multi-stage plans, open a progress checklist and track each stage.**
-  Any plan that spans more than one phase, or more than one implementation-task
-  cohort within a phase (cohorts as defined by the project's task-ordering ADR —
-  see [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md) § "Implementation-task
-  cohort ordering"), must begin with a checkbox list of all stages; mark each
-  stage `[x]` before advancing to the next.
-  Procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
-- **Never git commit without explicit user authorization.** Do not run `git commit`
-  (or any command that commits — e.g., `git commit -am`, `gh pr create`) unless the
-  user explicitly says to commit, acknowledges a commit prompt, or a specific workflow
-  file in `sdlc/workflow/` contains a directive authorizing commits at that step.
-  Authorization for one commit does not carry forward to the next.
+**HARD-GATE:** do not begin a new phase until `## Hard rules` and the
+relevant flow file are loaded. Applies across sessions.
+
+**Retrieval discipline** (what to load at each phase entry):
+[`sdlc/workflow/retrieval-discipline.md`](sdlc/workflow/retrieval-discipline.md).
+
+1. DDD nodes in `docs/<component>/nodes/` are truth. Node ↔ spec
+   conflict → node wins or reconcile both.
+2. Four governance sources: STD / ADR / CCC / DEC.
+   Discriminator: [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).
+   STDs: `sdlc/standards/` (stack-conditional via `applies_when:`).
+   CCCs: `docs/shared/ccc/` (NFR baselines; ADRs back-link for deviations).
+   Component ADRs: `docs/<component>/adrs/`.
+   Cross-component ADRs: `docs/shared/adrs/`.
+   Node-local: inline or `docs/<component>/nodes/decisions/`.
+3. Reference, never copy. Link by ID.
+4. Existing nodes are authoritative — adapt the template, don't retrofit.
+5. `/clear` at every flow boundary. Phases inside one flow share a session.
+   QA-track flows count as independent boundaries (`test-plan-ingest` →
+   `test-suite-codegen` → `qa-gate`; `/clear` between each and on entry
+   to each).
+6. Every artifact has an ID and links upstream + downstream. IDs:
+   `ADR-NNN`, `FRS-NNN`, `M-NN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`,
+   `OQ-NNN`, node IDs (all `-NNN`). Check per-type index and
+   `id-claims.md` before incrementing. OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
+7. Plans contain no syntax. Phase 2 names structures; Phase 3 writes
+   them. Multi-stage / cross-cohort plans need a progress checklist;
+   mark each stage `[x]` before advancing. Cohort definition + node-ingest
+   / CHG rules: [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md).
+   Progress-checklist procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
+8. Tiered touch for canonical edits. Nodes = 2-file (node + per-type
+   `index.md`). ADR routine = 2-file (ADR + `adrs/index.md`). ADR
+   lifecycle = 3-file (+ `adrs/log.md`). `related:` changes = base + N.
+   Per-type node `log.md` was dropped 2026-05-16 — see
+   [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md) § Rule history.
+9. Read the per-type `index.md` before globbing. Glob only when
+   component/type is unknown. Path: `docs/<component>/nodes/<type>/index.md`.
+10. One question per turn during FRS / FS drafting.
+11. TaskCreate mirrors phase task lists; durable status lives in
+    artifacts. One task = one outcome. Mark `in_progress` on start,
+    `completed` immediately. Session-scoped only.
+12. Never `git commit` (or any commit-equivalent — `git commit -am`,
+    `gh pr create`) without explicit user authorization.
+    Authorization for one commit does not carry forward to the next.
+13. Output style: token-optimized.
+    - Compact: no meta-commentary ("I think", "let me…"), no preamble,
+      no sign-offs. Status updates between tool calls are one sentence.
+    - Structured: tables, bullet lists, code fences, one-line descriptions.
+    - Rule-dense: numbered rules or trigger-based anti-pattern tables.
+    - Pointer-heavy: replace long explanations with file paths + short
+      context notes.
+    - Redundancy-free in project-authored content: never restate;
+      cross-reference. **Exception:** framework HARD-GATE rules MAY be
+      restated across canonical workflow files (CLAUDE.md, WORKFLOW.md,
+      flow files, validation checklists) — defense-in-depth against a
+      session loading only part of the rule set. Project-authored
+      artifacts (FRSs, FSs, nodes, ADRs) hold to strict cross-reference.
+    - Lead with the recommendation; rationale only when load-bearing.
 
 ## Project framing
 
-**`project_type: brownfield`** — existing system, existing DDD nodes,
-legacy absorption in scope. Greenfield variant: omit `## Existing nodes
+`project_type: brownfield`. APP component (`docs/app/`) is a .NET / ABP
+application (commands, entities, flows, integrations, states, decisions);
+shared area (`docs/shared/`) holds the glossary, tech-stack, cross-component
+ADRs, and `ccc/` NFR baselines. One human plays all roles — discipline
+substitutes for handoff.
+
+Greenfield variant (`project_type: greenfield`): omit `## Existing nodes
 scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
 
-Brownfield planning workspace. Workflow scaffolding (templates, flow
-files, indexes) is in place. The DDD knowledge base is organized into
-one component plus a shared area:
+## Index
 
-- **APP component** ([`docs/app/`](docs/app/)) — .NET/ABP application: commands,
-  entities, flows, integrations, states, decisions, and more. ADRs at
-  [`docs/app/adrs/`](docs/app/adrs/).
-- **Shared** ([`docs/shared/`](docs/shared/)) — glossary, CCCs
-  (cross-cutting concern baselines under `ccc/`), tech-stack, and any
-  future cross-component ADRs.
-
-Component descriptors: [`docs/app/COMPONENT.md`](docs/app/COMPONENT.md).
-`docs/milestones/` holds planning artifacts for all milestones.
-
-**One human plays all roles** — BA, BEA, Developer, QA — at different
-moments. Discipline substitutes for handoff.
-
-## Where to look
-
-Filesystem is the source of truth — `docs/` holds artifacts, `sdlc/` holds governance.
-Top-level entry points:
-
-- [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md) — phases, flows, cross-cutting practices
-- [`sdlc/workflow/index.md`](sdlc/workflow/index.md) — workflow file routing (read before drilling into a specific op)
-- [`sdlc/LAYOUT.md`](sdlc/LAYOUT.md) — folder map and multi-repo strategy
-- [`sdlc/KB-LAYOUT.md`](sdlc/KB-LAYOUT.md) — DDD KB folder structure and node-type table
-- [`docs/home.md`](docs/home.md) — cross-type artifact status counts
-
-Generator indexes (wholesale-read at phase entry — component-qualified; add a row here when running `new-component-bootstrap.md`):
-- APP ADRs: [`docs/app/adrs/index.md`](docs/app/adrs/index.md)
-- Shared ADRs: [`docs/shared/adrs/index.md`](docs/shared/adrs/index.md)
-- Shared CCCs: [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md)
+Framework (always present):
+- Phases, flows, validation gates: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md)
+- Workflow file routing: [`sdlc/workflow/index.md`](sdlc/workflow/index.md)
+- Folder map / multi-repo: [`sdlc/LAYOUT.md`](sdlc/LAYOUT.md)
+- DDD KB layout & node-type table: [`sdlc/KB-LAYOUT.md`](sdlc/KB-LAYOUT.md)
+- New component bootstrap (before Phase 2): [`sdlc/workflow/new-component-bootstrap.md`](sdlc/workflow/new-component-bootstrap.md)
+- Subagent dispatch & completion markers: [`sdlc/workflow/agent-contracts.md`](sdlc/workflow/agent-contracts.md)
 - Engine standards: [`sdlc/standards/index.md`](sdlc/standards/index.md)
-- APP nodes: `docs/app/nodes/<type>/index.md`
 
-## When to Use (inline subagent dispatch)
+Project (created lazily; framework requires the slot):
+- Cross-type artifact status: `docs/home.md`
+- Component descriptors: `docs/<component>/COMPONENT.md`
+- Component ADRs: `docs/<component>/adrs/index.md`
+- Cross-component ADRs: `docs/shared/adrs/index.md`
+- CCC baselines: [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md)
+- Component nodes: `docs/<component>/nodes/<type>/index.md`
 
-Subagent dispatch rules, dispatch shapes, quality tests, and the completion-marker contract:
-[`sdlc/workflow/agent-contracts.md`](sdlc/workflow/agent-contracts.md).
+## Advisor gate
 
-## Advisor call gate
-
-The `advisor()` tool forwards the full conversation context to a second model.
-Cost is proportional to context size.
-
-**Call advisor when:**
-- The task is genuinely ambiguous: multiple valid interpretations exist
-  and picking the wrong one carries real downstream cost.
-- About to commit to a structural change in a shared governance file
-  (`CLAUDE.md`, `WORKFLOW.md`, any `index.md`) where a wrong move
-  causes workspace-wide drift.
-- Stuck after 2+ failed tool approaches with no clear next step.
-- Before declaring a phase, milestone, or operation complete.
+`advisor()` forwards full conversation; cost scales with context. Call when:
+- Task is genuinely ambiguous and the wrong interpretation is costly.
+- About to make a structural change in a shared governance file.
+- Stuck after 2+ failed approaches.
+- Before declaring a phase / milestone / operation complete.
 
 ## When in doubt
 
 - Unclear requirement → stop and ask.
-- New requirement appears to conflict with an existing node → flag the
-  conflict in the FRS's "Brownfield impact" section. Do not silently
-  rewrite the node.
-- New requirement appears to conflict with an existing ADR → flag the
-  conflict in the FRS's "Brownfield impact" section. Do not silently
-  rewrite the ADR.
-- A Phase 2 architecture decision feels cross-cutting → apply the
-  STD/ADR/CCC/DEC discriminator. Don't inline a commitment that future
-  features will need to consult.
-- Multiple valid interpretations → present them, do not pick silently.
+- Conflict with existing node or ADR → flag in FRS "Brownfield impact",
+  do not silently rewrite.
+- Cross-cutting Phase 2 decision → apply STD/ADR/CCC/DEC discriminator.
+- Multiple valid interpretations → present, do not pick silently.
 
-*Named anti-pattern: see [`PRINCIPLES.md → "The Helpful Continuation"`](sdlc/PRINCIPLES.md#anti-patterns-to-refuse).*
+Named anti-pattern: see [`sdlc/PRINCIPLES.md`](sdlc/PRINCIPLES.md#anti-patterns-to-refuse) → "The Helpful Continuation".

@@ -36,7 +36,7 @@ follow the 3-file ADR touch (`adrs/log.md` entry). See
 
 <HARD-GATE>
 Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green — every new node flipped `proposed → active`, every CHG delta applied to canonical with the matching per-type `index.md` rows re-synced (and any ADR lifecycle events logged to `adrs/log.md`), every CHG flipped `approved → merged`. Coding against a still-`proposed` node, or against a CHG-targeted canonical node that hasn't yet received its delta, breaks the source-of-truth invariant the Merge stage exists to maintain.
-(Cross-cutting rules: see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Canonical edits use tiered touch".)
+(Cross-cutting rules: see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Tiered touch for canonical edits".)
 </HARD-GATE>
 
 ---
@@ -93,6 +93,37 @@ Applies CHG deltas + Flips statuses + Writes code; (QA track flows, independent 
   `sdlc/scripts/check-branch-coherence.sh path/to/FS-NNN.md` — if any
   repo mismatches, halt Phase 3 until coherent. See
   [Multi-repo Phase 3 model](#multi-repo-phase-3-model) below.
+
+---
+
+## Section routing
+
+Single-service / monolith projects skip [Multi-repo Phase 3 model](#multi-repo-phase-3-model) entirely —
+it covers branch-coherence and per-SVC stack discipline that only
+apply when an FS declares `service_repos:`. Skipping that section
+removes ~1,800 chars from the entry-time read.
+
+If you've loaded this file for a specific issue mid-flow (rather than
+at Phase 3 entry), route by operation:
+
+| Operation | Sections to read |
+|---|---|
+| Phase 3 entry (first time, monolith) | [Checklist](#checklist) → [Process Flow](#process-flow) → [The Process](#the-process); skip Multi-repo |
+| Phase 3 entry (first time, multi-service) | Same as above + [Multi-repo Phase 3 model](#multi-repo-phase-3-model) |
+| Resume after dependency unblocked | [Stage 1 — Merge](#stage-1--merge) (Step 0 only) |
+| Stage 1 merge of new nodes / CHGs | [Stage 1 — Merge](#stage-1--merge) + [Checklist — Stage 1 Merge exit](#checklist--stage-1-merge-exit-before-stage-2) |
+| Stage 2 code generation | [Stage 2 — Code](#stage-2--code) (conventions: ADRs / STDs / CCCs) |
+| Canonical node edit during Stage 2 | [Node content updates (during implementation)](#node-content-updates-during-implementation) |
+| Status flip during Stage 2 | [Status transitions (during implementation)](#status-transitions-during-implementation) |
+| Task needs research | [Pattern 1 — Task needs research](#pattern-1--task-needs-research) |
+| Task hits a bug | [Pattern 2 — Task encounters a bug](#pattern-2--task-encounters-a-bug) |
+| Task too big | [Pattern 3 — Task is too big](#pattern-3--task-is-too-big) |
+| Internal service surfaces | [Pattern 4 — Task reveals an internal service needing its own design](#pattern-4--task-reveals-an-internal-service-needing-its-own-design) |
+| Pre-merge branch check (multi-repo) | [Pre-merge branch-coherence check](#pre-merge-branch-coherence-check) |
+
+The [HARD-GATE](#) callout near the top and
+[Anti-Pattern: "The Shortcut Merge"](#anti-pattern-the-shortcut-merge) are
+doctrinal — re-read on each new Phase 3 even when routing.
 
 ---
 
@@ -576,7 +607,7 @@ Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Canonical edits use tiered touch" anchors every Stage 1 Merge
+  — "Tiered touch for canonical edits" anchors every Stage 1 Merge
   touch; "Existing nodes are authoritative" governs Stage 2 Code; "Read
   the per-type index.md before globbing" governs context loading.
 - **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase

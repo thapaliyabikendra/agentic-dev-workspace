@@ -1,6 +1,7 @@
 ---
 milestone_id: M-NN-<slug>
-active_phase: 0       # 0 | 1 | 1.5 | 2 | 3
+dev_phase: 0          # 0 | 1 | 1.5 | 2 | 3 | done
+qa_phase: not-started # not-started | qa-plan | qa-suite | qa-gate | done
 phase_entered: YYYY-MM-DD
 next_action: "<brief description of the immediate next step>"
 progress_percent: 0
@@ -17,11 +18,11 @@ session_notes: ""
 
 ## Phase history
 
-<!-- Append-only. One row per phase transition. -->
+<!-- Append-only. One row per phase transition. Track is dev | qa. -->
 
-| Date       | From phase | To phase | Session summary                          |
-| ---------- | ---------- | -------- | ---------------------------------------- |
-| YYYY-MM-DD | —          | 0        | Milestone opened; state file initialized |
+| Date       | Track | From phase | To phase | Session summary                          |
+| ---------- | ----- | ---------- | -------- | ---------------------------------------- |
+| YYYY-MM-DD | dev   | —          | 0        | Milestone opened; state file initialized |
 
 ---
 
@@ -50,4 +51,4 @@ session_notes: ""
 
 **Last session completed:** (nothing yet)
 
-**Next session should start with:** Load this file; check `active_phase` and `next_action`; load the relevant flow file.
+**Next session should start with:** Load this file; check `dev_phase`, `qa_phase`, and `next_action`; load the relevant flow file for the track being worked.

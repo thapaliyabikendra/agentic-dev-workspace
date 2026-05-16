@@ -466,11 +466,11 @@ open. (Doctrinal anchor: see
 The Phase 1.5 specialist passes run in **two ordered stages** — the
 parallel dispatch shape applies *inside* each stage, not across them:
 
-**Stage A (per-FRS, parallel within one FRS):** Pass 1's three checks
-(FRS existence + sanity + ADR conflict), the baseline-snapshot capture
-per [`frs-validation-rules.md`](frs-validation-rules.md), and the
-standard-conflict check fire as parallel inline
-`Agent(subagent_type=Explore, ...)` dispatches in a single message —
+**Stage A (per-FRS, parallel within one FRS):** Pass 1's five checks
+(existence + sanity + adr-conflict + standard-conflict + ccc-deviation)
+and the baseline-snapshot capture per
+[`frs-validation-rules.md`](frs-validation-rules.md) fire as parallel
+inline `Agent(subagent_type=Explore, ...)` dispatches in a single message —
 they are file-disjoint over one FRS. Run Stage A after each FRS is
 authored.
 
@@ -552,7 +552,7 @@ Findings format in the FRS's "Validation findings" table:
 
 | Finding | Type | Resolution | Rationale |
 | ------- | ---- | ---------- | --------- |
-| <one line> | existence \| sanity \| adr-conflict \| standard-conflict \| ccc-deviation | resolved \| deferred | <one line> |
+| <one line> | existence \| sanity \| adr-conflict \| standard-conflict \| ccc-deviation \| cross-frs | resolved \| deferred | <one line> |
 
 Unresolved findings after the author-review pass become `OQ-NNN` files
 under `docs/discovery/open-questions/` (allocate the next `OQ-NNN` from

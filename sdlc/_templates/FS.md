@@ -13,7 +13,7 @@ standards: []                 # STD IDs this FS consumes (carried from FRSs + an
 ccc: []                       # CCC IDs this FS cites (carried from FRSs); deviations filed as ADRs in `adrs:`
 stack: []                     # subset of api | ui | test | full-stack | infra | agnostic — canonical enum in ../BOUNDARY.md § Stack axis
 resolves: []                  # OQ-NNN IDs this FS closes; reciprocal — each OQ's `resolved_by:` cites this FS
-test_plan_path:               # filled at Phase 2 Test plan ingest, relative to this FS folder (e.g. "test-plans/")
+test_plan_path:               # filled by the QA-track Test plan ingest flow (post-Phase-2, independent session), relative to this FS folder (e.g. "test-plans/")
 created: YYYY-MM-DD
 merged: false                 # flipped true at Phase 3 after CHG deltas applied and new-node statuses flipped proposed→active
 merge_sha:                    # git sha of HEAD at the moment Phase 3 merge completes
@@ -90,10 +90,11 @@ ID-claims for every entry above must already be recorded in the milestone's
 
 ## Test plan
 
-The TC files Phase 2 ingest produced for this FS, grouped by use-case
-sub-folder. Filled by Test plan ingest after the FS validation loop
-passes — see
-[`../workflow/plan.md → Test plan ingest`](../workflow/plan.md#test-plan-ingest-after-fs-validation).
+The TC files the QA-track Test plan ingest flow produced for this FS,
+grouped by use-case sub-folder. Filled by
+[`../workflow/test-plan-ingest.md`](../workflow/test-plan-ingest.md) after
+the FS validation loop passes — runs in an independent session on the
+QA-track operator's cadence (no shared session with Phase 2).
 
 TC files live at `test-plans/<use-case>/TC-NNN-<slug>.md` relative to
 this FS folder; `test_plan_path:` in the frontmatter records the

@@ -16,7 +16,7 @@
 > a node-local decision; authoring for a rule that should be a CCC strands
 > it outside the NFR-baseline retrieval path. (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-> "Four sources of truth for governance: STD / ADR / CCC / DEC".)
+> "Four governance sources: STD / ADR / CCC / DEC".)
 
 ## When to Use
 
@@ -343,9 +343,9 @@ event.) See [`maintenance-discipline.md`](maintenance-discipline.md).
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Four sources of truth for governance: STD / ADR / CCC / DEC" is the
-  doctrinal anchor of this flow's HARD-GATE; "Canonical edits use
-  tiered touch" governs every ADR `created` / `linked` /
+  — "Four governance sources: STD / ADR / CCC / DEC" is the
+  doctrinal anchor of this flow's HARD-GATE; "Tiered touch for
+  canonical edits" governs every ADR `created` / `linked` /
   `status-change` / `superseded` event.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   "Adding rules without removing the old ones" is the named

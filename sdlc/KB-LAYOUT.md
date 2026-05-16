@@ -57,6 +57,22 @@ slices are **FA** nodes; deployable units realizing a MOD are **SVC** nodes.
 a query reads state and produces a projection with no side effects. Read
 operations belong in QRY — never shoehorn them into CMD.
 
+**Boundary cases — worked examples:**
+
+| Operation | Classification | Why |
+|---|---|---|
+| `CancelOrder` reads the order to validate state, then writes the cancellation | **CMD** | The persistent side-effect (state change + domain event) is the deliverable. The read is internal scaffolding for the write — model it inline in the CMD's "Preconditions" section, not as a separate QRY. |
+| `GetActiveOrders` reads and increments a "last-accessed" telemetry counter | **QRY** | Telemetry/cache writes are non-domain side effects. Note them in the QRY's "Side effects" sub-section if non-trivial; they do NOT promote the operation to CMD. |
+| `SnapshotInventory` reads inventory + writes a snapshot row to a history table | **CMD** | The snapshot row is a domain-meaningful write (new persistent record). Even though the user perceives it as "read," the write is the load-bearing effect. |
+| `RecalculateBalance` reads transactions, computes a balance, returns it without persisting | **QRY** | Computation does not promote to CMD. If the computed value is later persisted by a separate operation, that operation is the CMD. |
+| `ListUsers` with paging cursor stored server-side per session | **QRY** | Session-scoped cursor state is not domain state. If the cursor is persisted to a domain table (e.g., "saved searches"), the save operation is a separate CMD. |
+
+**Rule of thumb**: if the operation's reason-for-existing is a domain
+write, it is a CMD — even if a read is the first step. If the
+reason-for-existing is to return a projection, it is a QRY — even if a
+cache or telemetry write happens alongside. The user-visible deliverable
+decides, not the implementation steps.
+
 **CON** is the unified contract surface — HTTP routes, event topics, queues,
 gRPC methods — discriminated by `protocol:` frontmatter; superseded the
 prior EP (endpoint) prefix on 2026-05-14.

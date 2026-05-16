@@ -131,7 +131,7 @@ for the per-FRS and cross-FRS checks that populate this section.
 
 | Finding | Type | Resolution | Rationale |
 | ------- | ---- | ---------- | --------- |
-|         | existence \| sanity \| adr-conflict \| cross-frs | resolved \| deferred |  |
+|         | existence \| sanity \| adr-conflict \| standard-conflict \| ccc-deviation \| cross-frs | resolved \| deferred |  |
 
 Each unresolved (`resolution: deferred`) finding cites the raised
 `OQ-NNN` in its Rationale column. The OQ file under

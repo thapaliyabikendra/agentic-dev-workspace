@@ -22,7 +22,7 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 | File | One-line summary | When to load |
 |------|-----------------|--------------|
 | [design.md](design.md) | Design flow — generates milestone container, discoveries, FRSs, runs Phase 1.5 validation gate | Phase 0, 1, 1.5 entry |
-| [plan.md](plan.md) | Plan flow — authors Feature Spec, ingests proposed nodes, emits CHG nodes, runs FS validation loop | Phase 2 entry (after `/clear`) |
+| [plan.md](plan.md) | Plan flow — authors Feature Spec, ingests proposed nodes, emits CHG nodes, runs FS validation loop. Discoverability alias: [`authoring-fs.md`](authoring-fs.md) | Phase 2 entry (after `/clear`) |
 | [implementation.md](implementation.md) | Merge + Code — applies CHG deltas, flips node statuses, writes production code | Phase 3 entry (after `/clear`) |
 | [bug-fix.md](bug-fix.md) | Lightweight defect track — direct fix path or escalation to full FRS | When a defect surfaces |
 

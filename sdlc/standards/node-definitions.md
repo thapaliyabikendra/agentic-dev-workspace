@@ -1,17 +1,19 @@
 ---
 id: STD-004
 title: Engine-level per-node-type contract guarantees
-status: proposed
+status: deferred
 created: 2026-05-13
-updated: 2026-05-13
+updated: 2026-05-16
 supersedes: null
 superseded_by: null
-tags: [placeholder, methodology, node-types]
+tags: [deferred, methodology, node-types]
 scope: engine
 applies_when:
   stack: [agnostic]
 source: seed
 related_adrs: []
+deferred_until: "first project outside this workspace adopts the methodology and surfaces a contract drift"
+operative_source: "../_templates/nodes/"
 ---
 
 # STD-004: Engine-level per-node-type contract guarantees
@@ -28,15 +30,18 @@ a node of a given type, regardless of which project authored it.
 
 ## Standards
 
-**Placeholder — currently empty.** The de-facto contracts currently live in
-the per-type templates at [`../_templates/nodes/`](../_templates/nodes/) —
-each template's frontmatter and section headings *are* the contract. This
-standard codifies them in prose so contracts can be cited, audited, and
-versioned independent of the template files.
+**Deliberately deferred.** The operative per-node-type contracts live in the
+per-type templates at [`../_templates/nodes/`](../_templates/nodes/) — each
+template's frontmatter and section headings *are* the contract for now.
+This standard is reserved for the prose codification — written when a
+second project surfaces a real contract drift that the template-as-contract
+model cannot resolve.
 
-Populate when the first node-type contract is codified (likely when the
-first project outside this workspace adopts the methodology and surfaces a
-contract drift). Until then, the templates are the operative source.
+The deferral is **explicit, not accidental**: the `status: deferred` flag
+in frontmatter, the `deferred_until:` trigger, and the `operative_source:`
+pointer together signal that consulting `_templates/nodes/` is the correct
+substitute, not a workaround. Lint checks should treat this STD as
+intentionally unpopulated, not orphaned.
 
 ## Consequences
 

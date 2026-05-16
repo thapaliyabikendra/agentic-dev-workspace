@@ -60,14 +60,13 @@ sections need a final update.
 
 Edit `docs/milestones/M-NN-<slug>/MILESTONE-STATE.md`:
 
-1. Add `active_phase: done` (or set to the highest phase reached, e.g. `3`,
-   if `done` is not a valid value — note: `done` is not a numeric phase, so
-   leave `active_phase: 3` and set `next_action: "Milestone closed."`).
+1. Set `dev_phase: done` and `qa_phase: done`.
 2. Set `progress_percent: 100`.
 3. Set `next_action: "Milestone closed on <YYYY-MM-DD>."`.
-4. Append a final row to `## Phase history`:
+4. Append a final row to `## Phase history` (track is `dev` for the closing
+   transition since the milestone overall closes from the dev-track perspective):
    ```
-   | YYYY-MM-DD | 3 | closed | Milestone declared done; UAT.md status: <value>. |
+   | YYYY-MM-DD | dev | 3 | done | Milestone declared done; UAT.md status: <value>. |
    ```
 5. Clear `session_notes`.
 6. Update `## Session continuity`:

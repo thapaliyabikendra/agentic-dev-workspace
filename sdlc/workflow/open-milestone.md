@@ -93,7 +93,7 @@ Follow the `### Lazy create` procedure in [`phase-state.md`](phase-state.md):
 1. Copy `sdlc/_templates/MILESTONE-STATE.md` to
    `docs/milestones/M-NN-<slug>/MILESTONE-STATE.md`.
 2. Fill `milestone_id: M-NN-<slug>`.
-3. Set `active_phase: 0` and `phase_entered: <today>`.
+3. Set `dev_phase: 0`, `qa_phase: not-started`, and `phase_entered: <today>`.
 4. Set `next_action:` to "Begin Phase 0 — author milestone-scope.md discovery."
 5. Set `progress_percent: 0`.
 

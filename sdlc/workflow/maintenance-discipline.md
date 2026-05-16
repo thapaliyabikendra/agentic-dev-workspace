@@ -11,7 +11,7 @@
 > (`(base + N)` expansion). If any one is missing, the event is half-fired
 > and the canonical store is silently inconsistent. (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-> "Canonical edits use tiered touch".)
+> "Tiered touch for canonical edits".)
 
 ## When to Use
 
@@ -39,6 +39,34 @@ first-class and **do** fall under this rule.
 file is the **rule book** they consult for the file-set and log
 format. Every reference to "the 3-file touch" in any other file points
 here.
+
+## Section routing
+
+If you've loaded this file for a specific operation, read the linked
+section only. The first-time reader should also read
+[Process Flow](#process-flow) and
+[Anti-Pattern: "The Lightweight Shortcut"](#anti-pattern-the-lightweight-shortcut) —
+those carry the doctrinal frame the per-op sections assume.
+
+| Operation | Sections to read |
+|---|---|
+| Canonical node edit (any) | [Files to touch on a canonical node edit](#files-to-touch-on-a-canonical-node-edit) |
+| Node `related:` add / remove | + [Bidirectional-link enforcement](#bidirectional-link-enforcement) |
+| Node semantic content change | + [Node versioning — `version: N`](#node-versioning--version-n) |
+| ADR routine edit | [Files to touch on an ADR lifecycle event](#files-to-touch-on-an-adr-lifecycle-event) (2-file path only) |
+| ADR lifecycle event | same section (3-file path) + [Log entry format](#log-entry-format) + [Operation vocabulary](#operation-vocabulary-closed-set) |
+| CCC routine edit | [Files to touch on a CCC lifecycle event](#files-to-touch-on-a-ccc-lifecycle-event) (2-file path only) |
+| CCC lifecycle event | same section (3-file path) + [Log entry format](#log-entry-format) + [Operation vocabulary](#operation-vocabulary-closed-set) |
+| Promote inline DEC → standalone | [Promoting an inline DEC to standalone](#promoting-an-inline-dec-to-standalone) |
+| Cross-type supersession (ADR ↔ DEC) | [Cross-type supersession (ADR ↔ DEC)](#cross-type-supersession-adr--dec) |
+| Tech-stack version / command change | [Tech-stack touch at merge](#tech-stack-touch-at-merge) |
+| Discovery-surface artifact edit | [Discovery surface discipline](#discovery-surface-discipline) |
+| First node of a new type | [Lazy creation](#lazy-creation) |
+| Log append cadence | [Append-only, oldest first](#append-only-oldest-first) |
+
+If your operation is not in the table or you are unsure, read the full
+file. The type-split touch summary between the anti-pattern and the
+per-op sections carries shared invariants — skim once per session.
 
 ## Process Flow
 
@@ -222,6 +250,30 @@ the index row's Status column and git history are the audit trail. See
 back-link in **the same atomic operation**. The base touch on A
 (2-file for nodes, 3-file for ADRs) becomes `(base + N)` where N is the
 number of `related:` targets.
+
+**Worked example — creating a new ENT with three `related:` targets.**
+
+Suppose you author `docs/app/nodes/entities/ENT-007-invoice.md` at
+Phase 2 ingest with `related: [CMD-012, QRY-005, EVT-003]`. The base
+touch on ENT-007 is **2-file** (it is a node). The `(base + N)`
+expansion adds **N = 3** target touches, each of which is *itself* a
+2-file node touch. Total files touched in this atomic operation:
+
+1. `docs/app/nodes/entities/ENT-007-invoice.md` — new file (ENT-007 body).
+2. `docs/app/nodes/entities/index.md` — new `proposed` row for ENT-007.
+3. `docs/app/nodes/commands/CMD-012-<slug>.md` — add `ENT-007` to its `related:`.
+4. `docs/app/nodes/commands/index.md` — re-sync the CMD-012 row's `related` column.
+5. `docs/app/nodes/queries/QRY-005-<slug>.md` — add `ENT-007` to its `related:`.
+6. `docs/app/nodes/queries/index.md` — re-sync the QRY-005 row's `related` column.
+7. `docs/app/nodes/events/EVT-003-<slug>.md` — add `ENT-007` to its `related:`.
+8. `docs/app/nodes/events/index.md` — re-sync the EVT-003 row's `related` column.
+
+**8 files** for one node create with three reciprocal links. If any
+target were an ADR or CCC instead of a node, that target's base touch
+becomes 3-file (target + index + log entry), so the total would be
+9 or 10 files. Skipping any of these is a half-fired touch — the
+canonical store is silently inconsistent until the next operation
+catches up.
 
 **Concrete steps when `related:` changes on node A:**
 
@@ -534,7 +586,7 @@ call explicitly; don't let it erode by drift.
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Canonical edits use tiered touch" is the doctrinal anchor; this
+  — "Tiered touch for canonical edits" is the doctrinal anchor; this
   file is its procedural detail.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   "Silent node or ADR edits" and "If it can drift, the operation isn't
