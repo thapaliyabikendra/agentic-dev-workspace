@@ -2,15 +2,15 @@
 
 > Procedure for declaring a new standalone deployable component in the
 > workspace — choosing an `id_prefix`, creating `COMPONENT.md`,
-> lazy-seeding the per-type `index.md` + `log.md` pair on first node,
+> lazy-seeding the per-type `index.md` on first node,
 > and registering the component in the three workspace-level indexes
 > (`LAYOUT.md`, `CLAUDE.md ## Where to look`, `docs/home.md`).
 
 > **HARD-GATE:** Do NOT ingest a node into a component path that does
 > not yet have `docs/<component-slug>/COMPONENT.md` with `id_prefix:`
 > set. Coining IDs (`<PREFIX>-<TYPE>-001`) without a declared prefix
-> produces collisions with future components and leaves the index/log
-> pair orphaned. **Bootstrap runs before — never alongside — the
+> produces collisions with future components and leaves the per-type
+> `index.md` orphaned. **Bootstrap runs before — never alongside — the
 > first node ingest for the component.** (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 > "Every artifact has an ID and links upstream + downstream"; ID
@@ -60,9 +60,8 @@ Only create type folders you need immediately:
 docs/<component-slug>/nodes/<type>/
 ```
 
-Each type folder gets `index.md` and `log.md` from
-[`sdlc/_templates/INDEX.md`](../_templates/INDEX.md) and
-[`sdlc/_templates/LOG.md`](../_templates/LOG.md).
+Each type folder gets `index.md` from
+[`sdlc/_templates/INDEX.md`](../_templates/INDEX.md).
 
 ## Step 3 — Register the component globally
 
@@ -78,22 +77,22 @@ All new nodes use prefixed IDs: `{PREFIX}-{TYPE}-001`, `{PREFIX}-{TYPE}-002`, et
 IDs are globally unique — check `docs/home.md` ID high-water marks and
 `docs/milestones/M-NN/id-claims.md` before minting.
 
-Start numbering from 001 within each type per component — `FDE-CON-001` is
+Start numbering from 001 within each type per component — `<NEW>-CON-001` is
 independent of `APP-CON-001` (though in practice the `app` component uses
 unqualified IDs like `CON-001`).
 
 ## Step 5 — Declare depends_on
 
 If this component's nodes reference nodes in other components by ID (e.g., a
-`FDE-FLW-001` flow references `CON-010` from the `app` component), declare
+`<NEW>-FLW-001` flow references `CON-010` from the `app` component), declare
 those components in `COMPONENT.md` `depends_on: [app]`.
 
 ---
 
 ## Anti-Pattern: "The Implicit Component"
 
-Beginning to ingest nodes with a new `id_prefix:` — typing `FDE-CON-001`,
-`FDE-FLW-001` into Phase 2 deliverables — without first creating
+Beginning to ingest nodes with a new `id_prefix:` — typing `<NEW>-CON-001`,
+`<NEW>-FLW-001` into Phase 2 deliverables — without first creating
 `docs/<component-slug>/COMPONENT.md`. The temptation: the component is
 "obvious from context", the FRS already names it, and stopping to
 file the descriptor feels like ceremony. The cost: the `id_prefix:`
@@ -113,7 +112,7 @@ go.*
 
 - [ ] `docs/<component-slug>/COMPONENT.md` created with `id_prefix:` set
 - [ ] At least one `nodes/<type>/` folder created (only types needed immediately)
-- [ ] `index.md` and `log.md` created in each type folder
+- [ ] `index.md` created in each type folder
 - [ ] Component inventory table in `sdlc/LAYOUT.md` updated
 - [ ] `CLAUDE.md` `## Where to look` updated
 - [ ] `docs/home.md` Module Inventory updated
@@ -124,7 +123,7 @@ go.*
 
 The `shared/` component is the workspace-level home for:
 - Cross-component ADRs (ADRs constraining interfaces between ≥2 components)
-- `glossary.md`, `cross-cutting-concerns.md`, `tech-stack.md`
+- `glossary.md`, `ccc/` (CCC tree, entry at `docs/shared/ccc/index.md`), `tech-stack.md`
 - `overview/` derived reports
 
 `shared/` does not have a `nodes/` sub-tree or an `id_prefix`. Its `adrs/`
@@ -149,7 +148,7 @@ component that also needs cross-component ADRs.
   bootstrap procedure is engine-level).
 - **Rule books wholesale-read during this op:**
   [`maintenance-discipline.md`](maintenance-discipline.md) — lazy
-  creation of the per-type `index.md` + `log.md` on first node
+  creation of the per-type `index.md` on first node
   (`created` op).
 - **Callers (this file is wholesale-read by):**
   [`plan.md`](plan.md) (Phase 2 FS introduces a new component — runs

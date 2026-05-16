@@ -8,6 +8,8 @@ supersedes: null
 superseded_by: null
 tags: [placeholder, dotnet, application-layer]
 scope: engine
+applies_when:
+  stack: [agnostic]
 source: seed
 related_adrs: []
 ---

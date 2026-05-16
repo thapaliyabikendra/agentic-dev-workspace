@@ -7,13 +7,17 @@ description: "Use when Phase 1.5 has closed and you need to author a Feature Spe
 
 Plan flow turns a milestone's validated FRSs into a Feature Spec and the new DDD nodes
 the spec introduces. It writes every new node directly to canonical with `status: proposed`,
-fires the 3-file lifecycle touch, and emits a CHG node for any modifications to existing
-canonical nodes. Phase 3 applies the CHG deltas and flips new nodes `proposed → active`.
+fires the 2-file node touch (canonical node + per-type `index.md`), and emits a CHG node
+for any modifications to existing canonical nodes. Phase 3 applies the CHG deltas and
+flips new nodes `proposed → active`.
 
 <HARD-GATE>
-Do NOT write method bodies, brace bodies, SQL, YAML payloads, or any other concrete syntax
-in the FS, the new canonical nodes, or any CHG node. Phase 2 names structures; Phase 3
-writes them. This applies regardless of how obvious the implementation looks.
+Do NOT write **method bodies, brace-delimited blocks, SQL bodies, YAML payloads,
+implementation file paths, or line-level code** in the FS, the new canonical nodes, or
+any CHG node. **Structural names ARE the deliverable** — class names, method signatures,
+event names, table names, route paths. Phase 2 names structures; Phase 3 writes them.
+This applies regardless of how obvious the implementation looks. (Structural YAML in
+frontmatter and templates is not what this forbids — payload bodies are.)
 Cross-cutting rule canonical home: [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 "Plans contain no syntax".
 </HARD-GATE>
@@ -25,8 +29,10 @@ Cross-cutting rule canonical home: [`../../CLAUDE.md ## Hard rules`](../../CLAUD
 This flow runs after the Design flow ([`design.md`](design.md)) has produced a validated
 FRS set and a `/clear` has happened. It covers `generate-feat-spec`: FS authoring +
 canonical node ingest (status: proposed) + CHG emission + FS validation loop. Test plan
-ingest runs in the same session immediately after the validation loop passes — that
-operation is in [`test-plan-ingest.md`](test-plan-ingest.md).
+ingest is the first **QA-track** flow ([`test-plan-ingest.md`](test-plan-ingest.md)) — it
+runs in its own session after `/clear`, on the QA-track operator's cadence (not
+necessarily immediately). See [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
+— "QA-track flows count as independent flow boundaries."
 
 **Mode: Ingest.** Existing canonical nodes are NOT modified here. When the FS touches
 them, this flow emits a CHG-NNN node at
@@ -79,9 +85,11 @@ are file-disjoint mode boundaries; each requires a `/clear` at entry.
 
 Scan-level gate before diving into The Process. All seven must hold before Phase 3 begins.
 
-1. Every FRS acceptance criterion appears in the FS Coverage table exactly once.
+1. Every FRS acceptance criterion appears in the FS Coverage table — one row per Flow
+   scenario it spans; no AC partially covered or duplicated within a scenario.
 2. Every new node is written to canonical (`docs/<component>/nodes/<type>/<ID>-<slug>.md`)
-   with `status: proposed` and the 3-file lifecycle touch fired.
+   with `status: proposed` and the 2-file node touch fired (node + per-type `index.md`
+   row with Status = `proposed`).
 3. Every new node has `source_ref` tracing to a specific FRS criterion or Behavior paragraph.
 4. If the FS modifies any canonical node, a CHG node is emitted and all `touches_nodes`
    IDs are recorded in `id-claims.md` as `op: modify`.
@@ -101,13 +109,21 @@ digraph plan_flow {
     inputs    [shape=oval,  label="Validated FRSs\n+ touched/produced nodes\n+ ADRs"];
     ctxload   [shape=box,   label="Context loading\n(narrow-load only)"];
     idclaim   [shape=box,   label="ID-claim protocol"];
-    fsauthor  [shape=box,   label="FS authoring\n+ new node ingest\n(canonical, status: proposed)"];
-    chgemit   [shape=diamond, label="FS modifies\ncanonical?"];
-    chgnode   [shape=box,   label="Emit CHG-NNN\n(milestone-scoped,\nnever promoted)"];
-    fsval     [shape=diamond, label="FS validation\n(zero Blockers/Majors)?"];
-    tpingest  [shape=box,   label="Test plan ingest\n(TC files per use-case)"];
 
-    out_fs    [shape=doublecircle, label="FS-NNN.md\n+ proposed nodes in canonical\n+ CHG (if any)\n+ TC files staged"];
+    subgraph cluster_interleave {
+        label = "§3/§4/§5 interleave in practice";
+        style = dashed;
+        color = gray;
+        fontsize = 10;
+        fsauthor  [shape=box,   label="FS authoring\n+ new node ingest\n(canonical, status: proposed)"];
+        chgemit   [shape=diamond, label="FS modifies\ncanonical?"];
+        chgnode   [shape=box,   label="Emit CHG-NNN\n(milestone-scoped,\nnever promoted)"];
+    }
+
+    fsval     [shape=diamond, label="FS validation\n(zero Blockers/Majors)?"];
+
+    out_fs    [shape=doublecircle, label="FS-NNN.md\n+ proposed nodes in canonical\n+ CHG (if any)"];
+    qatrack   [shape=doublecircle, label="QA track\n(independent session)\n→ test-plan-ingest.md"];
     next      [shape=doublecircle, label="Phase 3 begins\n(after /clear)"];
 
     inputs -> ctxload;
@@ -118,15 +134,17 @@ digraph plan_flow {
     chgemit -> fsval   [label="no"];
     chgnode -> fsval;
     fsval -> fsauthor [label="fail — repair only flagged items"];
-    fsval -> tpingest [label="pass"];
-    tpingest -> out_fs;
-    out_fs -> next [label="/clear + load implementation.md"];
+    fsval -> out_fs   [label="pass"];
+    out_fs -> next    [label="/clear + load implementation.md"];
+    out_fs -> qatrack [label="/clear (separate QA-track cadence)", style=dashed];
 }
 ```
 
-The FS-validation diamond is the **node ingest gate** — Phase 2 is not complete (and
-Test plan ingest does not run) until zero Blockers and zero Majors remain. Repair is
-surgical, not full re-draft.
+The FS-validation diamond is the **node ingest gate** — Phase 2 is not complete
+until zero Blockers and zero Majors remain. Repair is surgical, not full re-draft.
+Test plan ingest is in the QA track and runs in its own session after a separate
+`/clear` — see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
+("QA-track flows count as independent flow boundaries").
 
 ---
 
@@ -137,7 +155,8 @@ surgical, not full re-draft.
 Read **only** the nodes and ADRs the milestone's FRSs declare:
 
 1. Open each linked FRS in `milestones/M-NN-<slug>/frs/` and collect every node ID in
-   `touches_nodes` and `produces_nodes`, plus every ADR ID in `adrs:`.
+   `touches_nodes` and `produces_nodes`, every ADR ID in `adrs:`, every STD ID in
+   `standards:`, and every CCC ID in `ccc:`.
 2. Check for `FS-NNN-CONTEXT.md` at
    `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN-CONTEXT.md`. If present, load it
    before drafting — it carries locked decisions that bind this FS's architecture choices.
@@ -147,13 +166,22 @@ Read **only** the nodes and ADRs the milestone's FRSs declare:
    also check `docs/shared/adrs/index.md`. Cross-check the FRS-declared ADR list against
    the index for anything plainly relevant that an FRS missed; if you find a gap, surface
    it (update the FRS, do not silently load).
-4. Read the canonical node files for IDs in `touches_nodes`. Follow `related` one hop and
+4. Read [`../standards/index.md`](../standards/index.md) and
+   [`../../docs/shared/ccc/index.md`](../../docs/shared/ccc/index.md) — one-line summaries
+   only, both indexes are bounded by design. Narrow-load every STD declared in the
+   collected FRSs' `standards:` set whose `applies_when.stack:` intersects the FS's
+   declared `stack:` plus every STD tagged `convention` or `task-ordering` that the FS
+   missed. Narrow-load every CCC declared in `ccc:`. If you find a relevant STD or CCC
+   missing from the FRS's declared sets, surface it (update the FRS, do not silently
+   load); the FS inherits `standards:` and `ccc:` from its FRSs.
+5. Read the canonical node files for IDs in `touches_nodes`. Follow `related` one hop and
    read those too. For IDs in `produces_nodes`, there is no canonical node yet — they will
    be created at the ingest step.
-5. Narrow-load the declared ADR pages. No transitive expansion.
-6. Do **not** glob `docs/*/nodes/**` or pre-load wholesale. If a node or ADR not on the
-   list turns out necessary mid-draft, stop, update the source FRS to declare it, and
-   re-enter Phase 1.5 (for a node) or update the FRS's `adrs:` (for an ADR).
+6. Narrow-load the declared ADR pages. No transitive expansion.
+7. Do **not** glob `docs/*/nodes/**` or pre-load wholesale. If a node, ADR, STD, or CCC
+   not on the list turns out necessary mid-draft, stop, update the source FRS to declare
+   it, and re-enter Phase 1.5 (for a node) or update the FRS's `adrs:` / `standards:` /
+   `ccc:` (for a governance artifact).
 
 This is the workflow's primary token lever — see [`retrieval-discipline.md`](retrieval-discipline.md).
 
@@ -161,7 +189,22 @@ This is the workflow's primary token lever — see [`retrieval-discipline.md`](r
 No unlisted files open.
 
 **On failure:** if you discover a needed node mid-draft, stop. Surface the gap. Update
-the FRS. Re-enter Phase 1.5 before continuing.
+the FRS. Re-enter Phase 1.5 before continuing. The same applies if an AC itself is
+unworkable — ambiguous, contradictory, or undefined. Do not paper over by inventing
+structure that doesn't trace to a clear AC.
+
+**Rollback procedure (when re-entering Phase 1.5).** The FS shell on disk is durable —
+do not delete it. Leave the frontmatter intact and the section headers in place. In any
+body section that referenced the now-missing node or unworkable AC, replace the prose
+with a `TBD — pending Phase 1.5 re-pass on FRS-NNN` marker so the next session knows
+exactly which sections need re-authoring. `/clear`, load [`design.md`](design.md),
+re-run Phase 1.5 on the updated FRS. After Phase 1.5 exit, `/clear` + load this file
+and resume the FS — re-walking only the TBD sections. New canonical nodes already
+ingested (`status: proposed`) stay where they are unless the re-pass explicitly retires
+them via the abandonment procedure in
+[`in-flight-nodes.md`](in-flight-nodes.md). CHG and TC files stay at their milestone
+paths. Already-claimed IDs in `id-claims.md` stay claimed (the re-pass may add more,
+never silently retire).
 
 ---
 
@@ -202,6 +245,14 @@ Across milestones, IDs are globally unique.
 
 ---
 
+> **Authoring sequence (sections 3–5).** Sections §3 (new-node ingest), §4 (CHG emit),
+> and §5 (FS authoring) **interleave in practice**. You draft the FS shell first
+> (frontmatter + empty section headers), name structures as you fill the body, ingest
+> each new node as it's named, and emit the CHG when the FS's first `touches_nodes`
+> reference is set. The linear presentation below is for completeness, not execution
+> order — the Process Flow diagram above shows the actual interleave (`fsauthor + new-node
+> ingest` in one box, CHG conditional from that box).
+
 ### 3. New node canonical ingest
 
 For every node ID in the FRSs' `produces_nodes` (newly introduced), write the node file
@@ -223,22 +274,28 @@ source_ref:
     op: introduce
 ```
 
+**Note.** `fs: FS-NNN` is a forward reference at ingest — the FS file may not yet exist
+on disk. The ID is valid because it was claimed in §2 (ID-claim protocol); the FS shell
+(frontmatter + empty section headers) is drafted at the start of §5, so the reference
+resolves within the same flow. Shape is consistent across all node templates:
+`source_ref: [{frs:, fs:, op:}]` (list-of-objects).
+
 For Flow nodes specifically: the three scenarios (happy / edge / fault) must be filled.
 They become the QA source of truth in Phase 3. If you can't fill all three from the FRS,
 the FRS is underspecified — surface it, do not paper over.
 
-**Fire the 3-file lifecycle touch at ingest** (see [`maintenance-discipline.md`](maintenance-discipline.md)):
+**Fire the 2-file node touch at ingest** (see [`maintenance-discipline.md`](maintenance-discipline.md)):
 
 - [ ] Canonical node file in place at `docs/<component>/nodes/<type>/<ID>-<slug>.md`
       with `status: proposed`.
 - [ ] Row added to `docs/<component>/nodes/<type>/index.md` showing Status = `proposed`.
       Create the file from [`../_templates/INDEX.md`](../_templates/INDEX.md) if this is
-      the first node of the type.
-- [ ] `created` entry appended to `docs/<component>/nodes/<type>/log.md`. Create from
-      [`../_templates/LOG.md`](../_templates/LOG.md) if first of type. Body notes the
-      originating FS and FRS.
+      the first node of the type. The `id-claims.md` row for this node (see §2) carries
+      the originating FS/FRS audit trail; no per-type node `log.md` fires (see
+      [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--per-type-node-logmd-dropped-2026-05-16)).
 - [ ] Bidirectional `related:` back-links fired against each target in this node's
-      `related:` list (the (3 + N) touch — see `maintenance-discipline.md`).
+      `related:` list (the (2 + N) touch for node targets; (3 + N) if any target is an
+      ADR — see `maintenance-discipline.md`).
 
 **For `touches_nodes` (existing canonical nodes the FS intends to modify): do NOT write
 to canonical at Phase 2.** The canonical file is left untouched; the CHG node records
@@ -255,11 +312,16 @@ Phase 3 enforces merge order from this field. An FS may **read** a sibling-FS pr
 node via `depends_on_specs:`, but may **not** include it in its own `touches_nodes` /
 CHG `modifies[]` — proposed nodes are provisional, not modify targets.
 
-**Verify:** every `produces_nodes` ID has a canonical file at the expected path with
-`status: proposed`, an index row, and a log entry. No canonical node body for a
-`touches_nodes` ID has been touched.
+**No reciprocal back-link.** `depends_on_specs:` is one-way. At Phase 3 merge, the merger
+globs `depends_on_specs:` across all FSs in the milestone to detect dependents before
+retiring or reordering an FS. A generated "Spec dependencies" table on the milestone
+portal is a future enhancement (track in [`evolving-the-workflow.md`](evolving-the-workflow.md)).
 
-**On failure:** if a 3-file touch is incomplete, complete it before moving on. If a
+**Verify:** every `produces_nodes` ID has a canonical file at the expected path with
+`status: proposed` and an index row showing Status = `proposed`. No canonical node body
+for a `touches_nodes` ID has been touched.
+
+**On failure:** if a 2-file node touch is incomplete, complete it before moving on. If a
 `touches_nodes` ID was edited, revert — it belongs in the CHG, not in canonical yet.
 
 ---
@@ -285,17 +347,21 @@ enumerates:
 - `invariants_before[]` / `invariants_after[]` — the milestone-level invariant delta.
 - `migration_steps[]` — data or schema migration the FS requires.
 
-CHG lifecycle: `draft → approved → merged` (Phase 3 flips `approved → merged` after
-applying the deltas). The CHG file stays at the milestone path permanently — no canonical
+CHG lifecycle: `draft → approved → merged`. The CHG is authored `status: draft` here in
+§4. It is flipped `draft → approved` when the FS validation loop (§6) passes zero
+Blockers and zero Majors. Phase 3 flips `approved → merged` after applying the deltas.
+The CHG file stays at the milestone path permanently — no canonical
 `docs/<component>/nodes/changes/` subtree exists.
 
 **Default granularity: one CHG per FS.** Split into multiple CHGs only when the FS has
-multiple unrelated canonical modifications that warrant separate review. Note the split
-in the FS's "Change maps" section.
+multiple unrelated canonical modifications that warrant separate review — for example,
+when modifications target unrelated bounded contexts that will be reviewed by different
+stakeholders, or when one delta is reversible-safe (config) and another is destructive
+(schema migration). Note the split in the FS's "Change maps" section.
 
 If the FS introduces only new nodes (no `touches_nodes`), do **not** emit a CHG. Pure
-additions are already audited by the new nodes' `source_ref` and the per-type `log.md`
-`created` entries.
+additions are already audited by the new nodes' `source_ref`, their `id-claims.md` rows,
+and git history.
 
 **Verify:** every `touches_nodes` ID from every FRS in this FS appears in the CHG's
 `modifies[]` or `removes[]`. The CHG file exists at the milestone-scoped path.
@@ -312,8 +378,9 @@ references nodes by ID — it does not restate their behavior.
 
 What belongs in the FS prose: architecture decisions, data model changes, interface
 contracts, ordered tasks, dependencies, edge cases, QA verification checklist.
-What does **not** belong: code, file paths, class names, behavior already in a canonical
-DDD node (link to the canonical node instead).
+What does **not** belong: code bodies, implementation file paths, class bodies, behavior
+already in a canonical DDD node (link to the canonical node instead). Structural names
+(class names, method signatures, table names, route paths) ARE the deliverable.
 
 #### Generate before converging
 
@@ -324,6 +391,9 @@ in the FS (see [`../_templates/FS.md`](../_templates/FS.md)).
 - **Real alternatives only.** If you can't write a real trade-off, drop it.
 - **Skip for obvious / low-stakes calls.** Forced alternatives are procrastination.
 - **Lead with your recommendation** and the reasoning behind it.
+- **Honor locked decisions.** Dimensions locked in `FS-NNN-CONTEXT.md` are not
+  re-litigated. Cite the lock and skip alternatives for that dimension — generate
+  alternatives only for dimensions still open.
 
 #### Promote to ADR vs file a DEC vs keep inline
 
@@ -346,8 +416,9 @@ specific node looks the way it does → DEC; otherwise → inline.*
 
 Walk the FS template in order — Coverage → New nodes → Change maps → Architecture
 decisions → Data model → Interface contracts → Implementation tasks → Dependencies → QA —
-and pause for confirmation between sections. If something stops making sense partway, go
-back; don't paper over.
+and pause for confirmation between sections. **Apply CLAUDE.md's "one question per turn"
+hard rule** — ask at most one question between sections, wait for the answer, then
+proceed. If something stops making sense partway, go back; don't paper over.
 
 #### Implementation-task cohort ordering
 
@@ -368,6 +439,10 @@ interleaved per scenario, but never before the cohort they validate compiles.
 
 ### 6. FS validation loop
 
+**Which gate is this?** This is the **Phase-2 close gate**. The top-of-doc Checklist is
+its scan-level subset (use it first). The template's `## QA verification` section is the
+**Phase-3 `implemented`-flip gate** — do not run it here.
+
 Findings carry the same **Blocker / Major / Minor** severity vocabulary used at Phase
 1.5 (see
 [`frs-validation-rules.md → Severity classification`](frs-validation-rules.md#severity-classification)).
@@ -376,13 +451,19 @@ Zero Blockers and zero Majors is the exit bar; Minors are noted, not blocking.
 **Targeted repair, not full re-draft.** Fix only the flagged items and re-check only
 those — not the whole FS.
 
+**Severity of the checkboxes below.** All boxes are **Blocker-tier** — any unchecked box
+prevents Phase 2 close. Major and Minor findings emerge from the self-review pass (the
+first box) and are recorded inline; Minors are noted, Majors must be repaired before
+close.
+
 - [ ] Author self-review pass — look at the FS with fresh eyes:
   1. Placeholder scan — any "TBD", incomplete sections, or vague requirements?
   2. Internal consistency — does the FS contradict itself or upstream inputs (FRSs, nodes)?
   3. Scope — single coherent slice? No scope creep from adjacent FRSs?
   4. Ambiguity — any task interpretable to build the wrong thing? Pick one interpretation and make it explicit.
   Fix inline. No separate review file, no dispatched reviewer.
-- [ ] Every FRS acceptance criterion appears in the Coverage table **exactly once**.
+- [ ] Every FRS acceptance criterion is **fully covered** in the Coverage table — one row
+      per Flow scenario it spans; no AC partially covered or duplicated within a scenario.
       Criteria that cannot be mapped to a Flow scenario are raised as `OQ-NNN` files under
       `docs/discovery/open-questions/` with `origin: fs-authoring, origin_ref: FS-NNN,
       gate_effect: blocking` — not absorbed as loose FS prose.
@@ -405,6 +486,15 @@ those — not the whole FS.
       `touches_nodes`. The CHG is **not** applied to canonical here — only documented.
 - [ ] No edits to existing canonical node bodies during Phase 2.
 - [ ] `adrs:` frontmatter declares every ADR consulted.
+- [ ] `standards:` frontmatter declares every STD this FS consumes (inherited
+      from the constituent FRSs plus any STD newly surfaced during FS drafting).
+      Engine-universal STDs (`applies_when.stack: [agnostic]`) listed when the
+      FS's behavior depends on a specific rule; stack-conditional STDs listed
+      only when their `applies_when.stack:` intersects the FS's `stack:`.
+- [ ] `ccc:` frontmatter declares every CCC this FS cites (inherited from
+      the constituent FRSs). For each CCC, body prose cites by ID rather than
+      restating the baseline. Any operation-specific deviation from a CCC is
+      filed as an ADR (with `related: [CCC-NNN]`) whose ID is in `adrs:`.
 - [ ] Every architecture decision has been routed: ADR, DEC, or inline.
 - [ ] Any ADR promoted from this FS is filed under
       `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed, logged with a `created` entry,
@@ -414,13 +504,12 @@ those — not the whole FS.
 - [ ] FS frontmatter: `merged: false`, `merge_sha:` left blank.
 - [ ] FS frontmatter: `test_plan_path:` left blank — filled by Test plan ingest.
 
-**Phase 2 fires the 3-file lifecycle touch for each new node's `created` event (canonical
-node + per-type `index.md` row + per-type `log.md` `created` entry). It does NOT modify
+**Phase 2 fires the 2-file node touch for each new node's `created` event (canonical
+node + per-type `index.md` row with Status = `proposed`). It does NOT modify
 existing canonical node bodies, nor add index rows for `touches_nodes` targets — those
 operations fire at Phase 3 merge when the CHG deltas are applied.**
 
-Once zero Blockers and zero Majors remain, proceed immediately to
-[`test-plan-ingest.md`](test-plan-ingest.md) — same session, no context reset.
+FS validation passed; the QA track may now run [`test-plan-ingest.md`](test-plan-ingest.md) in a fresh session. The QA track is independent — no shared session, no mandate to run immediately, but milestone close depends on `qa-gate.md` (the QA track's final flow) eventually running.
 
 ---
 
@@ -446,7 +535,7 @@ Phase 3 merge conflicts.
 **❌ Emitting a CHG for a pure-addition FS** — unnecessary noise when no canonical node is
 being modified.
 **✅ Only emit CHG when `touches_nodes` is non-empty** — pure additions are audited by
-`source_ref` and `log.md` `created` entries.
+`source_ref`, the `id-claims.md` row, and git history.
 
 ---
 
@@ -475,18 +564,19 @@ being modified.
   the FS-validation gate enforces.
 - **Required before (entry):** [`design.md`](design.md) — produces the validated FRS set
   this flow consumes.
-- **Required after (same session):** [`test-plan-ingest.md`](test-plan-ingest.md) — Test
-  plan ingest runs immediately after the FS validation loop passes, before the user-review
-  handoff. No `/clear` between the two.
+- **Routes to (QA track):** [`test-plan-ingest.md`](test-plan-ingest.md) — runs as an independent flow in the QA track, in its own session. Logical sequencing only: this file's FS validation must pass before the QA track's first flow can begin. No same-session requirement; no `/clear` exception.
 - **Maintenance ops that may fire:**
-  [`maintenance-discipline.md`](maintenance-discipline.md) (every 3-file lifecycle touch;
-  the (3+N) touch when new nodes carry `related:` back-links),
+  [`maintenance-discipline.md`](maintenance-discipline.md) (every 2-file node touch on
+  new node ingest; the (2+N) touch when new nodes carry `related:` back-links — (3+N)
+  if any target is an ADR),
   [`authoring-adr.md`](authoring-adr.md) (FS architecture decision promoted to ADR),
   [`new-component-bootstrap.md`](new-component-bootstrap.md) (FS introduces nodes for a
   new component — runs FIRST, before any ingest),
   [`evolving-the-workflow.md`](evolving-the-workflow.md) (Phase 2 surfaces a missing node
   type or template gap).
 - **Routes to (after `/clear`):** [`implementation.md`](implementation.md) — Phase 3
-  Merge + Code + QA.
+  Merge + Code + QA. After review and `/clear`, the QA track may begin with
+  [`test-plan-ingest.md`](test-plan-ingest.md). The QA track runs independently — its
+  first flow is the entry point for executable test coverage.
 - **Sibling flow files:** [`design.md`](design.md), [`implementation.md`](implementation.md),
   [`bug-fix.md`](bug-fix.md).

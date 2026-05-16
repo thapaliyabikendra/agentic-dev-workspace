@@ -7,6 +7,9 @@ discovery: ../discovery/FRS-NNN-<slug>.md
 touches_nodes: []             # canonical DDD node IDs this FRS modifies or extends; modifications captured by the FS's CHG and applied at Phase 3
 produces_nodes: []            # new DDD node IDs this FRS introduces; written directly to canonical at Phase 2 with status: proposed; flipped to active at Phase 3 merge
 adrs: []                      # ADR IDs consulted while drafting (carried from Discovery + dialog)
+standards: []                 # STD IDs this FRS consumes (e.g., STD-005); narrowed at Phase 1.5 from sdlc/standards/index.md
+ccc: []                       # CCC IDs this FRS cites by category (e.g., CCC-004 Auditing); deviations from these baselines must be filed as ADRs in `adrs:`
+stack: []                     # subset of api | ui | test | full-stack | infra | agnostic — canonical enum in sdlc/BOUNDARY.md § Stack axis
 related_frs: []
 resolves: []                  # OQ-NNN IDs this FRS closes (most often the OQs the FRS itself surfaced earlier, or pre-existing OQs the FRS finally answers); reciprocal — each OQ's `resolved_by:` cites this FRS
 created: YYYY-MM-DD
@@ -111,12 +114,14 @@ the FRS.
   under `docs/discovery/open-questions/` (template:
   [`../_templates/OPEN-QUESTION.md`](OPEN-QUESTION.md)). Each carries
   `origin: frs-authoring` and `origin_ref: <this FRS ID>`.
-- Deviations from a [`cross-cutting-concerns.md`](../cross-cutting-concerns.md)
-  baseline category: if this FRS deviates from a baseline (stricter
-  retention, different audit shape, custom session policy), file the
-  deviation as an ADR and list the ADR ID here. Do not absorb deviations
-  as paragraphs in the FRS body — the baseline is the source of truth;
-  ADRs capture operation-specific overrides.
+- Deviations from a CCC baseline (auth, audit, retention, observability,
+  multi-tenancy, exception handling, validation, localization, caching,
+  background jobs, distributed events, session, soft-delete, ...): if this
+  FRS deviates from any CCC declared in the `ccc:` frontmatter, file the
+  deviation as an ADR (which carries `related: [CCC-NNN]`) and list the ADR
+  ID here. The CCC baseline stays put; the ADR captures the override. Do
+  not absorb deviations as paragraphs in the FRS body. The full CCC roster
+  lives at [`docs/shared/ccc/index.md`](../../../shared/ccc/index.md).
 
 ## Validation findings
 

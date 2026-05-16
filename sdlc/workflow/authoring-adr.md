@@ -6,15 +6,17 @@
 > as a maintenance activity inside Phase 0 / 1 / 2 (occasionally
 > standalone); the Phase 3 QA gate consumes the result.
 
-> **HARD-GATE:** Do NOT author an ADR until the **3-way discriminator**
-> below has been run — Standard vs ADR vs DEC. The discriminator is not
+> **HARD-GATE:** Do NOT author an ADR until the **4-way discriminator**
+> below has been run — STD vs ADR vs CCC vs DEC. The discriminator is not
 > a one-time gate; re-apply it whenever a DEC's `related:` set or scope
-> expands (see *Scope-creep re-application*). Authoring an ADR for a
+> expands, or when an inline CCC commitment broadens into a project-wide
+> NFR default (see *Scope-creep re-application*). Authoring an ADR for a
 > rule that should be a Standard pollutes the project-specific
 > commitment store; authoring for a rule that should be a DEC over-weights
-> a node-local decision. (Cross-cutting rule:
+> a node-local decision; authoring for a rule that should be a CCC strands
+> it outside the NFR-baseline retrieval path. (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-> "Three sources of truth for governance: STD / ADR / DEC".)
+> "Four sources of truth for governance: STD / ADR / CCC / DEC".)
 
 ## When to Use
 
@@ -25,10 +27,16 @@ load when an `OQ-NNN` is resolved by a new or revised ADR (the
 `resolves:` mechanic at *Steps* §8 applies).
 
 **Do NOT use when:** the commitment is project-agnostic (load
-[`../standards/`](../standards/index.md) — it's a Standard), or when it
-shapes one specific node's behavior with no cross-cutting reach (file
-a DEC inline under that node's `## Decisions` heading; promote to
-standalone only on a trigger from *Inline vs standalone DEC*).
+[`../standards/`](../standards/index.md) — it's a Standard); when it
+states a project-wide NFR baseline default such as auth, audit,
+retention, observability, exception handling, validation, localization,
+caching, background jobs, distributed events, multi-tenancy, soft-delete,
+or session policy (load [`../../docs/shared/ccc/`](../../docs/shared/ccc/index.md)
+— it's a CCC; ADRs capture *deviations* from a CCC, not the baseline
+itself); or when it shapes one specific node's behavior with no
+cross-cutting reach (file a DEC inline under that node's `## Decisions`
+heading; promote to standalone only on a trigger from *Inline vs
+standalone DEC*).
 
 **Vs. sibling files:** [`maintenance-discipline.md`](maintenance-discipline.md)
 is the rule book for the 3-file lifecycle touch this procedure fires
@@ -51,63 +59,91 @@ digraph adr_discriminator {
     q1       [shape=diamond, label="Holds for ANY project\nusing this methodology?"];
     std      [shape=doublecircle, label="STD-NNN\n(sdlc/standards/)"];
 
-    q2       [shape=diamond, label="Constrains FUTURE\nnodes in THIS project?"];
+    q2       [shape=diamond, label="Project-wide NFR\nbaseline default?\n(auth, audit, retention,\nobservability, multi-tenancy,\nexception handling, ...)"];
+    ccc      [shape=doublecircle, label="CCC-NNN\n(docs/shared/ccc/)"];
+
+    q3       [shape=diamond, label="Constrains FUTURE\nfeatures in THIS project?\n(stack, layering, tooling,\nframework idiom)"];
     adr      [shape=doublecircle, label="ADR-NNN\n(docs/<component>/adrs/\nor docs/shared/adrs/)"];
 
-    q3       [shape=diamond, label="Standalone trigger?\n(related: spans >=2 nodes,\nlifecycle, length,\nexternal citation)"];
+    q4       [shape=diamond, label="Standalone trigger?\n(related: spans >=2 nodes,\nlifecycle, length,\nexternal citation)"];
     decstd   [shape=doublecircle, label="Standalone DEC-NNN\n(docs/<component>/nodes/decisions/)"];
     decinl   [shape=doublecircle, label="Inline DEC\n(host node's\n## Decisions block)"];
 
     rule -> q1;
     q1 -> std [label="yes"];
     q1 -> q2  [label="no"];
-    q2 -> adr [label="yes"];
+    q2 -> ccc [label="yes"];
     q2 -> q3  [label="no"];
-    q3 -> decstd [label="yes"];
-    q3 -> decinl [label="no"];
+    q3 -> adr [label="yes"];
+    q3 -> q4  [label="no"];
+    q4 -> decstd [label="yes"];
+    q4 -> decinl [label="no"];
 }
 ```
 
-Order the questions as drawn — Standard first, ADR second, DEC last.
+Order the questions as drawn — STD first, CCC second, ADR third, DEC last.
 Prefer the narrowest classification when multiple seem to apply, then
-lift upward (DEC → ADR → Standard) only when the underlying rule is
-genuinely re-applicable. Tired-solo-dev-at-midnight test: every
-diamond has a yes/no answer with no third option.
+lift upward (DEC → ADR → CCC → STD) only when the underlying rule is
+genuinely re-applicable. CCC and ADR are not competitors: a CCC is the
+*baseline default* (what happens absent a deviation); an ADR captures the
+*deviation* that overrides the CCC for a specific operation or scope.
+Tired-solo-dev-at-midnight test: every diamond has a yes/no answer with
+no third option.
 
 ## Anti-Pattern: "The Premature ADR"
 
 Filing an ADR because the decision *feels* architectural, without
 running the discriminator — most commonly when the rule is genuinely
-single-node-scoped (should be a DEC) or methodology-level (should be a
-Standard). The cost: ADRs accumulate as a junk drawer of "things we
-chose"; the Phase 3 QA gate has to enforce every one of them; the
-canonical Standards store loses content that should live there.
-**Cheaper than filing wrong is asking the three questions.** If the
-answer to "would this hold on a different project?" is yes, it's a
-Standard — file under [`../standards/`](../standards/index.md), not
-here. If the answer to "does it constrain future nodes?" is no, it's
-a DEC — inline under the owning node unless a trigger in *Inline vs
-standalone DEC* fires. Doctrinal anchor:
+single-node-scoped (should be a DEC), methodology-level (should be a
+Standard), or a project-wide NFR default (should be a CCC). The cost:
+ADRs accumulate as a junk drawer of "things we chose"; the Phase 3 QA
+gate has to enforce every one of them; the canonical Standards and CCC
+stores lose content that should live there. **Cheaper than filing wrong
+is asking the four questions.** If the answer to "would this hold on a
+different project?" is yes, it's a Standard — file under
+[`../standards/`](../standards/index.md), not here. If the rule is a
+project-wide NFR default (auth, audit, retention, observability,
+multi-tenancy, exception handling, ...), it's a CCC — file under
+[`../../docs/shared/ccc/`](../../docs/shared/ccc/index.md); ADRs only
+land when this operation *deviates* from that baseline. If the answer
+to "does it constrain future features?" is no, it's a DEC — inline
+under the owning node unless a trigger in *Inline vs standalone DEC*
+fires. Doctrinal anchor:
 [`../PRINCIPLES.md`](../PRINCIPLES.md) — *Adding rules without
 removing the old ones.*
 
 ADRs capture workspace-level architectural commitments — stack choices,
-layering rules, framework idioms, cross-cutting policies. They are not a
-phase; they're a maintenance activity that fires from inside Phase 0, Phase 1,
-or Phase 2 (and occasionally standalone). The Phase 3 QA gate consumes them.
+layering rules, framework idioms, cross-cutting policies, and documented
+deviations from CCC baselines. They are not a phase; they're a maintenance
+activity that fires from inside Phase 0, Phase 1, or Phase 2 (and
+occasionally standalone). The Phase 3 QA gate consumes them.
 
-## When to file a Standard, ADR, or DEC (the 3-way discriminator)
+## When to file a STD, CCC, ADR, or DEC (the 4-way discriminator)
 
-> **Standard** if the rule applies to **any project** using this methodology
-> (DDD constraints, framework idioms, node-contract rules, API-shape rules).
-> Lives in [`../standards/`](../standards/index.md). ID prefix `STD-NNN`.
+> **Standard (STD)** if the rule applies to **any project** using this
+> methodology (DDD constraints, framework idioms, node-contract rules,
+> API-shape rules). Lives in [`../standards/`](../standards/index.md).
+> Stack-conditional applicability is declared via `applies_when:` frontmatter
+> rather than by repository location. ID prefix `STD-NNN`.
+>
+> **Cross-cutting concern (CCC)** if the rule is a **project-wide NFR
+> baseline default** — authentication & identity, authorization,
+> multi-tenancy, auditing, validation, exception handling, localization,
+> caching, background jobs, distributed events, session management,
+> soft-delete & retention, observability, performance, availability,
+> security, data retention. Lives in
+> [`../../docs/shared/ccc/`](../../docs/shared/ccc/index.md). ID prefix
+> `CCC-NNN`. CCC is the *default*; an operation that needs to deviate
+> from a CCC files the deviation as an ADR back-linked to the CCC.
 >
 > **ADR** if it's a **project-specific cross-cutting commitment** that
-> constrains how we'd design future nodes in *this* project (stack choice,
-> integration topology, tooling). Lives in `docs/<component>/adrs/` (when
-> it constrains a single component) or `docs/shared/adrs/` (when it spans
-> ≥2 components — use the component discriminator in
-> [`BOUNDARY.md`](../BOUNDARY.md#component-structure-docs)). ID prefix `ADR-NNN`.
+> constrains how we'd design future features in *this* project (stack
+> choice, integration topology, tooling, framework idiom) — or the
+> **deviation** from a CCC baseline for one operation. Lives in
+> `docs/<component>/adrs/` (when it constrains a single component) or
+> `docs/shared/adrs/` (when it spans ≥2 components — use the component
+> discriminator in [`BOUNDARY.md`](../BOUNDARY.md#component-structure-docs)).
+> ID prefix `ADR-NNN`.
 >
 > **DEC** if it's a **node-local atomic decision** that shapes one node's
 > behavior. Lives inline under the node's `## Decisions` heading, or
@@ -117,15 +153,29 @@ or Phase 2 (and occasionally standalone). The Phase 3 QA gate consumes them.
 A tired solo dev at midnight should be able to apply this. Order the questions:
 
 1. **Would this rule still hold if a different team adopted the methodology
-   for an unrelated project?** Yes → Standard. No → continue.
-2. **Does it constrain how we'd design future nodes we haven't met yet in
-   this project?** Yes → ADR. No → DEC.
-3. **For a DEC**: would inline placement in the owning node serve discovery
+   for an unrelated project?** Yes → STD. No → continue.
+2. **Is this a project-wide NFR baseline default that every operation will
+   absorb unless it explicitly deviates?** Yes → CCC. No → continue.
+3. **Does it constrain how we'd design future features we haven't met yet in
+   this project, or capture a one-time deviation from a CCC?** Yes → ADR.
+   No → DEC.
+4. **For a DEC**: would inline placement in the owning node serve discovery
    better than a standalone file? See *Inline vs standalone DEC* below.
 
 If multiple seem to apply, prefer the narrowest. Then if the underlying rule
-is genuinely re-applicable, lift it upward (DEC → ADR → Standard) and have
+is genuinely re-applicable, lift it upward (DEC → ADR → CCC → STD) and have
 the narrower artifact reference the broader one.
+
+### Worked examples
+
+| Candidate rule | Routes to | Why |
+|----|----|----|
+| "Every new entity declares its base class and rationale" | **STD-005** with `applies_when: { stack: [api], framework: [abp-net] }` | Engine-level — would hold for any project on the ABP stack. Conditional applicability is split across `stack:` (functional role) and `framework:` (framework binding), not encoded as a single token. |
+| "Audit-log retention is 7 years by default; operations may extend it via ADR" | **CCC-NNN** (Auditing / Retention category) | Project-wide NFR default. Operation-specific extensions are ADRs back-linked to the CCC. |
+| "REST endpoints in the customer-facing API use `/v1/...` versioning and return RFC-7807 problem details on error" | **ADR** with `stack: [api]` | Project-specific API convention; constrains how every future API feature is designed. Not engine-universal (other projects may use gRPC, GraphQL, or unversioned routes). |
+| "The customer-portal UI uses TanStack Router with file-based routes" | **ADR** with `stack: [ui]` | Project-specific UI commitment; stack scope narrows to UI alone. |
+| "For this single workflow, the BG-number generator skips numbers ending in `13`" | **DEC** (inline under the owning command node) | Node-local quirk; no future feature consumes it. |
+| "Audit retention for legal-hold flags is 25 years instead of the baseline 7" | **ADR** back-linked to the Auditing CCC | A documented deviation from the CCC default for one operation. Baseline stays in CCC; deviation captured in ADR. |
 
 ## Inline vs standalone DEC (sub-discriminator)
 
@@ -142,9 +192,9 @@ node's file. Promote to **standalone** (a file under
 
 **Promotion paths:**
 - **Inline → standalone**: cut from host node's `## Decisions` block; create
-  `docs/<component>/nodes/decisions/DEC-NNN-<slug>.md`; fire the 3-file lifecycle touch
-  (file + decisions/index.md + decisions/log.md); replace the inline content
-  with a one-line link: `See [DEC-NNN](../decisions/DEC-NNN-<slug>.md)`.
+  `docs/<component>/nodes/decisions/DEC-NNN-<slug>.md`; fire the 2-file node touch
+  (file + decisions/index.md — DEC is a canonical node; no log.md fires); replace
+  the inline content with a one-line link: `See [DEC-NNN](../decisions/DEC-NNN-<slug>.md)`.
 - **Standalone → ADR**: see *Cross-type supersession* below. Worked example:
   DEC-009 → ADR-029 (2026-05-13).
 - **DEC → Standard**: rare — usually means the rule was misclassified as
@@ -176,12 +226,12 @@ same operation as the scope-expansion edit.
    e.g., "Use Playwright for E2E tests with the page-object pattern." No
    in-flight feature. Pick the next `ADR-NNN`, copy
    [`_templates/ADR.md`](../_templates/ADR.md), fill, update
-   `docs/<component>/adrs/index.md`, append a `created` entry to
-   `docs/<component>/adrs/log.md`, update the ADRs table in
-   [`home.md`](../home.md). Standalone ADRs have no Phase 1 / Phase 2
-   handoff to ride on, so author them directly as `accepted` once you're
-   committed; use `proposed` only if you want a deliberate "sit with this
-   for a week" gap before accepting.
+   `docs/<component>/adrs/index.md`, and append a `created` entry to
+   `docs/<component>/adrs/log.md`. (`docs/home.md`'s ADR table is derived
+   from the per-component indexes — regenerated on demand, not hand-edited.)
+   Standalone ADRs have no Phase 1 / Phase 2 handoff to ride on, so author
+   them directly as `accepted` once you're committed; use `proposed` only if
+   you want a deliberate "sit with this for a week" gap before accepting.
 
 2. **From an FRS** (Phase 1). The clarifying dialog surfaces a previously
    implicit architectural choice. Record as an ADR alongside the FRS draft.
@@ -203,24 +253,31 @@ same operation as the scope-expansion edit.
    globally existing `ADR-NNN` across all component ADR indexes.
 2. Copy [`_templates/ADR.md`](../_templates/ADR.md) to
    `docs/<component>/adrs/ADR-NNN-<slug>.md` and fill it. One-sentence imperative title.
-3. Update `docs/<component>/adrs/index.md` — add one row to the Active ADRs table.
+   **Body ≤80 lines** (see [`retrieval-discipline.md § ADRs`](retrieval-discipline.md#adrs)).
+   If the draft overflows, the rationale belongs in a deeper artifact
+   (research doc, FS) rather than the ADR itself.
+3. Update `docs/<component>/adrs/index.md` — add one row to the Active ADRs
+   table per the schema in [`retrieval-discipline.md § Index row schemas`](retrieval-discipline.md#index-row-schemas)
+   (title ≤120 chars; Source cell mapping per the schema).
 4. Append a `created` entry to `docs/<component>/adrs/log.md` — see
    [`maintenance-discipline.md`](maintenance-discipline.md) for format.
-5. Update [`home.md`](../home.md) — add the ADR to the top-level ADRs table
-   (component-scoped section if the README has component sections).
-6. Link from origin if applicable: set `frs_origin` / `fs_origin` on the ADR,
+   (`docs/home.md` is derived from the per-component ADR indexes — it
+   regenerates on demand, not per event. Do not hand-edit its ADR table.)
+5. Link from origin if applicable: set `frs_origin` / `fs_origin` on the ADR,
    and add the ADR ID to the origin artifact's `adrs:` frontmatter. When the
    back-link lands, append a `linked` entry to `docs/<component>/adrs/log.md`.
-7. If superseding: set `supersedes:` on the new ADR, set `superseded_by:` on
+6. If superseding: set `supersedes:` on the new ADR, set `superseded_by:` on
    the old one, move the old one's index row from Active to
    Superseded/deprecated, and append `superseded` entries to `docs/<component>/adrs/log.md`
    for both ADRs.
-8. If the ADR resolves one or more `OQ-NNN`: add the OQ ID(s) to the ADR's
+7. If the ADR resolves one or more `OQ-NNN`: add the OQ ID(s) to the ADR's
    `resolves:` frontmatter (add the field if absent — it accepts a list
    of OQ-NNN, DEC-NNN, or FRS-NNN IDs the ADR closes). For each resolved
    OQ, flip its `status` to `resolved`, set `resolved_by: ADR-NNN`, and
-   fire the 3-file lifecycle touch on `docs/discovery/open-questions/`
-   (`status-change` log entry; index row moves to Resolved section).
+   fire the discovery-surface touch on `docs/discovery/open-questions/` —
+   2-file (OQ file + `open-questions/index.md` if one exists; index row
+   moves to Resolved section). No `log.md` — discovery surface; see
+   [`maintenance-discipline.md → Discovery surface discipline`](maintenance-discipline.md#discovery-surface-discipline).
    Back-links are reciprocal; an OQ closed without the resolver citing it
    via `resolves:` is half-closed.
 
@@ -242,9 +299,9 @@ the DEC** rather than editing the DEC in place. The mechanics:
 - The DEC's `superseded_by:` field carries the ADR ID.
 - The DEC's status flips `active → superseded`.
 - The DEC's index row moves from Active to Superseded/deprecated in
-  `docs/<component>/nodes/decisions/index.md`. The DEC's `log.md` gets a
-  `status-change` entry; the ADR's `log.md` gets a `created` entry that
-  names the supersession.
+  `docs/<component>/nodes/decisions/index.md` (the Status column re-sync
+  captures the status-change — no separate DEC log entry). The ADR's
+  `log.md` gets a `created` entry that names the supersession.
 - The DEC body is retained for audit — add a banner at the top pointing
   at the superseding ADR. The canonical rationale, alternatives, and
   consequences live in the ADR going forward; the DEC page is read-only.
@@ -277,15 +334,16 @@ Status moves are explicit edits, not implicit. The user-review handoff at
 Phase 1 or Phase 2 exit is the moment to flip a `proposed` ADR to `accepted`
 if it was authored during that phase. Every status move appends a
 `status-change` entry to `docs/<component>/adrs/log.md` and re-syncs the row
-in both `docs/<component>/adrs/index.md` and `home.md`. See
-[`maintenance-discipline.md`](maintenance-discipline.md).
+in `docs/<component>/adrs/index.md`. (`docs/home.md` is derived from the
+per-component ADR indexes — regenerated on demand, not hand-edited per
+event.) See [`maintenance-discipline.md`](maintenance-discipline.md).
 
 ---
 
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Three sources of truth for governance: STD / ADR / DEC" is the
+  — "Four sources of truth for governance: STD / ADR / CCC / DEC" is the
   doctrinal anchor of this flow's HARD-GATE; "Canonical edits use
   tiered touch" governs every ADR `created` / `linked` /
   `status-change` / `superseded` event.

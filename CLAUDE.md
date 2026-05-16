@@ -18,7 +18,10 @@ phase, and points to the canonical home for each procedural detail.
 
 - **The DDD knowledge base in `docs/app/nodes/` is the source of truth for behavior.**
   If a node and a spec disagree, the node wins or both get reconciled before code is written.
-- **Three sources of truth for governance: STD / ADR / DEC.** Engine-level → `sdlc/standards/`;
+- **Four sources of truth for governance: STD / ADR / CCC / DEC.** Engine-level → `sdlc/standards/`
+  (stack-conditional applicability declared in `applies_when:` frontmatter rather than by repo location);
+  project-wide NFR baselines → `docs/shared/ccc/` (CCC defines the default; ADRs capture operation-specific
+  deviations and back-link to the CCC);
   component ADRs → `docs/<component>/adrs/` (APP: `docs/app/adrs/`);
   cross-component ADRs → `docs/shared/adrs/`;
   node-local → inline or `docs/<component>/nodes/decisions/`.
@@ -27,14 +30,19 @@ phase, and points to the canonical home for each procedural detail.
 - **Existing nodes are authoritative.** Adapt the template to existing files — do not retrofit.
 - **Clear the session at every flow boundary.** Moving design → plan or plan → implementation
   requires `/clear` and reload of the next flow file only. Phases inside one flow can share a session.
+  **QA-track flows count as independent flow boundaries** — `/clear` is required entering each of
+  `test-plan-ingest.md`, `test-suite-codegen.md`, and `qa-gate.md`, and between each. The QA track
+  is trigger-independent: it consumes dev-track outputs on its own cadence, never shares sessions
+  with dev-track flows or with each other.
 - **Every artifact has an ID and links upstream + downstream.** IDs: `ADR-NNN`, `FRS-NNN`,
   `M-NN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`, `OQ-NNN`, node IDs (all `-NNN`). Check per-type
   indexes and `id-claims.md` before incrementing. OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
 - **Plans contain no syntax; implementation design IS the plan.** Phase 2 names structures;
   Phase 3 writes them. Node-ingest + CHG rules: [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md).
-- **Canonical edits use tiered touch.** Routine = 2-file (artifact + index); lifecycle event
-  (`created`, `status-change`, `superseded`, `deprecated`, `linked`) = 3-file (+ log);
-  `related:` changes = (3 + N). Procedure: [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md).
+- **Canonical edits use tiered touch.** Nodes = 2-file (node + per-type `index.md`) always;
+  ADR routine = 2-file (ADR + adrs/index.md); ADR lifecycle event = 3-file (+ `adrs/log.md`);
+  `related:` changes = (base + N). Per-type node `log.md` was dropped 2026-05-16 (see
+  [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md) → Rule history).
 - **Read the per-type `index.md` before globbing.** `docs/<component>/nodes/<type>/index.md` lists
   every page with summary, tags, status, source. Glob only when the component or type is unknown.
   For APP nodes: `docs/app/nodes/<type>/index.md`.
@@ -42,8 +50,11 @@ phase, and points to the canonical home for each procedural detail.
 - **TaskCreate mirrors phase task lists; durable status lives in artifacts.** One task = one
   observable outcome. Mark `in_progress` on start, `completed` immediately. Session-scoped only.
 - **For multi-stage plans, open a progress checklist and track each stage.**
-  Any plan that spans more than one phase or cohort must begin with a checkbox
-  list of all stages; mark each stage `[x]` before advancing to the next.
+  Any plan that spans more than one phase, or more than one implementation-task
+  cohort within a phase (cohorts as defined by the project's task-ordering ADR —
+  see [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md) § "Implementation-task
+  cohort ordering"), must begin with a checkbox list of all stages; mark each
+  stage `[x]` before advancing to the next.
   Procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
 - **Never git commit without explicit user authorization.** Do not run `git commit`
   (or any command that commits — e.g., `git commit -am`, `gh pr create`) unless the
@@ -64,8 +75,9 @@ one component plus a shared area:
 - **APP component** ([`docs/app/`](docs/app/)) — .NET/ABP application: commands,
   entities, flows, integrations, states, decisions, and more. ADRs at
   [`docs/app/adrs/`](docs/app/adrs/).
-- **Shared** ([`docs/shared/`](docs/shared/)) — glossary, cross-cutting-concerns,
-  tech-stack, and any future cross-component ADRs.
+- **Shared** ([`docs/shared/`](docs/shared/)) — glossary, CCCs
+  (cross-cutting concern baselines under `ccc/`), tech-stack, and any
+  future cross-component ADRs.
 
 Component descriptors: [`docs/app/COMPONENT.md`](docs/app/COMPONENT.md).
 `docs/milestones/` holds planning artifacts for all milestones.
@@ -87,6 +99,7 @@ Top-level entry points:
 Generator indexes (wholesale-read at phase entry — component-qualified; add a row here when running `new-component-bootstrap.md`):
 - APP ADRs: [`docs/app/adrs/index.md`](docs/app/adrs/index.md)
 - Shared ADRs: [`docs/shared/adrs/index.md`](docs/shared/adrs/index.md)
+- Shared CCCs: [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md)
 - Engine standards: [`sdlc/standards/index.md`](sdlc/standards/index.md)
 - APP nodes: `docs/app/nodes/<type>/index.md`
 
@@ -119,7 +132,7 @@ Cost is proportional to context size.
   conflict in the FRS's "Brownfield impact" section. Do not silently
   rewrite the ADR.
 - A Phase 2 architecture decision feels cross-cutting → apply the
-  ADR-vs-DEC discriminator. Don't inline a commitment that future
+  STD/ADR/CCC/DEC discriminator. Don't inline a commitment that future
   features will need to consult.
 - Multiple valid interpretations → present them, do not pick silently.
 

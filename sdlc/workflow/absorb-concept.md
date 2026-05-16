@@ -120,10 +120,9 @@ For each row marked for promotion:
    - Nodes introduced outside an active FS phase: set `status: active`.
    - Nodes introduced inside Phase 2 (FS in flight): set `status: proposed`;
      Phase 3 merge will flip to `active`.
-4. Apply **3-file tiered touch** per
+4. Apply **2-file node touch** per
    [`maintenance-discipline.md`](maintenance-discipline.md):
    - Update the per-type `index.md` (add/update the row).
-   - Append a `created` entry to the per-type `log.md`.
 5. Add `absorbed_from: RESEARCH-NNN` in the canonical node's frontmatter
    `related:` list so the provenance chain is traceable.
 
@@ -166,7 +165,7 @@ The report now picks up the new node via its `Pulls from:` source list.
 | Action | Files touched |
 |---|---|
 | Create RESEARCH node | RESEARCH node + `docs/research/index.md` + `docs/research/log.md` |
-| Promote to canonical node | Canonical node + `docs/<component>/nodes/<type>/index.md` + `docs/<component>/nodes/<type>/log.md` |
+| Promote to canonical node | Canonical node + `docs/<component>/nodes/<type>/index.md` |
 | Mark RESEARCH `synthesized` | `docs/research/index.md` + `docs/research/log.md` |
 | Mark RESEARCH `superseded` | `docs/research/index.md` + `docs/research/log.md` |
 
@@ -189,7 +188,8 @@ then let the regeneration surface it.
   "Reference, never copy" and the tiered touch rule govern every step.
 - **Required before:**
   [`maintenance-discipline.md`](maintenance-discipline.md) —
-  the 3-file touch procedure for creating canonical nodes.
+  the 2-file touch procedure for creating canonical nodes (and 3-file for
+  ADRs).
 - **Trigger source:**
   [`derived-reports.md`](derived-reports.md) — calls this operation
   when synthesis surfaces a new concept.

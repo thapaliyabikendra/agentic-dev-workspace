@@ -8,6 +8,9 @@ supersedes: null              # STD-NNN if this replaces a prior standard
 superseded_by: null           # STD-NNN if this has been replaced
 tags: []                      # free-form
 scope: engine                 # always `engine` for files under sdlc/standards/
+applies_when:                 # conditional applicability — engine-wide default is `agnostic`
+  stack: [agnostic]           # subset of: api | ui | test | full-stack | infra | agnostic
+  # framework: [abp-net]      # optional; add when the standard is framework-conditional (enum in BOUNDARY.md § Framework axis)
 source: seed | harvested-from-ADR-NNN | proposal
 related_adrs: []              # docs/adrs/ ADRs that codify project-specific deviations from this standard, or ADRs harvested-from
 resolves: []                  # OQ-NNN IDs this standard closes; reciprocal — each OQ's `resolved_by:` cites this standard

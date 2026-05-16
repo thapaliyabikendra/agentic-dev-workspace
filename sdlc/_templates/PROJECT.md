@@ -30,7 +30,7 @@ Slots to fill:
 - Component table — one row per bounded component; repeat as needed
 - Repo layout table — one row per git repository (multi-repo projects only; delete section for single-repo)
 - Tech stack table — one row per layer; remove irrelevant rows; add layers
-- Cross-cutting constants — four values that also feed `docs/cross-cutting-concerns.md`
+- Cross-cutting constants — four values that also seed baseline prose in the relevant CCC pages under `docs/shared/ccc/`
 - Phase A grep terms — project-specific search terms used during
   [`sdlc/BOUNDARY.md`](../BOUNDARY.md) Phase A boundary checks
 - Milestones table — one row per planned or active milestone
@@ -95,9 +95,11 @@ Remove rows that do not apply. Add rows for layers not listed.
 
 ## Cross-Cutting Constants
 
-These values are seeded into `docs/cross-cutting-concerns.md` when that file
-is first authored from its template. A change here requires a corresponding
-update in that file (and a version bump in its revision history).
+These values seed baseline prose in the relevant CCC pages under
+`docs/shared/ccc/` (timezone → CCC-007 localization context; locale → CCC-007;
+retention → CCC-012 / CCC-004; audit-read role → CCC-004). A change here
+requires updating the affected CCC pages and bumping each one's
+`updated:` frontmatter + revision history entry.
 
 | Constant | Value |
 |---|---|

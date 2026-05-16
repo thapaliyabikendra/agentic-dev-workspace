@@ -8,6 +8,8 @@ supersedes: null
 superseded_by: null
 tags: [placeholder, api, http]
 scope: engine
+applies_when:
+  stack: [api]
 source: seed
 related_adrs: []
 ---

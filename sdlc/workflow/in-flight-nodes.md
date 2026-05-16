@@ -7,10 +7,13 @@ description: "Lifecycle rules for nodes with status: proposed — CHG mechanics,
 
 New DDD nodes drafted during Phase 2 land directly in canonical
 `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed` in
-frontmatter. The 3-file lifecycle touch fires at that ingest — `created` log
-entry, `proposed` row in the per-type index. Phase 3 merge flips
-`proposed → active` and fires a `status-change` log entry. DDD node
-lifecycle: `proposed → active → superseded | deprecated`.
+frontmatter. The 2-file node touch fires at that ingest — node file +
+`proposed` row in the per-type `index.md`. Phase 3 merge flips
+`proposed → active` by editing the node's frontmatter and re-syncing the
+per-type `index.md` Status column. DDD node lifecycle:
+`proposed → active → superseded | deprecated`. (Node lifecycle events do
+not fire a `log.md` entry — see
+[`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--per-type-node-logmd-dropped-2026-05-16).)
 
 ## CHG mechanics
 
@@ -21,9 +24,10 @@ scoped, permanent at
 that documents the intended delta in its `modifies[]` / `removes[]` /
 `supersedes[]` fields. The delta is *applied* at Phase 3 — never at
 Phase 2 — so canonical nodes never carry partially-applied changes
-while an FS is in flight. Phase 3 fires `updated` / `superseded` /
-`status-change` log entries on the canonical targets at apply time and
-flips the CHG's status `approved → merged` in place.
+while an FS is in flight. Phase 3 applies `updated` / `superseded` /
+`status-change` deltas to the canonical targets (each fires its 2-file
+node touch — node file + per-type `index.md` re-sync) and flips the
+CHG's status `approved → merged` in place.
 
 ## Cross-FS dependencies
 
@@ -67,4 +71,5 @@ WORKFLOW.md carries the always-loaded summary; this file is the full procedure.
 
 **Related:** [`../KB-LAYOUT.md`](../KB-LAYOUT.md) — where in the folder
 tree proposed nodes land; [`maintenance-discipline.md`](maintenance-discipline.md) —
-the 3-file tiered touch that fires at `created` and `status-change` events.
+the 2-file node touch (and 3-file ADR lifecycle touch) that fires at
+`created` and `status-change` events.

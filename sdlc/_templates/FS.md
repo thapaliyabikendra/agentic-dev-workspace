@@ -9,6 +9,9 @@ changes: []                   # CHG-NNN IDs emitted by this FS (empty if pure ad
 depends_on_specs: []          # sibling FSs whose proposed nodes this FS reads — must merge first
 service_repos: []             # workspace-relative paths of service repos this FS touches; multi-service projects only — empty for monolith. Branch-coherence check at Phase 3 verifies each is on `feat/FS-NNN-<slug>`. See sdlc/scripts/check-branch-coherence.sh.
 adrs: []                      # ADR IDs consulted (carried from FRSs + anything mid-draft)
+standards: []                 # STD IDs this FS consumes (carried from FRSs + anything mid-draft); narrowed at Phase 2 context load
+ccc: []                       # CCC IDs this FS cites (carried from FRSs); deviations filed as ADRs in `adrs:`
+stack: []                     # subset of api | ui | test | full-stack | infra | agnostic — canonical enum in ../BOUNDARY.md § Stack axis
 resolves: []                  # OQ-NNN IDs this FS closes; reciprocal — each OQ's `resolved_by:` cites this FS
 test_plan_path:               # filled at Phase 2 Test plan ingest, relative to this FS folder (e.g. "test-plans/")
 created: YYYY-MM-DD
@@ -46,7 +49,9 @@ Non-blocking OQs stay in the "Open questions" section at the bottom.
 
 ## Coverage
 
-Every FRS acceptance criterion in scope appears **exactly once** in this table.
+Every FRS acceptance criterion in scope is **fully covered** in this table — one row per
+Flow scenario it spans (e.g., happy + fault paths get one row each); no AC partially
+covered or duplicated within a scenario.
 If a criterion cannot be mapped to a scoped Flow scenario, raise an
 `OQ-NNN` under `docs/discovery/open-questions/` with
 `origin: fs-authoring, origin_ref: <this FS>, gate_effect: blocking`,
@@ -61,9 +66,10 @@ and cite the OQ ID in the "Flow scenario" column — not as loose FS prose.
 
 Every DDD node this FS **introduces**, written directly to canonical at
 `docs/nodes/<type>/<ID>-<slug>.md` with `status: proposed` at Phase 2
-ingest. The 3-file lifecycle touch fires per new node at Phase 2 (`created` log
-entry + `proposed` row in the per-type index). Phase 3 merge flips each
-to `status: active`. Modifications to existing canonical nodes are
+ingest. The 2-file node touch fires per new node at Phase 2 (node file +
+`proposed` row in the per-type `index.md`). Phase 3 merge flips each
+to `status: active` by editing the node's frontmatter and re-syncing the
+index row's Status column. Modifications to existing canonical nodes are
 captured in the CHG (see "Change maps" below), not here.
 
 - ACT-NNN — <new actor, one line>
@@ -189,11 +195,12 @@ Solo means QA hat ≠ skipped. Before marking this spec `implemented`:
       [`../workflow/test-runner-cookbook.md`](../workflow/test-runner-cookbook.md)
       and [`../workflow/test-suite-codegen.md`](../workflow/test-suite-codegen.md).
 - [ ] Every node in `new_nodes:` has had its canonical status flipped
-      `proposed → active`, with a `status-change` log entry fired and the
-      per-type index row re-synced.
+      `proposed → active` and the per-type index row's Status column
+      re-synced (2-file node touch — see
+      [`../workflow/maintenance-discipline.md`](../workflow/maintenance-discipline.md)).
 - [ ] Every CHG `modifies[]` entry has been applied to its canonical
-      target, with `updated` log entry fired and index row re-synced as
-      needed.
+      target, with the per-type index row re-synced as needed (2-file
+      node touch).
 - [ ] Every CHG node's status flipped `approved → merged` in place at its
       milestone path (no canonical promotion).
 - [ ] No silent edits to canonical nodes outside what `new_nodes:` or CHG

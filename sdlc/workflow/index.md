@@ -8,6 +8,13 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 > Read this file first. Find your category, pick the file, drill in.
 > One read here → one targeted read. Do not glob the folder.
 
+> **Cross-cutting rules survive `/clear`.**
+> [`CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) auto-loads in every
+> session, so the advisor() call gate, TaskCreate phase-mirror rule, multi-stage
+> progress-checklist rule, and `/clear`-at-flow-boundary rule (including the
+> QA-track per-flow `/clear`) are always in force. Flow files below assume
+> those rules; they do not re-state them.
+
 ---
 
 ## Flow files — load at phase entry / `/clear` boundary
@@ -21,23 +28,32 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 
 ---
 
+## QA track flow files — load at QA-track flow entry / `/clear` boundary
+
+The QA track is **trigger-independent** — three flows that consume dev-track outputs on their own cadence, each with its own `/clear` boundary.
+
+| File | One-line summary | Entry contract |
+|------|-----------------|----------------|
+| [test-plan-ingest.md](test-plan-ingest.md) | First QA flow — ingests TC files for every FRS use case; sets `test_plan_path` frontmatter; fills FRS test-plan-view table | FS validation passed (after `plan.md` exit) |
+| [test-suite-codegen.md](test-suite-codegen.md) | Second QA flow — generates Playwright test spec files from TC markdown, one spec per use-case sub-folder | TC selectors resolved against real DOM; Stage 2 Code complete (after `implementation.md` exit) |
+| [qa-gate.md](qa-gate.md) | Third QA flow — QA verification checklist, ADR-conformance check, code-quality gates, FS status flip to `implemented` | `test-suite-codegen.md` generation report emitted |
+
+---
+
 ## Operation files — load when a flow explicitly calls for one
 
 | File | One-line summary | When to load |
 |------|-----------------|--------------|
 | [authoring-adr.md](authoring-adr.md) | Land an ADR — pick artifact type, file it, wire cross-references, run supersession path | Phase 0/1/2 or standalone when an architectural commitment needs recording |
-| [maintenance-discipline.md](maintenance-discipline.md) | Tiered-touch rule for every lifecycle event on a canonical node or ADR (2-file routine, 3-file lifecycle, 3+N related) | Any canonical-node or ADR edit |
+| [maintenance-discipline.md](maintenance-discipline.md) | Type-split touch rule for canonical edits (node = 2-file always; ADR routine = 2-file; ADR lifecycle = 3-file; (base+N) for related). Per-type node `log.md` dropped 2026-05-16. | Any canonical-node or ADR edit |
 | [discuss.md](discuss.md) | Pre-plan discussion — captures architectural decisions after Phase 1.5 gate closure; outputs durable files that survive `/clear` | After Phase 1.5 exit, before `/clear` + `plan.md` |
 | [in-flight-nodes.md](in-flight-nodes.md) | CHG mechanics, cross-FS dependencies, abandonment procedure for `status: proposed` nodes | Phase 2/3 when authoring or merging an FS that touches canonical nodes |
 | [research.md](research.md) | Resolves `blocking-frs` OQs before FRS body sections can be authored | Phase 1 (internal) when ≥1 OQ classified `blocking-frs` |
-| [baseline-references.md](baseline-references.md) | Lifecycle ops for `docs/glossary.md` and `docs/cross-cutting-concerns.md` (Add / Change / Retire / Drift detection) | Between Phase 1.5 gates when a baseline term needs updating |
+| [baseline-references.md](baseline-references.md) | Lifecycle ops for `docs/shared/glossary.md` and `docs/shared/ccc/` (Add / Change / Retire / Drift detection) | Between Phase 1.5 gates when a baseline term needs updating |
 | [absorb-concept.md](absorb-concept.md) | Promotes a concept surfaced during report synthesis to a canonical KB node via RESEARCH staging | When report synthesis surfaces a concept with no canonical node |
 | [legacy-absorption.md](legacy-absorption.md) | Ingests a legacy doc from `docs-backup/` into canonical wiki — classifies, routes to nodes/ADRs/glossary, never copies verbatim | Maintenance activity when a legacy artifact needs promotion |
 | [lint.md](lint.md) | Debt-scan — detects orphan-node, stale-proposed, baseline-not-cited, stale-version-ref, index-entry-missing | On demand (before milestone close, after long absence, periodic) |
 | [review.md](review.md) | Review pass — QA gates, author self-review, ADR-conformance checks; files findings under `design-fit` or `execution-debt` | Phase 3 QA completion; author self-review at Phase 2 close |
-| [test-plan-ingest.md](test-plan-ingest.md) | Ingests TC files for every FRS use case; sets `test_plan_path` frontmatter; fills FRS test-plan-view table | Phase 2 (same session as `plan.md`, after FS validation loop passes) |
-| [test-suite-codegen.md](test-suite-codegen.md) | Generates Playwright test spec files from TC markdown, one spec per use-case sub-folder | Phase 3 (same session, after Stage 2 Code is complete) |
-| [qa-gate.md](qa-gate.md) | QA verification checklist, ADR-conformance check, code-quality gates, FS status flip to `implemented` | Phase 3 (same session, after test suite codegen) |
 | [verify.md](verify.md) | Post-implementation UAT — walks FRS acceptance criteria in aggregate, routes gaps, produces durable `UAT.md` record | After Phase 3 QA has passed for every FS in the milestone, before milestone close |
 
 ---
@@ -64,7 +80,7 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 | [close-milestone.md](close-milestone.md) | Close a milestone — pre-condition verification, status flip, state-file finalization, `home.md` update, roadmap regen | After `verify.md` emits `## VERIFICATION PASSED` |
 | [phase-state.md](phase-state.md) | Load and update `MILESTONE-STATE.md` — tracks active phase and session continuity across sessions | Entering a new phase, closing a session, or opening a session on an in-flight milestone |
 | [regenerate-roadmap.md](regenerate-roadmap.md) | Regenerates `docs/ROADMAP.md` from planning artifacts including five Stuck-class signals | On demand (before stakeholder review, periodic, or when artifacts appear stuck) |
-| [new-component-bootstrap.md](new-component-bootstrap.md) | Declare a new component — `id_prefix`, `COMPONENT.md`, per-type index + log seeding, workspace-level registration | Before Phase 2 ingest when an incoming FS introduces a new component |
+| [new-component-bootstrap.md](new-component-bootstrap.md) | Declare a new component — `id_prefix`, `COMPONENT.md`, per-type index seeding, workspace-level registration | Before Phase 2 ingest when an incoming FS introduces a new component |
 | [derived-reports.md](derived-reports.md) | Regenerate audience-facing reports under `reports/` — stable names, templates, regeneration prompts | On demand ("regenerate the `<kind>` overview") |
 | [evolving-the-workflow.md](evolving-the-workflow.md) | Extend the workflow — add a node type, refine a doc template, or define a new derived-report type | When an in-flight FRS/FS surfaces an artifact shape no existing type covers |
 | [vcs-migration.md](vcs-migration.md) | Filesystem-to-issue-tracker mapping table and platform adoption guidance (GitLab/GitHub/ADO/Jira) | Only when planning or executing a VCS platform migration |

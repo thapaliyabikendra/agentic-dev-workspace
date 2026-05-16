@@ -10,6 +10,19 @@ the corpus each session is the 10× win.
 
 ## Nodes
 
+### Phase 0/1 — discovery reads
+
+At Phase 0 (milestone scoping) and Phase 1 (FRS authoring), for each node
+type plausibly in scope read `docs/<component>/nodes/<type>/index.md` first —
+it carries one line per node (same bounded-file posture as the ADR index).
+Glob the type folder (`docs/<component>/nodes/<type>/*.md`) only when no
+`index.md` exists for that type yet (expected on a green KB or a type with
+no nodes ingested yet). Record node IDs identified from the index in the
+milestone-scope discovery's "Existing nodes scanned" section and in FRS
+`touches_nodes` frontmatter.
+
+### Phase 2/3 — ingest and merge reads
+
 When entering Phase 2 (Ingest) or Phase 3 (Merge + Code), read
 **only** the nodes the milestone's FRSs declare in `touches_nodes` and
 `produces_nodes`, plus one hop of transitive references (nodes those nodes
@@ -34,16 +47,90 @@ ADR IDs relevant to the scope and narrow-load those pages only. Declare the
 consulted IDs in the artifact's `adrs:` frontmatter. **Individual ADR pages
 are not wholesale-loaded.** Same rule, second corpus.
 
+**Budgets.** Index row carries a title cell ≤120 chars (the title *is* the
+one-line summary — if it doesn't fit, re-draft). ADR body ≤80 lines
+(excl. frontmatter). DEC body ≤60 lines. These caps keep the index cheap
+when always-loaded and bodies scannable when narrow-loaded. Section caps
+live in the templates ([`../_templates/ADR.md`](../_templates/ADR.md),
+[`../_templates/nodes/DECISION.md`](../_templates/nodes/DECISION.md)).
+
+### Index row schemas
+
+The canonical row format for `adrs/index.md`, `nodes/decisions/index.md`,
+and per-component variants. Same shape everywhere; deviations are bugs.
+
+```
+| ID | Status | Title (≤120 chars) | Tags | Stack | Source | Updated |
+|----|--------|--------------------|------|-------|--------|---------|
+```
+
+- **ID** — `ADR-NNN` or `DEC-NNN`.
+- **Status** — `proposed` / `accepted` / `active` / `superseded` / `deprecated`.
+  Superseded and deprecated rows live in a separate `Superseded/deprecated`
+  table below the Active table.
+- **Title** — the artifact's `title` frontmatter, one sentence imperative, ≤120 chars. If a title doesn't fit, the title itself is wrong — re-draft.
+- **Tags** — comma-joined from the artifact's `tags:` frontmatter.
+- **Stack** — comma-joined from the artifact's `stack:` frontmatter (e.g., `api`, `ui`, `agnostic`). The Phase 2 / Phase 3 retrieval narrows by intersection with the consuming artifact's `stack:`.
+- **Source** — origin reference, mapped per type:
+  - **ADRs** — comma-join non-null `frs_origin` and `fs_origin`
+    (e.g., `FRS-007`, or `FRS-007, FS-012`). Standalone ADR with neither
+    set → `—`.
+  - **DECs** — take the first entry from `source_ref[]` and render as
+    `FRS-NNN` / `FS-NNN` / `absorption:<basename>`. Multi-source DECs
+    show first only; full list stays in body frontmatter.
+- **Updated** — the artifact's `updated:` frontmatter date.
+
+**Row hygiene:** one row per artifact, no multi-line cells, no prose
+outside the table. Lifecycle moves (status flip, supersede) re-sync the
+row per [`maintenance-discipline.md`](maintenance-discipline.md).
+
+## STDs and CCCs
+
+Two more parallel corpora, same posture as ADRs.
+
+- **Engine standards** — `sdlc/standards/index.md` is wholesale-read at Phase
+  1.5 (for the STD-conformance check), Phase 2 plan context load, Phase 3
+  implementation context load, and the QA gate. Narrow-load each STD whose
+  `applies_when.stack:` intersects the consuming artifact's `stack:` plus
+  every STD declared in the artifact's `standards:` frontmatter. STDs tagged
+  `convention` / `task-ordering` / `code-quality` are loaded at Phase 3 + QA
+  gate even when the FS missed declaring them (surface the gap; update the
+  FS).
+- **Cross-cutting concerns** — `docs/shared/ccc/index.md` is snapshot-read at
+  Phase 1.5 (replacing the prior flat-doc snapshot) and wholesale-read at
+  Phase 2 / Phase 3 / QA gate. Narrow-load each CCC declared in the
+  consuming artifact's `ccc:` frontmatter. Individual CCC pages are not
+  wholesale-loaded.
+
+Phase-by-phase retrieval matrix:
+
+| Phase | STD index | CCC index | Narrow-load posture |
+|-------|-----------|-----------|---------------------|
+| 1.5   | scan      | snapshot  | STDs whose `applies_when.stack:` matches FRS `stack:`; CCCs declared in FRS `ccc:`. Drives the STD-conformance + CCC-deviation Pass 1 checks. |
+| 2     | wholesale | wholesale | STDs from FS `standards:` ∪ convention-tagged; CCCs from FS `ccc:`. |
+| 3     | wholesale | wholesale | Same as Phase 2, plus convention-tagged STDs not yet in FS. |
+| QA gate | wholesale | wholesale | Drives STD-conformance + CCC-deviation subagent dispatches alongside the existing ADR-conformance check. |
+
 ## Baselines
 
-`glossary.md` and `cross-cutting-concerns.md` are
-snapshot-read once at every Phase 1.5 gate entry (and at Phase 0 / Phase 1
-drafting sessions that consult them for term resolution or
-baseline-category citation). The current version of each is captured in
-any Phase 1.5 Validation finding that fires (audit reproducibility set —
+`docs/shared/glossary.md` is snapshot-read once at every Phase 1.5 gate
+entry (and at Phase 0 / Phase 1 drafting sessions that consult it for term
+resolution). The CCC baselines previously lived in a flat
+`docs/shared/cross-cutting-concerns.md` snapshot; that file was retired
+2026-05-16 in favor of per-CCC files under `docs/shared/ccc/` — see the
+`## STDs and CCCs` section above for the new snapshot posture. The current
+version of each consulted baseline / index is captured in any Phase 1.5
+Validation finding that fires (audit reproducibility set —
 see [`frs-validation-rules.md`](frs-validation-rules.md#audit-reproducibility-set)).
 Edits between runs follow
 [Maintaining baseline references](./baseline-references.md).
+
+**Body budget.** Each CCC's Baseline section keeps the default to one
+short paragraph (≤140 chars per the prior cell-budget convention); nuance
+that won't fit escapes to an ADR (back-linked via `related: [CCC-NNN]`)
+and the Baseline becomes `See ADR-NNN.` This keeps the always-snapshot-read
+CCC index injectable. Enforcement:
+[`baseline-references.md § Hard rules across all ops`](baseline-references.md#hard-rules-across-all-ops).
 
 ## Tech-stack operational baseline
 
@@ -78,7 +165,7 @@ Each is wholesale-read **only** when the matching operation fires; otherwise unr
   tiered touch).
 - [`baseline-references.md`](baseline-references.md) —
   add / change / retire / drift-detection ops on
-  `glossary.md` or `cross-cutting-concerns.md`. Runs between
+  `docs/shared/glossary.md` or `docs/shared/ccc/` (entry: `docs/shared/ccc/index.md`). Runs between
   Phase 1.5 gates, never during one.
 - [`authoring-adr.md`](authoring-adr.md) — authoring an
   ADR (standalone, from an FRS, or from an FS).
@@ -104,13 +191,53 @@ Each is wholesale-read **only** when the matching operation fires; otherwise unr
   return shape + operation completion markers). Load when authoring an
   operation that spawns subagents.
 
+## QA-track retrieval
+
+Each QA flow starts a fresh session (its own `/clear` boundary). Load only
+what the flow needs at entry; do not carry forward dev-track reads.
+
+### test-plan-ingest (`active_phase: qa-plan`)
+
+Load the FS, every FRS declared in the FS's `frs:` frontmatter, each FRS's
+referenced FLW nodes (scenario anchors), and each FRS's referenced ENT nodes
+(field constraints). Load the milestone's `id-claims.md` for TC ID
+allocation. Wholesale-read [`coverage-matrix.md`](coverage-matrix.md) and
+[`test-data-generation.md`](test-data-generation.md) rule books. Do **not**
+load production code at this phase.
+
+### test-suite-codegen (`active_phase: qa-suite`)
+
+Load the FS, all TC files under `test-plans/`, the runner config (e.g.,
+`playwright.config.ts`), and `tests/.env.example` if present.
+Wholesale-read [`test-runner-cookbook.md`](test-runner-cookbook.md) and
+[`test-data-generation.md`](test-data-generation.md) rule books.
+Production code may be loaded **only** for selector discovery (a
+post-implementation explorer pass) — not for behavioral context.
+
+### qa-gate (`active_phase: qa-gate`)
+
+Load the FS, every ADR declared in the FS's `adrs:` frontmatter plus any
+convention-tagged ADRs identified from `docs/<component>/adrs/index.md`,
+every STD declared in the FS's `standards:` plus convention-tagged STDs
+from `sdlc/standards/index.md`, every CCC declared in the FS's `ccc:` (read
+the Baseline section of each), the generation report produced by
+`test-suite-codegen.md`, the test results (pass/fail), and all affected
+canonical nodes. Wholesale-read
+[`agent-contracts.md`](agent-contracts.md) for the ADR-conformance,
+STD-conformance, and CCC-deviation dispatch contracts.
+
 ## Exceptions
 
-Two, both at Phase 0 or Phase 1:
-- Change-request KB scan — walks `docs/<component>/nodes/**` to find what an FRS
-  *should* declare. See [`design.md`](design.md).
-- ADR-index scan — always-on, every phase. The index file is the
-  wholesale-read target; individual ADRs are not.
+Always-on index reads (every phase consumes these as one-line summaries;
+individual pages are narrow-loaded):
+- ADR index — `docs/<component>/adrs/index.md` + `docs/shared/adrs/index.md`.
+- STD index — `sdlc/standards/index.md`.
+- CCC index — `docs/shared/ccc/index.md`.
+
+Phase 0 / Phase 1 only:
+- Change-request KB scan — reads per-type `docs/<component>/nodes/<type>/index.md`
+  for each node type in scope; globs the type folder only when no `index.md` exists
+  for that type yet. See [`design.md`](design.md) and `§Phase 0/1 — discovery reads` above.
 
 ---
 

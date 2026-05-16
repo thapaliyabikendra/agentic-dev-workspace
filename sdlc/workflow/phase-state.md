@@ -68,7 +68,10 @@ No tiered touch — this file is not a canonical DDD artifact. No index.md or lo
    - Phase 0 / 1 / 1.5 → `design.md`
    - Phase 2 → `plan.md`
    - Phase 3 → `implementation.md`
-4. Proceed with phase work. Do **not** rely on in-session memory as a substitute for reading this file.
+   - `qa-plan` → `test-plan-ingest.md`
+   - `qa-suite` → `test-suite-codegen.md`
+   - `qa-gate` → `qa-gate.md`
+4. Proceed with phase or flow work. Do **not** rely on in-session memory as a substitute for reading this file.
 
 ### Update at phase transition
 
@@ -82,8 +85,13 @@ No tiered touch — this file is not a canonical DDD artifact. No index.md or lo
    | YYYY-MM-DD | <from> | <to> | <one-sentence session summary> |
    ```
 5. Clear `session_notes` (stale mid-phase notes belong in history, not the live field).
-6. Remind user: if the transition is Phase 1.5 → 2 or Phase 2 → 3, a `/clear` is required
-   before loading the next flow file (per CLAUDE.md Hard rules).
+6. Remind user: a `/clear` is required before loading the next flow file on any of these
+   five transitions (per CLAUDE.md Hard rules):
+   - Phase 1.5 → 2 (design → plan)
+   - Phase 2 → 3 (plan → implementation)
+   - Phase 2 → qa-plan (after `plan.md` exit, entering QA track)
+   - Phase 3 → qa-suite (after `implementation.md` exit, entering QA track)
+   - qa-suite → qa-gate (within QA track, before final QA flow)
 
 ### Update during session
 
@@ -110,11 +118,17 @@ No tiered touch — this file is not a canonical DDD artifact. No index.md or lo
 | Field              | Type    | Allowed values                   | Meaning                                             |
 | ------------------ | ------- | -------------------------------- | --------------------------------------------------- |
 | `milestone_id`     | string  | `M-NN-<slug>`                    | Milestone identifier                                |
-| `active_phase`     | number  | `0 \| 1 \| 1.5 \| 2 \| 3`       | Current phase this milestone is in                  |
+| `active_phase`     | string  | `0 \| 1 \| 1.5 \| 2 \| 3 \| qa-plan \| qa-suite \| qa-gate` | Current phase this milestone is in                  |
 | `phase_entered`    | date    | `YYYY-MM-DD`                     | Date the current phase began                        |
 | `next_action`      | string  | Free text                        | Immediate next step; updated at every transition    |
 | `progress_percent` | integer | `0–100`                          | Rough milestone completion estimate                 |
 | `session_notes`    | string  | Free text                        | Working field; cleared at session close             |
+
+> **Dev-track vs. QA-track orthogonality.** Dev-track phases (`0` through `3`) and QA-track flow
+> values (`qa-plan`, `qa-suite`, `qa-gate`) are orthogonal — a milestone may be
+> `active_phase: 3` (implementation in flight) while the QA track has not yet run, or
+> `active_phase: qa-gate` (QA-track final flow in flight) while dev-track is otherwise complete.
+> The QA track runs independently of dev-track phases.
 
 ---
 

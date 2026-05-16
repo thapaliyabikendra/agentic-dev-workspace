@@ -8,17 +8,22 @@ supersedes: null
 superseded_by: null
 tags: [abp, dotnet, entity, dto, naming, conventions, validation]
 scope: engine
+applies_when:
+  stack: [api]
+  framework: [abp-net]
 source: guidelines/abp-guidelines.md
 related_adrs: []
 ---
 
 # STD-005: ABP framework coding conventions
 
-> **Engine-level technical standard.** Applies to any .NET project using
-> ABP Framework under this methodology. Project-specific deviations are
-> component-scoped ADRs that back-link here; node-local atomic decisions
-> are DECs. See [`../workflow/authoring-adr.md`](../workflow/authoring-adr.md)
-> for the Standard / ADR / DEC discriminator.
+> **Engine-level technical standard.** Applicability is declared in
+> `applies_when:` frontmatter — this standard binds when the consuming
+> artifact's `stack:` intersects `[api]` **and** its `framework:`
+> intersects `[abp-net]`. Project-specific deviations are component-scoped
+> ADRs that back-link here; node-local atomic decisions are DECs. See
+> [`../workflow/authoring-adr.md`](../workflow/authoring-adr.md) for the
+> STD / ADR / CCC / DEC discriminator.
 >
 > Source material: [`../../guidelines/abp-guidelines.md`](../../guidelines/abp-guidelines.md).
 > When this standard and any component ADR disagree, the ADR wins — flag
@@ -30,9 +35,9 @@ Entity and value-object base-class selection; DTO base-class mirroring;
 query input/output wrappers; companion entity pattern for ABP built-in
 extensions; property naming (PascalCase); bounded-value modelling (C# enums);
 data-annotation placement; file, folder, type-suffix, and database object
-naming. Applies to all ABP/.NET projects using this methodology. STD-001
-and STD-002 govern the framework-agnostic DDD and .NET rules; this standard
-governs the ABP-specific layer on top.
+naming. STD-001 and STD-002 govern the framework-agnostic DDD and .NET rules;
+this standard governs the ABP-specific layer on top — binding is declared
+in `applies_when: { stack: [api], framework: [abp-net] }` rather than in prose.
 
 ## Standards
 
@@ -64,9 +69,9 @@ feat-spec validator both block on it.
 |---|---|
 | user, account, login, password, email verification, lockout | reference `IdentityUser` — no `User` entity node |
 | role, user role | reference `IdentityRole` — no `Role` entity node |
-| audit who-changed-what-when, change history | rely on `AuditedAggregateRoot` / `FullAuditedAggregateRoot` + ABP entity-change tracking — no `AuditLog` entity node |
-| tenant, company-as-tenant | reference `Tenant` — no `Company` entity node |
-| permission, access right | declare in `PermissionDefinitionProvider` — no `Permission` entity node |
+| audit who-changed-what-when, change history | rely on `AuditedAggregateRoot` / `FullAuditedAggregateRoot` + ABP entity-change tracking — no `AuditLog` entity node (auditing baseline: `CCC-004`) |
+| tenant, company-as-tenant | reference `Tenant` — no `Company` entity node (multi-tenancy baseline: `CCC-003`) |
+| permission, access right | declare in `PermissionDefinitionProvider` — no `Permission` entity node (authorization baseline: `CCC-002`) |
 | feature flag, feature quota | declare a `FeatureDefinition` — no `Feature` entity node |
 | setting, configuration value | declare a `SettingDefinition` — no `Setting` entity node |
 | file upload, document storage, attachment | Integration entry against `BlobContainer` / `BlobInfo`; companion entity only when business metadata beyond the blob is tracked |
@@ -107,9 +112,9 @@ A child entity's audit level must be **equal to or lighter than** its parent roo
 
 | Interface | Use when |
 |---|---|
-| `IMultiTenant` | Aggregate is tenant-scoped (the project default). Adds nullable `TenantId`. Omit only on global lookups documented in an ADR. |
+| `IMultiTenant` | Aggregate is tenant-scoped (the project default per `CCC-003`). Adds nullable `TenantId`. Omit only on global lookups documented in an ADR back-linked to `CCC-003`. |
 | `IHasConcurrencyStamp` | FRS mentions optimistic locking or concurrent edits. |
-| `ISoftDelete` | Implicit on `FullAudited*`. Add explicitly only on non-`FullAudited` bases with a delete/archive use case. |
+| `ISoftDelete` | Implicit on `FullAudited*` (baseline `CCC-012`). Add explicitly only on non-`FullAudited` bases with a delete/archive use case. |
 | `IHasExtraProperties` | Implicit on `AggregateRoot*`; explicit on `BasicAggregateRoot` when the object-extension system is used. |
 
 ---

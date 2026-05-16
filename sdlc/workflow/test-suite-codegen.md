@@ -1,17 +1,17 @@
 ---
 name: generate-test-suite
-description: "Use when Stage 2 Code is complete and TC files exist under the FS's test-plans/ folder — generates test spec files from TC markdown, one spec per use-case sub-folder, targeting tests/{test_dir}/<feature>/<use-case>.<ext>."
+description: "Use when Stage 2 Code is complete and TC files exist under the FS's test-plans/ folder with selectors resolved — second flow of the QA track. Generates test spec files from TC markdown, one spec per use-case sub-folder, targeting tests/{test_dir}/<feature>/<use-case>.<ext>."
 ---
 
 # Test Suite Codegen
 
-Generates Playwright (or runner-equivalent) spec files from the Phase 2 TC markdown files for a given FS. Each TC becomes one test case; each use-case sub-folder becomes one spec file. Spec files are disposable — regenerated end-to-end each run; hand edits are lost.
+Generates Playwright (or runner-equivalent) spec files from the Phase 2 TC markdown files for a given FS. This is the **second flow of the QA track** — runs in its own session after `implementation.md`'s Stage 2 Code is complete and the developer has resolved selectors against the real DOM. Independent of any prior `implementation.md` session. Each TC becomes one test case; each use-case sub-folder becomes one spec file. Spec files are disposable — regenerated end-to-end each run; hand edits are lost.
 
 ---
 
 ## When to Use
 
-**Use when:**
+**Use when:** These are the **entry contract** for this QA-track flow — verify on disk before loading; do not rely on session state from a prior `implementation.md` run:
 - Stage 2 Code is complete or substantially complete for the FS's Implementation tasks.
 - TC files exist under `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/test-plans/<use-case>/` from Phase 2's Test plan ingest, and the FS's `test_plan_path:` frontmatter is set.
 - The developer has run an explorer pass and replaced `(discovered by explorer)` selectors in each TC's Steps table with concrete CSS or role-based selectors.
@@ -19,6 +19,8 @@ Generates Playwright (or runner-equivalent) spec files from the Phase 2 TC markd
 **Do NOT use when:**
 - Every interaction step in every TC still reads `(discovered by explorer)` — resolve selectors against the real DOM first, update the TC, then invoke this operation.
 - TC files have not yet been authored (Phase 2 Test plan ingest is incomplete).
+
+**Vs. sibling flows:** This is the second flow of the QA track. [`test-plan-ingest.md`](test-plan-ingest.md) (first flow) authors TCs; this file generates executable specs from them; [`qa-gate.md`](qa-gate.md) (third flow) runs the verification checklist and flips the FS to implemented.
 
 ---
 
@@ -98,7 +100,7 @@ Surface any remaining TODOs (unresolved selectors, ambiguous step text) explicit
 
 ## Integration
 
-- **Called from:** [`implementation.md`](implementation.md) — runs after Stage 2 Code is complete. Same Phase 3 session, no `/clear`.
-- **Routes to:** [`qa-gate.md`](qa-gate.md) — load immediately after the generation report is emitted. Same session, no `/clear`.
+- **Triggered after:** [`implementation.md`](implementation.md) Stage 2 Code is complete. Runs in its own QA-track session — `/clear` between `implementation.md` exit and this flow.
+- **Routes to:** [`qa-gate.md`](qa-gate.md) — load in a fresh QA-track session after the generation report is emitted. `/clear` between this flow and the QA gate.
 - **Rule book:** [`test-runner-cookbook.md`](test-runner-cookbook.md) — action-inference table, code emission table, selector resolution, value substitution, auth/SSO patterns, and the full spec file template including the mandatory `createdRecords + afterEach` cleanup pattern.
 - **Test data:** [`test-data-generation.md`](test-data-generation.md) — directive interpolation for TC Test Data fields.

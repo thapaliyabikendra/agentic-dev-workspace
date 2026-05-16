@@ -69,7 +69,7 @@ consumes.
 
 Per-service operational reference. Pinned versions, repo URL, build /
 run / test / deploy commands, deployment target. The project-level
-[`docs/tech-stack.md`](../../tech-stack.md) carries cross-cutting
+[`docs/shared/tech-stack.md`](../../../shared/tech-stack.md) carries cross-cutting
 shared infrastructure only; service-local stack lives here.
 
 - **Runtime / framework:** <e.g., .NET 9 + ABP 8.x>
@@ -84,8 +84,9 @@ shared infrastructure only; service-local stack lives here.
 ## Operations
 
 Per-service operational truths. Stable facts about how the service runs in
-production — distinct from cross-cutting NFRs (those live as ADRs or
-under `docs/cross-cutting-concerns.md`).
+production — distinct from cross-cutting NFRs (those live as CCCs under
+`docs/shared/ccc/`, with operation-specific deviations as ADRs back-linked
+via `related: [CCC-NNN]`).
 
 - **Deployment cardinality:** `single-instance` \| `N-replicas` \| `autoscaled`
 - **Health endpoint:** <path or signal — e.g., `/healthz`, k8s liveness probe>

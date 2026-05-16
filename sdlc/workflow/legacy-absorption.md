@@ -25,7 +25,8 @@ artifact) needs to be promoted into canonical — an architecture doc,
 an API spec, an integration deep-dive, a convention doc, a deployment
 doc, a feature tracker. The operation runs as a forked Explore
 dispatch (see *Dispatch posture* below); the main session writes
-canonical artifacts and fires the 3-file lifecycle touch.
+canonical artifacts and fires the appropriate touch (2-file for nodes,
+3-file for ADRs).
 
 **Do NOT use when:** the source is a node or ADR already in canonical
 (use the standard edit path with [`maintenance-discipline.md`](maintenance-discipline.md)),
@@ -36,7 +37,8 @@ has flagged out of scope (see the inventory appendix below).
 ADR side of the same routing — when the classified target is an ADR,
 this file routes the discriminator call into that one.
 [`maintenance-discipline.md`](maintenance-discipline.md) governs the
-3-file touch that fires on every promoted node and ADR.
+type-split touch that fires on every promoted artifact (2-file for nodes;
+3-file for ADRs).
 [`evolving-the-workflow.md`](evolving-the-workflow.md) governs the
 extension procedure when absorption exercises a new node type or
 report type for the first time.
@@ -54,7 +56,7 @@ digraph legacy_absorption {
 
     arch     [shape=box,     label="Architecture/topology\n→ MOD + INT + ADR\n+ glossary + ARCHITECTURE.md"];
     api      [shape=box,     label="API spec\n→ CMD + QRY + CON + SCR"];
-    convn    [shape=box,     label="Convention/coding-std\n→ ADR or CCC (per ADR-028)"];
+    convn    [shape=box,     label="Convention/coding-std\n→ ADR (coding/arch) or CCC (process)"];
     integ    [shape=box,     label="Integration deep-dive\n→ INT (+ ADR)"];
     infra    [shape=box,     label="Deployment/infra\n→ MOD + CCC"];
     track    [shape=box,     label="Feature tracker\n→ FRS + milestone status\n(not nodes)"];
@@ -65,7 +67,7 @@ digraph legacy_absorption {
     halt     [shape=doublecircle, label="Halt — human resolves\nbefore canonical write"];
 
     authcan  [shape=box,     label="Author canonical\n(nodes/ADRs/glossary)\nstatus: active (no proposed)"];
-    touch    [shape=box,     label="3-file lifecycle touch\nper maintenance-discipline.md\n(op: created)"];
+    touch    [shape=box,     label="Type-split touch\n2-file nodes / 3-file ADRs\nper maintenance-discipline.md\n(op: created)"];
     rewrite  [shape=box,     label="Target-side rewrites:\nrepoint stale slugs +\ngrep-empty gate"];
     deriv    [shape=box,     label="Regenerate derived\nreport (if applicable)"];
     foot     [shape=box,     label="Mark legacy file\nabsorbed (footer line)"];
@@ -147,8 +149,8 @@ CLAUDE.md → "Inline subagent dispatch has a fixed contract."
 
 ≤ 600 words. Cite by file path; do not restate legacy content. The
 subagent surfaces the routing; the main session writes the canonical
-artifacts and fires the 3-file lifecycle touch — those are mutations and
-stay in main context for visibility.
+artifacts and fires the appropriate touch (2-file for nodes, 3-file for
+ADRs) — those are mutations and stay in main context for visibility.
 
 ## Signal-to-target map
 
@@ -159,9 +161,9 @@ corresponding canonical targets.
 | ----------------------------- | ------------------------------------------------------------------------------------------ |
 | Architecture / topology doc   | MOD nodes + INT nodes + ADRs + glossary terms + a derived `reports/ARCHITECTURE.md` |
 | API spec                      | CMD nodes (writes) + QRY nodes (reads) + CON nodes (`protocol: http` routes / event topics / queues) + SCR nodes (UI surfaces)  |
-| Convention / coding-standard  | See [ADR-028](../../docs/adrs/ADR-028-convention-absorption-policy.md) — three-rule routing: architecture/coding-conv → ADR; process-conv → `cross-cutting-concerns.md` light summary; overlap with existing ADRs → footer-link only |
+| Convention / coding-standard  | Three-rule routing: architecture/coding-conv → ADR (component-scoped under `docs/<component>/adrs/`, or cross-component under `docs/shared/adrs/`); process-conv → `docs/shared/ccc/` (relevant CCC page); overlap with existing ADRs → footer-link only |
 | Integration deep-dive         | INT nodes (one per external system) + ADRs if integration patterns are reusable           |
-| Deployment / infra doc        | MOD nodes + `cross-cutting-concerns.md` updates                                            |
+| Deployment / infra doc        | MOD nodes + `docs/shared/ccc/` updates (see `docs/shared/ccc/index.md` for matching CCC page)                                            |
 | Feature tracker / status      | FRS + milestone status updates, not nodes                                                  |
 | Knowledge-graph workspace     | Out of scope — separate ontology, do not absorb                                            |
 
@@ -186,13 +188,13 @@ that make the gate enforceable.
   lands at the next free canonical ID — never overwrite. Record the
   legacy-to-canonical ID remap in the absorbing FRS or in the
   ADR's Revision History.
-- **3-file lifecycle touch fires at the absorption merge.** Each promoted
-  node triggers the full 3-file lifecycle touch against
+- **Tiered lifecycle touch fires at the absorption merge.** Each promoted
+  node triggers the 2-file node touch against
   `docs/<component>/nodes/<type>/` per
-  [`maintenance-discipline.md`](maintenance-discipline.md) — node file,
-  per-type `index.md`, per-type `log.md`. Same rule for ADRs against
-  `docs/<component>/adrs/`. Absorption is Phase-3-equivalent in discipline, not
-  in phase ordering.
+  [`maintenance-discipline.md`](maintenance-discipline.md) — node file
+  and per-type `index.md`. ADRs absorb via the 3-file touch (ADR +
+  `adrs/index.md` + `adrs/log.md`) against `docs/<component>/adrs/`.
+  Absorption is Phase-3-equivalent in discipline, not in phase ordering.
 - **Absorbed nodes go straight to `status: active`.** The `proposed`
   stage applies only to FS-generated nodes (Phase 2 ingest by an
   unmerged FS); absorption writes canonical with `status: active`
@@ -242,9 +244,11 @@ that make the gate enforceable.
 3. **Author the canonical artifacts** — nodes via their templates,
    ADRs via [`authoring-adr.md`](authoring-adr.md), glossary terms via
    [`baseline-references.md → Op 1 (Add)`](baseline-references.md#op-1-add).
-4. **Fire the 3-file lifecycle touch** for each canonical node and ADR
-   landing. Log entry operation is `created` (not `updated`) since
-   the absorbed content is new in canonical terms.
+4. **Fire the lifecycle touch** for each canonical artifact landing. For
+   nodes: 2-file touch (node + per-type `index.md`). For ADRs: 3-file
+   touch (ADR + `adrs/index.md` + `adrs/log.md`). Log entry operation
+   is `created` (not `updated`) since the absorbed content is new in
+   canonical terms.
 5. **Generate the derived report** (if applicable) per
    [`derived-reports.md → Procedure on regenerate`](derived-reports.md#procedure-on-regenerate).
 6. **Mark the legacy file absorbed.** Add the footer line to
@@ -253,7 +257,7 @@ that make the gate enforceable.
    follow the extension procedure in
    [`evolving-the-workflow.md`](evolving-the-workflow.md). Routine
    absorptions (existing types only) don't need any methodology update —
-   the per-type `log.md` carries the record.
+   the per-type `index.md` carries the record.
 
 ---
 
@@ -303,8 +307,9 @@ canonical output shape (per the signal-to-target map above):
   brownfield muscle.
 - **Rule books wholesale-read during this op:**
   [`maintenance-discipline.md`](maintenance-discipline.md) — fires the
-  3-file lifecycle touch on every promoted node and ADR (`created` op;
-  absorbed nodes go directly to `status: active`, not `proposed`).
+  appropriate touch on every promoted artifact (2-file for nodes, 3-file
+  for ADRs; `created` op; absorbed nodes go directly to `status: active`,
+  not `proposed`).
 - **Maintenance ops that may fire as part of this op:**
   [`authoring-adr.md`](authoring-adr.md) (every ADR-classified target
   uses the discriminator + procedure there),

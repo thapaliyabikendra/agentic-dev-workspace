@@ -61,7 +61,7 @@ without modification.
   `docs/milestones/M-NN-<slug>/{discovery,frs,specs,id-claims.md}` —
   with FSs and their CHG nodes (under `specs/FS-NNN/nodes/changes/`)
   living inside.
-- Validation gates and context-reset rule between Phase 1.5→2 and 2→3.
+- Validation gates and context-reset rule: five named `/clear` boundaries — two in the dev track (Phase 1.5→2, Phase 2→3), and three at each QA-track flow entry (from `plan.md` to `test-plan-ingest.md`, from `implementation.md` to `test-suite-codegen.md`, and from `test-suite-codegen.md` to `qa-gate.md`).
 - Author self-review + user-review handoff at phase exits.
 
 ### DDD knowledge base structure
@@ -93,14 +93,7 @@ without modification.
   (per-FRS existence/sanity/ADR-conflict checks + milestone cross-FRS
   sweep). Phase 1.5 existence-scan includes `proposed` in-flight nodes
   from sibling FSs.
-- **Per-type `index.md` + `log.md` pair convention.** Each canonical
-  node-type folder owns a Karpathy-style content catalog and an
-  append-only chronological event record. **Three-file (or 3+N) touch
-  is event-driven** — fires at the lifecycle event itself: Phase 2
-  ingest for a new node's `created` event; Phase 3 merge for the
-  `proposed → active` `status-change` event and for CHG-applied
-  `updated` / `superseded` / `status-change` events on canonical
-  targets. Procedure documented in
+- **Per-type `index.md` convention for nodes; `index.md` + `log.md` pair for ADRs.** Each canonical node-type folder owns a Karpathy-style content catalog (`index.md`). ADR folders additionally carry an append-only chronological event record (`log.md`). **Node touch is 2-file (node + per-type `index.md`); ADR lifecycle events are 3-file (ADR + `adrs/index.md` + `adrs/log.md`).** Procedure documented in
   [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
 ### ADR Wiki
@@ -155,15 +148,13 @@ without modification.
 - Validation gates, context resets, retrieval discipline, traceability,
   brownfield muscle, OQ-NNN open questions as a first-class artifact
   type with per-OQ files + index + log.
-- **Maintenance discipline** — the tiered touch rule (routine = 2-file, lifecycle
-  event = 3-file: page + per-type index + per-type log; master README is
-  derived and regenerated on demand).
+- **Maintenance discipline** — the tiered touch rule (node = 2-file: node + per-type `index.md`; ADR lifecycle event = 3-file: ADR + `adrs/index.md` + `adrs/log.md`; master README is derived and regenerated on demand).
   See [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 - **Derived stakeholder overviews.** The two-template pattern
   (BUSINESS / TECHNICAL), the wiki-as-source rule, and the
   regenerate-on-demand discipline. The *shape* is team-agnostic —
   Karpathy-index-first read, link-by-ID summaries, never-patch-derived,
-  no `index.md` / `log.md` pair on the overview folder. The specific
+  no `index.md` / `log.md` pair on the overview folder (reports are not node-type folders). The specific
   "Pulls from" lists in
   [`_templates/OVERVIEW-BUSINESS.md`](_templates/OVERVIEW-BUSINESS.md)
   and [`_templates/OVERVIEW-TECHNICAL.md`](_templates/OVERVIEW-TECHNICAL.md)
@@ -212,10 +203,10 @@ actual choice when adopting the engine.
   2026-05-11]` Template extracted to
   [`_templates/CROSS-CUTTING-CONCERNS.md`](_templates/CROSS-CUTTING-CONCERNS.md)
   with `[bracketed slot]` placeholders for project-specific values; the
-  live `docs/cross-cutting-concerns.md` is the project seed.
+  live `docs/shared/cross-cutting-concerns.md` is the project seed.
 - **Glossary template** — `[Phase A — Resolved 2026-05-11]` Template
   extracted to [`_templates/GLOSSARY.md`](_templates/GLOSSARY.md); the
-  live `docs/glossary.md` is the project seed.
+  live `docs/shared/glossary.md` is the project seed.
 
 ### Role / capacity assumptions
 
@@ -262,28 +253,77 @@ Topic-by-topic classification:
 | Topic | Classification | Notes |
 |-------|----------------|-------|
 | `sdlc/standards/` location and shape | **engine-prescribed** | Engine-level rules live at `sdlc/standards/`; no project alternative path. |
-| `docs/cross-cutting-concerns.md` presence | **engine-prescribed** | Every project carries one; it is the NFR baseline. |
-| `docs/tech-stack.md` presence and shape | **engine-prescribed** | Every project carries one (added 2026-05-13). Eight-section structure (versions / layout / commands / environments / infra deps / runtime state / progress / cadence) is engine-prescribed; field contents are project-time. Read posture: Phase 3 wholesale-read; no `index.md` / `log.md` pair; no Phase 1.5 snapshot. |
+| `docs/shared/ccc/` location and shape | **engine-prescribed** | Karpathy index + append-only log + per-CCC file (`CCC-NNN-<slug>.md`). Every project carries this tree; it is the NFR baseline store. Replaces the flat `docs/shared/cross-cutting-concerns.md` (retired 2026-05-16). |
+| `docs/shared/tech-stack.md` presence and shape | **engine-prescribed** | Every project carries one (added 2026-05-13). Eight-section structure (versions / layout / commands / environments / infra deps / runtime state / progress / cadence) is engine-prescribed; field contents are project-time. Read posture: Phase 3 wholesale-read; no per-type `index.md` (not a node-type folder); no Phase 1.5 snapshot. |
 | `docs/<component>/adrs/` location and shape | **engine-prescribed** | Karpathy index + append-only log + per-ADR file. |
 | `docs/<component>/nodes/decisions/` (standalone DECs) location | **engine-prescribed** | Standalone DECs always live here. |
 | Inline DEC `## Decisions` heading on node templates | **engine-prescribed** | Every node-type template carries the heading; inline placement is the default. |
 | Inline-vs-standalone DEC choice for a specific decision | **engine-recommended** | Discriminator in `workflow/authoring-adr.md` defaults to inline; project applies it. |
 | Standard-vs-ADR boundary on existing content | **project-time** | Existing project ADRs that turn out to be engine-level migrate opportunistically; no bulk lift. |
-| Three-file (or 3+N) touch on lifecycle events | **engine-prescribed** | Event-driven — fires at the lifecycle event itself: Phase 2 ingest `created`, Phase 3 merge `status-change` (`proposed → active`) and CHG-applied `updated`/`superseded`/`status-change`. Light-touch fallback is a project-time election only after several weeks of friction. |
+| Tiered touch on edits and lifecycle events | **engine-prescribed** | Node edits: 2-file (node + per-type `index.md`). ADR lifecycle events: 3-file (ADR + `adrs/index.md` + `adrs/log.md`). Event-driven — fires at the lifecycle event itself: Phase 2 ingest `created`, Phase 3 merge `status-change` (`proposed → active`) and CHG-applied `updated`/`superseded`/`status-change`. |
 | DDD node status vocabulary | **engine-prescribed** | `proposed → active → superseded \| deprecated`. FS-generated nodes pass through `proposed` (Phase 2 → Phase 3 merge flip); brownfield-absorbed nodes start at `active` directly (Phase-3-equivalent in discipline). |
 | ADR status vocabulary | **engine-prescribed** | `proposed → accepted → deprecated \| superseded`. |
 | DEC status vocabulary | **engine-prescribed** | `proposed → active → superseded \| deprecated`. Parity with other DDD nodes — standalone DECs go canonical at Phase 2 with `proposed`; flip to `active` at Phase 3 merge. Inline DECs have no independent status (they ride the host node's lifecycle). |
 | CHG status vocabulary | **engine-prescribed** | `draft → approved → merged`. CHG nodes are milestone-scoped (never canonical); status transitions edit the file in place at its milestone path. |
 | Standard status vocabulary | **engine-prescribed** | Same as ADR. |
-| Phase 1.5 gate snapshots (CCC + ADR index + standards index) | **engine-prescribed** | All three baselines snapshot at gate entry; `_version` fields captured. |
+| Phase 1.5 gate snapshots (CCC index + ADR index + standards index) | **engine-prescribed** | All three indexes snapshot at gate entry. CCC snapshot is now the per-CCC index (`docs/shared/ccc/index.md`) rather than the retired flat baseline doc — individual CCC pages narrow-load on the consuming artifact's `ccc:` declaration. `_version` fields captured. |
 | Test runner choice | **project-time** | Captured in a project-owned test-runner cookbook (`workflow/test-runner-cookbook.md` by convention); formalized in a testing-convention ADR once authored. |
-| Stack / framework choice | **project-time** | Decision captured as project ADRs; current operational state captured in `docs/tech-stack.md`. |
+| Stack / framework choice | **project-time** | Decision captured as project ADRs; current operational state captured in `docs/shared/tech-stack.md`. |
 | Brownfield-vs-greenfield posture | **project-time** | Set in CLAUDE.md `project_type:`. |
 | Component structure (`docs/<component-slug>/`) | **engine-recommended** | Engine defines the `COMPONENT.md` format and folder convention (see [`LAYOUT.md § Component structure`](LAYOUT.md#component-structure-docs)). Projects may omit components (keeping the flat `docs/<component>/nodes/` structure) when they have only one deployable component. Projects must not reuse component-slug names across projects within the same workspace. Bootstrap procedure: [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md). |
 | Standalone component ID prefix | **engine-recommended** | When the component layer is adopted, each standalone component must declare a globally unique 2–4 char uppercase `id_prefix` in `COMPONENT.md`. Brownfield-imported legacy components are exempt. The engine defines the format; the project chooses the prefix values. |
 
 When a new governance topic arises, classify it explicitly using this axis
 before adding it to any rule book.
+
+---
+
+## Stack axis (frontmatter enum)
+
+> Added 2026-05-16. Declares which stack a governance / spec artifact
+> binds on. Engine-prescribed; the enum vocabulary is canonical here and
+> referenced by templates and indexes elsewhere.
+
+Every STD / ADR / FRS / FS / DEC / CCC carries a `stack:` (or, for STDs,
+`applies_when.stack:`) frontmatter field whose value is a non-empty subset
+of:
+
+- **`api`** — backend HTTP / service-layer rules.
+- **`ui`** — frontend / view-layer rules.
+- **`test`** — testing infrastructure / harness rules.
+- **`full-stack`** — rules that bind across api + ui (or beyond).
+- **`infra`** — deployment, observability, CI/CD, runtime infrastructure.
+- **`agnostic`** — rules that bind regardless of stack (e.g., engine-universal DDD constraints).
+
+Multi-value lists are allowed (an ADR may bind both `api` and `ui`).
+Engine-universal rules default to `[agnostic]`. The Phase 2/3 retrieval
+filters by intersection between the consuming artifact's `stack:` and the
+governance artifact's stack declaration.
+
+---
+
+## Framework axis (frontmatter enum)
+
+> Added 2026-05-16. Orthogonal to the stack axis: declares which
+> application framework a governance / spec artifact binds on. Used
+> primarily on STDs whose rules apply only under a specific framework
+> (e.g., ABP coding conventions). Engine-prescribed enum.
+
+A STD whose applicability is framework-conditional carries
+`applies_when.framework:` in addition to `applies_when.stack:`. A
+consuming artifact intersects on **both** axes — a STD binds only when
+the consumer's `stack:` intersects `applies_when.stack:` *and* the
+consumer's declared `framework:` (if any) intersects
+`applies_when.framework:`.
+
+Current enum:
+
+- **`abp-net`** — ABP Framework on .NET (project default).
+- **`agnostic`** — framework-independent; rules bind regardless of framework choice.
+
+Add entries here when a new framework becomes a project target. STDs
+that omit `applies_when.framework:` bind regardless of framework (treat
+as `[agnostic]`).
 
 ---
 

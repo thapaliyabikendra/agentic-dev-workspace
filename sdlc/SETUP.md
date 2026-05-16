@@ -48,8 +48,9 @@ Copy [`sdlc/_templates/PROJECT.md`](_templates/PROJECT.md) to
   `docs/project.md § Components`.
 - **Tech stack** — one row per layer; remove irrelevant rows.
 - **Cross-cutting constants** — timezone, locale, data retention, audit-read
-  role. These values are copied into `docs/cross-cutting-concerns.md` in
-  Step 5; keep the two files in sync.
+  role. These values inform the CCC baselines under `docs/shared/ccc/`
+  seeded in Step 6; keep `docs/project.md § Cross-Cutting Constants` and
+  the relevant CCC pages in sync.
 - **Phase A grep terms** — project-specific search terms used to verify
   no project content has leaked into `sdlc/` engine files
   (see [`sdlc/BOUNDARY.md § Change history`](BOUNDARY.md#change-history)).
@@ -66,11 +67,20 @@ template exists):
 ```
 docs/
   project.md                 ← already seeded in Step 2
-  glossary.md                ← from sdlc/_templates/GLOSSARY.md
-  cross-cutting-concerns.md  ← from sdlc/_templates/CROSS-CUTTING-CONCERNS.md
-  adrs/
-    index.md                 ← from sdlc/_templates/INDEX.md  (ADR variant)
-    log.md                   ← from sdlc/_templates/LOG.md    (ADR variant)
+  shared/
+    COMPONENT.md             ← from sdlc/_templates/COMPONENT.md (shared variant)
+    glossary.md              ← from sdlc/_templates/GLOSSARY.md
+    ccc/                     ← per-CCC pages (one file per concern); seed per Step 6
+      index.md               ← Karpathy-style index of CCC pages; seed shape per `_templates/INDEX.md`
+                                with the CCC-specific columns (Stack, Updated) from this engine's
+                                reference at `docs/shared/ccc/index.md`
+      log.md                 ← append-only CCC lifecycle log; entry format per
+                                `_templates/LOG.md` and `workflow/maintenance-discipline.md`
+    tech-stack.md            ← author manually per `BOUNDARY.md` § Engine-vs-project axis
+                                (no template; 8-section structure is engine-prescribed)
+    adrs/
+      index.md               ← from sdlc/_templates/INDEX.md  (ADR variant)
+      log.md                 ← from sdlc/_templates/LOG.md    (ADR variant)
   home.md                    ← stub; will be derived once nodes exist
 ```
 
@@ -85,22 +95,31 @@ At minimum, author one ADR before Phase 1 work begins:
 | ADR-003 | Code-quality gates | Phase 3 QA checklist depends on this |
 
 Use [`sdlc/workflow/authoring-adr.md`](workflow/authoring-adr.md).
-Tag conventions-ADRs with `convention` in `adrs/index.md` — the
+Tag conventions-ADRs with `convention` in `docs/shared/adrs/index.md` — the
 workflow's implementation phase resolves the convention set by tag.
 
-### 5. Populate `docs/glossary.md`
+### 5. Populate `docs/shared/glossary.md`
 
 Add at minimum:
 - The project's primary domain terms (aggregates, bounded contexts).
 - Any abbreviations used in node IDs or ADR titles.
 
-### 6. Populate `docs/cross-cutting-concerns.md`
+### 6. Populate `docs/shared/ccc/`
 
-Fill in the NFR baseline categories using the cross-cutting constants
-already recorded in `docs/project.md § Cross-Cutting Constants`. Anything
-project-specific that deviates from the baseline gets its own ADR
-back-linked from the relevant category. See the template for the category
-list.
+Seed one `CCC-NNN-<slug>.md` page per NFR baseline category using
+[`sdlc/_templates/CROSS-CUTTING-CONCERNS.md`](_templates/CROSS-CUTTING-CONCERNS.md)
+as the per-CCC template. Use the cross-cutting constants already recorded
+in `docs/project.md § Cross-Cutting Constants` to seed the baseline prose.
+For each new CCC:
+
+1. Copy the template to `docs/shared/ccc/CCC-NNN-<slug>.md`.
+2. Add a row to `docs/shared/ccc/index.md` (Active table).
+3. Append a `created` entry to `docs/shared/ccc/log.md` per the
+   maintenance-discipline log format.
+
+Anything project-specific that deviates from a CCC baseline gets its own
+ADR back-linked via `related: [CCC-NNN]` in the ADR's frontmatter — the
+CCC baseline stays put and the ADR captures the override.
 
 ### 7. Create `docs/<component>/nodes/` on first node
 

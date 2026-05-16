@@ -43,6 +43,11 @@ The lazy folders (`queries/`, `modules/`, `screens/`, `contracts/`,
 `permissions/`, `services/`, `functional-areas/`, `events/`) are created **lazily
 on first Phase 2 ingest of that type.**
 
+Each node-type folder gets only an `index.md` companion (no `log.md`) — per the
+2026-05-16 rule change in
+[`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
+Per-type node logging was dropped; ADR and research `log.md` files are retained.
+
 ## Node-type discriminators
 
 **MOD** is the bounded-context node (engineering-facing); cross-MOD product
@@ -93,6 +98,28 @@ RESEARCH entries are *cited references*: ADRs and FRSs link by ID
 rather than restating content. Lifecycle: `raw` → `synthesized` →
 `superseded`. Template:
 [`_templates/RESEARCH.md`](_templates/RESEARCH.md).
+
+## Cross-cutting concerns (parallel to nodes)
+
+`docs/shared/ccc/` is a parallel canonical tree for **project-wide NFR
+baseline defaults** — auth, audit, retention, observability, multi-tenancy,
+soft-delete, exception handling, validation, localization, caching,
+background jobs, distributed events, session management. It is not DDD
+content and does not live under `docs/<component>/nodes/`.
+
+```
+docs/shared/ccc/                # canonical CCC tree
+  index.md                      # Karpathy-style content catalog
+  log.md                        # append-only chronological record
+  CCC-NNN-<slug>.md             # individual pages, narrow-loaded
+```
+
+CCC entries are *cited references*: FRSs and ADRs link by ID rather than
+restating content. Lifecycle: `proposed → accepted → superseded |
+deprecated`. Per-CCC page template:
+[`_templates/CROSS-CUTTING-CONCERNS.md`](_templates/CROSS-CUTTING-CONCERNS.md)
+(one file per concern; the retired v0.1 flat doc is not a template).
+ADRs that override a CCC default carry `related: [CCC-NNN]`.
 
 ---
 

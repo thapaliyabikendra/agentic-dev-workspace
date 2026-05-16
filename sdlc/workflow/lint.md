@@ -143,17 +143,17 @@ the answer adds back-links via `related:` / `linked_*` updates per
 
 ### `stale-proposed`
 
-**Detection.** A canonical node with `status: proposed` whose most
-recent entry in the per-type `log.md` is older than **14 days**. The
-`proposed` status is intended as a transient state between Phase 2
-ingest and Phase 3 merge — nodes that linger there are FS-stalls,
-abandonments without cleanup, or forgotten work.
+**Detection.** A canonical node with `status: proposed` whose row in
+the per-type `index.md` has not been updated (by git mtime) in more
+than **14 days**. The `proposed` status is intended as a transient
+state between Phase 2 ingest and Phase 3 merge — nodes that linger
+there are FS-stalls, abandonments without cleanup, or forgotten work.
 
 **Scan procedure.** Read each per-type `index.md`'s "Proposed" section
 (per [`maintenance-discipline.md → Lazy creation`](maintenance-discipline.md#lazy-creation)).
-For each entry, locate its most recent dated log entry in
-`docs/<component>/nodes/<type>/log.md` (`grep "^## \[" log.md | grep "<NODE-ID>"`).
-If the latest is more than 14 days old, flag.
+For each entry, check the git modification time of the node file itself
+(`git log -1 --format="%ci" -- docs/<component>/nodes/<type>/<NODE-ID>-*.md`).
+If the latest commit is more than 14 days old, flag.
 
 **Action.** Open an OQ-NNN with `origin: workflow-evolution`. The
 question shape: "Should `<NODE-ID>` be merged via Phase 3 / CHG, or has
@@ -248,10 +248,9 @@ no OQ-NNN needed:
 1. Add the missing row to the per-type `index.md` (or remove the
    dangling row if the file is genuinely gone — in which case verify
    against git history that the deletion was intentional).
-2. Append a `created` (or `recovered`) entry to the per-type `log.md`
-   with a body note explaining "recovered from index-entry-missing
-   lint pass" plus a date.
-3. The fix itself is a 3-file lifecycle touch (or routine 2-file if no log exists); no further action.
+2. Add a body note in the `index.md` row or update the row's summary
+   to record "recovered from index-entry-missing lint pass" plus a date.
+3. The fix itself is a 2-file node touch (node + `index.md`); no further action.
 
 If multiple violations of this class accumulate, that's a signal that
 the tiered touch discipline is eroding — consider raising as a

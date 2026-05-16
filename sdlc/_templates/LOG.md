@@ -9,9 +9,16 @@
 > the **bottom** of the Entries section; the last 5 are visible via
 > `grep "^## \[" log.md | tail -5`.
 
-**Replace `<Type>` and `<scope>` above** with the actual type (Actors, Entities,
-Commands, Flows, States, Decisions, Integrations, ADRs) and folder path
-(`nodes/actors/`, `adrs/`, etc.).
+> **Note (2026-05-16):** Per-type node `log.md` was dropped on 2026-05-16
+> (see `maintenance-discipline.md` → Rule history). This template no longer
+> applies to canonical node-type folders (Actors, Entities, Commands, Flows,
+> States, Decisions, Integrations, etc.).
+
+**Replace `<Type>` and `<scope>` above** with the applicable area and folder path:
+
+- **ADRs** — component-level: `docs/<component>/adrs/`; cross-component: `docs/shared/adrs/`
+- **Research** — `docs/research/`
+- **Engine-level standards** — `sdlc/standards/`
 
 ---
 

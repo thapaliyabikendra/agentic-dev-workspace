@@ -75,12 +75,12 @@ artifact). When in doubt about where a new file goes, check here first.
                            FRSs / FSs in flight, shipped, five stuck-signal classes.
                            Regenerated on demand via regenerate-roadmap.md.
                            Lazy — created on first regenerate.
-    glossary.md            ← project-owned domain vocabulary baseline
-    cross-cutting-concerns.md ← project-owned NFR baseline categories
-    /adrs                  architectural commitments (Karpathy-style wiki)
-      index.md             ← the one file generators wholesale-read
-      log.md               ← append-only chronological record of ADR events
-      ADR-NNN-*.md         ← individual pages, narrow-loaded
+    (No /docs/glossary.md.)  ← project-owned domain vocabulary lives under
+                                /shared/glossary.md
+    (No /docs/cross-cutting-concerns.md.) ← NFR baselines live as per-CCC
+                                pages under /shared/ccc/ (flat doc retired 2026-05-16)
+    (No top-level /adrs/.) ← ADRs live under /<component>/adrs/ per
+                              ## Component structure (docs/) below.
     /discovery
       open-questions.md    ← frozen legacy log (pre-2026-05-13 OQs)
       /open-questions      ← per-OQ folder (new OQs land here)
@@ -158,7 +158,10 @@ docs/
     COMPONENT.md
     adrs/                      ← only ADRs spanning ≥2 components; starts empty
     glossary.md
-    cross-cutting-concerns.md
+    ccc/                       ← per-CCC NFR baseline files (replaces flat cross-cutting-concerns.md)
+      index.md                 ← Karpathy catalog
+      log.md                   ← append-only chronological log
+      CCC-NNN-*.md             ← individual CCC pages
     tech-stack.md
   <component-slug>/            ← standalone component
     COMPONENT.md               ← declares id_prefix
@@ -166,7 +169,6 @@ docs/
     nodes/
       <type>/
         index.md               ← per-type index (component-scoped)
-        log.md                 ← per-type log (component-scoped)
         {PREFIX}-{TYPE}-{NNN}-<slug>.md  ← canonical node files (prefixed IDs)
 ```
 
@@ -190,12 +192,16 @@ Node ID uniqueness is global. `docs/home.md` is the cross-component ID
 high-water-mark reference (regenerated on demand from all component indexes).
 
 **Standalone component ID prefix convention.** Every standalone component declares
-a 2–4 character uppercase prefix code in its `COMPONENT.md` (`id_prefix: FDE`).
+a 2–4 character uppercase prefix code in its `COMPONENT.md` (`id_prefix: <NEW>`).
 All canonical DDD nodes created within that component are named `{PREFIX}-{TYPE}-{NNN}`
 starting at 001. The prefix is global — no two components in the same workspace share
 a prefix. The `shared/` component and any brownfield-imported legacy component (e.g.,
-`app`) are exempt: they retain their original type-only IDs for backward compatibility.
-New components created from scratch must always use prefixed IDs.
+`app`) are exempt: they retain their original type-only IDs for backward compatibility,
+**and may retain a legacy COMPONENT.md body structure** (descriptive sections like
+`## Stack` / `## Homes` instead of the canonical `## Role / ## Node inventory /
+## Depends on / ## ADRs`). Body-structure migration is optional, not required.
+New components created from scratch must always use the prefixed IDs **and** the
+canonical body structure from [`_templates/COMPONENT.md`](_templates/COMPONENT.md).
 
 Template: [`_templates/COMPONENT.md`](_templates/COMPONENT.md).
 Bootstrap procedure: [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md).
@@ -304,7 +310,7 @@ for new OQ-NNN files).
   `## Component structure (docs/)` map above.
 - **Cited by:**
   - [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md)
-    — per-type `index.md` / `log.md` paths under
+    — per-type `index.md` paths under
     `docs/<component>/nodes/<type>/` come from here.
   - [`workflow/plan.md`](workflow/plan.md) — Phase 2 node ingest
     target paths under `docs/<component>/nodes/<type>/`.

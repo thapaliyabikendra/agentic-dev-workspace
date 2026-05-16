@@ -57,7 +57,7 @@ digraph evolve_workflow {
     lifecyc  [shape=diamond, label="Distinct lifecycle, index,\nor cross-ref shape?"];
     drop2    [shape=box,     label="Drop — refine existing\ntemplate; coining unjustified"];
 
-    coin     [shape=box,     label="Coin new type:\n1. append to KB layout\n2. add template under\n   _templates/nodes/<TYPE>.md\n3. lazy index.md + log.md\n   on first instance"];
+    coin     [shape=box,     label="Coin new type:\n1. append to KB layout\n2. add template under\n   _templates/nodes/<TYPE>.md\n3. lazy index.md\n   on first instance"];
 
     done_ext [shape=doublecircle, label="Existing type\nrefined / extended"];
     done_new [shape=doublecircle, label="New type lands\nin methodology"];
@@ -125,9 +125,8 @@ sequentially — refine first, invent last.
    [`../KB-LAYOUT.md`](../KB-LAYOUT.md) —
    directory, ID prefix, lazy-creation note if applicable.
 2. Add a node template at `_templates/nodes/<TYPE>.md`.
-3. Lazy-create the per-type `docs/<component>/nodes/<type>/index.md` +
-   `docs/<component>/nodes/<type>/log.md` pair on first instance, per the
-   existing rule in
+3. Lazy-create `docs/<component>/nodes/<type>/index.md` on first
+   instance, per the existing rule in
    [`maintenance-discipline.md → Lazy creation`](maintenance-discipline.md#lazy-creation).
 
 ## Defining or refining a doc template
@@ -187,8 +186,7 @@ maintained.
   `overview/ARCHITECTURE.md`).
 - **Maintenance ops that may fire after a coin:**
   [`maintenance-discipline.md`](maintenance-discipline.md) — lazy
-  `index.md` + `log.md` creation on the first instance of the new
-  type.
+  `index.md` creation on the first instance of the new type.
 - **Sibling rule books:**
   [`authoring-adr.md`](authoring-adr.md),
   [`maintenance-discipline.md`](maintenance-discipline.md),

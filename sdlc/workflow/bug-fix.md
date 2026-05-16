@@ -5,12 +5,11 @@ A bug fix is "the code drifted from canonical" or "canonical was
 under-specified" — not a milestone-scoping problem.
 
 > **HARD-GATE:** Do NOT edit a canonical node (FLW or otherwise) as
-> part of a bug fix without firing the full 3-file lifecycle touch
-> (artifact + per-type `index.md` re-sync + per-type `log.md`
-> `updated` entry). The bug-fix track exists as a lightweight option
-> *because* it still honors the maintenance discipline — silent
-> canonical edits are not the discount; they are a different (broken)
-> path. (Cross-cutting rules: see
+> part of a bug fix without firing the 2-file node touch
+> (node + per-type `index.md` re-sync). The bug-fix track exists as a
+> lightweight option *because* it still honors the maintenance
+> discipline — silent canonical edits are not the discount; they are a
+> different (broken) path. (Cross-cutting rules: see
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Canonical
 > edits use tiered touch".)
 
@@ -46,7 +45,7 @@ digraph bug_fix_flow {
     repro    [shape=box,   label="Reproduce + locate"];
     triage   [shape=diamond, label="Canonical correct\nor under-specified?"];
     fix_code [shape=box,   label="Fix code\n+ add regression test"];
-    fix_can  [shape=box,   label="Update canonical FLW\n(3-file touch:\nartifact + index + log)"];
+    fix_can  [shape=box,   label="Update canonical FLW\n(2-file node touch:\nFLW + per-type index.md)"];
     escal    [shape=diamond, label="Escalation criteria?"];
     frs      [shape=box,   label="Escalate to FRS\n(load design.md)"];
     merge    [shape=box,   label="Merge fix/<slug>"];
@@ -76,15 +75,16 @@ work it shouldn't.
 ## Anti-Pattern: "The Obvious Tweak"
 
 A one-line fix to a canonical node body during bug investigation
-because the wording is "clearly" wrong — without firing the
-`updated` log entry or re-syncing the index. The temptation: the
-edit is small, the bug fix is small, and the canonical node is right
-there. The cost: a future reader sees the index summary unchanged,
-assumes the node is what they think it is, and writes code against
-the wrong shape. **Every canonical edit fires the 3-file touch — bug
-fix track included.** If you can't write the `updated` log entry
-naming what changed and why, the edit isn't ready; either delay it
-or escalate the bug to an FRS. Doctrinal anchor:
+because the wording is "clearly" wrong — without re-syncing the
+per-type `index.md` row. The temptation: the edit is small, the bug
+fix is small, and the canonical node is right there. The cost: a
+future reader sees the index summary unchanged, assumes the node is
+what they think it is, and writes code against the wrong shape.
+**Every canonical edit fires the 2-file node touch — bug fix track
+included.** If the index row's summary/tags/source-ref need updating
+because of the bug fix and you can't write a commit message naming
+what changed and why, the edit isn't ready; either delay it or
+escalate the bug to an FRS. Doctrinal anchor:
 [`../PRINCIPLES.md`](../PRINCIPLES.md) — "Silent node or ADR edits".
 
 ## File location
@@ -122,8 +122,8 @@ resolution the bug Exploration flips to `done` (when fixed in code) or
    in the fix; fix the code; verify. `canonical_changed: false`.
 3. **If canonical FLW was wrong or under-specified:** update the
    canonical FLW node (add the fault scenario or correct the existing
-   one). Fire an `updated` log entry per maintenance discipline (this
-   is a 3-file lifecycle event for the FLW node). Then fix code; add
+   one). Fire the 2-file node touch per maintenance discipline
+   (FLW + per-type `index.md` re-sync as needed). Then fix code; add
    test; verify. `canonical_changed: true`.
 4. Bug Exploration `status: done`; populate `fixed:` date.
 5. Merge.
@@ -178,7 +178,7 @@ escalation-specific case, `escalated_from: docs/exploration/EXP-<slug>.md`).
   anti-patterns this track exists to navigate around.
 - **Rule books wholesale-read when a canonical edit fires:**
   [`maintenance-discipline.md`](maintenance-discipline.md) — for the
-  3-file touch on the `updated` event when canonical FLW changes.
+  2-file node touch when canonical FLW changes.
 - **Routes to (on escalation):** [`design.md`](design.md) — the FRS
   authored under a new or existing milestone per the change-request
   routing matrix in

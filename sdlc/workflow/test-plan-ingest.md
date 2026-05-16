@@ -1,14 +1,13 @@
 ---
 name: test-plan-ingest
-description: "Use immediately after the generate-feat-spec FS validation loop passes (zero Blockers, zero Majors). Ingests TC files for every FRS use case, sets the FS test_plan_path frontmatter, and fills the FRS test-plan-view table. Runs in the same Phase 2 session as plan.md — no /clear between the two."
+description: "Use after the generate-feat-spec FS validation loop passes (zero Blockers, zero Majors). Ingests TC files for every FRS use case, sets the FS test_plan_path frontmatter, and fills the FRS test-plan-view table. Runs as the first flow of the QA track — independent of plan.md's session."
 ---
 
 # Test Plan Ingest
 
 Test plan ingest is the second part of Phase 2. It drafts TC files for every use case in
 the FS's FRS set, traced to FLW scenario anchors and FRS acceptance criteria, and updates
-the FS and FRS frontmatter to record the test plan. It runs in the same session as
-[`plan.md`](plan.md) immediately after the FS validation loop passes — no context reset.
+the FS and FRS frontmatter to record the test plan. It is the first flow of the **QA track** — runs as an independent session after `plan.md` exits its validation loop (zero Blockers, zero Majors). Load FS + FRS + FLW + ENT context fresh; do not rely on residual `plan.md` session state.
 
 <HARD-GATE>
 Do NOT begin until:
@@ -75,7 +74,7 @@ and [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md).
 ## Overview
 
 **Operation:** `generate-test-plan`
-**Mode:** still **Ingest** — runs in the same Phase 2 session as `plan.md`, no context reset.
+**Mode:** **Ingest** — first flow of the QA track. Runs in its own session after `plan.md` exit; no shared session with `plan.md`.
 
 **Inputs:**
 - Every FRS in the FS's `frs:` list.
@@ -110,7 +109,8 @@ scenarios, or ENT nodes are missing field-level constraints — complete those p
 first, then return here.
 
 **Vs. plan.md:** `plan.md` authors the FS and ingests canonical nodes. This file ingests
-the test plan for that FS. Both run in the same session; this file is the second half.
+the test plan for that FS. It is the first flow of the QA track — runs in its own session
+after `plan.md` exits its validation loop; no shared session with `plan.md`.
 
 ---
 
@@ -232,9 +232,10 @@ label it `(Guard)`.
 scenario IDs the TC's `Traces to:` line must reference. If a scenario in the FLW node
 has no TC by the end of the walkthrough, emit a TC for it OR record the gap as a Blocker.
 
-**7. Cross-FRS scope notes** — when the FRS references a baseline
-(cross-cutting-concerns.md) category that drives test surface (auth, session, retention,
-audit, localization), check the Coverage Matrix for matching rows.
+**7. Cross-FRS scope notes** — when the FRS references a CCC baseline
+(declared in the FRS's `ccc:` frontmatter) that drives test surface
+(auth, session, retention, audit, localization), check the Coverage
+Matrix for matching rows.
 
 **Open Questions.** OQs are first-class artifacts under `docs/discovery/open-questions/`
 as `OQ-NNN-<slug>.md` files — not inline in the FRS or FS body. If a TC depends on an
@@ -379,14 +380,12 @@ most out-of-scope items get no TC at all.
 
 - **Required before:** [`plan.md`](plan.md) (`generate-feat-spec`) — the FS validation
   loop must pass (zero Blockers, zero Majors) before this operation begins.
-- **Runs in the same session as:** [`plan.md`](plan.md) — no `/clear` between the two.
+- **Track:** First flow of the QA track. Runs in its own session; a `/clear` separates it from `plan.md`.
 - **Rule books wholesale-read during this flow:**
   [`coverage-matrix.md`](coverage-matrix.md) (test-type checklist by use-case category),
   [`test-data-generation.md`](test-data-generation.md) (`## Test Data` section rules and
   verification self-checks).
-- **Required after:** user-review handoff, then `/clear` + load
-  [`implementation.md`](implementation.md) (Phase 3 Merge + Code), followed in the same
-  session by [`test-suite-codegen.md`](test-suite-codegen.md) then [`qa-gate.md`](qa-gate.md).
+- **Required after:** user-review handoff. The dev track continues at `implementation.md` (Phase 3 Merge + Code) in a fresh session. The QA track's next flow (`test-suite-codegen.md`) runs after implementation is complete, in its own QA-track session.
 - **Sibling flow files:** [`plan.md`](plan.md), [`design.md`](design.md),
   [`implementation.md`](implementation.md), [`test-suite-codegen.md`](test-suite-codegen.md),
   [`qa-gate.md`](qa-gate.md).

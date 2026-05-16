@@ -61,9 +61,9 @@ delivery corrupts state.
 ## Failure handling
 
 - **Failure impact boundary:** `hard | soft | eventual` — see
-  [`glossary.md`](../../glossary.md).
+  [`docs/shared/glossary.md`](../../../shared/glossary.md).
 - **Domain-event gating:** `eager | committed-only` — see
-  [`glossary.md`](../../glossary.md).
+  [`docs/shared/glossary.md`](../../../shared/glossary.md).
 - Timeout behavior:
 - Retry policy:
 - Circuit breaker / fallback:

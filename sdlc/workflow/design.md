@@ -46,7 +46,7 @@ Load only what the task type requires. Do not pre-load speculatively.
 | **Meta question** ("what is the process", "document phase X") | `design.md` | `frs-validation-rules.md` §Severity + §Bundling detection (lines 1–140) | `KB-LAYOUT.md`, `retrieval-discipline.md`, `FRS.md` template, `WORKFLOW.md` body |
 | **Actual Phase 0 execution** | `design.md` | `WORKFLOW.md` §Phase flows (router only) | `KB-LAYOUT.md`, `retrieval-discipline.md`, `FRS.md` template |
 | **Actual Phase 1 execution** | `design.md` | ADR index (one-line scan) | `KB-LAYOUT.md`, `retrieval-discipline.md` |
-| **Actual Phase 1.5 execution** | `design.md`, `frs-validation-rules.md` | `glossary.md`, `cross-cutting-concerns.md` (snapshot at gate entry) | `KB-LAYOUT.md`, `WORKFLOW.md` body |
+| **Actual Phase 1.5 execution** | `design.md`, `frs-validation-rules.md` | `glossary.md`, `docs/shared/ccc/index.md` (snapshot at gate entry), `sdlc/standards/index.md` (scan for FRS-relevant STDs) | `KB-LAYOUT.md`, `WORKFLOW.md` body |
 
 For `frs-validation-rules.md` partial reads: §Severity classification ends at the gate-verdict block (~line 110 of the file). §Bundling detection follows immediately. Read offset 0, limit 140 for meta questions; read the full file only at an actual Phase 1.5 gate.
 
@@ -71,8 +71,8 @@ digraph design_flow {
     phase0 -> out_ms;
     phase0 -> phase1;
     phase1 -> gate_pass1;
-    gate_pass1 -> phase1 [label="fail — revise FRS"];
-    gate_pass1 -> gate_pass2 [label="pass (every FRS)"];
+    gate_pass1 -> phase1 [label="fail — revise FRS / next FRS"];
+    gate_pass1 -> gate_pass2 [label="all FRSs cleared"];
     gate_pass2 -> phase1 [label="conflict — revise"];
     gate_pass2 -> out_frs [label="pass"];
     out_frs -> next [label="/clear + load plan.md"];
@@ -124,7 +124,11 @@ Related surfaces:
 
 - **OQ-NNN** (`docs/discovery/open-questions/`) — first-class artifacts for
   answerable open questions. Use when the question needs a resolver artifact
-  (DEC / ADR / FRS) before work can continue. 3-file lifecycle touch.
+  (DEC / ADR / FRS) before work can continue. Discovery-surface touch: 1-file
+  for routine edits, 2-file (artifact + `open-questions/index.md` if one
+  exists) for terminal lifecycle events (`resolved`, `rejected`, `escalated`).
+  No `log.md` — see
+  [`maintenance-discipline.md → Discovery surface discipline`](maintenance-discipline.md#discovery-surface-discipline).
   See [`../_templates/OPEN-QUESTION.md`](../_templates/OPEN-QUESTION.md).
 - **ADR / DEC** — commitments. Promote to ADR when cross-cutting; DEC when
   node-local. See [`authoring-adr.md`](authoring-adr.md).
@@ -188,6 +192,17 @@ already been drafted. Both paths are valid; the directory layout is the same.
   (e.g., "auth + billing + reporting"), split into separate milestones —
   one milestone per scope — *before* drafting any discovery. Decomposition
   is cheaper at this gate than at any later phase.
+
+  **If a split need surfaces partway through Phase 0** (after some discovery
+  is drafted): narrow the current milestone's scope statement in
+  `milestone-scope.md` to the retained concern, then either (a) open a new
+  milestone via [`open-milestone.md`](open-milestone.md) for the
+  out-of-scope concern and migrate any already-drafted discovery content
+  into its discovery folder, or (b) raise an `OQ-NNN` under
+  `docs/discovery/open-questions/` with
+  `origin: milestone-scoping, needed_by: roadmap` if the out-of-scope
+  concern is genuinely deferrable. Do not delete already-drafted
+  discovery — preserve it through migration or OQ attachment.
 - **Scan the ADR index.** Read `docs/<component>/adrs/index.md` —
   one-line summaries only, the file is bounded by design. Identify ADRs
   whose tags or components intersect the milestone scope. This is
@@ -206,9 +221,12 @@ already been drafted. Both paths are valid; the directory layout is the same.
 Then find the canonical DDD nodes the milestone touches.
 
 This is cheaper than free-form code archaeology because the knowledge base
-already exists. Read the relevant Actors, Entities, Flows, and Decisions for
-the affected area. Note where the milestone would extend or break existing
-invariants or ADRs.
+already exists. Read `docs/<component>/nodes/<type>/index.md` for each node
+type plausibly in scope — it carries one line per node (same bounded-file
+posture as the ADR index); glob only when no `index.md` exists for that type
+yet (expected on a green KB or a type with no nodes ingested yet). Read the
+relevant Actors, Entities, Flows, and Decisions for the affected area. Note
+where the milestone would extend or break existing invariants or ADRs.
 
 ### Milestone-scope Discovery
 
@@ -217,11 +235,13 @@ Author `docs/milestones/M-NN-<slug>/discovery/milestone-scope.md` using
 `level: milestone` in the frontmatter. Keep it short — one page. It anchors
 the FRSs that follow.
 
-For change requests: set `kind: change-request`, run the KB scan against
-`docs/<component>/nodes/**` for nodes whose `source_ref`, `related`, or title match the
-request's domain language, and pre-fill the "Existing nodes scanned" section
-with matched IDs. For new features: set `kind: new-feature`; the
-"Existing nodes scanned" section may be left empty.
+For change requests: set `kind: change-request`, run the KB scan using
+per-type indexes — read `docs/<component>/nodes/<type>/index.md` for each
+node type plausibly in scope; glob `docs/<component>/nodes/<type>/*.md` only
+when no `index.md` exists for that type yet. Match on `source_ref`, `related`,
+or title. Pre-fill the "Existing nodes scanned" section with matched IDs. For
+new features: set `kind: new-feature`; the "Existing nodes scanned" section
+may be left empty.
 
 The KB scan and ADR-index scan are the only places in the workflow where
 wholesale reading is allowed — see
@@ -252,15 +272,18 @@ constraints. Out-of-scope items go in the discovery doc, not the portal.
       in the discovery.
 - [ ] Open questions raised during discovery are answered, explicitly
       deferred, or carried as `OQ-NNN` files under
-      `docs/discovery/open-questions/` with
+      `docs/discovery/open-questions/` (check
+      `docs/discovery/open-questions/index.md` and `id-claims.md` before
+      allocating the next `OQ-NNN`) with
       `origin: discovery, origin_ref: DISCOVERY-NNN, needed_by: phase-1`.
       The discovery's "Open questions" section cites the OQ IDs; the
       question text is not duplicated.
 - [ ] Milestone portal frontmatter set: `id`, `title`, `status: planning`,
       `discovery: discovery/milestone-scope.md`. `frs: []` and `specs: []`
       start empty.
-- [ ] Run [`regenerate-roadmap.md`](regenerate-roadmap.md) so the milestone
-      surfaces in `docs/ROADMAP.md` (if not already present).
+- [ ] Run [`regenerate-roadmap.md`](regenerate-roadmap.md) to surface this
+      milestone in `docs/ROADMAP.md`. No-op if the milestone is already
+      listed; the operation is idempotent.
 
 ---
 
@@ -288,8 +311,12 @@ For each user-journey in the milestone:
      `docs/milestones/M-NN-<slug>/frs/FRS-NNN-<slug>.md` (frontmatter +
      scope paragraph + `produces_nodes` + `touches_nodes` only), then
      author the per-FRS Survey bounded by the skeleton's declared nodes.
-     Use Path B only when node scope is already well-defined before
-     discovery begins.
+     Use Path B only when `touches_nodes` and `produces_nodes` can be
+     filled completely from the canonical node indexes
+     (`docs/<component>/nodes/<type>/index.md`) **before** any discovery
+     dialog — i.e., every node ID is already known and confirmed against
+     the index. If any node scope is still being negotiated with the
+     user, use Path A.
 2. Classify OQs from the Survey using the 4-tier table in
    [`research.md`](research.md) (load when ≥1 OQ requires tier-classification;
    skip entirely when no Survey OQs exist). If any OQ is `blocking-frs`, invoke
@@ -299,7 +326,10 @@ For each user-journey in the milestone:
 3. Author the complete FRS at
    `docs/milestones/M-NN-<slug>/frs/FRS-NNN-<slug>.md` using
    [`../_templates/FRS.md`](../_templates/FRS.md) (Path A), or complete
-   the FRS body sections on the existing skeleton (Path B).
+   the FRS body sections on the existing skeleton (Path B). If the
+   user-journey directly answers a pre-existing `OQ-NNN`, populate the
+   `resolves:` frontmatter at draft time — don't defer it to the exit
+   checklist.
 4. Append the FRS ID to the milestone portal's `frs:` frontmatter and to its
    "FRSs in this milestone" section.
 
@@ -312,6 +342,18 @@ Each FRS must:
 - Declare `adrs:` — the ADR IDs consulted while drafting. Carries forward
   from the discovery's "Relevant ADRs scanned" plus any ADR that surfaces
   during the dialog.
+- Declare `standards:` — the STD IDs whose rules the FRS consumes. Scan
+  [`../standards/index.md`](../standards/index.md) at draft time;
+  narrow-load each STD whose `applies_when.stack:` intersects this FRS's
+  declared `stack:`. Engine-universal rules (those tagged `agnostic`) apply
+  by default — list them when the FRS's behavior depends on a specific
+  rule.
+- Declare `ccc:` — the CCC-NNN IDs from
+  [`../../docs/shared/ccc/index.md`](../../docs/shared/ccc/index.md) whose
+  baselines this FRS cites or relies on. Each CCC is cited by category
+  reference; do not restate the baseline in the FRS body. Operation-specific
+  deviations from a CCC are filed as ADRs (which carry
+  `related: [CCC-NNN]`) and listed in the FRS's "Brownfield impact" section.
 
 The FRS describes the use case behaviorally but does **not** duplicate node
 or ADR content. If existing canonical nodes already define an Actor or
@@ -355,21 +397,28 @@ later.
 - [ ] `touches_nodes`, `produces_nodes`, `adrs:`, and `milestone:` frontmatter
       fields are filled (empty list allowed only when genuinely nothing applies —
       and that's noted, not assumed).
+- [ ] `resolves:` frontmatter lists any pre-existing `OQ-NNN` this FRS closes
+      (most commonly OQs raised at Phase 0 discovery or by an earlier FRS in
+      this milestone). For each cited OQ, set its `resolved_by:` field to this
+      FRS ID — reciprocal 2-file touch. Empty list is allowed when this FRS
+      opens questions but closes none.
 - [ ] Conflicts noticed at drafting time are recorded in "Brownfield impact" —
       not silently absorbed. (Validation findings from the gate land in a
       separate section at Phase 1.5; do not pre-empt.)
 - [ ] Any ADR authored during Phase 1 dialog is filed under
       `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed in `adrs/index.md`, logged with
-      a `created` entry in `adrs/log.md`, mirrored in `docs/home.md`, and
-      back-linked from the FRS via `adrs:`. See
+      a `created` entry in `adrs/log.md`, and back-linked from the FRS via `adrs:`.
+      (`docs/home.md` is derived from the per-component ADR indexes — regenerated on
+      demand, not hand-edited per ADR event.) See
       [`maintenance-discipline.md`](maintenance-discipline.md).
-- [ ] **QA-hat review.** Walk each FRS's referenced and produced Flow
-      scenarios (happy / edge / fault). Each scenario is independently
-      testable. Any scenario that cannot be expressed as a test runner
-      assertion (see the testing-convention ADR for the chosen runner)
-      is flagged in "Brownfield impact" or sent back for clarification. The
-      Flow scenarios *are* the test plan — do not draft a parallel test-plan
-      artifact.
+- [ ] **QA-hat review.** For referenced FLWs (`touches_nodes`), walk
+      existing scenarios; for produced FLWs (`produces_nodes`), walk the
+      scenarios you intend to write at Phase 2. Each scenario (happy /
+      edge / fault) is independently testable. Any scenario that cannot
+      be expressed as a test runner assertion (see the testing-convention
+      ADR for the chosen runner) is flagged in "Brownfield impact" or
+      sent back for clarification. The Flow scenarios *are* the test plan
+      — do not draft a parallel test-plan artifact.
 
 Then run the user-review handoff before moving to Phase 1.5.
 
@@ -414,11 +463,24 @@ open. (Doctrinal anchor: see
 
 #### Subagent dispatch shape + outcome routing
 
-The four Phase 1.5 specialist passes (FRS existence + sanity + ADR
-conflict; cross-FRS sweep; baseline-snapshot capture per
-[`frs-validation-rules.md`](frs-validation-rules.md); standard-conflict
-check) run as **parallel** inline `Agent(subagent_type=Explore, ...)`
-dispatches in a single message, each returning the 3-block contract
+The Phase 1.5 specialist passes run in **two ordered stages** — the
+parallel dispatch shape applies *inside* each stage, not across them:
+
+**Stage A (per-FRS, parallel within one FRS):** Pass 1's three checks
+(FRS existence + sanity + ADR conflict), the baseline-snapshot capture
+per [`frs-validation-rules.md`](frs-validation-rules.md), and the
+standard-conflict check fire as parallel inline
+`Agent(subagent_type=Explore, ...)` dispatches in a single message —
+they are file-disjoint over one FRS. Run Stage A after each FRS is
+authored.
+
+**Stage B (milestone cross-FRS, after all FRSs cleared Stage A):**
+Pass 2's cross-FRS sweep dispatches once, after every FRS in the
+milestone has cleared Stage A. Running Pass 2 against an unvalidated
+FRS produces findings against a moving target. Skip Stage B when the
+milestone has < 2 FRSs (see Pass 2 below).
+
+Each dispatch returns the 3-block contract
 (`## Findings / ## Risks / ## Open questions`). Contract canonical home:
 [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)
 — do not restate the contract here.
@@ -443,7 +505,7 @@ step based on the 3-block return, using these outcome handles):
 
 ### Pass 1 — Per-FRS gate (runs after each FRS is authored)
 
-For each FRS, run these three checks and write findings to the FRS's
+For each FRS, run these five checks and write findings to the FRS's
 "Validation findings" section.
 
 1. **Existence scan.** Search the canonical wiki (including `status:
@@ -469,15 +531,32 @@ For each FRS, run these three checks and write findings to the FRS's
    proposes? Each conflict is a finding with `type: adr-conflict`. The
    resolution either updates the ADR (via the supersession procedure) or
    reshapes the FRS to honor the ADR.
+4. **STD conformance scan.** Scan [`../standards/index.md`](../standards/index.md);
+   narrow-load each STD whose `applies_when.stack:` intersects this FRS's
+   declared `stack:` plus every STD already in the FRS's `standards:`. Does
+   any `accepted` STD rule constrain something the FRS proposes? Each
+   conflict is a finding with `type: standard-conflict`. The resolution is
+   to either reshape the FRS to honor the STD or file a project-scoped ADR
+   that codifies the deviation (which back-links to the STD via
+   `related_adrs:`).
+5. **CCC deviation scan.** Re-read each CCC in the FRS's `ccc:` frontmatter
+   plus any CCC whose category the FRS implicitly touches (auth, audit,
+   retention, ...). For each CCC the FRS reads, walk the Baseline section
+   and verify the FRS does not override the default in body prose. A silent
+   override is a finding with `type: ccc-deviation`. The resolution is to
+   either remove the override from the FRS body, or file an ADR (carrying
+   `related: [CCC-NNN]`) that captures the operation-specific deviation —
+   and add the ADR ID to the FRS's `adrs:` and the "Brownfield impact" list.
 
 Findings format in the FRS's "Validation findings" table:
 
 | Finding | Type | Resolution | Rationale |
 | ------- | ---- | ---------- | --------- |
-| <one line> | existence \| sanity \| adr-conflict | resolved \| deferred | <one line> |
+| <one line> | existence \| sanity \| adr-conflict \| standard-conflict \| ccc-deviation | resolved \| deferred | <one line> |
 
 Unresolved findings after the author-review pass become `OQ-NNN` files
-under `docs/discovery/open-questions/` with
+under `docs/discovery/open-questions/` (allocate the next `OQ-NNN` from
+`id-claims.md`; verify against the OQ index) with
 `origin: validation-gate, origin_ref: FRS-NNN` and a back-link to the
 FRS in `nodes:` / body. The FRS's `Validation findings` row cites the
 `OQ-NNN`; the question text is not duplicated.
@@ -514,7 +593,8 @@ appends a corresponding `cross-frs` finding to the FRSs involved.
 - [ ] Every finding has `resolution: resolved` or `resolution: deferred`
       with a non-blank `rationale:`.
 - [ ] Unresolved findings each have a corresponding `OQ-NNN` under
-      `docs/discovery/open-questions/` with `origin: validation-gate`
+      `docs/discovery/open-questions/` (next ID drawn from `id-claims.md`
+      and verified against the OQ index) with `origin: validation-gate`
       and a back-link to the FRS.
 - [ ] The milestone portal's `frs:` list matches the actual set of FRS files
       in `frs/`.
@@ -554,9 +634,15 @@ Next: [`plan.md`](plan.md) (Phase 2, Ingest) after context reset.
   [`new-component-bootstrap.md`](new-component-bootstrap.md) (Phase 0
   may need to scaffold a new component before any FRS lands),
   [`discuss.md`](discuss.md) (optional post-Phase-1.5 gate — invoke when
-  deferred FRS findings carry high architectural impact on Phase 2 FS
-  authoring; produces DISCUSSION-LOG.md and per-FS CONTEXT.md before
-  `/clear`).
+  **any** of the following holds, otherwise skip:
+  (a) ≥1 deferred FRS finding has `gate_effect: blocking`;
+  (b) ≥2 FRSs in the milestone touch the same canonical node and the
+      coordinate-or-conflict resolution direction is not yet locked;
+  (c) a new ADR was authored during Phase 1 dialog but has not yet flipped
+      to `accepted`; or
+  (d) a milestone-scope discovery's "Cross-FRS conflicts" section contains
+      an unresolved row.
+  Produces DISCUSSION-LOG.md and per-FS CONTEXT.md before `/clear`).
 - **Routes to (after `/clear`):**
   [`plan.md`](plan.md) — Phase 2 Ingest, with the validated FRS set as
   input.

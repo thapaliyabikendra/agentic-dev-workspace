@@ -13,8 +13,8 @@ per-flow files under [`workflow/`](workflow/); doctrinal *why* lives in
 [`PRINCIPLES.md`](PRINCIPLES.md).
 
 <HARD-GATE>
-Do NOT begin Phase 2 (Ingest) or Phase 3 (Merge + Code) without a `/clear` and a reload of
-the next flow file only. Context that survives a phase boundary is a bug, not a feature.
+Do NOT begin Phase 2 (Ingest), Phase 3 (Merge + Code), or any **QA-track flow** (`test-plan-ingest.md`, `test-suite-codegen.md`, `qa-gate.md`) without a `/clear` and a reload of
+the next flow file only. Context that survives a flow boundary is a bug, not a feature.
 Detail at [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip).
 (Cross-cutting rules: see [CLAUDE.md ## Hard rules](../CLAUDE.md#hard-rules).)
 </HARD-GATE>
@@ -28,7 +28,7 @@ FRS flow Queries the canonical DDD wiki to validate requirements; the FS flow
 Ingests new DDD nodes directly into the canonical wiki at `docs/<component>/nodes/` with
 `status: proposed`, and emits a milestone-scoped CHG node when existing canonical
 nodes are touched; implementation Applies the CHG deltas to canonical and flips
-the new nodes `proposed → active`.
+the new nodes `proposed → active`. The **QA track** runs as three independent flows after the dev track produces its artifacts: `test-plan-ingest.md` authors TCs once the FS validates; `test-suite-codegen.md` generates executable specs after implementation completes; `qa-gate.md` runs the verification checklist and flips the FS to `implemented`.
 
 Three principles run through every phase:
 
@@ -112,21 +112,31 @@ digraph workflow_phases {
     node [fontname="Helvetica"];
 
     inputs    [shape=oval,  label="Inputs:\nraw requirements\n+ existing DDD nodes"];
-    phase0    [shape=box,   label="Phase 0\nMilestone Scoping"];
-    phase1    [shape=box,   label="Phase 1\nFRS Authoring"];
-    gate15    [shape=diamond, label="Phase 1.5\nValidation Gate?"];
-    phase2    [shape=box,   label="Phase 2\nFS + Node Ingest"];
-    fsval     [shape=diamond, label="FS validation?"];
-    phase2tp  [shape=box,   label="Phase 2 (cont.)\nTest plan ingest"];
-    phase3a   [shape=box,   label="Phase 3\nMerge + Code"];
-    phase3b   [shape=box,   label="Phase 3 (cont.)\nTest suite codegen"];
-    phase3c   [shape=box,   label="Phase 3 (cont.)\nQA Gate"];
 
-    out_ms    [shape=doublecircle, label="Milestone portal\n+ scope discovery"];
-    out_frs   [shape=doublecircle, label="Validated FRSs\n+ OQs"];
-    out_fs    [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
-    out_tc    [shape=doublecircle, label="TC files staged"];
-    out_impl  [shape=doublecircle, label="Active canonical\n+ code + test specs\n+ FS implemented"];
+    subgraph cluster_dev {
+        label="Dev track";
+        phase0    [shape=box,   label="Phase 0\nMilestone Scoping"];
+        phase1    [shape=box,   label="Phase 1\nFRS Authoring"];
+        gate15    [shape=diamond, label="Phase 1.5\nValidation Gate?"];
+        phase2    [shape=box,   label="Phase 2\nFS + Node Ingest"];
+        fsval     [shape=diamond, label="FS validation?"];
+        phase3a   [shape=box,   label="Phase 3\nMerge + Code"];
+    }
+
+    subgraph cluster_qa {
+        label="QA track";
+        style=dashed;
+        phase2tp  [shape=box,   label="QA track\nTest plan ingest"];
+        phase3b   [shape=box,   label="QA track\nTest suite codegen"];
+        phase3c   [shape=box,   label="QA track\nQA Gate"];
+    }
+
+    out_ms        [shape=doublecircle, label="Milestone portal\n+ scope discovery"];
+    out_frs       [shape=doublecircle, label="Validated FRSs\n+ OQs"];
+    out_fs        [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
+    out_tc        [shape=doublecircle, label="TC files staged"];
+    out_impl_code [shape=doublecircle, label="Stage 2 Code complete\n(dev track exit)"];
+    out_impl      [shape=doublecircle, label="Active canonical\n+ code + test specs\n+ FS implemented (after QA gate)"];
 
     inputs -> phase0;
     phase0 -> out_ms;
@@ -138,19 +148,17 @@ digraph workflow_phases {
     phase2 -> fsval;
     fsval -> phase2    [label="fail — repair"];
     fsval -> out_fs    [label="pass"];
-    out_fs -> phase2tp;
+    out_fs -> phase2tp [label="/clear (QA track entry)"];
     phase2tp -> out_tc;
     out_tc -> phase3a  [label="/clear (context reset)"];
-    phase3a -> phase3b;
-    phase3b -> phase3c;
+    phase3a -> out_impl_code;
+    out_impl_code -> phase3b [label="/clear (QA track entry)"];
+    phase3b -> phase3c [label="/clear"];
     phase3c -> out_impl;
 }
 ```
 
-Steps `[shape=box]` are phase work; gates `[shape=diamond]` are
-non-skippable validation; terminal artifacts `[shape=doublecircle]` are
-the durable outputs each phase emits. The `/clear` labels on the
-phase-1.5→2 and 2→3 edges are the canonical `HARD-GATE` instances above.
+Steps `[shape=box]` are phase or flow work; gates `[shape=diamond]` are non-skippable validation; terminal artifacts `[shape=doublecircle]` are the durable outputs each phase or flow emits. The `/clear` labels mark the canonical `HARD-GATE` instances above; QA-track flows are independent of the dev track and run in their own sessions.
 
 The milestone is **the planning container**, top-down or retroactive — it holds
 its discoveries, FRSs, and FSs under one path. Multiple FSs can be generated
@@ -160,21 +168,24 @@ from one milestone, each aggregating a subset of the milestone's FRSs.
 
 ## Phase flows
 
+### Dev track flows
+
 | Flow                | File                                                                       | Operation             | Mode                  | Phases covered              |
 | ------------------- | -------------------------------------------------------------------------- | --------------------- | --------------------- | --------------------------- |
 | Design              | [`workflow/design.md`](workflow/design.md)                                 | `generate-frs`        | Validation (Query)    | 0, 1, 1.5                   |
 | Pre-plan            | [`workflow/discuss.md`](workflow/discuss.md)                               | `pre-plan-discuss`    | Optional              | Between 1.5 and 2           |
 | Plan                | [`workflow/plan.md`](workflow/plan.md)                                     | `generate-feat-spec`  | Ingest                | 2                           |
-| Test plan ingest    | [`workflow/test-plan-ingest.md`](workflow/test-plan-ingest.md)             | `generate-test-plan`  | Ingest (test plan)    | 2 (same session, after FS validation) |
 | Implementation      | [`workflow/implementation.md`](workflow/implementation.md)                 | `implement-feat`      | Merge + Code          | 3                           |
-| Test suite codegen  | [`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md)         | `generate-test-suite` | Codegen (test suite)  | 3 (same session, after Stage 2 Code) |
-| QA Gate             | [`workflow/qa-gate.md`](workflow/qa-gate.md)                               | `qa-gate`             | QA + status flip      | 3 (same session, after test codegen) |
 
-Each flow file owns its phase detail, validation checklists, and exit
-criteria. The three Phase 3 files (`implementation.md`, `test-suite-codegen.md`,
-`qa-gate.md`) run in sequence in the same Phase 3 session — no `/clear` between
-them; the `/clear` boundary sits only at Phase 2→3 entry. Test plan ingest runs
-in the same Phase 2 session as Plan — no `/clear` there either.
+### QA track flows
+
+| Flow                | File                                                                              | Operation             | Mode                    | Entry contract                                                                          |
+| ------------------- | --------------------------------------------------------------------------------- | --------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
+| Test plan ingest    | [`workflow/test-plan-ingest.md`](workflow/test-plan-ingest.md)                    | `generate-test-plan`  | Ingest (test plan)      | FS validation passed (after `plan.md` exit)                                             |
+| Test suite codegen  | [`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md)                | `generate-test-suite` | Codegen (test suite)    | TC files with resolved selectors; Stage 2 Code complete (after `implementation.md` exit) |
+| QA Gate             | [`workflow/qa-gate.md`](workflow/qa-gate.md)                                      | `qa-gate`             | QA + status flip        | Test suite generation report emitted (after `test-suite-codegen.md` exit)               |
+
+Each flow file owns its phase or flow detail, validation checklists, and exit criteria. **Dev track** flows respect the historical `/clear` boundaries at Phase 1.5→2 and Phase 2→3. **QA track** flows are each independent — `/clear` is required entering each one. The QA track is trigger-independent: `test-plan-ingest.md` may run any time after `plan.md` exit (FS validation passed); `test-suite-codegen.md` requires implemented UI (after `implementation.md` Stage 2 Code complete); `qa-gate.md` requires the codegen report. Milestone close blocks until `qa-gate.md` flips the FS to `implemented`, but cadence is up to the QA-track operator.
 The sections below this point (The Process, Knowledge base
 layout, Migration to VCS platform) apply to all flows.
 
@@ -231,7 +242,7 @@ body, is silent drift waiting to happen. See
 At every phase entry: load only nodes declared in the milestone's
 `touches_nodes` and `produces_nodes` plus one transitive hop. For ADRs:
 wholesale-read `adrs/index.md` only; narrow-load individual pages.
-`glossary.md` and `cross-cutting-concerns.md` snapshot-read at Phase 1.5
+`glossary.md` and `docs/shared/ccc/index.md` (CCC index) snapshot-read at Phase 1.5
 gate entry. `tech-stack.md` wholesale-read at Phase 3 entry. Test rule books
 and maintenance operation references are wholesale-read only when their
 matching operation fires.
@@ -302,8 +313,10 @@ implemented without doing this pass.
   one-line summary, tags, and source — enough for an LLM to route to the
   right page without opening it. These are the files generators wholesale-read.
 - **Per-type `log.md`** — append-only chronological event records, one entry
-  per lifecycle event. See [Maintenance discipline](#maintenance-discipline)
-  for format and update rules.
+  per lifecycle event. Applies to **ADRs** (`adrs/log.md`) and **research**
+  (`docs/research/log.md`) only. Node lifecycle events are recorded by
+  re-syncing the Status column in the per-type `index.md`; no per-type node
+  `log.md` fires. See [Maintenance discipline](#maintenance-discipline).
 
 ### Test artifacts traceability
 
@@ -314,16 +327,20 @@ implemented without doing this pass.
 
 ### Maintenance discipline
 
-> Every lifecycle event on a canonical node or ADR touches three files (artifact + per-type
-> `index.md` + per-type `log.md`). `home.md` is derived from per-type indexes, not hand-maintained.
+> Node edits (routine or lifecycle): **2-file touch** (node + per-type `index.md`); Status
+> changes are reflected by re-syncing the `index.md` Status column. No per-type node `log.md`
+> fires. ADR routine edits: 2-file touch (ADR + `adrs/index.md`). ADR lifecycle events:
+> **3-file touch** (ADR + `adrs/index.md` + `adrs/log.md`). `home.md` is derived from
+> per-type indexes, not hand-maintained.
 > Canonical home (vocabulary, tier-touch procedure, log format, lazy-creation rule, fallback):
 > [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
-### Maintaining baseline references (glossary, cross-cutting concerns)
+### Maintaining baseline references (glossary, CCC)
 
-> Project-owned NFR baselines (`docs/glossary.md`, `docs/cross-cutting-concerns.md`) that
-> every FRS inherits. Lifecycle ops run between Phase 1.5 gates (never during); not part of
-> the tiered touch. Full procedures:
+> Project-owned NFR baselines (`docs/shared/glossary.md`, `docs/shared/ccc/` tree — index at
+> `docs/shared/ccc/index.md`) that every FRS inherits. The flat `cross-cutting-concerns.md` is
+> retired; the CCC tree is the canonical home. Lifecycle ops run between Phase 1.5 gates (never
+> during); not part of the tiered touch. Full procedures:
 > [`workflow/baseline-references.md`](workflow/baseline-references.md).
 
 ### In-flight nodes (`status: proposed`)
@@ -375,7 +392,11 @@ found during ambient reading) become OQ-NNN files under
 [`discovery/open-questions/`](discovery/open-questions/) with
 `origin: legacy-absorption` (when found while absorbing legacy text) or
 `origin: workflow-evolution` (when found while reading the workflow itself).
-Same 3-file lifecycle touch idiom as DEC / ADR. Template:
+Discovery-surface touch: 1-file for routine edits, 2-file (artifact +
+`open-questions/index.md` if one exists) for terminal lifecycle events
+(`resolved`, `rejected`, `escalated`). No `log.md` — see
+[`workflow/maintenance-discipline.md → Discovery surface discipline`](workflow/maintenance-discipline.md#discovery-surface-discipline).
+Template:
 [`_templates/OPEN-QUESTION.md`](_templates/OPEN-QUESTION.md). The
 pre-2026-05-13 legacy file
 [`discovery/open-questions.md`](discovery/open-questions.md) is frozen and
@@ -553,10 +574,11 @@ cross-cutting practice cited here.
 
 **Routes to (per phase):**
 - Phase 0 / 1 / 1.5 → [`workflow/design.md`](workflow/design.md)
-- Phase 2 (FS + node ingest, then test plan ingest) → [`workflow/plan.md`](workflow/plan.md)
+- Phase 2 (FS + node ingest) → [`workflow/plan.md`](workflow/plan.md)
 - Phase 3 — Merge + Code → [`workflow/implementation.md`](workflow/implementation.md)
-- Phase 3 — Test suite codegen → [`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md) (same session, load after Stage 2 Code)
-- Phase 3 — QA Gate → [`workflow/qa-gate.md`](workflow/qa-gate.md) (same session, load after test codegen)
+- **QA track — Test plan ingest** → [`workflow/test-plan-ingest.md`](workflow/test-plan-ingest.md) (independent session, after `plan.md` exit)
+- **QA track — Test suite codegen** → [`workflow/test-suite-codegen.md`](workflow/test-suite-codegen.md) (independent session, after `implementation.md` Stage 2 Code complete)
+- **QA track — QA Gate** → [`workflow/qa-gate.md`](workflow/qa-gate.md) (independent session, after `test-suite-codegen.md` generation report)
 - Bug fix track → [`workflow/bug-fix.md`](workflow/bug-fix.md)
 
 **Maintenance ops fired during phases:** [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md),

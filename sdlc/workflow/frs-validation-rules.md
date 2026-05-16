@@ -42,11 +42,12 @@ governs how code-derived items become FRS rows in the first place
 items at validation time. [`design.md`](design.md) is the caller that
 fires the gate; this file is the rule book it loads.
 
-The project's Phase 1.5 gate runs three per-FRS checks
-(`existence`, `sanity`, `adr-conflict`) plus a cross-FRS sweep. **The
-cross-FRS sweep is skipped when the milestone has fewer than 2 FRSs** — a
-single-FRS milestone has no cross-FRS conflicts to detect; append "N/A —
-single FRS milestone" to `discovery/milestone-scope.md` for audit trail.
+The project's Phase 1.5 gate runs five per-FRS checks
+(`existence`, `sanity`, `adr-conflict`, `standard-conflict`, `ccc-deviation`)
+plus a cross-FRS sweep. **The cross-FRS sweep is skipped when the milestone
+has fewer than 2 FRSs** — a single-FRS milestone has no cross-FRS conflicts
+to detect; append "N/A — single FRS milestone" to
+`discovery/milestone-scope.md` for audit trail.
 This file
 expands those checks with **severity classification**, **bundling
 detection**, the **NFR rubric**, the **`[inferred from code]` propagation
@@ -57,8 +58,9 @@ and the **audit reproducibility set** captured per finding.
 
 The rules apply on top of the project's FRS template
 ([`../_templates/FRS.md`](../_templates/FRS.md)), the canonical DDD wiki,
-and the baselines at [`../glossary.md`](../glossary.md) and
-[`../cross-cutting-concerns.md`](../cross-cutting-concerns.md).
+and the baselines at [`docs/shared/glossary.md`](../../docs/shared/glossary.md) and
+[`docs/shared/ccc/index.md`](../../docs/shared/ccc/index.md) (the per-CCC
+baseline pages).
 
 ---
 
@@ -68,8 +70,8 @@ Every Validation finding is one of:
 
 | Severity | Meaning | Examples |
 |---|---|---|
-| **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in Behavior; bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion; missing or dangling `touches_nodes` / `produces_nodes` / `adrs:` declarations that clearly apply; FRS-ID collision; FRS contradicts an `accepted` ADR without an ADR-supersession path. |
-| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a baseline category with no ADR back-link. |
+| **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in Behavior; bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion; missing or dangling `touches_nodes` / `produces_nodes` / `adrs:` declarations that clearly apply; FRS-ID collision; FRS contradicts an `accepted` ADR without an ADR-supersession path; FRS violates an `accepted` STD whose `applies_when.stack:` intersects the FRS's `stack:` without filing a deviation ADR (`type: standard-conflict`); FRS silently overrides a CCC baseline declared in `ccc:` without a back-linked deviation ADR (`type: ccc-deviation`). |
+| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS uses a stack-narrow STD (`applies_when.stack:` intersects `stack:`) without declaring it in `standards:`; FRS cites a CCC by content (restating the baseline prose) instead of by ID. |
 | **Minor** | Style / clarity issue; does not invalidate the FRS. | Ambiguous phrasing; inconsistent terminology; AC restating a Behavior step verbatim; OQ missing a tag; non-rule trap ("no limit applies" — describes absence of a constraint rather than a constraint). |
 
 **Gate verdicts:**
@@ -143,8 +145,10 @@ A bundling finding is recorded as a Validation finding with
 
 An NFR-shaped statement is valid in an FRS only if it (a) describes an
 **experience or obligation the business owes the user** — not a technical
-target — AND (b) is not already covered by
-[`../cross-cutting-concerns.md`](../cross-cutting-concerns.md).
+target — AND (b) is not already covered by a CCC under
+[`docs/shared/ccc/`](../../docs/shared/ccc/index.md). If the FRS deviates
+from a CCC, the deviation lands as an ADR (with `related: [CCC-NNN]`) — not
+as inline FRS prose.
 
 | ✅ Business language and operation-specific | ❌ Technical in disguise, or restates the baseline |
 |---|---|
@@ -179,9 +183,9 @@ surface.
 actor is informed that no matching record was found."**
 
 **❌ "Use Redis to cache session state for 30 minutes"** — technical NFR.
-**✅ Reference the Session Management category in
-`cross-cutting-concerns.md`; state only the operation-specific deviation
-if any.**
+**✅ Reference the Session Management CCC (e.g., `CCC-011`) in the FRS's
+`ccc:` frontmatter; state only the operation-specific deviation if any
+(via an ADR back-linked with `related: [CCC-011]`).**
 
 **❌ "The administrator uses drag-and-drop to set a complete new section
 order"** — interaction mechanism (will rot with future UI changes).
@@ -292,19 +296,20 @@ When a Validation finding fires, the gate also captures (in the FRS's
 deferred findings):
 
 - `glossary_version` — from the Revision History of
-  [`../glossary.md`](../glossary.md) at gate entry.
-- `baseline_version` — from the Revision History of
-  [`../cross-cutting-concerns.md`](../cross-cutting-concerns.md) at gate
-  entry.
+  [`docs/shared/glossary.md`](../../docs/shared/glossary.md) at gate entry.
+- `baseline_version` — set of CCC IDs and their `updated:` dates from
+  the FRS's `ccc:` frontmatter, as read from
+  [`docs/shared/ccc/`](../../docs/shared/ccc/index.md) at gate entry.
 - `adrs_consulted` — the FRS's `adrs:` frontmatter list at gate entry.
 - `commit` — the git SHA at gate entry (optional but recommended).
 
 The reproducibility set makes findings auditable later — a reviewer can
 reconstruct which baseline content the finding was generated against,
-even after the baselines have evolved. The version stamps are how the
-breaking / non-breaking classification on baseline edits stays
-meaningful: a finding cited against `baseline_version: 1.0` is
-interpretable independently of subsequent edits.
+even after the baselines have evolved. The per-CCC `updated:` stamps are
+how the breaking / non-breaking classification on baseline edits stays
+meaningful: a finding cited against
+`baseline_version: { CCC-005: 2026-05-16 }` is interpretable
+independently of subsequent edits to CCC-005.
 
 ---
 
@@ -335,7 +340,7 @@ nodes; the in-flight context affects the resolution path (coordinate
 with sibling FS), not the severity.
 
 Example Rationale:
-`"Major: baseline-not-cited — Behavior restates retention default in para 3 (baseline_version: 1.0). Replace with category-5 forward reference."`
+`"Major: baseline-not-cited — Behavior restates retention default in para 3 (baseline_version: { CCC-012: 2026-05-16 }). Replace with CCC-012 reference in the FRS's ccc: frontmatter."`
 
 When `resolution: deferred`, a matching `OQ-NNN` file exists under
 [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)

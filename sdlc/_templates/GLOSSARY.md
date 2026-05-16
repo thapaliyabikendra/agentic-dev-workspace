@@ -1,12 +1,12 @@
 # Glossary
 
 > **Type:** Project-owned reference template. Seed once per project into
-> `docs/glossary.md`. Maintained by the project's curator (typically the
+> `docs/shared/glossary.md`. Maintained by the project's curator (typically the
 > solo developer wearing a curator hat) — see
 > [`../workflow/baseline-references.md`](../workflow/baseline-references.md)
 > for Add / Change / Retire / Drift procedures.
 > **Template path:** `sdlc/_templates/GLOSSARY.md`
-> **Seed path:** `docs/glossary.md`
+> **Seed path:** `docs/shared/glossary.md`
 
 Project-wide domain vocabulary. Each FRS that uses a domain term references
 this file rather than restating the definition — terms live here, FRSs link
@@ -23,7 +23,7 @@ able to find the canonical definition here without hunting across documents.
 
 When seeding this file into a project:
 
-1. Copy the file to `docs/glossary.md`.
+1. Copy the file to `docs/shared/glossary.md`.
 2. Replace the seed-path note above with the project's path.
 3. Keep the Baseline terms section intact — Audit Trail, Audit Trail
    Entry, and Cross-Cutting Concerns are universal across audited
@@ -109,10 +109,12 @@ and any operation-specific fields the spec mandates be captured verbatim
 ### Cross-Cutting Concerns
 
 The set of project-wide non-functional requirements, defaults, and
-obligations defined in [`cross-cutting-concerns.md`](../cross-cutting-concerns.md).
-Every FRS inherits these concerns; FRS sections that touch NFR territory
-reference rather than restate them. See the file for the canonical list of
-categories.
+obligations defined as per-CCC pages under
+[`docs/shared/ccc/`](../../docs/shared/ccc/index.md) (one file per concern;
+index at `docs/shared/ccc/index.md`). Every FRS declares the CCCs it
+inherits in its `ccc:` frontmatter; FRS sections that touch NFR territory
+reference CCCs by ID rather than restate them. Operation-specific
+deviations are filed as ADRs back-linked via `related: [CCC-NNN]`.
 
 ### Project-specific terms
 

@@ -11,22 +11,31 @@ production code, then runs the QA gate. Part of the workflow defined in
 [`../WORKFLOW.md`](../WORKFLOW.md).
 
 **Mode: Merge + Code.** Covers Stage 1 (Merge) and Stage 2 (Code) only. After Stage 2 Code is
-complete, load [`test-suite-codegen.md`](test-suite-codegen.md) to generate test specs, then
-[`qa-gate.md`](qa-gate.md) to run the QA gate and flip the FS to `implemented`. All three
-files share one Phase 3 session — no `/clear` between them.
+complete, **hand off to the QA track** — the QA track is independent of this session. Its second
+flow ([`test-suite-codegen.md`](test-suite-codegen.md)) runs in a fresh session after the developer
+has resolved selectors against the real DOM; its third flow ([`qa-gate.md`](qa-gate.md)) runs the
+QA gate and flips the FS to `implemented`. No shared session, no `/clear` exception — `/clear`
+separates this file from each QA-track flow.
 
 "Merge" here is the apply-deltas-and-flip-statuses operation, not a file copy. The new nodes the FS introduced are already
 canonical (written at Phase 2 with `status: proposed`); this flow flips
-them to `active` and fires a `status-change` log entry per node. For
-each CHG node listed in the FS's `changes:`, this flow applies the
-CHG's `modifies[]` / `removes[]` / `supersedes[]` deltas to the canonical
-targets (firing `updated` / `superseded` / `status-change` log entries
-there), then flips the CHG's status `approved → merged` in place. The
-CHG file itself stays at its milestone path — never promoted. Then
-implements the code that the now-active canonical nodes describe.
+them to `active` and re-syncs each node's per-type `index.md` row Status
+column. For each CHG node listed in the FS's `changes:`, this flow
+applies the CHG's `modifies[]` / `removes[]` / `supersedes[]` deltas to
+the canonical targets (re-syncing the affected index rows), then flips
+the CHG's status `approved → merged` in place. The CHG file itself stays
+at its milestone path — never promoted. Then implements the code that
+the now-active canonical nodes describe.
+
+Node lifecycle events (status flips, supersession, content updates)
+fire the 2-file node touch — they do **not** append a per-type node
+`log.md` entry. The audit trail is the index row's Status column +
+git history. ADR lifecycle events fired during implementation still
+follow the 3-file ADR touch (`adrs/log.md` entry). See
+[`maintenance-discipline.md`](maintenance-discipline.md).
 
 <HARD-GATE>
-Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green — every new node flipped `proposed → active`, every CHG delta applied to canonical with the matching log entries fired, every CHG flipped `approved → merged`. Coding against a still-`proposed` node, or against a CHG-targeted canonical node that hasn't yet received its delta, breaks the source-of-truth invariant the Merge stage exists to maintain.
+Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green — every new node flipped `proposed → active`, every CHG delta applied to canonical with the matching per-type `index.md` rows re-synced (and any ADR lifecycle events logged to `adrs/log.md`), every CHG flipped `approved → merged`. Coding against a still-`proposed` node, or against a CHG-targeted canonical node that hasn't yet received its delta, breaks the source-of-truth invariant the Merge stage exists to maintain.
 (Cross-cutting rules: see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Canonical edits use tiered touch".)
 </HARD-GATE>
 
@@ -35,16 +44,14 @@ Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green 
 ## Anti-Pattern: "The Shortcut Merge"
 
 Starting Stage 2 code work while one of the Merge bookkeeping touches
-is still pending — the canonical node body is correct but the
-`status-change` log entry hasn't been appended, or the per-type
+is still pending — the canonical node body is correct but the per-type
 `index.md` Status column hasn't been re-synced, or the CHG file's
 frontmatter still reads `approved`. The temptation: the *behavior* is
-right; the log/index sync feels like ceremony. The cost: the next
-person (often future-you) reads the index, sees `proposed`, decides
-the node isn't ready, and builds against the wrong assumption. The
-3-file touch is one operation, not a checklist of optional steps. Do not
-advance to Stage 2 until every item in the Stage 1 Merge exit checklist
-is checked. Doctrinal anchor:
+right; the index sync feels like ceremony. The cost: the next person
+(often future-you) reads the index, sees `proposed`, decides the node
+isn't ready, and builds against the wrong assumption. The node touch
+is one operation, not a checklist of optional steps. Do not advance to
+Stage 2 until every item in the Stage 1 Merge exit checklist is checked. Doctrinal anchor:
 [`../PRINCIPLES.md`](../PRINCIPLES.md) — "Silent node or ADR edits"
 and "If it can drift, the operation isn't atomic enough."
 
@@ -64,8 +71,9 @@ FS-driven slice (load [`bug-fix.md`](bug-fix.md)).
 
 **Vs. sibling files:** [`design.md`](design.md) Queries canonical;
 [`plan.md`](plan.md) Ingests new nodes (`status: proposed`); this file
-Applies CHG deltas + Flips statuses + Writes code; [`test-suite-codegen.md`](test-suite-codegen.md)
-Generates test specs from TC files; [`qa-gate.md`](qa-gate.md) Runs QA and flips statuses.
+Applies CHG deltas + Flips statuses + Writes code; (QA track flows, independent of this session):
+[`test-plan-ingest.md`](test-plan-ingest.md), [`test-suite-codegen.md`](test-suite-codegen.md),
+[`qa-gate.md`](qa-gate.md) — Generates test specs from TC files and runs QA gate to flip statuses.
 
 **Prerequisites:**
 
@@ -95,7 +103,7 @@ You MUST complete these in order:
 1. Load context (FS-declared sets only — FS, new canonical nodes, CHG files, ADRs, tech-stack)
 2. Stage 1 — Merge (flip every new node `proposed → active`, apply CHG deltas to canonical targets, flip every CHG `approved → merged`)
 3. Stage 2 — Code (implement against now-active canonical nodes, one cohort at a time, build-validate between cohorts)
-4. Load [`test-suite-codegen.md`](test-suite-codegen.md) to generate test specs from Phase 2 TC files
+4. Hand off to the **QA track** — `test-suite-codegen.md` and `qa-gate.md` run as independent flows in their own sessions. Do not load them in this session.
 
 ---
 
@@ -127,9 +135,9 @@ digraph implementation_flow {
 
 The Stage-1-exit diamond is the canonical instance of this file's
 HARD-GATE — Stage 2 does not begin until every Merge entry has fired
-correctly. The QA gate (ADR-conformance + tests-green) runs in
-[`qa-gate.md`](qa-gate.md) after test suite codegen; the FS does not flip to
-`implemented` until it passes.
+correctly. The QA gate (ADR-conformance + tests-green) runs in [`qa-gate.md`](qa-gate.md) as the third
+QA-track flow — in its own session, not this one. The FS does not flip to `implemented` until
+it passes; milestone close blocks until that flip occurs.
 
 ---
 
@@ -145,13 +153,15 @@ correctly. The QA gate (ADR-conformance + tests-green) runs in
 This flow runs in two stages, in order:
 
 1. **Merge** — flip new nodes `proposed → active`, apply CHG `modifies[]` /
-   `removes[]` / `supersedes[]` to canonical targets, fire the matching log
-   entries per event. ("Merge" is the apply-deltas-and-flip-statuses
+   `removes[]` / `supersedes[]` to canonical targets, re-sync the affected
+   per-type `index.md` rows. ("Merge" is the apply-deltas-and-flip-statuses
    operation, not a file copy.)
 2. **Code** — implement against the now-active canonical nodes.
 
-After Stage 2 Code is complete, load [`test-suite-codegen.md`](test-suite-codegen.md) to
-generate test specs, then [`qa-gate.md`](qa-gate.md) to run the QA gate.
+After Stage 2 Code is complete, this flow exits. The **QA track** then runs as three independent
+flows in their own sessions (`test-suite-codegen.md` then `qa-gate.md`). The FS-to-`implemented`
+flip happens in `qa-gate.md` once its checks pass — milestone close depends on that flip, but
+cadence is up to the QA-track operator.
 
 Do not skip ahead — coding before the Merge stage applies the CHG deltas defeats the
 source-of-truth invariant.
@@ -162,7 +172,7 @@ Read **only** what the FS declares:
 
 1. Open the FS at
    `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md`. Collect:
-   `new_nodes:`, `changes:`, `adrs:`, `depends_on_specs:`.
+   `new_nodes:`, `changes:`, `adrs:`, `standards:`, `ccc:`, `depends_on_specs:`.
 2. Read every new canonical node under `docs/<component>/nodes/<type>/` whose ID
    appears in the FS's `new_nodes:` (all carry `status: proposed`). These
    are the definitions the FS introduces; Phase 3 flips them to `active`.
@@ -176,7 +186,15 @@ Read **only** what the FS declares:
    Narrow-load every ADR declared in the FS's `adrs:` plus any
    convention-tagged ADR the FS missed (surface the gap if you find one,
    update the FS, do not silently load).
-5. Read [`../../docs/tech-stack.md`](../../docs/tech-stack.md) wholesale —
+4a. Read [`../standards/index.md`](../standards/index.md) and
+    [`../../docs/shared/ccc/index.md`](../../docs/shared/ccc/index.md) — one-line
+    summaries only, both indexes bounded. Narrow-load every STD declared in the
+    FS's `standards:` whose `applies_when.stack:` intersects the FS's `stack:`,
+    plus every STD tagged `convention` / `task-ordering` / `code-quality` that
+    the FS missed. Narrow-load every CCC declared in `ccc:`; for each CCC, walk
+    its Baseline section so Stage 2 Code honors the default unless an ADR
+    declares the operation-specific deviation.
+5. Read [`../../docs/shared/tech-stack.md`](../../docs/shared/tech-stack.md) wholesale —
    it is the operational baseline that carries pinned stack versions,
    application layout, operational commands (build / run / test /
    migrate), environments, runtime state, and milestone progress. Cited
@@ -192,19 +210,36 @@ rule.
 
 ### Stage 1 — Merge
 
+**Step 0 — Verify dependency ordering** (before any flip or delta application):
+
+1. Read this FS's `depends_on_specs:` frontmatter.
+2. For each spec ID in that list, open the spec file and verify its
+   frontmatter shows `merged: true`.
+3. Halt if any shows `merged: false` — this FS's Phase 3 is blocked until
+   those dependencies merge. Do not partial-merge; surface the blocker and
+   wait. Resuming in the same session after the dependency merges does
+   **not** require a fresh `/clear` if Step 0 was the only step executed.
+4. **Reverse-dependent check** (only when retiring or reordering THIS FS):
+   glob `depends_on_specs:` across every other FS in the milestone; each
+   match identifies a downstream dependent that must be coordinated with
+   before this FS's merge state changes. Surface the dependent list — do
+   not silently re-order.
+
 For **every new node** in the FS's `new_nodes:` (already at
 `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed` from Phase 2):
 
 1. **Flip status.** Edit the canonical node's frontmatter:
    `status: proposed → status: active`.
-2. **Append `status-change` log entry** to `docs/<component>/nodes/<type>/log.md`. Body
-   notes `proposed → active via FS-NNN Phase 3 merge`.
-3. **Re-sync the per-type index row** at `docs/<component>/nodes/<type>/index.md`:
+2. **Re-sync the per-type index row** at `docs/<component>/nodes/<type>/index.md`:
    Status column flips from `proposed` to `active`. If the one-line
    summary, tags, or source also changed, sync those too.
 
    `docs/home.md` is derived from the per-type indexes — it regenerates
    on demand, not per merge.
+
+   No per-type node `log.md` entry fires; the index row's Status column
+   plus git history are the audit trail. See
+   [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--per-type-node-logmd-dropped-2026-05-16).
 
 For **every CHG-NNN** in the FS's `changes:`:
 
@@ -217,15 +252,14 @@ For **every CHG-NNN** in the FS's `changes:`:
    - [ ] Apply the delta described in the CHG's `before → after` summary.
    - [ ] Append a `source_ref` entry `{frs, fs, op: modify}` to the
          canonical node.
-   - [ ] Append an `updated` entry to `docs/<component>/nodes/<type>/log.md` with a
-         one-line note referencing CHG-NNN.
    - [ ] Re-sync the canonical node's row in `docs/<component>/nodes/<type>/index.md` if
          the summary, tags, status, or source changed.
-3. For each entry in the CHG's `removes[]` or `supersedes[]`: apply the
-   status transition (`status-change` or `superseded` log entry per the
-   [Operation vocabulary](maintenance-discipline.md#operation-vocabulary-closed-set))
-   and re-sync the per-type index. Any successor IDs must already be in
-   the CHG's `adds[]`.
+3. For each entry in the CHG's `removes[]` or `supersedes[]`: flip the
+   canonical node's Status (`active → superseded` or `active → deprecated`)
+   and re-sync the per-type index row (move it to the
+   Superseded/deprecated section). The CHG file's `before → after`
+   summary plus git history are the per-event audit. Any successor IDs
+   must already be in the CHG's `adds[]`.
 
 Finally, flip the CHG node itself:
 
@@ -234,7 +268,7 @@ Finally, flip the CHG node itself:
       flip frontmatter `status: approved → status: merged`.
 - [ ] CHG files stay at the milestone path permanently — they are NOT
       promoted to canonical. No `docs/<component>/nodes/changes/` subtree exists; no
-      3-file lifecycle touch fires against canonical for the CHG.
+      canonical touch fires against the CHG itself.
 
 The CHG file under the milestone folder is **kept as permanent history.**
 Do not delete `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`
@@ -247,13 +281,13 @@ durable audit trail of this FS's modifications to canonical.
 See [Anti-Pattern: "The Shortcut Merge"](#anti-pattern-the-shortcut-merge) above for why every item below is non-optional.
 
 - [ ] Every entry in the FS's `new_nodes:` has had its canonical
-      `status` flipped `proposed → active`, with a `status-change` log
-      entry fired and the per-type index row re-synced.
+      `status` flipped `proposed → active`, and the per-type index row
+      Status column re-synced.
 - [ ] Every CHG `modifies[]` entry has been applied to its canonical target
-      (delta applied, `source_ref` appended, `updated` log entry fired,
-      index row re-synced as needed).
-- [ ] Every CHG `removes[]` / `supersedes[]` entry has fired its status
-      transition on the canonical target.
+      (delta applied, `source_ref` appended, index row re-synced as needed).
+- [ ] Every CHG `removes[]` / `supersedes[]` entry has flipped the
+      canonical target's Status and moved the index row to the
+      Superseded/deprecated section.
 - [ ] Every CHG node's frontmatter has been flipped `approved → merged` in
       place at its milestone path.
 - [ ] No canonical edits exist outside what the FS's `new_nodes:` or its
@@ -268,13 +302,20 @@ Every node referenced in this Stage carries `status: active` after Stage 1
 (or `status: proposed` for a node that hasn't been flipped yet — that is a
 Stage 1 bug, not a Stage 2 working state).
 
-**Convention ADRs to consult during coding.** Stage 2 honors every ADR
-in `docs/<component>/adrs/index.md` tagged `convention` (or
-labelled as a project-wide commitment) in addition to the FS's declared
-ADR set. Read the index first; narrow-load each page when authoring code
-that touches its area. The FS's `adrs:` list plus the convention-tagged
-ADRs from the index together form the conformance set [`qa-gate.md`](qa-gate.md)
-verifies.
+**Convention ADRs, STDs, and CCCs to consult during coding.** Stage 2 honors:
+- Every ADR in `docs/<component>/adrs/index.md` tagged `convention` (or labelled
+  as a project-wide commitment) in addition to the FS's declared `adrs:` set.
+- Every STD in the FS's `standards:` set whose `applies_when.stack:` intersects
+  the FS's `stack:`, plus any STD tagged `convention` / `task-ordering` /
+  `code-quality` from `sdlc/standards/index.md`.
+- Every CCC in the FS's `ccc:` set — the Baseline section names the default
+  behavior; an operation-specific deviation requires a back-linked ADR (with
+  `related: [CCC-NNN]`) already declared in `adrs:`.
+
+Read each relevant index first; narrow-load individual pages when authoring
+code that touches their area. The FS's `adrs:` + `standards:` + `ccc:` lists
+together with the convention-tagged ADRs and STDs from the indexes form the
+conformance set [`qa-gate.md`](qa-gate.md) verifies.
 
 Cohort ordering inside the FS's Implementation tasks maps to these ADRs —
 see
@@ -283,7 +324,7 @@ and the cohort-ordering ADR for this project.
 
 **Build validation between cohorts.** After each cohort's code lands,
 run your project's build command (declared in
-[`../../docs/tech-stack.md § Operational commands`](../../docs/tech-stack.md#3-operational-commands))
+[`../../docs/shared/tech-stack.md § Operational commands`](../../docs/shared/tech-stack.md#3-operational-commands))
 for the affected projects (and the host) before moving on. Compilation
 failures inside the just-touched cohort are local and fixed in place;
 failures in unrelated projects, missing-type errors across cohort
@@ -326,44 +367,52 @@ is no second pair of eyes to tell you when you're done — the failing check
 is the signal, and the QA gate's verification checklist in [`qa-gate.md`](qa-gate.md)
 is just the aggregate of those per-task checks.
 
+### Exit handoff
+
+Stage 2 Code complete; this flow exits. The **QA track** may now run
+[`test-suite-codegen.md`](test-suite-codegen.md) in a fresh session (after `/clear`). The
+QA-track operator owns the cadence — informational handoff, not a directive — but milestone
+close depends on the QA track's final flow ([`qa-gate.md`](qa-gate.md)) flipping the FS to
+`implemented`.
+
 ### Node content updates (during implementation)
 
-The "Keep canonical nodes in sync" discipline above produces `updated`
-lifecycle events on canonical nodes — implementation reveals a node was
-missing an invariant, had a wrong transition, or stated a wrong contract,
-and the canonical node gets edited to match reality. These are not status
-changes, but they **are** lifecycle events under
-[`maintenance-discipline.md`](maintenance-discipline.md)
-and follow the full 3-file lifecycle touch.
+The "Keep canonical nodes in sync" discipline above produces content
+edits on canonical nodes — implementation reveals a node was missing an
+invariant, had a wrong transition, or stated a wrong contract, and the
+canonical node gets edited to match reality. These follow the 2-file
+node touch under
+[`maintenance-discipline.md`](maintenance-discipline.md).
 
 - [ ] For every canonical node whose content is edited during
       implementation:
-      - [ ] `updated` entry appended to `docs/<component>/nodes/<type>/log.md` with a
-            one-line note on what changed (the why; the diff is in git).
       - [ ] Per-type `index.md` row re-synced if the one-line summary,
             tags, or source changed. (No re-sync needed for purely internal
-            edits that don't change those fields.)
-- [ ] Conversely: no silent canonical edits. If you can't write an
-      `updated` log entry that names the reason, the edit isn't ready —
-      either the FS should have declared it, or you're drifting outside the
-      slice.
+            edits that don't change those fields — the node file edit
+            alone is the 1-file-of-2 in that case; the index row simply
+            doesn't need updating.)
+- [ ] Conversely: no silent canonical edits. If you can't write a git
+      commit message that names the reason for the edit, the edit isn't
+      ready — either the FS should have declared it, or you're drifting
+      outside the slice.
 
 ### Status transitions (during implementation)
 
 Implementation routinely flips canonical node and ADR lifecycle states — a
 node moves `active → superseded` when its replacement lands; an ADR moves
 `accepted → deprecated` (or `superseded`) when an implementation deviation
-forces it. **Every status move re-syncs the four files** named in
+forces it. Each side fires its own touch per
 [`maintenance-discipline.md`](maintenance-discipline.md).
 No silent flips.
 
-- [ ] For every canonical node whose status changes during implementation:
-      - [ ] `status-change` (or `superseded` / `deprecated`) entry appended
-            to `docs/<component>/nodes/<type>/log.md` with old and new status in the
-            body.
-      - [ ] Per-type `index.md` row updated (moved to the
-            Superseded/deprecated section if applicable).
-- [ ] For every ADR whose status changes during implementation:
+- [ ] For every canonical node whose status changes during implementation
+      (2-file node touch):
+      - [ ] Frontmatter `status:` updated on the node file.
+      - [ ] Per-type `index.md` row's Status column re-synced; if status
+            is terminal (`superseded` / `deprecated`), row moved to the
+            Superseded/deprecated section.
+- [ ] For every ADR whose status changes during implementation
+      (3-file ADR lifecycle touch):
       - [ ] `status-change` (or `superseded` / `deprecated`) entry appended
             to `adrs/log.md`.
       - [ ] `adrs/index.md` row updated (moved to the Superseded/deprecated
@@ -438,11 +487,11 @@ directly?*
 
 ## Common Mistakes
 
-**❌ Starting Stage 2 before all Stage 1 exit checklist items are checked** — the canonical node body may be correct but the log entry or index re-sync is missing; the next reader sees `proposed` and treats the node as unready.
+**❌ Starting Stage 2 before all Stage 1 exit checklist items are checked** — the canonical node body may be correct but the per-type `index.md` re-sync is missing; the next reader sees `proposed` and treats the node as unready.
 **✅ Complete every item in the Stage 1 Merge exit checklist before writing a single line of production code.**
 
-**❌ Editing a canonical node during Stage 2 without updating the FS's declared sets** — silent drift; no log entry; index goes stale.
-**✅ If implementation reveals a missed node, update the FS first (or raise an OQ), then make the canonical edit with the full 3-file lifecycle touch.**
+**❌ Editing a canonical node during Stage 2 without updating the FS's declared sets** — silent drift; index goes stale; the edit has no FS-declared reason.
+**✅ If implementation reveals a missed node, update the FS first (or raise an OQ), then make the canonical edit with the 2-file node touch (node + per-type index.md).**
 
 **❌ Drive-by-fixing or refactoring adjacent code discovered while working on an FS task** — scope creep inside the feature branch; untested changes.
 **✅ File a separate bug-fix branch per [`bug-fix.md`](bug-fix.md); the FS branch touches only what the FS declares.**
@@ -503,7 +552,7 @@ log.
 ### Reading tech stack across repos
 
 [`Context loading`](#context-loading-before-merging-or-coding) reads
-`docs/tech-stack.md` wholesale for cross-cutting infrastructure. In
+`docs/shared/tech-stack.md` wholesale for cross-cutting infrastructure. In
 multi-service projects, **also** read the `## Stack` section of every
 SVC node listed in (or implied by) the FS's `service_repos:` — that is
 where per-service runtime, build, test, and deploy commands live. See
@@ -511,7 +560,7 @@ where per-service runtime, build, test, and deploy commands live. See
 
 ### Per-SVC stack discipline
 
-`docs/tech-stack.md` carries **cross-cutting** shared infrastructure
+`docs/shared/tech-stack.md` carries **cross-cutting** shared infrastructure
 only — Kafka cluster, databases, observability stack, CI/CD platform,
 language / ecosystem standards, project-wide runtime state. **Per-service**
 runtime, repo URL, branch convention, directory layout, build / test /
@@ -533,7 +582,7 @@ Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
 - **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase
   pipeline, retrieval discipline,
   [`Maintenance discipline`](./maintenance-discipline.md)
-  for the 3-file lifecycle touch fired here.
+  for the 2-file node touch (and 3-file ADR lifecycle touch) fired here.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
   doctrinal anti-patterns this stage enforces ("Silent node or ADR
   edits"; "Editing a canonical node outside an active Phase 3 merge";
@@ -547,8 +596,10 @@ Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
 - **Maintenance ops that may fire:**
   [`authoring-adr.md`](authoring-adr.md) (Stage 2 implementation
   forces an ADR supersession).
-- **Routes to (after Stage 2 Code is complete):**
-  [`test-suite-codegen.md`](test-suite-codegen.md) — same session, no `/clear`.
-- **Sibling flow files:** [`design.md`](design.md),
-  [`plan.md`](plan.md), [`test-suite-codegen.md`](test-suite-codegen.md),
-  [`qa-gate.md`](qa-gate.md), [`bug-fix.md`](bug-fix.md).
+- **Hands off to (after Stage 2 Code is complete):** the **QA track**, starting at
+  [`test-suite-codegen.md`](test-suite-codegen.md) (the QA-track's first applicable flow at this
+  point; [`test-plan-ingest.md`](test-plan-ingest.md) may already have run after `plan.md` exit).
+  Each QA-track flow runs in its own session — `/clear` between this file and `test-suite-codegen.md`.
+- **Sibling flow files (dev track):** [`design.md`](design.md), [`plan.md`](plan.md);
+  (bugs) [`bug-fix.md`](bug-fix.md); (QA track) [`test-plan-ingest.md`](test-plan-ingest.md),
+  [`test-suite-codegen.md`](test-suite-codegen.md), [`qa-gate.md`](qa-gate.md).
