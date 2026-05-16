@@ -27,9 +27,11 @@ relevant flow file are loaded. Applies across sessions.
    `test-suite-codegen` → `qa-gate`; `/clear` between each and on entry
    to each).
 6. Every artifact has an ID and links upstream + downstream. IDs:
-   `ADR-NNN`, `FRS-NNN`, `M-NN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`,
+   `ADR-NNN`, `FRS-NNN`, `M-NN`, `CR-NNN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`,
    `OQ-NNN`, node IDs (all `-NNN`). Check per-type index and
    `id-claims.md` before incrementing. OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
+   CR-NNN: standalone change-request container (not a milestone).
+   See [`sdlc/workflow/change-request.md`](sdlc/workflow/change-request.md).
 7. Plans contain no syntax. Phase 2 names structures; Phase 3 writes
    them. Multi-stage / cross-cohort plans need a progress checklist;
    mark each stage `[x]` before advancing. Cohort definition + node-ingest
@@ -93,6 +95,14 @@ Project (created lazily; framework requires the slot):
 - Cross-component ADRs: `docs/shared/adrs/index.md`
 - CCC baselines: [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md)
 - Component nodes: `docs/<component>/nodes/<type>/index.md`
+
+## Where to look
+
+- `docs/app/` — APP component (entities, commands, flows, actors, ADRs)
+- `docs/shared/` — glossary, CCC baselines, cross-component ADRs, tech-stack
+- `docs/milestones/` — milestone portals, FRSs, FSs, CHG nodes, TC files
+- `docs/discovery/` — open questions (per-OQ folder)
+- `docs/home.md` — cross-component catalog and ID high-water marks
 
 ## Advisor gate
 

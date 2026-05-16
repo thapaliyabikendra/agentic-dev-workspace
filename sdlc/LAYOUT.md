@@ -57,7 +57,8 @@ artifact). When in doubt about where a new file goes, check here first.
                            references (maintenance-discipline.md,
                            baseline-references.md, authoring-adr.md,
                            derived-reports.md, legacy-absorption.md,
-                           evolving-the-workflow.md, coverage-matrix.md, bug-fix.md)
+                           evolving-the-workflow.md, coverage-matrix.md, bug-fix.md,
+                           change-request.md)
     /_templates            scaffolding for new artifacts and nodes
                            includes INDEX.md and LOG.md for per-type pairs;
                            16 node templates (ACTOR, ENTITY, COMMAND, QUERY,
@@ -87,6 +88,21 @@ artifact). When in doubt about where a new file goes, check here first.
         index.md           ← OQ catalog (Karpathy-style)
         log.md             ← OQ lifecycle log
         OQ-NNN-*.md        ← individual OQ files
+    /change-requests       CR-as-container — standalone change requests (no milestone grouping)
+      /CR-NNN-<slug>
+        CR-NNN-<slug>.md   ← CR portal doc (template: sdlc/_templates/CR-PORTAL.md)
+        id-claims.md       ← per-CR ID reservation ledger (lazy)
+        /frs
+          FRS-NNN-<slug>.md  ← single FRS per CR
+        /specs
+          /FS-NNN-<slug>
+            FS-NNN.md
+            /nodes
+              /changes           ← CHG-NNN nodes, permanent CR home (never promoted)
+                CHG-NNN-<slug>.md
+            /test-plans          ← TC files (lazy; created by QA-track flow)
+              /<use-case>
+                TC-NNN-<slug>.md
     /milestones            milestone-as-container — everything for one milestone
       /M-NN-<slug>
         M-NN-<slug>.md     ← milestone portal doc

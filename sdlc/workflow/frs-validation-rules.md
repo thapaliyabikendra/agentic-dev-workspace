@@ -329,6 +329,76 @@ independently of subsequent edits to CCC-005.
 
 ---
 
+## Additional sanity rules
+
+Three rules introduced 2026-05-16 to tighten the Phase 1.5 gate's reach
+into AC discipline, deferred-finding bookkeeping, and NFR baseline
+traceability.
+
+**Grandfather clause.** Rules in this section apply **prospectively** to
+FRSs whose Phase 1.5 gate first runs after 2026-05-16. FRSs whose gate
+already ran on or before 2026-05-16 are not retroactively re-classified —
+their existing `Validation findings` rows stand. A revision of a
+grandfathered FRS that re-triggers the gate is subject to these rules
+from the re-run forward; the grandfather is one-shot.
+
+### Rule: ac-single-outcome
+
+| Trigger | An acceptance-criteria bullet contains "OR" / "either…or" / "and/or" between two distinct observable outcomes (different HTTP status codes, redirect-vs-error, success-vs-fail). |
+| ------- | --- |
+| Type | `sanity` |
+| Severity | **Major** |
+| Resolution | Split the AC into two rows (one per outcome), pin to one outcome (revise the other to a separate criterion), or carry the ambiguity as an OQ with `gate_effect: blocking` until the stakeholder picks. |
+| Rationale prefix | `"Major: ac-single-outcome — …"` |
+
+An AC must be a single testable claim. Test runners assert one expected
+shape per assertion; an OR-bridged AC forces the test author to pick
+silently, defeating the trace from FRS → FLW scenario → TC. The
+"the platform default does whichever" intuition — see FRS-002's original
+"400 or redirect" row — is exactly the trap: the FRS reader cannot tell
+whether `200` is a defect or a tolerated path.
+
+### Rule: deferred-finding-raises-oq
+
+| Trigger | A Validation findings row carries `resolution: deferred` and the Rationale column does not cite an `OQ-NNN`. |
+| ------- | --- |
+| Type | (matches the underlying finding type) |
+| Severity | **Major** |
+| Resolution | Either resolve the finding inline (revise the FRS / file the ADR / drop the line) and flip to `resolved`, or raise the OQ now and cite the ID in Rationale. Deferral without an OQ is a half-fired touch. |
+| Rationale prefix | `"Major: deferred-finding-raises-oq — …"` |
+
+The `Pre-resolved Gate` anti-pattern (see [`design.md`](design.md#anti-pattern-the-pre-resolved-gate))
+catches resolutions claimed without artifact change. This rule catches
+the dual failure: a deferral claimed without the OQ that carries the
+deferred question forward. Without the OQ, the deferred finding has
+nowhere to live after the FRS is closed — it falls off the surface and
+silently expires.
+
+### Rule: nfr-baseline-trace
+
+| Trigger | An NFR-shaped sentence appears in any FRS body section (Behavior, Postconditions, Auditability, Acceptance criteria) without a CCC-NNN citation in the immediate surrounding clause **or** an explicit "deviates from CCC-NNN via ADR-NNN" annotation. |
+| ------- | --- |
+| Type | `ccc-deviation` |
+| Severity | **Minor** |
+| Resolution | Cite the relevant CCC by ID, or replace the NFR claim with a CCC reference, or file the operation-specific override as an ADR back-linked via `related: [CCC-NNN]` and cite both IDs in the FRS. |
+| Rationale prefix | `"Minor: nfr-baseline-trace — …"` |
+
+Distinct from the existing `Major: baseline-not-cited` rule
+(see [NFR rubric](#nfr-rubric)). `baseline-not-cited` fires when the
+FRS restates a baseline's content as if it were operation-specific;
+`nfr-baseline-trace` fires when the FRS makes a valid operation-specific
+NFR claim but omits the baseline citation. The Minor severity reflects
+the gap (traceability, not duplication); the Major reflects the
+violation (duplication of authority).
+
+| Violation example | Classification |
+|---|---|
+| Body says "retention is 10 years" and no CCC-012 cited | Minor: nfr-baseline-trace (cite CCC-012 or file ADR) |
+| Body says "the audit log retains operation attempts for 7 years" verbatim from CCC-004 | Major: baseline-not-cited (delete; rely on `ccc:` frontmatter) |
+| Body says "this operation extends CCC-012's retention from 7 to 25 years per ADR-014" | Pass (cited + deviation annotated) |
+
+---
+
 ## How findings appear in the FRS
 
 The FRS template's `Validation findings` section carries one row per

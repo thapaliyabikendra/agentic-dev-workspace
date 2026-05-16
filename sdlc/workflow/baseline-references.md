@@ -72,6 +72,48 @@ ADR back-linked to the CCC via `related: [CCC-NNN]`.
 
 Lifecycle operations run **between** Phase 1.5 gates, never during one.
 
+## Glossary read contract
+
+The Phase 1.5 validation gate snapshots
+[`docs/shared/glossary.md`](../../docs/shared/glossary.md) at gate entry and
+captures the version in any Validation finding that fires
+([audit reproducibility set](frs-validation-rules.md#audit-reproducibility-set)).
+Drafters reference the glossary while writing the FRS Behavior section;
+the gate cross-checks that every term used in the FRS body resolves to an
+entry there. The glossary version is captured as `glossary_version` in every
+Validation finding's audit reproducibility set.
+
+## Glossary format
+
+Each entry is one term with one definition. Definitions are written in
+business language — no technical surfaces, no schema references. When a
+term has both a long form and an abbreviation, list both at the term head
+and use either consistently across FRS bodies.
+
+Format:
+
+```
+### Term Name (TLA, if any)
+
+One- or two-sentence business definition. The definition explains what the
+term means in this project, not what it means in the dictionary or in
+another industry. If the term is regulator-defined, cite the regulation.
+
+**Examples** *(when helpful):*
+- Concrete example 1
+- Concrete example 2
+
+**See also:** RelatedTerm1, RelatedTerm2 *(when relevant)*
+```
+
+Avoid nesting subterms inside an entry. If a sub-term needs its own
+definition, give it its own entry and cross-reference.
+
+**Matching is case-insensitive** and resolves `See also` synonyms — so a
+body mention of "audit log" matches an entry titled `Audit Trail` if that
+entry's `See also` lists it (or vice versa). Entries are inserted
+alphabetically within their subsection (see Op 1).
+
 ## Op 1: Add
 
 **Op 1 adds a new baseline entry** — glossary term or new CCC category.
@@ -173,9 +215,9 @@ FRS edits.
 
 ## Hard rules across all ops
 
-- **Glossary alphabetical insertion** is the contract within the chosen
-  subsection — Phase 1.5 term resolution assumes case-insensitive
-  alphabetical order and `See also` synonym resolution.
+- **Glossary alphabetical insertion** within the chosen subsection — full
+  entry shape, matching semantics, and synonym resolution:
+  [§ Glossary format](#glossary-format).
 - **CCC IDs are permanent.** Never reuse a retired ID. Retired CCCs
   keep their file and index row (Superseded/deprecated table) with a
   retired status.

@@ -26,9 +26,17 @@ Detail at [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip
 Workflow aligns operations to Karpathy's Ingest/Query pattern: the
 FRS flow Queries the canonical DDD wiki to validate requirements; the FS flow
 Ingests new DDD nodes directly into the canonical wiki at `docs/<component>/nodes/` with
-`status: proposed`, and emits a milestone-scoped CHG node when existing canonical
-nodes are touched; implementation Applies the CHG deltas to canonical and flips
-the new nodes `proposed → active`. The **QA track** runs as three independent flows after the dev track produces its artifacts: `test-plan-ingest.md` authors TCs once the FS validates; `test-suite-codegen.md` generates executable specs after implementation completes; `qa-gate.md` runs the verification checklist and flips the FS to `implemented`.
+`status: proposed`, and emits a CHG node when existing canonical nodes are touched;
+implementation Applies the CHG deltas to canonical and flips the new nodes
+`proposed → active`. The **CR track** (`change-request.md`) is a lightweight
+alternative to the full dev track for isolated, standalone change requests that
+don't warrant milestone grouping — it produces a CR-scoped container instead of
+a milestone folder, skips Phase 0 and the cross-FRS sweep, and delegates to
+`plan.md` / `implementation.md` for the FS and code phases. The **QA track**
+runs as three independent flows after the dev track (or CR track) produces its
+artifacts: `test-plan-ingest.md` authors TCs once the FS validates;
+`test-suite-codegen.md` generates executable specs after implementation completes;
+`qa-gate.md` runs the verification checklist and flips the FS to `implemented`.
 
 Three principles run through every phase:
 
@@ -176,6 +184,14 @@ from one milestone, each aggregating a subset of the milestone's FRSs.
 | Pre-plan            | [`workflow/discuss.md`](workflow/discuss.md)                               | `pre-plan-discuss`    | Optional              | Between 1.5 and 2           |
 | Plan                | [`workflow/plan.md`](workflow/plan.md)                                     | `generate-feat-spec`  | Ingest                | 2                           |
 | Implementation      | [`workflow/implementation.md`](workflow/implementation.md)                 | `implement-feat`      | Merge + Code          | 3                           |
+
+### CR track flows
+
+| Flow                | File                                                                             | Operation          | Mode        | Phases covered                          |
+| ------------------- | -------------------------------------------------------------------------------- | ------------------ | ----------- | --------------------------------------- |
+| Change Request      | [`workflow/change-request.md`](workflow/change-request.md)                       | `change-request`   | Multi-mode (CR-scoped) | CR-0, CR-1, CR-1.5, CR-2, CR-3 |
+
+CR track is the milestone-free path for isolated change requests. It delegates to `plan.md` (Phase CR-2) and `implementation.md` (Phase CR-3). Escalation criteria to milestone track are in `change-request.md § Escalation procedure`.
 
 ### QA track flows
 
@@ -413,7 +429,8 @@ When a change request arrives, the milestone choice follows this matrix:
 | Existing milestone in flight AND change is within its scope | **Existing** — add FRS under it |
 | Existing milestone in flight AND change extends scope materially | **New milestone**, declare `extends: [M-NN]` |
 | Existing milestone shipped AND change refines what it built | **New milestone**, declare `extends: [M-NN]` |
-| Change is small AND no in-flight milestone fits | **Accumulator milestone** — `kind: accumulator` (see Milestone kinds below) |
+| Change is standalone, isolated, single user-journey AND no related in-flight work | **CR track** ([`workflow/change-request.md`](workflow/change-request.md)) — milestone-free; CR-scoped FRS + FS + CHG |
+| Change is small AND no in-flight milestone fits AND several similar small CRs accumulate | **Accumulator milestone** — `kind: accumulator` (see Milestone kinds below) |
 | Change is genuinely new large scope | **New milestone** |
 | Change is small AND code-level only (parameter tweak, copy edit, UI nudge) | **Bug-fix path** ([`workflow/bug-fix.md`](workflow/bug-fix.md)) — it's a code change, not a requirements change |
 

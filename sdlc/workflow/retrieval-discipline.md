@@ -16,6 +16,8 @@ below are this file's doctrinal preamble — always read on first phase
 entry of a milestone. The returning reader who knows which phase is
 firing reads only the sections the table names.
 
+**Before using the phase-entry rows below:** if the operation is a meta question, documentation request, or single-phase task (not a full phase execution), check [`design.md § Minimal read set per task type`](design.md#minimal-read-set-per-task-type) first — it overrides the phase-entry load for those task shapes and is the primary token lever for orientation sessions.
+
 | Operation | Sections to read |
 |---|---|
 | Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Baselines](#baselines) + [ADRs](#adrs) + [Exceptions](#exceptions) |

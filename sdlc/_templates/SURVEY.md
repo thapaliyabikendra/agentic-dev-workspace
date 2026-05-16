@@ -23,6 +23,26 @@ related: []
 > **not** a free-form working note — for that, use Exploration
 > (`docs/exploration/`, [`EXPLORATION.md`](EXPLORATION.md)).
 >
+> **Status lifecycle:**
+> - `draft` — Survey is being authored. Default at creation.
+> - `done` — Survey content is complete; consuming artifact has not yet
+>   reached `approved`. Use for absorption surveys that finish before
+>   any downstream FRS is approved.
+> - `adopted` — When `level: frs`, flip from `draft`/`done` to `adopted`
+>   at the Phase 1.5 exit checklist step (see
+>   [`../workflow/design.md → Checklist — Phase 1.5 exit`](../workflow/design.md#checklist--phase-15-exit-gate-closure)),
+>   the moment the consuming FRS named in `adopted_into:` reaches
+>   `status: approved`. When `level: milestone`, flip to `adopted` at
+>   milestone close (see [`../workflow/close-milestone.md`](../workflow/close-milestone.md)).
+>   1-file touch — discovery surface; no `index.md` re-sync.
+> - `stale` — Survey content is no longer current; the milestone moved
+>   on without adopting it. Useful for absorption surveys overtaken by
+>   events. 1-file touch.
+> - `rejected` — Survey was authored but the consuming artifact
+>   declined to adopt it (e.g., the FRS path was abandoned). 1-file touch.
+> - `dormant` — Survey was authored speculatively and is parked pending
+>   a future milestone. 1-file touch.
+>
 > Lightweight map of the existing system surface that upcoming requirements
 > will touch. One page or less. Anchors the milestone (when `level: milestone`)
 > or a single FRS (when `level: frs`) — does not document the whole system.

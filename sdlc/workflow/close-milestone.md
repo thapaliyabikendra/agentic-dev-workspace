@@ -73,6 +73,19 @@ Edit `docs/milestones/M-NN-<slug>/MILESTONE-STATE.md`:
    - `Last session completed:` — "Milestone closed."
    - `Next session should start with:` — "N/A — milestone done."
 
+### C-3.5 — Flip milestone-scope discovery to adopted
+
+Edit `docs/milestones/M-NN-<slug>/discovery/milestone-scope.md`:
+
+1. Set frontmatter `status:` from its current value (typically `draft`
+   or `done`) to `adopted`.
+
+1-file touch — discovery surface; no `log.md`, no `index.md` re-sync.
+Per-FRS discovery files were already flipped to `adopted` at their
+Phase 1.5 exit (see
+[`design.md → Checklist — Phase 1.5 exit`](design.md#checklist--phase-15-exit-gate-closure));
+this step closes the milestone-level survey.
+
 ### C-4 — Update docs/home.md (if it exists)
 
 If `docs/home.md` exists, update the milestone's row:

@@ -623,6 +623,14 @@ appends a corresponding `cross-frs` finding to the FRSs involved.
       and a back-link to the FRS.
 - [ ] The milestone portal's `frs:` list matches the actual set of FRS files
       in `frs/`.
+- [ ] For each FRS that reaches `status: approved` at this gate, flip its
+      per-FRS discovery file's frontmatter `status:` from `draft` (or
+      `done`) to `adopted`. 1-file touch — discovery surface; no
+      `log.md`, no `index.md` re-sync. Background:
+      [`../_templates/SURVEY.md → Status lifecycle`](../_templates/SURVEY.md).
+      Milestone-level discovery (`milestone-scope.md`) flips to `adopted`
+      at milestone close, not here — see
+      [`close-milestone.md`](close-milestone.md).
 
 The gate cannot be bypassed. Deferred findings are explicitly deferred —
 "will address in Phase 2" or "needs business clarification, blocked on

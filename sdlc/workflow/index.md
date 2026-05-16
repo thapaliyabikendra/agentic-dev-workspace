@@ -25,6 +25,7 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 | [plan.md](plan.md) | Plan flow — authors Feature Spec, ingests proposed nodes, emits CHG nodes, runs FS validation loop (also known as the `authoring-fs` operation) | Phase 2 entry (after `/clear`) |
 | [implementation.md](implementation.md) | Merge + Code — applies CHG deltas, flips node statuses, writes production code | Phase 3 entry (after `/clear`) |
 | [bug-fix.md](bug-fix.md) | Lightweight defect track — direct fix path or escalation to full FRS | When a defect surfaces |
+| [change-request.md](change-request.md) | CR track — standalone change request; CR portal + single FRS + per-FRS gate (Pass 1 only) + FS + CHG + implementation; no milestone grouping | When a standalone change request doesn't warrant milestone grouping |
 
 ---
 

@@ -2,7 +2,8 @@
 id: FS-NNN
 title: <Spec title — usually mirrors the milestone slice>
 status: draft                 # draft | reviewed | approved | implemented
-milestone: M-NN
+milestone: M-NN               # blank for CR track (mutually exclusive with cr:)
+cr:                           # CR-NNN for CR track; blank for milestone track
 frs: [FRS-NNN, FRS-NNN]       # subset of the milestone's FRSs aggregated by this FS
 new_nodes: []                 # DDD node IDs this FS introduces — written directly to docs/nodes/<type>/ with status: proposed at Phase 2 (formerly `scoped_nodes:`)
 changes: []                   # CHG-NNN IDs emitted by this FS (empty if pure addition); CHG files live at nodes/changes/ permanently

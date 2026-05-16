@@ -90,7 +90,12 @@ on dev; qa-suite → qa-gate on QA).
    ```
    Track is `dev` or `qa`.
 5. Clear `session_notes` (stale mid-phase notes belong in history, not the live field).
-6. Remind user: a `/clear` is required before loading the next flow file on any of these
+6. Re-derive `progress_percent` from the new `(dev_phase, qa_phase)` pair
+   using the anchor table in
+   [`../_templates/MILESTONE-STATE.md → Progress-percent formula`](../_templates/MILESTONE-STATE.md#progress-percent-formula).
+   The value is the table cell for the current pair — no free-form
+   interpolation.
+7. Remind user: a `/clear` is required before loading the next flow file on any of these
    five transitions (per CLAUDE.md Hard rules):
    - Phase 1.5 → 2 (design → plan)
    - Phase 2 → 3 (plan → implementation)
@@ -114,7 +119,11 @@ on dev; qa-suite → qa-gate on QA).
 2. Update `## Session continuity`:
    - `Last session completed:` — one sentence on the last milestone action taken.
    - `Next session should start with:` — the exact first step for the next session.
-3. Update `progress_percent` to a rough estimate (0–100) of milestone completion.
+3. Re-derive `progress_percent` from the `(dev_phase, qa_phase)` pair using
+   the anchor table in
+   [`../_templates/MILESTONE-STATE.md → Progress-percent formula`](../_templates/MILESTONE-STATE.md#progress-percent-formula).
+   The value is the table cell for the current pair — no free-form
+   interpolation.
 
 ---
 
@@ -127,7 +136,7 @@ on dev; qa-suite → qa-gate on QA).
 | `qa_phase`         | string  | `not-started \| qa-plan \| qa-suite \| qa-gate \| done` | Current QA-track flow                  |
 | `phase_entered`    | date    | `YYYY-MM-DD`                     | Date the current (most-recently-entered) phase began |
 | `next_action`      | string  | Free text                        | Immediate next step; updated at every transition    |
-| `progress_percent` | integer | `0–100`                          | Rough milestone completion estimate                 |
+| `progress_percent` | integer | `10 \| 25 \| 40 \| 55 \| 70 \| 80 \| 90 \| 95 \| 100` | Derived from the `(dev_phase, qa_phase)` pair — see [`../_templates/MILESTONE-STATE.md → Progress-percent formula`](../_templates/MILESTONE-STATE.md#progress-percent-formula). Not free-form. |
 | `session_notes`    | string  | Free text                        | Working field; cleared at session close             |
 
 > **Dev-track vs. QA-track orthogonality.** The two `*_phase` fields are
