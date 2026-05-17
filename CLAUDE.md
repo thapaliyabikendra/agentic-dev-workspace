@@ -28,8 +28,14 @@ relevant flow file are loaded. Applies across sessions.
    to each).
 6. Every artifact has an ID and links upstream + downstream. IDs:
    `ADR-NNN`, `FRS-NNN`, `M-NN`, `CR-NNN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`,
-   `OQ-NNN`, node IDs (all `-NNN`). Check per-type index and
-   `id-claims.md` before incrementing. OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
+   `OQ-NNN`, node IDs (all `-NNN`). Check the per-type `index.md` (canonical
+   node types) or the milestone-scoped folder (CHG: `chg/`; TC:
+   `specs/**/test-plans/**`) or the FRS frontmatter glob
+   (`produced_actor:` for ACT) before incrementing.
+   `id-claims.md` is the modify-intent + released-claim ledger only post-
+   2026-05-17 — `op: modify` and `op: released` rows only; do not consult
+   it for `introduce` ceilings (R-NEW-9 amended; pre-cutover `op: introduce`
+   rows are grandfathered). OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
    CR-NNN: standalone change-request container (not a milestone).
    See [`sdlc/workflow/change-request.md`](sdlc/workflow/change-request.md).
 7. Plans contain no syntax. Phase 1 ingests FLW (Trigger + Scenarios)

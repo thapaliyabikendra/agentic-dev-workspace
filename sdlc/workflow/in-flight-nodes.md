@@ -17,9 +17,11 @@ with `status: proposed` in frontmatter. The birth phase is **type-keyed**:
   below.
 - **ACT** is born at **Phase 2** when the FS is authored, when the FRS
   declares `produced_actor:` (per R-NEW-2a retirement 2026-05-17). The
-  ACT-NNN ID is claimed at Phase 1 in `id-claims.md` (Source = FRS-NNN,
-  Op = introduce) but the ACT file does not exist on disk until Phase 2.
-  See [ACT-NNN ID claim lifecycle](#act-nnn-id-claim-lifecycle) below.
+  ACT-NNN ID is claimed at Phase 1 via the FRS frontmatter
+  `produced_actor:` field itself (R-NEW-9 amended 2026-05-17 — no
+  `id-claims.md` introduce row written); the ACT file does not exist on
+  disk until Phase 2. See [ACT-NNN ID claim lifecycle](#act-nnn-id-claim-lifecycle)
+  below.
 - **ENT, CMD, STA, CON, INT, DEC, PERM, QRY** are born at **Phase 2** when the
   FS is authored (per the FRS's `produces_nodes:` list).
 
@@ -62,12 +64,15 @@ discriminator](#phase-1-bare-vs-phase-2-wired-discriminator) below).
 
 R-NEW-2a retired 2026-05-17. ACT is born at **Phase 2** (alongside ENT /
 CMD / STA / etc.), not Phase 1. At Phase 1, only the ACT-NNN ID is claimed
-when the FRS sets `produced_actor:` — recorded in the milestone /
-CR-scoped `id-claims.md` with Source = FRS-NNN, Op = introduce. No ACT
-file is created at this stage.
+when the FRS sets `produced_actor:` — the claim lives **in the FRS
+frontmatter itself** (R-NEW-9 amended 2026-05-17 — `id-claims.md`
+introduce rows are no longer written; the `produced_actor:` field is the
+authoritative claim). No ACT file is created at this stage.
 
-**Phase 1.** `produced_actor: ACT-NNN` on the FRS frontmatter. ID claim row
-in `id-claims.md`. No file. Phase 1.5 verifies the ID claim exists but
+**Phase 1.** `produced_actor: ACT-NNN` on the FRS frontmatter IS the
+claim. No `id-claims.md` row. No ACT file. Phase 1.5 verifies the
+`produced_actor:` value is unique against (a) sibling FRSs'
+`produced_actor:` glob and (b) canonical `nodes/actors/index.md`, but
 does not look up an ACT body (there is none).
 
 **Phase 2.** The consuming FS authors the ACT file in full at
@@ -82,7 +87,10 @@ they issue (QRY-NNN, optional), Flows they initiate (FLW-NNN IDs — real).
 
 Cross-FRS duplicate-actor detection at Phase 1.5 is explicitly dropped
 (accepted trade-off — surfaces at Phase 2 FS authoring as an ID collision
-in `id-claims.md` when both FSs claim the same actor name).
+against canonical `nodes/actors/index.md` plus the cross-FRS
+`produced_actor:` glob when both FRSs claim the same actor name;
+R-NEW-9 amended 2026-05-17 — `id-claims.md` is no longer the collision
+surface).
 
 ## Phase-1-bare vs. Phase-2-wired discriminator (FLW only)
 
@@ -158,7 +166,7 @@ in flight.
 
 | Phase | Event | Status flip |
 |---|---|---|
-| **Phase 1** | FRS births CHG when `touches_nodes:` is non-empty (R-CHG-1). Allocated via `id-claims.md` with Source = FRS-NNN, Op = introduce. Body carries behavior-language `modifies[]`, optional milestone-level `invariants_before/after`, optional `removes[]` / `supersedes[]`. No `adds[]`, no `migration_steps[]`, no structural before/after. | birth → `draft` |
+| **Phase 1** | FRS births CHG when `touches_nodes:` is non-empty (R-CHG-1). Allocated by globbing the milestone's `chg/` folder for the next free `CHG-NNN-<slug>.md` filename (R-NEW-9 amended 2026-05-17 — the CHG file itself is the claim; no `id-claims.md` introduce row). Body carries behavior-language `modifies[]`, optional milestone-level `invariants_before/after`, optional `removes[]` / `supersedes[]`. No `adds[]`, no `migration_steps[]`, no structural before/after. | birth → `draft` |
 | **Phase 1.5** | Pass 1 `chg-sanity` validates each CHG's behavior delta against FRS ACs + target node state (R-CHG-5). Pass 2 cross-FRS sweep catches CHG-conflicts (R-CHG-6). Round-trip body edits use the 1-file touch carve-out (R-NEW-7 extension) when `status:` stays `draft`. | unchanged (`draft`) |
 | **Phase 2** | Consuming FS lists CHG in `consumes_chgs:` (R-CHG-3); enriches in place — structural before/after on `modifies[]`, `adds[]` mirroring new node ingest, `migration_steps[]`. 2-file touch fires on the CHG file (CHG has no per-type `index.md` today — see [`maintenance-discipline.md`](maintenance-discipline.md)). | unchanged (`draft`) |
 | **Phase 2 close** | FS-validation exit (per [`plan.md § 6`](plan.md#6-fs-validation-loop)) flips each consumed CHG. | `draft → approved` |
@@ -256,9 +264,11 @@ abandonment event, two-to-three artifact-side touches (FRS, FLW, CHG).
 not a body-only edit (R-NEW-7's carve-out does not apply); for the CHG,
 the touch is 1-file on the CHG file (CHG has no per-type `index.md`
 today). **ACT-NNN ID release.** If the abandoned FRS claimed an ACT-NNN
-in `id-claims.md` via `produced_actor:`, the row is annotated with `Op:
-released` and the ID is not reused — no canonical ACT file exists yet to
-deprecate. FRS **split-and-replace** (FRS revised to split into two new
+via the FRS frontmatter `produced_actor:` field, the release is recorded
+by appending a fresh `op: released` row to the milestone's
+`id-claims.md` (Source = the abandoned FRS) — this is the only audit
+trail because the FRS frontmatter itself is being retired. The ID is
+not reused; no canonical ACT file exists yet to deprecate. FRS **split-and-replace** (FRS revised to split into two new
 FRSs) retires the originals as `deprecated` and allocates fresh IDs for
 the splits; IDs are never reused.
 

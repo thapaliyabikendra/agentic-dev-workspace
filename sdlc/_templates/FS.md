@@ -88,7 +88,6 @@ captured in the CHG (see "Change maps" below), not here.
 - ENT-NNN — <new entity / new invariant / new lifecycle>
 - CMD-NNN — <new command, write operation>
 - QRY-NNN — <new query, read operation>
-- FLW-NNN — <new flow>
 - STA-NNN — <new state machine>
 - MOD-NNN — <module / feature area>
 - SCR-NNN — <UI screen / view>
@@ -97,8 +96,18 @@ captured in the CHG (see "Change maps" below), not here.
 - DEC-NNN — <node-scoped decision>
 - INT-NNN — <integration>
 
-ID-claims for every entry above must already be recorded in the milestone's
-`id-claims.md`. See [`../workflow/plan.md → ID-claim protocol`](../workflow/plan.md#id-claim-protocol).
+FLW-NNN is **not** listed here — FLW is Phase-1-born by the producing FRS
+(per R-NEW-1), not Phase-2-introduced by the FS. The FS enriches the
+Phase-1-bare FLW in place at Phase 2 (Sequence / Branches / Compensating /
+Postconditions / Decisions); the enrichment is recorded by appending a
+`{frs, fs, op: detail}` entry to the FLW's `source_ref:`, not by adding
+the FLW to this "New nodes" list. See
+[`../workflow/plan.md § 3 (b) Phase-1-born FLW enrichment`](../workflow/plan.md#3-new-node-canonical-ingest--phase-1-born-flw-enrichment).
+
+Each entry above is born to canonical at this FS's Phase 2 ingest — the
+per-type `index.md` row IS the claim (R-NEW-9 amended 2026-05-17 — no
+`id-claims.md` introduce row written). See
+[`../workflow/plan.md → ID-claim protocol`](../workflow/plan.md#id-claim-protocol).
 
 ## Test plan
 

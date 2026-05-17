@@ -312,8 +312,9 @@ constraints. Out-of-scope items go in the discovery doc, not the portal.
 - [ ] Open questions raised during discovery are answered, explicitly
       deferred, or carried as `OQ-NNN` files under
       `docs/discovery/open-questions/` (check
-      `docs/discovery/open-questions/index.md` and `id-claims.md` before
-      allocating the next `OQ-NNN`) with
+      `docs/discovery/open-questions/index.md` for the next OQ-NNN —
+      R-NEW-9 amended 2026-05-17, the OQ index is the authoritative
+      ceiling) with
       `origin: discovery, origin_ref: DISCOVERY-NNN, needed_by: phase-1`.
       The discovery's "Open questions" section cites the OQ IDs; the
       question text is not duplicated.
@@ -337,12 +338,16 @@ constraints. Out-of-scope items go in the discovery doc, not the portal.
 - `docs/milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` — the per-FRS CHG this FRS introduces when `touches_nodes:` is non-empty, born to its milestone-scoped permanent home with `status: draft`, Phase-1-bare body (behavior-language `modifies[]` + optional milestone-level `invariants_before/after` + optional `removes[]` / `supersedes[]`; no `adds[]`, no `migration_steps[]`, no structural before/after). One CHG per FRS. Per R-CHG-1..4. (CR track: `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`.)
 
 **ACT-NNN is NOT born at Phase 1.** When the FRS introduces a new actor role
-(`produced_actor:` is set), the ACT-NNN ID is **claimed** at Phase 1 in
-`id-claims.md` (Source = FRS-NNN, Op = introduce) but the canonical ACT file
-is authored at Phase 2 alongside ENT / CMD / STA / etc. — see
-[`plan.md § 3`](plan.md#3-new-node-canonical-ingest--phase-1-born-flw-enrichment).
+(`produced_actor:` is set), the ACT-NNN ID is **claimed** via the FRS
+frontmatter `produced_actor: ACT-NNN` field (R-NEW-9 amended 2026-05-17 —
+the FRS frontmatter IS the authoritative claim; no `id-claims.md` introduce
+row is written). The canonical ACT file is authored at Phase 2 alongside
+ENT / CMD / STA / etc. — see [`plan.md § 3`](plan.md#3-new-node-canonical-ingest--phase-1-born-flw-enrichment).
 The FRS body cites `produced_actor: ACT-NNN` as a forward reference (real ID,
 no file yet) — parallel to the way `produces_nodes:` entries are claimed.
+**Cross-FRS ACT-NNN collision detection at allocation:** glob every FRS in
+the milestone's `frs/` folder for `produced_actor:` and pick the next free
+ID above both that ceiling and the canonical `nodes/actors/index.md` ceiling.
 R-NEW-2a retired 2026-05-17 — Phase-1-bare ACT body shape no longer applies
 because there is no Phase-1 ACT body. Cross-FRS duplicate-actor detection at
 Phase 1.5 is explicitly dropped (accepted trade-off — surfaces at Phase 2 FS
@@ -422,8 +427,10 @@ For each user-journey in the milestone:
    Scenarios (happy / edge / fault, Given/When/Then, business language only —
    no ENT/CMD/STA IDs) + Brownfield notes (optional). `related: []`. Status
    `proposed`. Per R-NEW-2. 2-file touch: FLW file + `nodes/flows/index.md`.
-   Allocate the FLW-NNN ID from the milestone's `id-claims.md` per R-NEW-9
-   (Source column accepts the FRS-NNN as the claimant).
+   Allocate the FLW-NNN ID from `docs/<component>/nodes/flows/index.md` —
+   the per-type canonical index is the FLW ID ceiling (R-NEW-9 amended
+   2026-05-17 — no `id-claims.md` introduce row written; the index row
+   created by the 2-file touch IS the claim).
 5. **Author the Phase-1-born CHG** at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`
    (CR track: `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`)
    using [`../_templates/nodes/CHANGE.md`](../_templates/nodes/CHANGE.md) —
@@ -438,21 +445,23 @@ For each user-journey in the milestone:
    `migration_steps[]`, and structural before/after on `modifies[]` stay
    empty at Phase 1 — they fire at Phase 2 FS enrichment. Status `draft`.
    `source_ref: [{frs: FRS-NNN, op: modify}]`. Per R-CHG-1..4. Allocate
-   the CHG-NNN ID from the milestone's `id-claims.md` with Source =
-   FRS-NNN, Op = introduce. 2-file touch on the CHG file +
-   `chg/index.md` if one exists (CHG has no per-type `index.md` today
-   per row-12 gap note — fire only the CHG file edit when no index
-   exists). When the FRS's `touches_nodes:` is empty (pure-addition
-   FRS), skip this step.
+   the CHG-NNN ID by globbing the milestone's `chg/` folder for the next
+   free `CHG-NNN-<slug>.md` filename (R-NEW-9 amended 2026-05-17 — the
+   CHG file itself is the claim; no `id-claims.md` introduce row is
+   written). 1-file touch on the CHG file (CHG has no per-type
+   `index.md` today per row-12 gap note). When the FRS's
+   `touches_nodes:` is empty (pure-addition FRS), skip this step.
 
    **ACT-NNN ID claim (when `produced_actor:` is set).** Even though the
    ACT file is authored at Phase 2, the ACT-NNN ID is claimed at Phase 1
-   in `id-claims.md` with Source = FRS-NNN, Op = introduce — same row
-   shape as FLW-NNN / CHG-NNN claims. This reserves the ID against
-   sibling FRSs allocating the same number. The FRS frontmatter
-   `produced_actor: ACT-NNN` resolves as a forward reference. When
-   `produced_actor:` is blank (FRS reuses an existing ACT), no claim is
-   made; cite the existing ACT-NNN in the FRS Actors section by ID.
+   via the FRS frontmatter `produced_actor: ACT-NNN` field — R-NEW-9
+   amended 2026-05-17, the FRS frontmatter IS the authoritative claim;
+   no `id-claims.md` introduce row is written. This reserves the ID
+   against sibling FRSs: cross-FRS collision detection globs every FRS
+   in the milestone's `frs/` for `produced_actor:` plus the canonical
+   `nodes/actors/index.md` ceiling. When `produced_actor:` is blank
+   (FRS reuses an existing ACT), no claim is made; cite the existing
+   ACT-NNN in the FRS Actors section by ID.
 6. Append the FRS ID to the milestone portal's `frs:` frontmatter and to its
    "FRSs in this milestone" section.
 
@@ -465,8 +474,9 @@ Each FRS must:
   no new FLW is introduced (rare; usually a `touches_nodes:`-only FRS).
 - Declare `produced_actor:` — the ACT-NNN this FRS introduces when it
   introduces a new actor role (scalar; forward reference because the ACT
-  file is authored at Phase 2, but the ID is claimed at Phase 1 in
-  `id-claims.md`). Blank when reusing an existing actor.
+  file is authored at Phase 2, but the ID is claimed at Phase 1 in the
+  FRS frontmatter itself — R-NEW-9 amended 2026-05-17). Blank when
+  reusing an existing actor.
 - Declare `produces_nodes:` — new node IDs this FRS intends to introduce
   at Phase 2 Ingest (ENT / CMD / STA / CON / INT / DEC / PERM / QRY only;
   FLW and ACT are covered by `produced_flw:` / `produced_actor:`).
@@ -550,15 +560,17 @@ later.
       (empty list / blank scalar allowed only when genuinely nothing applies —
       and that's noted, not assumed). `produced_flw:` resolves to a real
       Phase-1-born node file in canonical; `produced_actor:` resolves to a
-      claimed ID in `id-claims.md` (forward reference; the ACT file is
-      authored at Phase 2).
+      claimed ID in the FRS frontmatter itself (forward reference; the ACT
+      file is authored at Phase 2 — R-NEW-9 amended 2026-05-17).
 - [ ] The Phase-1-born FLW file exists at `docs/<component>/nodes/flows/FLW-NNN-<slug>.md`
       with body shape per R-NEW-2 (Trigger + Scenarios + optional Brownfield;
       `related: []`); the FLW is appended to `nodes/flows/index.md` (2-file
       touch).
-- [ ] When `produced_actor:` is set, the ACT-NNN ID is recorded in
-      `id-claims.md` with Source = this FRS, Op = introduce. **No Phase-1
-      ACT file is authored** — that fires at Phase 2 (plan.md § 3).
+- [ ] When `produced_actor:` is set, the ACT-NNN ID is recorded in the
+      FRS frontmatter `produced_actor:` field (R-NEW-9 amended 2026-05-17
+      — the FRS frontmatter is the claim; no `id-claims.md` introduce
+      row). **No Phase-1 ACT file is authored** — that fires at Phase 2
+      (plan.md § 3).
 - [ ] When `touches_nodes:` is non-empty, the Phase-1-born CHG file exists
       at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
       `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`) with body
@@ -566,8 +578,9 @@ later.
       milestone-level `invariants_before/after` + optional `removes[]` /
       `supersedes[]`; no `adds[]`, no `migration_steps[]`, no structural
       before/after); `status: draft`; `source_ref: [{frs: FRS-NNN, op:
-      modify}]`. The CHG-NNN ID is recorded in `id-claims.md` with Source
-      = this FRS, Op = introduce.
+      modify}]`. The CHG-NNN ID is the filename itself at the milestone
+      `chg/` path (R-NEW-9 amended 2026-05-17 — the CHG file is the
+      claim; no `id-claims.md` introduce row).
 - [ ] `resolves:` frontmatter lists any pre-existing `OQ-NNN` this FRS closes
       (most commonly OQs raised at Phase 0 discovery or by an earlier FRS in
       this milestone). For each cited OQ, set its `resolved_by:` field to this
@@ -659,10 +672,10 @@ Phase-1-born FLW / CHG, but each writes to a disjoint finding row).
 Run Stage A after each FRS is authored. **`chg-sanity` (check #8) fires
 only when the FRS declares non-empty `touches_nodes:` — pure-addition
 FRSs skip the chg-sanity dispatch.** **Sibling-FRS ordering for
-chg-sanity:** Pass 1 processes sibling FRSs in birth order (per
-`id-claims.md` sequence); chg-sanity re-runs only on the affected CHG
-when any cited sibling FLW body changes during the round-trip
-(per υ / M1).
+chg-sanity:** Pass 1 processes sibling FRSs in birth order (per the
+FRS frontmatter `created:` timestamp; tie-break by FRS-NNN ascending);
+chg-sanity re-runs only on the affected CHG when any cited sibling FLW
+body changes during the round-trip (per υ / M1).
 
 **Stage B (milestone cross-FRS, after all FRSs cleared Stage A):**
 Pass 2's cross-FRS sweep dispatches once, after every FRS in the
@@ -702,8 +715,8 @@ Phase-1-born CHG when `touches_nodes:` is non-empty (the CHG file exists
 at this gate per R-CHG-1); pure-addition FRSs skip check 8. **ACT-NNN is
 not Phase-1-born** (R-NEW-2a retired 2026-05-17 — see HARD-GATE callout
 at top of file). When `produced_actor:` is set, Pass 1 checks the ID is
-claimed in `id-claims.md` but does NOT read an ACT body — there is none
-at this stage.
+claimed in the FRS frontmatter `produced_actor:` field (R-NEW-9 amended
+2026-05-17) but does NOT read an ACT body — there is none at this stage.
 
 1. **Existence scan** (widened per R-NEW-6 to match FLW scenario signatures).
    Search the canonical wiki (including `status: proposed` in-flight nodes
@@ -729,7 +742,10 @@ at this stage.
    - the FRS is duplicative → drop it (and retire the Phase-1-born FLW
      via `proposed → deprecated` per
      [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md); the
-     claimed ACT-NNN ID is released from `id-claims.md`);
+     claimed ACT-NNN ID is released — append an `op: released` row to
+     the milestone's `id-claims.md` with Source = this FRS, since the
+     FRS itself is being retired and the frontmatter no longer carries
+     the claim);
    - the FRS is adjacent-but-distinct → narrow the title and the use case to
      remove the ambiguity (and revise the FLW Scenarios in place — 1-file
      body-edit per R-NEW-7).
@@ -799,7 +815,8 @@ at this stage.
    Severity prefix in Rationale: `"Major: chg-sanity — …"`.
 
    **Sibling-FRS ordering (per υ / M1):** Pass 1 processes sibling FRSs
-   in birth order (per `id-claims.md` sequence). If a CHG's target FLW /
+   in birth order (per FRS frontmatter `created:` timestamp; tie-break
+   by FRS-NNN ascending). If a CHG's target FLW /
    ACT is Phase-1-bare and born by a sibling FRS, the check validates
    against the current Phase-1-bare body. If that sibling's body changes
    mid-round-trip, chg-sanity re-runs on the affected CHG only (not full
@@ -826,7 +843,8 @@ Findings format in the FRS's "Validation findings" table:
 
 Unresolved findings after the author-review pass become `OQ-NNN` files
 under `docs/discovery/open-questions/` (allocate the next `OQ-NNN` from
-`id-claims.md`; verify against the OQ index) with
+the OQ index `docs/discovery/open-questions/index.md` — R-NEW-9 amended
+2026-05-17) with
 `origin: validation-gate, origin_ref: FRS-NNN` and a back-link to the
 FRS in `nodes:` / body. The FRS's `Validation findings` row cites the
 `OQ-NNN`; the question text is not duplicated.
@@ -846,8 +864,10 @@ abandonment `proposed → deprecated`, CHG `draft → approved`) keeps the
 standard 2-file touch. Full FRS abandonment during Phase 1 / 1.5 routes to
 [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md) and deprecates
 the Phase-1-born FLW and CHG (if any) together; any `produced_actor:`
-ID claim is released from `id-claims.md` (no ACT file exists yet to
-deprecate). FRS split-and-replace retires the originals as `deprecated`
+ID claim is released — append an `op: released` row to the milestone's
+`id-claims.md` since the FRS itself is being retired (no ACT file
+exists yet to deprecate). FRS split-and-replace retires the originals
+as `deprecated`
 and allocates fresh IDs for the splits (IDs are never reused).
 
 ### Pass 2 — Milestone cross-FRS sweep (runs once after all FRSs in the milestone are per-FRS gated)
@@ -894,8 +914,9 @@ appends a corresponding `cross-frs` finding to the FRSs involved.
 - [ ] Every finding has `resolution: resolved` or `resolution: deferred`
       with a non-blank `rationale:`.
 - [ ] Unresolved findings each have a corresponding `OQ-NNN` under
-      `docs/discovery/open-questions/` (next ID drawn from `id-claims.md`
-      and verified against the OQ index) with `origin: validation-gate`
+      `docs/discovery/open-questions/` (next ID drawn from the OQ index
+      `docs/discovery/open-questions/index.md` per R-NEW-9 amended
+      2026-05-17) with `origin: validation-gate`
       and a back-link to the FRS.
 - [ ] The milestone portal's `frs:` list matches the actual set of FRS files
       in `frs/`.

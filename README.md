@@ -72,7 +72,7 @@ The pipeline has five phases across three flows:
 
 ## Artifact ID scheme
 
-Every artifact carries a stable ID. Check the relevant `index.md` and `id-claims.md` before incrementing.
+Every artifact carries a stable ID. Check the relevant `index.md` (canonical types) or the relevant milestone folder glob (CHG: `chg/`; TC: `specs/**/test-plans/**`; ACT Phase-1 claims: cross-FRS `produced_actor:`) before incrementing. `id-claims.md` is the modify-intent + released-claim ledger only (R-NEW-9 amended 2026-05-17).
 
 | Prefix | Type |
 |---|---|

@@ -235,10 +235,11 @@ that make the gate enforceable.
    If it spans multiple kinds (common for big root files like a 227K
    `technical-solution.md`), split the absorption into per-kind
    passes — one pass per target set.
-2. **Reserve IDs** in the consuming milestone's `id-claims.md` (per
-   [`plan.md`](plan.md)) for every node and ADR
-   the absorption will produce. For ADRs the collisions rule applies;
-   pick the next free ID from
+2. **Reserve IDs** by reading each authoritative home — per-type
+   `index.md` for nodes; `adrs/index.md` for ADRs (R-NEW-9 amended
+   2026-05-17 — `id-claims.md` no longer carries introduce rows; the
+   index row created on artifact birth IS the claim). For ADRs the
+   collisions rule applies; pick the next free ID from
    `docs/<component>/adrs/index.md`.
 3. **Author the canonical artifacts** — nodes via their templates,
    ADRs via [`authoring-adr.md`](authoring-adr.md), glossary terms via

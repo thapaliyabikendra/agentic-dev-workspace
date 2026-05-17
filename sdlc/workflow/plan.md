@@ -153,7 +153,9 @@ Scan-level gate before diving into The Process. All seven must hold before Phase
    noted in the FS's "Change maps"); each consumed CHG has been
    structurally enriched (`modifies[]` before/after, `adds[]`,
    `migration_steps[]` filled); each `modifies[]` target's ID is recorded
-   in `id-claims.md` as `op: modify`.
+   in `id-claims.md` as `op: modify` (R-NEW-9 amended 2026-05-17 —
+   `op: introduce` rows no longer written; per-type `index.md` is the
+   introduce audit).
 5. No syntax (method bodies, SQL, YAML) appears anywhere in the FS or new nodes.
 6. Every architecture decision is routed: promoted to ADR, filed as DEC, or kept inline.
 7. FS validation loop passes: zero Blockers, zero Majors.
@@ -264,73 +266,79 @@ and resume the FS — re-walking only the TBD sections. New canonical nodes alre
 ingested (`status: proposed`) stay where they are unless the re-pass explicitly retires
 them via the abandonment procedure in
 [`in-flight-nodes.md`](in-flight-nodes.md). CHG and TC files stay at their milestone
-paths. Already-claimed IDs in `id-claims.md` stay claimed (the re-pass may add more,
-never silently retire).
+paths. Existing rows in `id-claims.md` stay (the re-pass may add `op: modify` /
+`op: released` rows, never silently retire pre-cutover `op: introduce` grandfathers).
 
 ---
 
 ### 2. ID-claim protocol
 
-Every node ID this FS introduces or modifies must be recorded in
-`docs/milestones/M-NN-<slug>/id-claims.md`. **Lazy-create timing** (per R-NEW-9):
-the file is created on the **first FRS or FS claim** — i.e., the moment Phase 1 first
-allocates an FLW or claims an ACT-NNN ID for its FRS (R-NEW-1), or the moment Phase 2
-first allocates an ENT / CMD / STA / CON / INT / DEC / PERM / QRY / TC, whichever fires
-earlier. (ACT-NNN is always Phase-1-claimed when `produced_actor:` is set — Phase 2
-authors the ACT file against the existing claim; it does not first-allocate the ID.)
+`id-claims.md` is the **modify-intent + released-claim ledger**. Post-2026-05-17
+(R-NEW-9 amended), the file carries `op: modify` and `op: released` rows only.
+`op: introduce` rows are no longer written — every introduce has an authoritative
+home elsewhere (see ID-ceiling table below), so a mirroring ledger entry adds
+nothing but drift surface. Pre-cutover `op: introduce` rows are **grandfathered**:
+they stay in existing files as audit, and no migration is required.
+
+**Lazy-create timing** (per R-NEW-9 amended): the file is created on the **first
+claim that produces a row** — i.e., the first `op: modify` (Phase 2 FS authoring,
+when an FS consumes a Phase-1-born CHG whose `modifies[]` cites a canonical ID)
+or the first `op: released` (Phase 1 / 1.5 FRS abandonment that retires an
+ACT-NNN claim under `produced_actor:`). If neither fires through milestone close,
+the file is never created — and that is fine.
+
+**ID-ceiling table — where to read before allocating:**
+
+| ID type | Authoritative home (read this for ceiling) |
+| ------- | ------------------------------------------ |
+| FLW, ENT, CMD, STA, CON, INT, DEC, PERM, QRY, ACT (after Phase 2 file birth) | per-type `docs/<component>/nodes/<type>/index.md` |
+| ACT (Phase 1 claim, before file birth) | FRS frontmatter `produced_actor:` glob across the milestone's `frs/` folder |
+| CHG | milestone `chg/` folder glob (filenames are `CHG-NNN-<slug>.md`); CR track: `docs/change-requests/CR-NNN-<slug>/chg/`; pre-cutover grandfathered: `specs/FS-NNN-<slug>/nodes/changes/` |
+| TC | milestone `specs/**/test-plans/**/TC-*.md` glob (TCs nest under `specs/FS-NNN-<slug>/test-plans/<use-case>/`) |
+
+Counters are per-(component, type); see [`../KB-LAYOUT.md → Counter scope`](../KB-LAYOUT.md).
+Retired IDs are not reused. Across milestones, IDs are globally unique.
 
 | ID | Source | Op | Date |
 | -- | ------ | -- | ---- |
-| FLW-005 | FRS-008 | introduce | YYYY-MM-DD |
-| ACT-005 | FRS-008 | introduce | YYYY-MM-DD |
-| CHG-003 | FRS-008 | introduce | YYYY-MM-DD |
-| CMD-010 | FS-007  | modify    | YYYY-MM-DD |
-| ENT-021 | FS-007  | introduce | YYYY-MM-DD |
-| TC-001  | FS-007  | introduce | YYYY-MM-DD |
+| CMD-010 | FS-007 | modify   | YYYY-MM-DD |
+| ENT-014 | FS-009 | modify   | YYYY-MM-DD |
+| ACT-005 | FRS-011 | released | YYYY-MM-DD |
 
-**Op enum.** Valid values: `introduce` | `modify` | `released`. The third
-value `released` fires when a claimed ID is given up before the file
-materializes — most commonly an ACT-NNN claim under `produced_actor:`
-that's abandoned at Phase 1 / 1.5 FRS abandonment. Released IDs are
-never reused; the row stays in the ledger as the audit trail.
+**Op enum.** Valid values: `modify` | `released`.
 
-(CHG-NNN is allocated at Phase 1 by the FRS whose `touches_nodes:` is
-non-empty — Source = FRS-NNN, Op = introduce. The IDs the CHG's
-`modifies[]` cites are NOT separately listed in `id-claims.md` here as
-`op: modify` rows under the FRS; they appear as Phase-2 rows under the
-consuming FS — Source = FS-NNN, Op = modify — at FS authoring time.)
+- **`modify`** — a Phase-1-born CHG consumed by this FS lists the ID in its
+  `modifies[]`. The Source column carries the consuming FS-NNN. One row per
+  (canonical target, consuming FS) pair. Records the cross-FS modify-intent
+  collision lookup that the CHG-side `modifies[]` glob doubles as.
+- **`released`** — a claimed ID is given up before the file materializes — most
+  commonly an ACT-NNN claim under `produced_actor:` retired at Phase 1 / 1.5
+  FRS abandonment, or a CHG-NNN flipped to `status: deprecated` via R-CHG-3
+  CHG-merging. Released IDs are never reused; the row is the audit trail.
 
-**Source column** (per R-NEW-9 — column renamed from `FS`) accepts either an FRS-NNN
-(Phase 1 FLW / ACT allocation) or an FS-NNN (Phase 2 ENT / CMD / STA / CON / INT / DEC /
-PERM / QRY / TC allocation). **Grandfathered entries:** pre-cutover rows with `FS` as the
-column header are valid as-is — `FS-007` is a valid `Source` value. The header rename
-uses **next-touch eventual consistency**: a milestone's `id-claims.md` keeps its old `FS`
-header until the next claim allocation against that file, at which point the header is
-renamed in the same edit. Closed milestones with no further allocations keep the old
-header indefinitely; in-flight milestones converge to `Source` on next use.
+(Pre-cutover `op: introduce` rows in existing `id-claims.md` files are
+grandfathered and stay as-is; do not strip them. New post-cutover files
+carry only `modify` and `released` rows.)
 
-TC IDs use the same ledger; Test plan ingest claims them after the FS validation loop
-passes — see [`test-plan-ingest.md`](test-plan-ingest.md).
-
-Before allocating a new ID, **read both** the canonical per-type
-`docs/<component>/nodes/<type>/index.md` (carries every claimed ID: proposed, active,
-superseded, deprecated) **and** the milestone's `id-claims.md` (carries in-flight
-reservations). Pick the next free ID from the higher of the two ceilings **for this
-(component, type) counter** — counters are per-(component, type), per
-[`../KB-LAYOUT.md → Counter scope`](../KB-LAYOUT.md). Retired IDs are not reused.
+**Source column** (per R-NEW-9 — column renamed from `FS` pre-cutover) accepts
+either an FRS-NNN (released claim under FRS abandonment) or an FS-NNN (modify
+intent under FS consumption). **Grandfathered entries:** pre-cutover rows with
+`FS` as the column header are valid as-is. The header rename uses **next-touch
+eventual consistency**: a milestone's `id-claims.md` keeps its old `FS` header
+until the next claim allocation, at which point it is renamed in the same edit.
+Closed milestones with no further allocations keep the old header indefinitely.
 
 Two collision signals to surface (never silently resolve):
 
-- **New-ID collision** — another FS has already claimed the same ID for the same concept.
-  Either merge the intent or re-coordinate.
 - **Cross-FS modify-intent collision** — a sibling FS has already recorded an
-  `op: modify` row for the same canonical ID. Coordinate which FS owns the change or
-  merge the modify-intents into a single CHG.
+  `op: modify` row for the same canonical ID. Coordinate which FS owns the
+  change or merge the modify-intents into a single CHG (R-CHG-3).
+- **New-ID collision at allocation** — when reading the authoritative home in
+  the ID-ceiling table, two sibling artifacts have claimed the same ID for
+  different concepts. Merge or re-coordinate.
 
-Across milestones, IDs are globally unique.
-
-**Verify:** every ID in this FS's `produces_nodes` and `touches_nodes` has a row in
-`id-claims.md`. No row duplicates a sibling FS's claim.
+**Verify:** every CHG `modifies[]` entry consumed by this FS has a matching
+`op: modify` row in `id-claims.md`. No row duplicates a sibling FS's claim.
 
 **On failure:** surface the collision immediately. Do not allocate a conflicting ID.
 
@@ -438,9 +446,11 @@ silent rewrite here.
       `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`.
 - [ ] Row added to `docs/<component>/nodes/<type>/index.md` showing Status = `proposed`.
       Create the file from [`../_templates/INDEX.md`](../_templates/INDEX.md) if this is
-      the first node of the type. The `id-claims.md` row for this node (see §2) carries
-      the originating FS/FRS audit trail; no canonical `log.md` fires (see
-      [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16)).
+      the first node of the type. The index row's Source column (FRS/FS) carries the
+      originating audit trail; the node frontmatter `source_ref:` carries the
+      structured form; git history carries the chronology. No `id-claims.md`
+      introduce row fires (R-NEW-9 amended 2026-05-17) and no canonical `log.md`
+      fires (see [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16)).
 - [ ] Bidirectional `related:` back-links fired against each target in this node's
       `related:` list (the (2 + N) touch — every target fires its own 2-file
       touch regardless of canonical type — see `maintenance-discipline.md`).
@@ -568,8 +578,9 @@ FSs) rather than merging them.
 
 If the FS's constituent FRSs all have empty `touches_nodes:` (pure
 additions), `consumes_chgs:` is empty. Pure additions are already
-audited by new nodes' `source_ref`, their `id-claims.md` rows, and git
-history.
+audited by new nodes' `source_ref`, their per-type `index.md` rows,
+and git history (R-NEW-9 amended 2026-05-17 — no `id-claims.md`
+introduce row).
 
 **Verify:** every Phase-1-born CHG from this FS's constituent FRSs is
 either listed in this FS's `consumes_chgs:` (consumed here) or
@@ -743,8 +754,10 @@ close.
       promoted to a DEC, or raised as `OQ-NNN`.
 - [ ] Every new node has `source_ref` populated (`frs:`, `fs:`, `op: introduce`). Optional
       `section:` key naming the specific FRS heading improves traceability.
-- [ ] Every new-node ID claimed by this FS is in `id-claims.md`; no double-claims with
-      sibling FSs. Every CHG `modifies[]` entry recorded as `op: modify`.
+- [ ] Every CHG `modifies[]` entry consumed by this FS is recorded as `op: modify`
+      in `id-claims.md` (R-NEW-9 amended 2026-05-17 — introduce rows no longer
+      written; the per-type `index.md` row for each new node is the introduce
+      audit). No `op: modify` row duplicates a sibling FS's claim.
 - [ ] **`consumes_chgs:` cardinality check** (per R-CHG-3). Every CHG-NNN
       in this milestone is consumed by exactly **one** FS — globbing
       `consumes_chgs:` across the milestone's FSs returns a flat list with
@@ -813,7 +826,8 @@ when no canonical node is being modified (post-cutover CHGs are born at Phase 1 
 the FRS declares non-empty `touches_nodes:`).
 **✅ Only populate `consumes_chgs:` when at least one constituent FRS declared
 non-empty `touches_nodes:`** — pure additions are audited by `source_ref`, the
-`id-claims.md` row, and git history.
+per-type `index.md` row, and git history (R-NEW-9 amended 2026-05-17 — no
+`id-claims.md` introduce row).
 
 ---
 
@@ -823,7 +837,9 @@ non-empty `touches_nodes:`** — pure additions are audited by `source_ref`, the
 - Write syntax (method bodies, SQL, YAML payloads) in the FS or new canonical nodes
 - Glob `docs/*/nodes/**` — load only what FRSs declare by ID
 - Edit existing canonical node bodies during Phase 2
-- Allocate a node ID without reading both the per-type `index.md` and `id-claims.md`
+- Allocate a node ID without reading its authoritative home (per-type `index.md`
+  for canonical types; `chg/` glob for CHG; `specs/**/test-plans/**` glob for TC; FRS `produced_actor:`
+  glob for Phase-1 ACT claims) — see §2 ID-ceiling table
 - Proceed to `test-plan-ingest.md` before zero Blockers and zero Majors
 - Emit a CHG node when the FS has no `touches_nodes` entries
 - Silently broaden the context load when a mid-draft gap is found — stop and update the FRS

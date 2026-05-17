@@ -42,8 +42,9 @@ pre-condition checks.
    highest N in use.
 2. Claim the next ID (e.g., M-03). There is no root-level milestone
    ID ledger — `id-claims.md` lives inside each milestone folder and is
-   lazy-created by `plan.md` for intra-milestone IDs. The milestone ID
-   itself is established by folder-scan only.
+   lazy-created on first `op: modify` or `op: released` (R-NEW-9 amended
+   2026-05-17). The milestone ID itself is established by folder-scan
+   only.
 4. Choose a slug (lowercase, hyphen-separated, ≤ 4 words):
    `M-NN-<slug>` (e.g., `M-03-payment-processing`).
 
@@ -55,7 +56,7 @@ Create these paths (all lazy — create only when needed in later phases):
 docs/milestones/M-NN-<slug>/
   M-NN-<slug>.md          ← created in O-3
   MILESTONE-STATE.md      ← created in O-4
-  id-claims.md            ← leave absent; lazy-created by plan.md Phase 2
+  id-claims.md            ← leave absent; lazy-created on first `op: modify` / `op: released` row (R-NEW-9 amended 2026-05-17)
   discovery/              ← leave absent; created by Phase 0 in design.md
   frs/                    ← leave absent; created by Phase 1 in design.md
   specs/                  ← leave absent; created by Phase 2 in plan.md

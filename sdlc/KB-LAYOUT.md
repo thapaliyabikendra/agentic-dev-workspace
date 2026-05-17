@@ -144,8 +144,10 @@ Single-component projects use the unqualified form (`ACT-NNN`, `CMD-NNN`, …).
 Multi-component projects introduce the `{COMPONENT-PREFIX}-` qualifier
 lazily — only when a cross-component collision would otherwise occur.
 Milestone-scoped [`id-claims.md`](workflow/plan.md#2-id-claim-protocol)
-captures in-flight reservations (primarily modify-intents) and is not
-the ceiling source.
+captures `op: modify` (cross-FS modify-intent on existing canonical) and
+`op: released` (abandoned ACT-NNN claims) rows only — R-NEW-9 amended
+2026-05-17, no `op: introduce` rows written. It is not the ceiling
+source for any ID type.
 
 There is no canonical `docs/<component>/nodes/changes/` folder — CHG-NNN nodes
 live permanently under the milestone's FS folder. See

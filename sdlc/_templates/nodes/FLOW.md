@@ -31,7 +31,7 @@ updated: YYYY-MM-DD
 
 What starts this flow?
 
-- Actor: ACT-NNN          <!-- ACT-NNN ID is real (recorded in id-claims.md); the canonical ACT file may not exist on disk yet — ACT births at Phase 2 (R-NEW-2a retired 2026-05-17). The Trigger names the ID regardless. -->
+- Actor: ACT-NNN          <!-- ACT-NNN ID is real (recorded in the producing FRS's `produced_actor:` frontmatter — R-NEW-9 amended 2026-05-17, the FRS field IS the claim); the canonical ACT file may not exist on disk yet — ACT births at Phase 2 (R-NEW-2a retired 2026-05-17). The Trigger names the ID regardless. -->
 <!-- Phase 2: uncomment and fill once CMD-NNN is allocated. -->
 <!-- - Initiating command: CMD-NNN -->
 

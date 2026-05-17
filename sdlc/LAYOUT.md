@@ -91,7 +91,7 @@ artifact). When in doubt about where a new file goes, check here first.
     /change-requests       CR-as-container — standalone change requests (no milestone grouping)
       /CR-NNN-<slug>
         CR-NNN-<slug>.md   ← CR portal doc (template: sdlc/_templates/CR-PORTAL.md)
-        id-claims.md       ← per-CR ID reservation ledger (lazy)
+        id-claims.md       ← per-CR modify-intent + released-claim ledger (lazy; R-NEW-9 amended 2026-05-17)
         /frs
           FRS-NNN-<slug>.md  ← single FRS per CR
         /specs
@@ -106,7 +106,7 @@ artifact). When in doubt about where a new file goes, check here first.
     /milestones            milestone-as-container — everything for one milestone
       /M-NN-<slug>
         M-NN-<slug>.md     ← milestone portal doc
-        id-claims.md       ← per-milestone ID reservation ledger (lazy)
+        id-claims.md       ← per-milestone modify-intent + released-claim ledger (lazy; R-NEW-9 amended 2026-05-17)
         MILESTONE-STATE.md ← phase tracker (lazy; template: sdlc/_templates/MILESTONE-STATE.md)
         UAT.md             ← post-Phase-3 UAT record (lazy; created by verify.md)
         /discovery

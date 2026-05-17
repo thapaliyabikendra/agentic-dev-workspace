@@ -60,7 +60,7 @@ done | escalated`) and path structure — criterion met for a new flow file.
 docs/change-requests/
   CR-NNN-<slug>/
     CR-NNN-<slug>.md           # Portal doc (template: sdlc/_templates/CR-PORTAL.md)
-    id-claims.md               # ID reservation ledger (lazy — same discipline as milestones)
+    id-claims.md               # modify-intent + released-claim ledger (lazy — same discipline as milestones; R-NEW-9 amended 2026-05-17)
     frs/
       FRS-NNN-<slug>.md        # Single FRS per CR
     chg/                       # CR-scoped CHG nodes (lazy; created when FRS births a CHG at Phase CR-1)
@@ -163,7 +163,9 @@ to `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` with
 CHG: behavior-language `modifies[]` only, no structural before/after, no
 `adds[]`, no `migration_steps[]`). When the FRS introduces a new actor
 role, the `produced_actor:` scalar declares the ACT-NNN ID — **claimed
-at Phase CR-1 in `id-claims.md` but the ACT file is authored at Phase
+at Phase CR-1 via the FRS's `produced_actor:` frontmatter itself
+(R-NEW-9 amended 2026-05-17 — the FRS field IS the claim; no
+`id-claims.md` introduce row) but the ACT file is authored at Phase
 CR-2** (R-NEW-2a retired 2026-05-17). Phase CR-2 births the ACT file
 alongside ENT / CMD / STA / etc., enriches the FLW in place (wiring +
 Sequence + Branches + Compensating + structural Postconditions), and
@@ -172,12 +174,17 @@ enriches the CHG structurally (`adds[]` + `migration_steps[]` via FS
 CHG `approved → merged`. The CR portal doc does not need to redeclare
 these — the FRS's frontmatter is the source of truth.
 
-**id-claims.md inherits R-NEW-9.** `docs/change-requests/CR-NNN-<slug>/id-claims.md`
-uses the renamed `Source` column (formerly `FS`) and the lazy-create
-timing of "first FRS or FS claim". Phase CR-1's allocation of FLW-NNN
-and the ACT-NNN ID claim against the FRS-NNN as `Source` lazy-creates
-the file if it does not yet exist. Pre-cutover CR id-claims.md files
-keep the `FS` header until the next allocation against that file.
+**id-claims.md inherits R-NEW-9 amended 2026-05-17.**
+`docs/change-requests/CR-NNN-<slug>/id-claims.md` is the modify-intent
++ released-claim ledger; it lazy-creates on the first `op: modify`
+(Phase CR-2 FS consumption of a CHG) or `op: released` (FRS
+abandonment retiring an ACT-NNN claim). Phase CR-1's FLW allocation
+goes through `nodes/flows/index.md`; CHG allocation goes through the
+CR's `chg/` folder glob; ACT-NNN is claimed via the FRS frontmatter
+`produced_actor:` itself — none of these write `id-claims.md` rows.
+Pre-cutover CR `id-claims.md` files keep their existing rows
+(grandfathered) and the `FS` column header is renamed to `Source` on
+the next claim against that file.
 
 ---
 
@@ -260,4 +267,4 @@ TC files live under
 - **Delegates Phase CR-3 to:** `implementation.md` (full)
 - **Escalation target:** `design.md` (full, under new or existing milestone)
 - **Canonical-edit discipline:** [`maintenance-discipline.md`](maintenance-discipline.md) — fires at every 2-file node touch
-- **ID discipline:** [`maintenance-discipline.md`](maintenance-discipline.md) — check `id-claims.md` + per-type index before assigning FRS / FS / CHG IDs
+- **ID discipline:** [`maintenance-discipline.md`](maintenance-discipline.md) — check the per-type `index.md` / CR `chg/` folder glob / FRS frontmatter before assigning FRS / FS / CHG IDs (R-NEW-9 amended 2026-05-17 — `id-claims.md` is modify+released only)

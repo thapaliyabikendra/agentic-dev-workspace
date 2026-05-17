@@ -53,10 +53,11 @@ motivates it; finish bootstrap before the first node ingest.
   in nodes for a previously-undeclared component.
 
 **Do NOT use when:** the new artifacts belong to an existing
-component (just use that component's existing `id_prefix:` and
-register IDs in the milestone's `id-claims.md`), or when extending
-the workflow itself with a new node type for an existing component
-(load [`evolving-the-workflow.md`](evolving-the-workflow.md) instead).
+component (just use that component's existing `id_prefix:` — IDs
+claim themselves via per-type `index.md` / milestone folder globs
+per R-NEW-9 amended 2026-05-17), or when extending the workflow
+itself with a new node type for an existing component (load
+[`evolving-the-workflow.md`](evolving-the-workflow.md) instead).
 
 **Vs. sibling files:** [`evolving-the-workflow.md`](evolving-the-workflow.md)
 coins new *types*; this file coins new *components* (which carry the
@@ -108,7 +109,8 @@ Each type folder gets `index.md` from
 All new nodes use prefixed IDs: `{PREFIX}-{TYPE}-001`, `{PREFIX}-{TYPE}-002`, etc.
 
 IDs are globally unique — check `docs/home.md` ID high-water marks and
-`docs/milestones/M-NN/id-claims.md` before minting.
+the per-(component, type) `index.md` ceiling before minting (R-NEW-9
+amended 2026-05-17 — `id-claims.md` is no longer the introduce ceiling).
 
 Start numbering from 001 within each type per component — `<NEW>-CON-001` is
 independent of `APP-CON-001` (though in practice the `app` component uses

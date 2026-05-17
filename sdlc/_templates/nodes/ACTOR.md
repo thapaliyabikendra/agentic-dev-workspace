@@ -15,10 +15,11 @@ updated: YYYY-MM-DD
 
 > **Phase-keyed authoring.** ACT is born at **Phase 2** (alongside ENT / CMD /
 > STA / etc.) when the FRS declares `produced_actor: ACT-NNN` in its
-> frontmatter. The ACT-NNN ID is claimed at Phase 1 in the milestone /
-> CR-scoped `id-claims.md` (Source = FRS-NNN, Op = introduce), but the
-> ACT file does NOT exist on disk until Phase 2. All sections below are
-> authored at birth — there is no Phase-1-bare ACT body shape.
+> frontmatter. The ACT-NNN ID is claimed at Phase 1 via the FRS's
+> `produced_actor:` frontmatter field itself (R-NEW-9 amended 2026-05-17
+> — the FRS field IS the claim; no `id-claims.md` introduce row), but
+> the ACT file does NOT exist on disk until Phase 2. All sections below
+> are authored at birth — there is no Phase-1-bare ACT body shape.
 > Status `proposed` at Phase 2 birth; Phase 3 flips `proposed → active`.
 > (R-NEW-2a retired 2026-05-17 — Phase-1-bare ACT body shape no longer
 > applies because the ACT was relocated to Phase 2 birth.)

@@ -20,7 +20,7 @@ Load and update this operation whenever:
 - **CLAUDE.md / WORKFLOW.md** — always-on rules; this operation is milestone-instance state.
 - **design.md / plan.md / implementation.md** — per-phase procedure; this file tracks *where* you
   are in that procedure, not *what* the procedure is.
-- **id-claims.md** — ID reservation ledger; separate from phase tracking.
+- **id-claims.md** — modify-intent + released-claim ledger (R-NEW-9 amended 2026-05-17); separate from phase tracking.
 
 ---
 

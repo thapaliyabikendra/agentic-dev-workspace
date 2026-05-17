@@ -315,8 +315,10 @@ where no index exists):** Phase 3 activation `proposed → active` (FLW /
 ACT — both flip at Phase 3 regardless of birth phase) / CHG `approved →
 merged`, FS-validation exit CHG `draft → approved`, full FRS abandonment
 FLW `proposed → deprecated` / CHG `draft → deprecated` (the FRS's
-`produced_actor:` ACT-NNN ID claim is released from `id-claims.md` — no
-ACT file exists on disk to deprecate), sibling-CHG fold `draft →
+`produced_actor:` ACT-NNN ID claim is released — append an
+`op: released` row to the milestone's `id-claims.md` since the FRS
+itself is being retired; no ACT file exists on disk to deprecate),
+sibling-CHG fold `draft →
 deprecated` (R-CHG-3). See
 [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md) for the
 abandonment procedure.
@@ -652,9 +654,10 @@ CMD / STA / CON / INT / DEC / PERM / QRY). Two rule changes landed:
   Goals + business Preconditions + Flows initiated; `related: []`) no
   longer exists because there is no Phase-1 ACT body. The FRS's
   `produced_actor:` scalar now carries a forward-reference ACT-NNN — the
-  ID is claimed at Phase 1 in `id-claims.md` (Source = FRS-NNN, Op =
-  introduce), but the ACT file is authored at Phase 2 with all sections
-  filled at birth.
+  ID is claimed at Phase 1 via the FRS's `produced_actor:` frontmatter
+  itself (R-NEW-9 amended 2026-05-17 — the FRS field IS the claim; no
+  `id-claims.md` introduce row), but the ACT file is authored at Phase
+  2 with all sections filled at birth.
 - **R-NEW-7 narrowed to FLW only.** The 1-file body-edit carve-out for
   Phase 1.5 round-trip applies to Phase-1-born nodes; with ACT moved to
   Phase 2 birth, the carve-out's scope is FLW alone (plus the parallel
@@ -702,8 +705,9 @@ retired for all canonical artifacts: nodes, ADRs, and CCCs now use the
 - One-human-all-roles. The audit-for-others case is weak;
   audit-for-future-self is covered by git history + the per-type `index.md`
   Status column.
-- `id-claims.md` already records `created` events for nodes from the
-  planning side (`milestones/M-NN-<slug>/id-claims.md`).
+- The per-type canonical `index.md` row + node frontmatter `source_ref:`
+  + git history together cover `created` events from the planning side
+  (R-NEW-9 amended 2026-05-17 — `id-claims.md` no longer mirrors them).
 - ADR / CCC supersession chains are visible in `superseded_by:` /
   `supersedes:` frontmatter and the Active vs Superseded/deprecated
   sections of the index. The chronological view a `log.md` added is

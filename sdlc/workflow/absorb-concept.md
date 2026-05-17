@@ -112,8 +112,9 @@ For each row marked for promotion:
    CMD, QRY, FLW, STA, DEC, INT, MOD, SCR, CON, PERM, SVC, FA, EVT, CHG).
    If the type is still unclear after the RESEARCH review, raise an `OQ-NNN`
    — do not guess.
-2. Check the per-type `index.md` for the next free ID. Claim the ID in the
-   milestone `id-claims.md` if a milestone is in flight.
+2. Check the per-type `index.md` for the next free ID — the index row
+   created on node birth IS the claim (R-NEW-9 amended 2026-05-17 — no
+   `id-claims.md` introduce row).
 3. Author the canonical node at `docs/<component>/nodes/<type>/<ID>-<slug>.md`
    using the appropriate template from
    [`sdlc/_templates/nodes/`](../_templates/nodes/).

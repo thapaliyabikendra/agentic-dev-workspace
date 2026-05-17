@@ -97,7 +97,8 @@ born at Phase 1; the `/clear` between Phase 1.5 and Phase 2 enforces
 that this file is re-read from disk for enrichment, never reconstructed
 from Phase 1 deliberations. (ACT is born at Phase 2, not enriched —
 R-NEW-2a retired 2026-05-17; the `produced_actor:` ID is read from
-`id-claims.md` to claim the file path at birth.) Per
+the producing FRS's frontmatter to claim the file path at birth —
+R-NEW-9 amended 2026-05-17, the FRS field IS the claim.) Per
 [`plan.md` HARD-GATE](plan.md).
 
 Phase 2 retrieval reads canonical the same as every other phase — there is
@@ -129,8 +130,10 @@ alongside the discovery reads above:
 
 ACTOR.md is **NOT** loaded at Phase 1 — the ACT file is born at Phase 2
 alongside ENT / CMD / STA / etc. (R-NEW-2a retired 2026-05-17). The
-ACT-NNN ID is claimed at Phase 1 in `id-claims.md` but no ACT body is
-authored. Load ACTOR.md at Phase 2 entry instead.
+ACT-NNN ID is claimed at Phase 1 via the FRS's `produced_actor:`
+frontmatter (R-NEW-9 amended 2026-05-17 — the FRS field IS the claim;
+no `id-claims.md` introduce row) but no ACT body is authored. Load
+ACTOR.md at Phase 2 entry instead.
 
 The STD index and CCC index are **NOT** narrow-loaded at Phase 1 — the
 STD-conformance and CCC-deviation Pass 1 checks fire at Phase 1.5. Phase 1
@@ -325,8 +328,9 @@ what the flow needs at entry; do not carry forward dev-track reads.
 
 Load the FS, every FRS declared in the FS's `frs:` frontmatter, each FRS's
 referenced FLW nodes (scenario anchors), and each FRS's referenced ENT nodes
-(field constraints). Load the milestone's `id-claims.md` for TC ID
-allocation. Wholesale-read [`coverage-matrix.md`](coverage-matrix.md) and
+(field constraints). Read the milestone's `specs/**/test-plans/**/TC-*.md`
+glob for the next free TC-NNN (R-NEW-9 amended 2026-05-17 — TC files are
+the ID ledger; no `id-claims.md` introduce row). Wholesale-read [`coverage-matrix.md`](coverage-matrix.md) and
 [`test-data-generation.md`](test-data-generation.md) rule books. Do **not**
 load production code at this phase.
 

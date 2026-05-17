@@ -35,7 +35,7 @@ Milestone kinds (set in `kind:` frontmatter):
 ```
 M-NN-<slug>/
   M-NN-<slug>.md         # you are here
-  id-claims.md           # per-milestone ID reservation ledger (lazy)
+  id-claims.md           # per-milestone modify-intent + released-claim ledger (lazy; created on first `op: modify` or `op: released` — per R-NEW-9 amended 2026-05-17)
   discovery/
     milestone-scope.md   # milestone-level discovery (level: milestone)
     FRS-NNN-<slug>.md    # per-FRS discovery (level: frs), one per FRS

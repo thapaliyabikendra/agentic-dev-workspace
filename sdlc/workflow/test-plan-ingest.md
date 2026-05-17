@@ -101,7 +101,8 @@ and [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md).
   drafted from [`../_templates/TC.md`](../_templates/TC.md).
 - The FS's `test_plan_path:` frontmatter set to `test-plans/`.
 - The FS's `## Test plan` section populated, grouped by use-case sub-folder.
-- TC ID rows in the milestone's `id-claims.md`, one per emitted TC.
+- TC files themselves at the milestone path serve as the TC ID ledger
+  (R-NEW-9 amended 2026-05-17 — no `id-claims.md` introduce rows for TC).
 - (Retired) The FRS's `## Test plan view` table is no longer populated — the
   table was dropped 2026-05-17. TC coverage trace lives on each TC's
   `**Traces to:**` line; reverse-index is a `grep` against TC files.
@@ -139,7 +140,9 @@ handoff.
 5. Every TC has a `## Test Data` section per `test-data-generation.md` — including
    verification self-checks.
 6. Every TC has `Preconditions` and `Postconditions`.
-7. Each emitted TC ID is recorded in the milestone's `id-claims.md`; the FS's
+7. Each emitted TC has a unique TC-NNN filename across the milestone's
+   `specs/**/test-plans/**` glob (R-NEW-9 amended 2026-05-17 — TC files
+   themselves are the ledger; no `id-claims.md` introduce row); the FS's
    `test_plan_path:` frontmatter is set to `test-plans/`.
 
 ---
@@ -149,26 +152,27 @@ handoff.
 ### 1. TC ID and naming setup
 
 - **TC IDs are globally unique** across the milestone. Increment from the highest TC ID
-  across both the milestone's `id-claims.md` and any TCs already staged in sibling FSs.
+  across the milestone's `specs/**/test-plans/**/TC-*.md` glob (R-NEW-9 amended
+  2026-05-17 — TC files are the ID ledger; no `id-claims.md` introduce row written).
   Filename: `TC-NNN-<slug>.md`. Header line: `# TC-NNN: <Title> (<Category>)`.
 - The TC's `**Tags:**` line carries `@smoke @<feature> @TC-NNN` — the feature tag is the
   kebab-case FS slug, used by the test runner for feature-tag filtering at run time.
 - TC IDs are **sequential across the entire feature** (across all use-case sub-folders),
   not per sub-folder. Pass-0 (section-walkthrough) TCs come first; Pass-2
   (matrix-driven) TCs follow.
-- Record each emitted TC ID in `docs/milestones/M-NN-<slug>/id-claims.md` as
-  `op: introduce` before closing the session.
+- (R-NEW-9 amended 2026-05-17 — TC IDs are NOT recorded in
+  `id-claims.md`. The TC file at its milestone path IS the claim.)
 
 **Use-case sub-folder vocabulary.** Sub-folders carry kebab-case verbs:
 `display`, `view`, `preview`, `add`, `edit`, `delete`, `toggle`, `reorder`, `search`,
 `export`, `bulk`, `workflow`, `auth`, `navigation`. Only create sub-folders for verbs
 this FS actually exercises — empty folders are a smell.
 
-**Verify:** every TC ID is unique across `id-claims.md` and sibling TC files. Filenames
-match `TC-NNN-<slug>.md`.
+**Verify:** every TC ID is unique across sibling TC files in the milestone
+(`specs/**/test-plans/**/TC-*.md` glob). Filenames match `TC-NNN-<slug>.md`.
 
 **On failure:** if a TC ID collides with a sibling FS, increment past the collision.
-Record the updated ID in `id-claims.md`.
+Rename the TC file with the new ID.
 
 ---
 
@@ -341,7 +345,9 @@ removal.
       "User is logged in").
 - [ ] No TC exceeds 10 steps.
 - [ ] No TC has all-`(discovered by explorer)` selectors AND all-empty Form Input.
-- [ ] Each emitted TC ID is recorded in the milestone's `id-claims.md`.
+- [ ] Each emitted TC has a unique TC-NNN filename across the milestone's
+      `specs/**/test-plans/**/TC-*.md` glob (R-NEW-9 amended 2026-05-17 —
+      the TC file is the claim; no `id-claims.md` introduce row).
 - [ ] The FS's `test_plan_path:` frontmatter is set to `test-plans/`.
 - [ ] The FS's `## Test plan` section lists every emitted TC, grouped by use-case
       sub-folder.
@@ -366,7 +372,7 @@ cannot be verified as a side-effect of a success flow.
 element or behavior.
 
 **❌ Numbering TCs per sub-folder** (restarting at TC-001 for each folder) — breaks
-global ID uniqueness and `id-claims.md` tracking.
+global ID uniqueness across the milestone's TC-file glob.
 **✅ TC IDs are globally sequential** across the entire feature, regardless of sub-folder.
 
 **❌ Leaving `test_plan_path:` blank after TC files are emitted** — the FS's Integration

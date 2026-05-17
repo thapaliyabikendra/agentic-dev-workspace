@@ -94,9 +94,11 @@ without modification.
   modify-intent against existing canonical nodes; born at Phase 1 by the
   FRS (R-CHG-1); never promoted to canonical. Pre-cutover CHGs at
   `specs/FS-NNN-<slug>/nodes/changes/` are grandfathered.
-- Per-milestone ID-claim ledger (`id-claims.md`) preventing sibling-FS ID
-  collisions on new IDs and detecting cross-FS modify-intent collisions
-  on existing IDs.
+- Per-milestone ID-claim ledger (`id-claims.md`) tracking cross-FS
+  modify-intent collisions on existing IDs and released ACT-NNN claims
+  from FRS abandonment. New-ID ceilings live in per-type `index.md` /
+  milestone folder globs / FRS frontmatter, not here (R-NEW-9 amended
+  2026-05-17).
 - Reference-never-copy principle.
 - Brownfield-conflict surfacing rule, plus the Phase 1.5 Validation Gate
   (per-FRS existence/sanity/ADR-conflict checks + milestone cross-FRS

@@ -56,8 +56,10 @@ Phase 1 authors up to three artifacts per user-journey: the FRS, the
 Phase-1-born FLW (per R-NEW-1 / R-NEW-2), and the Phase-1-born CHG (per
 R-CHG-1..4 — when the FRS declares non-empty `touches_nodes:`). When the
 FRS introduces a new actor role (`produced_actor:` set), the ACT-NNN ID
-is claimed at Phase 1 in `id-claims.md` but the ACT file is authored at
-Phase 2 (R-NEW-2a retired 2026-05-17). Default posture: **sequential
+is claimed at Phase 1 via the FRS's `produced_actor:` frontmatter
+itself (R-NEW-9 amended 2026-05-17 — the FRS field IS the claim; no
+`id-claims.md` introduce row) but the ACT file is authored at Phase 2
+(R-NEW-2a retired 2026-05-17). Default posture: **sequential
 authoring in one main session**, in the order FRS → FLW → CHG (FLW after
 FRS body because Scenarios must map back to ACs; CHG last because the
 behavior-language `modifies[]` delta is grounded in the FRS's ACs / BRs
