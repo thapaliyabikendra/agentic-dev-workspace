@@ -43,10 +43,11 @@
 | ID  | Title (one line) | Status | Applies when | Tags | Source |
 | --- | ---------------- | ------ | ------------ | ---- | ------ |
 | [STD-001](ddd-standards.md) | Engine-level DDD constraints — aggregate encapsulation, entity vs VO, identity rules, domain-event semantics (placeholder pending first FRS that touches the domain layer) | proposed | agnostic | placeholder, ddd, domain-layer | seed |
-| [STD-002](dotnet-conventions.md) | Engine-level .NET implementation conventions — Result Pattern, exception policy, async naming (placeholder pending first FRS that touches application-layer code) | proposed | agnostic | placeholder, dotnet, application-layer | seed |
+| [STD-002](dotnet-conventions.md) | Engine-level .NET implementation conventions (3 rules — see file § Scope) | accepted | api | dotnet, application-layer, errororstd, validation, localization | seed |
 | [STD-003](api-design.md) | Engine-level API design rules — verb / status code, REST/RPC choice rationale, pagination shape (placeholder pending first FRS that touches an HTTP boundary) | proposed | api | placeholder, api, http | seed |
 | [STD-004](node-definitions.md) | Engine-level per-node-type contract guarantees — what each node type's frontmatter and body must carry (placeholder pending first contract codification) | proposed | agnostic | placeholder, methodology, node-types | seed |
-| [STD-005](STD-005-abp-coding-conventions.md) | ABP framework coding conventions — built-in entity catalog check, base-class declarations, DTO audit mirroring, query wrappers, companion entity pattern, PascalCase naming, C# enums for bounded values, no data annotations on domain entities, file/folder/type-suffix and DB naming | accepted | api + framework: abp-net | abp, dotnet, entity, dto, naming, conventions, validation | guidelines/abp-guidelines.md |
+| [STD-005](STD-005-abp-coding-conventions.md) | ABP framework coding conventions (17 rules — see file § Scope) | accepted | api + framework: abp-net | abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging | guidelines/abp-guidelines.md |
+| [STD-006](STD-006-logging-conventions.md) | Engine-level logging conventions — `ILogger<T>` injection only (MEL abstraction), per-layer log levels (Domain: none; Application: Info/Warning; Infrastructure: Debug/Error), structured logging with named properties, PII prohibition, ABP Serilog correlation/tenant/user enrichment, audit logging via `IAuditingStore` (not `ILogger`) | accepted | api | logging, observability, structured-logging, convention, pii, abp | seed |
 
 ---
 

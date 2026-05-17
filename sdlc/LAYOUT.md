@@ -86,7 +86,6 @@ artifact). When in doubt about where a new file goes, check here first.
       open-questions.md    ← frozen legacy log (pre-2026-05-13 OQs)
       /open-questions      ← per-OQ folder (new OQs land here)
         index.md           ← OQ catalog (Karpathy-style)
-        log.md             ← OQ lifecycle log
         OQ-NNN-*.md        ← individual OQ files
     /change-requests       CR-as-container — standalone change requests (no milestone grouping)
       /CR-NNN-<slug>

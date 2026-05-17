@@ -3,10 +3,10 @@ id: STD-005
 title: ABP framework coding conventions
 status: accepted
 created: 2026-05-15
-updated: 2026-05-15
+updated: 2026-05-17
 supersedes: null
 superseded_by: null
-tags: [abp, dotnet, entity, dto, naming, conventions, validation]
+tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging]
 scope: engine
 applies_when:
   stack: [api]
@@ -35,9 +35,13 @@ Entity and value-object base-class selection; DTO base-class mirroring;
 query input/output wrappers; companion entity pattern for ABP built-in
 extensions; property naming (PascalCase); bounded-value modelling (C# enums);
 data-annotation placement; file, folder, type-suffix, and database object
-naming. STD-001 and STD-002 govern the framework-agnostic DDD and .NET rules;
-this standard governs the ABP-specific layer on top — binding is declared
-in `applies_when: { stack: [api], framework: [abp-net] }` rather than in prose.
+naming; HTTP exposure default (Auto API Controllers); node-body to
+service-layer mapping (Manager vs AppService); `IEntityTypeConfiguration<T>`
+enforcement against inline `OnModelCreating` blocks; per-module shared
+validation / schema constants; per-module localization-key constants.
+STD-001 and STD-002 govern the framework-agnostic DDD and .NET rules; this
+standard governs the ABP-specific layer on top — binding is declared in
+`applies_when: { stack: [api], framework: [abp-net] }` rather than in prose.
 
 ## Standards
 
@@ -234,7 +238,8 @@ Folder hierarchy: **`<Module>/<SubModule>/<TypeFamily>/<TypeName>.cs`**. Types a
 | `Domain` | `<Module>/<SubModule>/Events/<AggregateName><Event>Event.cs` | domain events |
 | `Domain` | `<Module>/<SubModule>/Specifications/<SpecName>Specification.cs` | specifications |
 | `Domain.Shared` | `Enums/<Module>/<EnumName>.cs` | enums (Rule 7) |
-| `Domain.Shared` | `<Module>/<ModuleName>Errors.cs` | error code constants |
+| `Domain.Shared` | `<Module>/<Module>Consts.cs` | shared validation / schema constants (Rule 13) |
+| `Domain.Shared` | `<Module>/Localization/<Module>Keys.cs` | localization-key string constants (error codes + validation messages + every user-facing key; see note below) |
 | `EntityFrameworkCore` | `<Module>/EntityConfigurations/<AggregateName>Configuration.cs` | `IEntityTypeConfiguration<T>` |
 | `EntityFrameworkCore` | `<RootNamespace>DbContext.cs` | DbContext — one per solution |
 | `EntityFrameworkCore` | `Migrations/<UtcTimestamp>_<DescriptiveName>.cs` | EF Core migrations |
@@ -246,6 +251,17 @@ Folder hierarchy: **`<Module>/<SubModule>/<TypeFamily>/<TypeName>.cs`**. Types a
 | `HttpApi` | `Controllers/<Module>/<AggregateName>Controller.cs` | controllers (thin; delegate to AppService) |
 
 `<Module>` = bounded-context folder in PascalCase (`BankGuarantee`, `LetterOfCredit`). `<SubModule>` = feature group (`Issuance`, `Claims`). Omit `<SubModule>` when a module has only one feature group.
+
+*Note on `<Module>Keys.cs` (2026-05-17).* The slot replaces the earlier
+`<Module>/<ModuleName>Errors.cs` (which was scoped to error-code constants
+only). It now holds **every** localization-key string constant for the
+module — ErrorOr `<code>` arguments, FluentValidation `.WithMessage(...)`
+arguments, and any other user-facing string reference — because error
+codes ARE localization keys (see STD-002 § Localization-key constants).
+Maintaining two separate constant files duplicated entries; the single
+`<Module>Keys.cs` is the per-module home. Resource JSON files live
+alongside the project resource (`Domain.Shared/Localization/<Project>/<lang>.json`,
+per `CCC-007`); each constant's value is 1:1 with an `en.json` key.
 
 #### 9.3 Type-name suffix conventions
 
@@ -303,9 +319,302 @@ Single `public` schema by default. Module-scoped schemas require an ADR amendmen
 
 The folder hierarchy maps 1:1 to the namespace. The solution root namespace comes from `<RootNamespace>` in the project file — not hardcoded here. Drift between folder path and namespace is a Phase 3 merge-gate defect.
 
+---
+
+### Rule 10 — Auto API Controllers are the default HTTP exposure
+
+Every `IApplicationService` in the contracts assembly is auto-exposed as
+an HTTP endpoint through ABP's auto API controller pipeline. The host
+module registers conventional controllers once:
+
+```csharp
+// <Project>HttpApiHostModule.ConfigureServices
+Configure<AbpAspNetCoreMvcOptions>(options =>
+{
+    options.ConventionalControllers.Create(
+        typeof(<Project>ApplicationContractsModule).Assembly);
+});
+```
+
+Manual `[ApiController]` classes are written **only** when one of these
+conditions applies:
+
+- Routing or binding semantics cannot be expressed through ABP's auto-route
+  conventions (custom verb / path shape, multipart form binding that the
+  AppService signature cannot model).
+- The response body must diverge from ABP's envelope (e.g., a legacy wire
+  contract like `{ "error": "department_not_found" }` carried over from a
+  prior API version).
+- The endpoint origin is not an AppService — webhook receivers, callback
+  endpoints, or static file servers that have no AppService analog.
+
+When written, a manual controller stays **thin** and delegates to an
+AppService per Rule 9.2 (line: `HttpApi` Controllers row) — it does not
+carry business logic. The decision to deviate from auto-exposure is
+recorded in a node-local DEC on the host node (typically a CON node) or
+in a component-scoped ADR if it spans multiple CONs.
+
+The Phase 3 merge gate flags any manual controller without a backing DEC
+/ ADR justifying the deviation.
+
+---
+
+### Rule 11 — Node-body to service-layer mapping
+
+Every business node has exactly one C# type that carries its body, by
+node type:
+
+| Node type | C# type holding the body | Slot |
+|---|---|---|
+| FLW (flow) | `<AggregateName>Manager` | `Domain/<Module>/<SubModule>/Managers/` |
+| QRY (query) | `<AggregateName>Manager` | `Domain/<Module>/<SubModule>/Managers/` |
+| CMD (command) | `<AggregateName>Manager` | `Domain/<Module>/<SubModule>/Managers/` |
+| CON (wire surface) | `<AggregateName>AppService` | `Application/<Module>/<SubModule>/AppServices/` |
+
+Managers (Domain Services per Rule 9.3) carry the body: entity invariant
+enforcement, cross-aggregate coordination, and policy decisions. They
+return `ErrorOr<T>` (see STD-002 § ErrorOr Result Pattern) and never throw
+on expected failures.
+
+Application Services are **thin orchestration boundaries** — they accept
+the input DTO, delegate to the appropriate Manager method(s), unwrap the
+returned `ErrorOr<T>`, translate the error branch to `UserFriendlyException`
+(per CCC-006), and project the success branch onto the output DTO. They
+do not contain business rules. Logging, authorization attributes, and
+unit-of-work boundaries belong here; logic does not.
+
+This rule closes the gap left by Rule 9.3, which named the types but did
+not bind each node family to a layer. The Phase 2 feat-spec validator
+inspects each FLW / QRY / CMD node for a `service_layer:` frontmatter
+field (default `domain`); the Phase 3 merge gate scans the implementation
+for a Manager method bearing the node's name and flags AppService methods
+that carry logic beyond unwrap-and-project.
+
+---
+
+### Rule 12 — `IEntityTypeConfiguration<T>` enforcement (tightens Rule 8 + Rule 9.2)
+
+Every entity has its own configuration class at the slot Rule 9.2
+declares:
+
+`<Project>.EntityFrameworkCore/<Module>/EntityConfigurations/<AggregateName>Configuration.cs`
+
+The DbContext's `OnModelCreating` is restricted to ABP module
+configurations plus the assembly-scan registration — nothing else:
+
+```csharp
+protected override void OnModelCreating(ModelBuilder builder)
+{
+    base.OnModelCreating(builder);
+
+    builder.ConfigureAbpConventions();      // and other ABP ConfigureXxx() calls
+    builder.ApplyConfigurationsFromAssembly(typeof(<Project>DbContext).Assembly);
+}
+```
+
+Inline `builder.Entity<X>(b => b.ToTable(...).Property(...).HasMaxLength(...))`
+blocks inside `OnModelCreating` are **prohibited**. Every persistence
+concern (table name, column type, max-length, indexes, owned-type
+mapping, value conversions, enum-to-string conversion per Rule 7) moves
+into the per-entity configuration class.
+
+The Phase 3 merge gate scans `OnModelCreating` for inline
+`builder.Entity<...>` calls and blocks the merge on any hit. Each new
+entity also requires its own `<AggregateName>Configuration.cs` file —
+missing configuration files block the merge.
+
+---
+
+### Rule 13 — Shared validation / schema constants per module
+
+Each module declares one `Domain.Shared/<Module>/<Module>Consts.cs` file
+holding the numeric and pattern literals shared between persistence and
+validation:
+
+```csharp
+namespace <Project>.<Module>;
+
+public static class <Module>Consts
+{
+    public const int DepartmentNameMaxLength = 128;
+    public const int DepartmentDescriptionMaxLength = 512;
+    public const int DoctorPhoneMaxLength = 20;
+    public const string PhoneNumberPattern = @"^\+?[1-9]\d{1,14}$";
+    public const decimal AppointmentFeeMaxValue = 999_999.99m;
+    // ...
+}
+```
+
+Both layers read from these constants:
+
+- **EF Core** `IEntityTypeConfiguration<T>` classes (per Rule 12) —
+  `HasMaxLength`, `HasPrecision`, length-bounded indexes.
+- **FluentValidation** validators (per STD-002 § FluentValidation) —
+  `MaximumLength`, `Matches`, `InclusiveBetween`, `PrecisionScale`.
+
+Inline numeric literals or regex strings in either layer are
+**prohibited** — the Phase 3 merge gate scans both `EntityConfigurations/`
+and `Application.Contracts/<Module>/Validators/` for hardcoded
+`HasMaxLength(<int-literal>)`, `MaximumLength(<int-literal>)`, and
+`Matches("<regex-literal>")` and blocks the merge on hits.
+
+`<Module>Consts.cs` holds **non-localization** values only — pure
+numbers, ranges, and regex patterns. User-visible strings live in
+`<Module>Keys.cs` (Rule 9.2 amended slot). A module with no shared
+constants does not require the file until the first constant is
+introduced.
+
+---
+
+### Rule 14 — Typed ABP exceptions only; HTTP status mapping
+
+**Anchor:** [CCC-006](../../docs/shared/ccc/CCC-006-exception-handling.md)
+(baseline; companion to STD-002 R1 — ErrorOr is the preferred path,
+this rule governs the residual direct-throw cases).
+
+Raw `throw new Exception(...)` and `throw new ApplicationException(...)`
+are **prohibited solution-wide**. When code must throw directly (e.g.,
+a guard clause on a repository miss where no Manager sits between the
+AppService and the data, or a framework-imposed exception type),
+exactly one of the typed exceptions below applies — and the HTTP
+status is fixed by the exception type, never overridden.
+
+| Exception type | HTTP status | Use when |
+|---|---|---|
+| `UserFriendlyException` | 400 | AppService unwrap of an `ErrorOr<T>` error branch (per STD-002 R1) or any other AppService-boundary message intended for the end user |
+| `BusinessException` | constructor `code` arg drives 4xx | Codified business error with a stable `code` resolved to a `<Module>Keys` constant; status set by the exception's `Code`-keyed mapping |
+| `AbpValidationException` | 400 | DTO-level validation failure (raised by ABP's validation filter — never thrown by hand) |
+| `AbpAuthorizationException` | 403 | Authorization check failed at any layer (raised by ABP — do not catch and re-wrap) |
+| `EntityNotFoundException` | 404 | Repository `GetAsync` miss surfaced directly (no Manager between AppService and repo) |
+| `AbpDbConcurrencyException` | 409 | Optimistic concurrency stamp mismatch (raised by ABP — do not catch) |
+| _unhandled_ | 500 | Anything else falls through ABP's `ExceptionHandlingMiddleware` and is logged as an unexpected fault |
+
+ABP's `ExceptionHandlingMiddleware` is the **only** global exception
+middleware. Custom `IMiddleware` implementations that catch all
+exceptions, transform the response, or duplicate the
+status-code-mapping table are prohibited; extensions go through ABP's
+filter pipeline or `IExceptionSubscriber`.
+
+The Phase 3 merge gate greps for `throw new (System\.)?Exception\(`,
+`throw new ApplicationException\(`, and any custom `IMiddleware`
+implementation whose body inspects the catch-all `Exception` type —
+hits block the merge.
+
+---
+
+### Rule 15 — Authorization placement and grouping
+
+**Anchor:** [CCC-002](../../docs/shared/ccc/CCC-002-authorization.md).
+
+`[Authorize(<Project>Permissions.<Name>)]` applies at the
+**AppService method or class level only** — never on a Domain Manager
+method, an entity, a specification, or any domain-layer type. Domain
+Managers stay authorization-agnostic; the AppService is the
+authorization boundary.
+
+Permission constants are grouped by feature module inside
+`<Project>Permissions.cs` at the Rule 9.2 slot
+(`Application.Contracts/Permissions/<Module>Permissions.cs`). Each
+group corresponds to a feature module; nested static classes carry
+per-resource permissions:
+
+```csharp
+public static class BankGuaranteePermissions
+{
+    public const string GroupName = "BankGuarantee";
+
+    public static class BgRequests
+    {
+        public const string Default = GroupName + ".BgRequests";
+        public const string Create  = Default + ".Create";
+        public const string Approve = Default + ".Approve";
+    }
+}
+```
+
+Inline string literals at `[Authorize("...")]` call sites are
+**prohibited** — every attribute argument resolves to a constant.
+
+The `<Project>PermissionDefinitionProvider` registers every group and
+permission definition and **is** the canonical authorization surface.
+Scattered `IAuthorizationService.AuthorizeAsync(...)` checks inside
+Domain Managers are prohibited; AppService methods declare their
+permission via the attribute, and granular per-resource policy checks
+that cannot be expressed as an attribute use the AppService-injected
+`IAuthorizationService` (still at the AppService layer, never deeper).
+
+Anonymous endpoints opt in explicitly with `[AllowAnonymous]`.
+
+The Phase 3 merge gate greps for `[Authorize` on any class or method
+whose containing type ends in `Manager`, and for
+`[Authorize("<string-literal>")]` (inline literal). Hits block the
+merge.
+
+---
+
+### Rule 16 — Soft-delete data filter discipline
+
+**Anchor:** [CCC-012](../../docs/shared/ccc/CCC-012-soft-delete-and-retention.md).
+Companion to Rule 2 (`FullAudited*` base classes implicitly enable
+`ISoftDelete`).
+
+ABP's `ISoftDelete` data filter is **automatic** — repository queries
+against an `ISoftDelete`-implementing entity (implicit on `FullAudited*`)
+exclude soft-deleted rows without the caller writing a predicate.
+Manual `.Where(x => !x.IsDeleted)` or `.Where(x => x.IsDeleted == false)`
+in repository, Manager, or AppService code is **prohibited** — it
+duplicates filter logic the framework already provides and silently
+breaks the explicit-include path.
+
+The only sanctioned escape is the explicit-disable block, used when a
+query must see soft-deleted rows (administrative exports, restore
+flows, retention-audit reports):
+
+```csharp
+using (_dataFilter.Disable<ISoftDelete>())
+{
+    var allRequests = await _repository.GetListAsync();
+    // allRequests includes soft-deleted rows
+}
+```
+
+The Phase 3 merge gate greps repository / Manager / AppService code
+for the `IsDeleted` token inside a LINQ `Where` clause that is **not**
+contained in an `IDataFilter.Disable<ISoftDelete>()` `using` block —
+hits block the merge.
+
+---
+
+### Rule 17 — Audit logging via ABP audit module, not `ILogger`
+
+**Anchor:** [CCC-004](../../docs/shared/ccc/CCC-004-auditing.md).
+Logging-side mirror: [STD-006 Rule 6](STD-006-logging-conventions.md).
+
+Entity-change audit trails (who changed what, when, with what
+before/after values) flow through ABP's audit-logging module —
+`IAuditingStore` (default DB-backed via the audit-logging EF module),
+the `[Audited]` attribute on application services or specific entity
+properties, and module-level `Configure<AbpAuditingOptions>(...)`.
+Application Services are audited by default per ABP convention; the
+configuration declares which entities also record property-level
+diffs.
+
+Manual `_logger.LogInformation("User {UserId} changed entity {Id}…")`
+lines written for audit purposes are **prohibited** — see STD-006 R6
+for the logging-side enforcement. Rule 17 is the **structural** rule
+(use the audit module's pipeline); STD-006 R6 is the logging-discipline
+mirror that fires when the `_logger` call site is the symptom.
+
+The Phase 3 merge gate cross-references STD-006 R6 to avoid duplicate
+flagging — Rule 17 fires when a class is structurally
+`[Audited]`-eligible (an AppService touching an aggregate root marked
+for audit per the FRS) but the module's `AbpAuditingOptions` block is
+missing the corresponding `EntityHistorySelectors.AddAllEntities()` /
+selector entry.
+
 ## Consequences
 
-This standard constrains every ENT, CMD, QRY, and CON node authored in any ABP/.NET
+This standard constrains every ENT, CMD, QRY, FLW, and CON node authored in any ABP/.NET
 project under this methodology. Specifically:
 
 - **Phase 1.5 FRS validation** — the validator checks the built-in catalog before any
@@ -313,11 +622,39 @@ project under this methodology. Specifically:
   progression.
 - **Phase 2 feat-spec validator** — every staged entity node must carry `Base class:`
   and `Base class rationale:`. Every query must specify compliant input/output wrappers.
-  Every output DTO must mirror its entity's audit level. Non-PascalCase identifiers and
-  duplicate enum declarations block gate passage.
+  Every output DTO must mirror its entity's audit level. Every FLW / QRY / CMD node
+  carries `service_layer:` (Rule 11). Non-PascalCase identifiers and duplicate enum
+  declarations block gate passage.
 - **Phase 3 merge gate** — the implementation's base class must match the staged node's
   declaration. File names, folder paths, namespace alignment, ABP suffixes, DTO suffixes,
-  table names, FK columns, and migration names are all scanned. Any hit blocks the merge.
+  table names, FK columns, and migration names are all scanned. Additionally:
+  - Manual `[ApiController]` classes without a backing DEC / ADR are flagged
+    (Rule 10).
+  - FLW / QRY / CMD bodies that live in an AppService rather than a Manager — or
+    AppService methods carrying logic beyond unwrap-and-project — are flagged
+    (Rule 11).
+  - Inline `builder.Entity<X>(...)` blocks inside `OnModelCreating` are flagged;
+    missing `<AggregateName>Configuration.cs` files are flagged (Rule 12).
+  - Hardcoded `HasMaxLength(<int>)`, `MaximumLength(<int>)`, `Matches("<regex>")`
+    in EF configurations or FluentValidation validators are flagged (Rule 13).
+  - String literals inside ErrorOr `Error.<Factory>(...)` calls or FluentValidation
+    `.WithMessage(...)` calls that don't reference `<Module>Keys` constants are
+    flagged (Rule 9.2 amended slot — see STD-002 § Localization-key constants).
+  - `throw new Exception(...)`, `throw new ApplicationException(...)`, and
+    custom global exception middleware impls are flagged (Rule 14). Direct-throw
+    cases must use one of the typed ABP exceptions in the Rule 14 mapping table.
+  - `[Authorize]` on a `<Aggregate>Manager`-suffixed class or method is flagged;
+    `[Authorize("<string-literal>")]` with an inline literal (rather than a
+    `<Project>Permissions.<Name>` constant) is flagged (Rule 15).
+  - `IsDeleted` referenced inside a LINQ `Where` clause in repository / Manager /
+    AppService code that is not contained in an
+    `IDataFilter.Disable<ISoftDelete>()` `using` block is flagged (Rule 16).
+  - An AppService structurally eligible for `[Audited]` (touching an aggregate
+    root the FRS marks for audit) with no matching
+    `Configure<AbpAuditingOptions>(...)` entry is flagged (Rule 17, cross-
+    referenced with STD-006 R6 on the logging side).
+
+  Any hit blocks the merge.
 
 ## Project-specific deviations
 

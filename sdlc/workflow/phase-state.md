@@ -6,7 +6,7 @@ Load and update this operation whenever:
 - Entering a new phase on a milestone (lazy-create if absent)
 - Closing a session mid-phase (record what completed, what is next)
 - Opening a new session on an in-flight milestone (read before any phase work)
-- Transitioning between phases (flip `dev_phase` or `qa_phase`, append Phase history row)
+- Transitioning between phases (flip `dev_phase` or `qa_phase`)
 
 ## Do NOT use when
 
@@ -37,7 +37,7 @@ Work the phase (design / plan / implementation, or QA-track flow)
       ↓
 Update during session (session_notes, accumulated_context as artifacts land)
       ↓
-Update at phase transition (flip dev_phase or qa_phase, phase_entered, next_action; append Phase history row)
+Update at phase transition (flip dev_phase or qa_phase, phase_entered, next_action)
       ↓
 Update at session close (record "completed X, next Y" in Session continuity)
 ```
@@ -84,18 +84,13 @@ on dev; qa-suite → qa-gate on QA).
    QA-track transitions. The other field's value is independent and is not changed.
 2. Set `phase_entered` to today's date.
 3. Set `next_action` to the first concrete step in the new phase.
-4. Append a row to `## Phase history`:
-   ```
-   | YYYY-MM-DD | <track> | <from> | <to> | <one-sentence session summary> |
-   ```
-   Track is `dev` or `qa`.
-5. Clear `session_notes` (stale mid-phase notes belong in history, not the live field).
-6. Re-derive `progress_percent` from the new `(dev_phase, qa_phase)` pair
+4. Clear `session_notes` (stale mid-phase notes belong in history, not the live field).
+5. Re-derive `progress_percent` from the new `(dev_phase, qa_phase)` pair
    using the anchor table in
    [`../_templates/MILESTONE-STATE.md → Progress-percent formula`](../_templates/MILESTONE-STATE.md#progress-percent-formula).
    The value is the table cell for the current pair — no free-form
    interpolation.
-7. Remind user: a `/clear` is required before loading the next flow file on any of these
+6. Remind user: a `/clear` is required before loading the next flow file on any of these
    five transitions (per CLAUDE.md Hard rules):
    - Phase 1.5 → 2 (design → plan)
    - Phase 2 → 3 (plan → implementation)

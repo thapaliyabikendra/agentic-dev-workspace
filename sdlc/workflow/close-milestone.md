@@ -63,13 +63,8 @@ Edit `docs/milestones/M-NN-<slug>/MILESTONE-STATE.md`:
 1. Set `dev_phase: done` and `qa_phase: done`.
 2. Set `progress_percent: 100`.
 3. Set `next_action: "Milestone closed on <YYYY-MM-DD>."`.
-4. Append a final row to `## Phase history` (track is `dev` for the closing
-   transition since the milestone overall closes from the dev-track perspective):
-   ```
-   | YYYY-MM-DD | dev | 3 | done | Milestone declared done; UAT.md status: <value>. |
-   ```
-5. Clear `session_notes`.
-6. Update `## Session continuity`:
+4. Clear `session_notes`.
+5. Update `## Session continuity`:
    - `Last session completed:` — "Milestone closed."
    - `Next session should start with:` — "N/A — milestone done."
 
@@ -100,6 +95,22 @@ milestone from "Milestones in flight" to "Shipped" in
 referencing this milestone's artifacts.
 
 Commit `docs/ROADMAP.md` alongside the close commit.
+
+### C-6 — Dangling cross-reference audit
+
+Run the audit recipe in
+[`maintenance-discipline.md § Periodic dangling-reference audit`](maintenance-discipline.md#periodic-dangling-reference-audit).
+The milestone-close boundary is the canonical recurring touchpoint —
+citations that drifted during the milestone (new framework edits
+pointing at not-yet-authored ADRs / STDs / CCCs / tags) surface here
+before the next milestone's Phase 3 sessions load them as load-bearing
+references. Any dangling reference found is either resolved by
+authoring the target in a follow-up commit before close, or downgraded
+to a slot description in the citing file.
+
+If the audit finds zero dangling references, record one line in the
+close commit message: `audit: 0 dangling refs`. If it finds any,
+resolve before flipping milestone status to `done`.
 
 ---
 

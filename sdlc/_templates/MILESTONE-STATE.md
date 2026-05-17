@@ -41,16 +41,6 @@ The roadmap regen consumes this field as-is.
 
 ---
 
-## Phase history
-
-<!-- Append-only. One row per phase transition. Track is dev | qa. -->
-
-| Date       | Track | From phase | To phase | Session summary                          |
-| ---------- | ----- | ---------- | -------- | ---------------------------------------- |
-| YYYY-MM-DD | dev   | —          | 0        | Milestone opened; state file initialized |
-
----
-
 ## Accumulated context
 
 <!-- ID list of produced artifacts — not prose. One ID per line. -->

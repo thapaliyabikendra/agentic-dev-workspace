@@ -244,6 +244,36 @@ Read **only** what the FS declares:
 See [`retrieval-discipline.md`](retrieval-discipline.md) for the underlying
 rule.
 
+#### Load-completeness checkpoint (before Stage 1)
+
+Before entering Stage 1 Merge, emit the **Conformance set in scope** to
+the session as a named-slot list. Each slot is empty-by-default; an
+empty slot is visibly missing in the transcript and forces a re-load
+rather than silently passing. Use this exact shape:
+
+```
+Conformance set in scope (FS-NNN):
+  FS-declared STDs:           [STD-…, STD-…]
+  Convention-tagged STDs:     [STD-… (convention), STD-… (task-ordering), STD-… (code-quality)]
+  FS-declared ADRs:           [ADR-…, ADR-…]
+  Convention-tagged ADRs:     [ADR-… (convention), ADR-… (task-ordering)]
+  FS-declared CCCs:           [CCC-…, CCC-…]
+```
+
+The convention / task-ordering / code-quality slots are populated by
+scanning `sdlc/standards/index.md` and `docs/<component>/adrs/index.md`
+for those tag values — they are not optional and not derivable from
+the FS's frontmatter alone. A slot left as `[]` is a load gap: either
+the index truly has zero tagged artifacts for that slot (rare; record
+as `[]` explicitly), or the scan was skipped. The latter is the
+failure mode this checkpoint exists to prevent.
+
+The emitted list is the session's evidence of retrieval. The QA gate's
+STD-conformance and ADR-conformance dispatches
+([`qa-gate.md`](qa-gate.md)) verify the SAME set; a slot that was empty
+at Stage 1 and non-empty at QA-gate time is a retrieval-discipline
+finding, not a code finding.
+
 ---
 
 ### Stage 1 — Merge
@@ -368,7 +398,13 @@ conformance set [`qa-gate.md`](qa-gate.md) verifies.
 Cohort ordering inside the FS's Implementation tasks maps to these ADRs —
 see
 [`plan.md → Implementation-task cohort ordering`](plan.md#implementation-task-cohort-ordering)
-and the cohort-ordering ADR for this project.
+and the project's `task-ordering`-tagged ADR (APP component:
+[`ADR-002`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md);
+look up `docs/<component>/adrs/index.md` for other components). The
+ADR's cohort table is the source of truth for layer order, per-cohort
+STD/CCC anchors, and per-cohort parallel-dispatch eligibility (file-
+disjoint subagents within a cohort per
+[`agent-contracts.md § Dispatch shapes`](agent-contracts.md#dispatch-shapes)).
 
 **Build validation between cohorts.** After each cohort's code lands,
 run your project's build command (declared in
@@ -378,7 +414,9 @@ failures inside the just-touched cohort are local and fixed in place;
 failures in unrelated projects, missing-type errors across cohort
 boundaries, or DI-resolution errors at startup indicate the cohort
 ordering or dependency declaration is wrong — halt and revisit the FS
-task ordering rather than papering over.
+task ordering rather than papering over. Cohort 3 is the canonical
+surface for STD-005 R12 violations — see
+[`ADR-002 § Build-validate at each boundary`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md).
 
 Four disciplines distinguish this from "just write the code":
 

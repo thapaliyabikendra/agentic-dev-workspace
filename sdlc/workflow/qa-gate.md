@@ -53,10 +53,17 @@ run (load those files first).
   dispatch covering every STD declared in the FS's `standards:` whose
   `applies_when.stack:` intersects the FS's `stack:`, plus every STD tagged
   `convention` / `code-quality` / `task-ordering` from `sdlc/standards/index.md`.
-  Returns the same 3-block contract. Code conforms to every `accepted` STD's
-  rules; deviations either fixed in code, captured in a project-scoped ADR
-  back-linked to the STD via `related_adrs:`, or flagged as a finding before the
-  flip. Same outcome routing as ADR-conformance (DONE / DONE_WITH_CONCERNS /
+  Returns the same 3-block contract. **Dispatch contract — scans, not
+  judgment.** For each in-scope STD, the subagent's check list IS the STD's
+  `## Consequences` section (or the equivalently named enforcement section),
+  run verbatim — the subagent does NOT re-derive rules from body prose. An
+  in-scope STD whose Consequences subsection is prose-only (no concrete scan
+  triggers — file globs, grep patterns, or named structural checks) returns
+  `NEEDS_CONTEXT`; the cure is to sharpen the STD, not to invent checks at
+  QA-gate time. Code conforms to every `accepted` STD's rules; deviations
+  either fixed in code, captured in a project-scoped ADR back-linked to the
+  STD via `related_adrs:`, or flagged as a finding before the flip. Same
+  outcome routing as ADR-conformance (DONE / DONE_WITH_CONCERNS /
   NEEDS_CONTEXT / BLOCKED).
 - **CCC-deviation check** — parallel inline `Agent(subagent_type=Explore, ...)`
   dispatch covering every CCC declared in the FS's `ccc:`. For each CCC, verify

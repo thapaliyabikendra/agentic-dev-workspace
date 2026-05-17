@@ -419,6 +419,28 @@ Phase-1-born) + **Commands they trigger** (CMD-NNN IDs from this FS's
 `nodes/actors/index.md`). (R-NEW-2a retired 2026-05-17 — the Phase-1-bare ACT body
 shape no longer applies because the ACT is born at Phase 2.)
 
+**Phase-2 node frontmatter / body contract additions (project = APP component,
+ABP / .NET stack).** Two additions per
+[`STD-005 § Rule 11`](../standards/STD-005-abp-coding-conventions.md#rule-11--node-body-to-service-layer-mapping)
+and
+[`STD-005 § Rule 13`](../standards/STD-005-abp-coding-conventions.md#rule-13--shared-validation--schema-constants-per-module):
+
+- **FLW / QRY / CMD** nodes declare `service_layer:` in frontmatter, value
+  `domain` or `application` (default `domain`). The default is the home
+  declared by STD-005 R11 — the body lives in the `<AggregateName>Manager`
+  returning `ErrorOr<T>`. The `application` value flags an exceptional
+  AppService-resident body and requires a node-local DEC or component ADR
+  justifying the deviation (the Phase 2 validator surfaces an unjustified
+  `application` value as a Blocker).
+- **ENT** nodes declare each persisted property's validation constants
+  (max-length, range, decimal-precision, regex-pattern) in the body,
+  named to match the `<Module>Consts.cs` constants Cohort 1 of
+  [`ADR-002`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md)
+  will author. The ENT body names the constant (e.g.,
+  `DepartmentNameMaxLength = 128`); the actual `.cs` file is Phase 3 Cohort
+  1's deliverable. Phase 2 stops at the names + values. Numeric literals
+  in the ENT body without a constant name are a Blocker per STD-005 R13.
+
 **(b) Phase-1-born FLW enrichment.** The FLW (per `produced_flw:`) already exists in
 canonical with `status: proposed` and Phase-1-bare body shape (`related: []`, Trigger
 + Scenarios). At Phase 2:
@@ -688,9 +710,12 @@ Scan `docs/<component>/adrs/index.md` for the ADR tagged `task-ordering` and con
 cohort table. Each task references the relevant convention ADR by ID rather than restating
 the convention.
 
-> **Your project:** Look up the ADR tagged `task-ordering` in
-> `docs/<component>/adrs/index.md` and note its ID and cohort names here as a session
-> reference.
+> **APP component:** [`ADR-002`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md)
+> (`task-ordering` tag) — six cohorts: (1) `Domain.Shared`, (2) `Domain`,
+> (3) `EntityFrameworkCore`, (4) `Application.Contracts`, (5) `Application`,
+> (6) `HttpApi.Host`, plus a cross-cutting cohort (seed contributors, `en.json`,
+> tests). Other components: look up their own `task-ordering`-tagged ADR; if
+> the slot is empty, author the ADR before authoring Implementation tasks.
 
 Cross-cutting tasks (test scaffolding, seed data) land at the end as a final cohort or
 interleaved per scenario, but never before the cohort they validate compiles.
