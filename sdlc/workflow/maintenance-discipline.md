@@ -53,7 +53,7 @@ those carry the doctrinal frame the per-op sections assume.
 | Canonical node edit (any) | [Files to touch on a canonical node edit](#files-to-touch-on-a-canonical-node-edit) |
 | Node `related:` add / remove | + [Bidirectional-link enforcement](#bidirectional-link-enforcement) |
 | Node semantic content change | + [Node versioning — `version: N`](#node-versioning--version-n) |
-| Phase 1.5 round-trip body edit on Phase-1-born FLW / ACT | [Phase 1.5 round-trip body-edit exception](#phase-15-round-trip-body-edit-exception) |
+| Phase 1.5 round-trip body edit on Phase-1-born FLW | [Phase 1.5 round-trip body-edit exception](#phase-15-round-trip-body-edit-exception) |
 | ADR edit (any) | [Files to touch on an ADR edit](#files-to-touch-on-an-adr-edit) |
 | CCC edit (any) | [Files to touch on a CCC edit](#files-to-touch-on-a-ccc-edit) |
 | Promote inline DEC → standalone | [Promoting an inline DEC to standalone](#promoting-an-inline-dec-to-standalone) |
@@ -139,15 +139,14 @@ ADRs, or CCCs — see *Rule history* below.
 **The touch is event-driven** — it fires at each edit, not at a fixed phase
 boundary. Concretely:
 
-- **Phase 1 ingest of a Phase-1-born FLW or ACT** (per R-NEW-1) — new row
-  in `nodes/flows/index.md` (for FLW) or `nodes/actors/index.md` (for
-  ACT) with Status = `proposed`. The new node is written directly to
-  `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`
-  and a Phase-1-bare body shape (per R-NEW-2 / R-NEW-2a — see
-  [`in-flight-nodes.md → FLW lifecycle`](in-flight-nodes.md)). The 2-file
-  node touch fires immediately. When a single FRS births both a FLW and
-  an ACT, that is **two independent 2-file touches** in the same
-  authoring session — they do not compound.
+- **Phase 1 ingest of a Phase-1-born FLW** (per R-NEW-1) — new row in
+  `nodes/flows/index.md` with Status = `proposed`. The new node is
+  written directly to `docs/<component>/nodes/flows/FLW-NNN-<slug>.md`
+  with `status: proposed` and a Phase-1-bare body shape (per R-NEW-2 —
+  see [`in-flight-nodes.md → FLW lifecycle`](in-flight-nodes.md)). The
+  2-file node touch fires immediately. ACT is no longer Phase-1-born
+  (R-NEW-2a retired 2026-05-17 — ACT births at Phase 2 with the rest of
+  the structural nodes).
 - **Phase 1 birth of a Phase-1-born CHG** (per R-CHG-1) — when the FRS's
   `touches_nodes:` is non-empty, the CHG file is written to
   `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
@@ -156,21 +155,29 @@ boundary. Concretely:
   `modifies[]` only — see [`in-flight-nodes.md → CHG mechanics`](in-flight-nodes.md#chg-mechanics)).
   The touch is **1-file** because CHG has no per-type `index.md`
   companion today (see **CHG `index.md` gap** in the round-trip
-  exception below). This is independent from any FLW / ACT birth in the
+  exception below). This is independent from any FLW birth in the
   same session — touches do not compound across artifact types.
-- **Phase 1.5 round-trip body edit** on a Phase-1-born FLW or ACT — see
+- **Phase 1.5 round-trip body edit** on a Phase-1-born FLW — see
   [Phase 1.5 round-trip body-edit exception](#phase-15-round-trip-body-edit-exception)
   below. This is the framework's first and only carve-out to the
   universal 2-file rule; the scope is tight and the rule is not
-  generalizable.
-- **Phase 2 enrichment of a Phase-1-born FLW or ACT** — same file edited
+  generalizable. (R-NEW-7 narrowed to FLW only 2026-05-17 — ACT no longer
+  participates because ACT births at Phase 2, not Phase 1.)
+- **Phase 2 enrichment of a Phase-1-born FLW** — same file edited
   in place, body content added (Sequence / Branches / Compensating /
-  Postconditions / Decisions on FLW; Commands triggered / Queries issued /
-  PERM-NNN refs on ACT), `related:` populated, `status:` unchanged
+  Postconditions / Decisions), `related:` populated, `status:` unchanged
   (`proposed`). The 2-file node touch fires because frontmatter `updated:`
   and the body change are non-trivial; the index row's Status column
   stays `proposed`. Plus the `(base + N)` expansion fires because
   `related:` just transitioned `[] → [...]`.
+- **Phase 2 birth of an ACT** (per `produced_actor:`, R-NEW-2a retired
+  2026-05-17) — new row in `nodes/actors/index.md` with Status =
+  `proposed`. The new node is written directly to
+  `docs/<component>/nodes/actors/ACT-NNN-<slug>.md` with `status:
+  proposed` and all sections filled at birth (Description + Goals +
+  Preconditions + Flows initiated + Commands triggered + Queries issued);
+  `related:` populated at birth. The 2-file node touch fires immediately
+  — this is a Phase-2 *birth* event, not a Phase-1 enrichment.
 - **Phase 2 ingest of a new Phase-2-born node** (ENT / CMD / STA / CON /
   INT / DEC / PERM / QRY) — new row in the per-type `index.md` with
   Status = `proposed`. The new node is written directly to
@@ -254,9 +261,11 @@ A doctrinal carve-out (per R-NEW-7 / B3, 2026-05-17; extended to CHG per
 R-CHG-1..7) to the universal 2-file touch rule. Tightly scoped. **The
 framework's first exception to the universal 2-file rule.**
 
-**Trigger.** A Phase 1.5 round-trip on a Phase-1-born FLW, ACT, or CHG,
+**Trigger.** A Phase 1.5 round-trip on a Phase-1-born FLW or CHG,
 where the revision is body-only and the artifact's `status:` stays
-unchanged (FLW / ACT: `proposed`; CHG: `draft`).
+unchanged (FLW: `proposed`; CHG: `draft`). (R-NEW-7 narrowed to FLW
+only 2026-05-17 — ACT no longer participates because ACT births at
+Phase 2, not Phase 1; see [Rule history](#rule-history--phase-1-birth-list-trimmed-2026-05-17).)
 
 **Action.** 1-file touch — edit the artifact body only. The per-type
 `index.md` is NOT re-synced (Status column unchanged; Title / Description
@@ -269,42 +278,46 @@ status-stability discipline.
 
 **Scope restrictions — not generalizable. ALL four must hold:**
 
-- **Only Phase-1-born artifacts (FLW / ACT / CHG).** Not Phase-2-born
-  canonical nodes (ENT / CMD / STA / CON / INT / DEC / PERM / QRY).
+- **Only Phase-1-born artifacts (FLW / CHG).** Not Phase-2-born
+  canonical nodes (ACT / ENT / CMD / STA / CON / INT / DEC / PERM / QRY).
 - **Only during Phase 1.5 round-trip.** Not during free-form edits, not
   during Phase 2 enrichment, not during bug fixes.
 - **Only when `status:` does not change.** Any status flip
-  (FLW / ACT `proposed → active` or `proposed → deprecated`; CHG
+  (FLW `proposed → active` or `proposed → deprecated`; CHG
   `draft → approved`, `draft → deprecated`) → 2-file touch as usual.
 - **Only when body edits do not change frontmatter fields driving index
   columns** (title, summary, tags). Such edits → 2-file touch as usual.
 
 **Precedent risk.** Future requests "I'm just editing the body, can I use
 1-file touch?" MUST NOT cite R-NEW-7 or its R-CHG extension. The carve-out
-is scoped to Phase 1.5 round-trip on Phase-1-born FLW / ACT / CHG only;
-each extension is type-named (FLW / ACT in the original, CHG here) — not
+is scoped to Phase 1.5 round-trip on Phase-1-born FLW or CHG only;
+each extension is type-named (FLW per R-NEW-7, CHG per R-CHG-1..7) — not
 generalized as "any in-flight body edit." Generalizing the carve-out to
 all canonical body edits is a separate doctrinal question (deferred —
 body-edit vs. index-relevance audit not done). The carve-out exists
 because:
 
 - Phase 1.5 round-trip is the FRS revision loop; an FAIL / PASS_WITH_MAJORS
-  verdict often ripples to the canonical FLW (Scenarios revised), the
-  canonical ACT (Goals / Preconditions revised), and/or the milestone-
-  scoped CHG (`modifies[]` behavior delta revised). Worst case 4× edit
-  cost per round-trip otherwise.
+  verdict often ripples to the canonical FLW (Scenarios revised) and/or
+  the milestone-scoped CHG (`modifies[]` behavior delta revised). Worst
+  case 3× edit cost per round-trip otherwise. (Pre-2026-05-17 the ripple
+  also reached a Phase-1-born ACT; R-NEW-2a retirement moved ACT birth
+  to Phase 2, so Phase 1.5 round-trip no longer touches an ACT body.)
 - The Phase-1-bare body shape (per R-NEW-8 / R-CHG-7) means the index
   row (where one exists) is carrying minimal information — Status
   `proposed` / `draft`, Title (frontmatter), one-line description
-  (frontmatter). Body content (Scenarios prose, ACT Description prose,
-  CHG `modifies[]` behavior delta) is not in the index, so a body
-  revision does not invalidate any index column.
+  (frontmatter). Body content (FLW Scenarios prose, CHG `modifies[]`
+  behavior delta) is not in the index, so a body revision does not
+  invalidate any index column.
 
 **Other status-change events keep the existing 2-file touch (or 1-file
 where no index exists):** Phase 3 activation `proposed → active` (FLW /
-ACT) / CHG `approved → merged`, FS-validation exit CHG `draft → approved`,
-full FRS abandonment FLW / ACT `proposed → deprecated` / CHG `draft →
-deprecated`, sibling-CHG fold `draft → deprecated` (R-CHG-3). See
+ACT — both flip at Phase 3 regardless of birth phase) / CHG `approved →
+merged`, FS-validation exit CHG `draft → approved`, full FRS abandonment
+FLW `proposed → deprecated` / CHG `draft → deprecated` (the FRS's
+`produced_actor:` ACT-NNN ID claim is released from `id-claims.md` — no
+ACT file exists on disk to deprecate), sibling-CHG fold `draft →
+deprecated` (R-CHG-3). See
 [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md) for the
 abandonment procedure.
 
@@ -629,6 +642,50 @@ tiered-touch rule now covers CCCs with the same 2-file shape as nodes and
 ADRs (CCC + `ccc/index.md`). The exclusion of `cross-cutting-concerns.md`
 from the When to Use gate was removed and replaced with a note that individual
 CCC-NNN artifacts are first-class and in scope.
+
+## Rule history — Phase 1 birth list trimmed (2026-05-17)
+
+ACT was relocated from Phase 1 birth to Phase 2 birth (alongside ENT /
+CMD / STA / CON / INT / DEC / PERM / QRY). Two rule changes landed:
+
+- **R-NEW-2a retired.** The Phase-1-bare ACT body shape (Description +
+  Goals + business Preconditions + Flows initiated; `related: []`) no
+  longer exists because there is no Phase-1 ACT body. The FRS's
+  `produced_actor:` scalar now carries a forward-reference ACT-NNN — the
+  ID is claimed at Phase 1 in `id-claims.md` (Source = FRS-NNN, Op =
+  introduce), but the ACT file is authored at Phase 2 with all sections
+  filled at birth.
+- **R-NEW-7 narrowed to FLW only.** The 1-file body-edit carve-out for
+  Phase 1.5 round-trip applies to Phase-1-born nodes; with ACT moved to
+  Phase 2 birth, the carve-out's scope is FLW alone (plus the parallel
+  CHG body-edit extension under R-CHG-1..7).
+- **R-NEW-8 narrowed to FLW only.** The `related: []` Phase-1-bare body-
+  shape discriminator now applies to FLW only. ACT births at Phase 2
+  with `related:` populated; an ACT with `related: []` would be a
+  malformed Phase-2 birth, not a Phase-1-bare body.
+
+**Duplicate-actor detection at Phase 1.5 is explicitly dropped** —
+accepted trade-off. Two failure modes that the prior canonical-ACT-index
+scan caught now both route to Phase 2 FS authoring:
+- **Cross-FRS duplicate-actor:** two sibling FRSs in the same milestone
+  independently introduce the same actor role.
+- **FRS-vs-canonical duplicate-actor:** a new FRS introduces an actor
+  role whose title duplicates an existing canonical ACT.
+
+Both surface at Phase 2 when the FS attempts to author the ACT file and
+either the chosen slug collides with an existing canonical ACT file (FS
+validation flags it) or the author notices the duplicate role-name
+during ACT authoring and resolves by reusing the canonical ACT-NNN
+(retroactive `produced_actor:` clear-out on the originating FRS via
+`R-NEW-10` loop-back).
+
+**Survey inlining for simple FRSs.** Parallel change on the same date:
+FRS frontmatter `discovery:` accepts `inline` as an enum value (Path C
+in `design.md § Phase 1`). When `discovery: inline`, the per-FRS Survey
+content is absorbed into the FRS's "Brownfield impact" section; no
+separate file at `discovery/FRS-NNN-<slug>.md` is created. Use for
+narrow FRSs (pure-addition or single-node change-request) where a
+separate survey file would be less than one screen.
 
 ## Rule history — canonical `log.md` retired (2026-05-16)
 

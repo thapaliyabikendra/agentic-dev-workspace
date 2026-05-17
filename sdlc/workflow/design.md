@@ -4,25 +4,25 @@
 > and runs the validation gate that hardens those FRSs before the Ingest flow
 > drafts nodes. Part of the workflow defined in [`../WORKFLOW.md`](../WORKFLOW.md).
 >
-> **Mode: mixed — Query (FRS validates against canonical) + Ingest (FLW + ACT
+> **Mode: mixed — Query (FRS validates against canonical) + Ingest (FLW
 > born to canonical with `status: proposed`; CHG born to milestone with
 > `status: draft` when `touches_nodes:` is non-empty).** Phase 1 Queries
 > the canonical wiki (which includes `status: proposed` in-flight nodes
 > from any FS not yet at Phase 3) and the ADR index to validate that
 > requirements are well-formed, non-duplicate, and conflict-free, **and**
-> Ingests the journey + identity + modify-intent containers — the new FLW
-> (Trigger + Scenarios, business language) and, when the FRS introduces a
-> new actor role, the new ACT (Description + Goals + business preconditions
-> + flows initiated) — both born to canonical with `status: proposed`; plus
-> a per-FRS CHG (behavior-language `modifies[]` only) born to the
-> milestone-scoped `chg/` home with `status: draft` when the FRS declares
-> non-empty `touches_nodes:` (R-CHG-1..4). Phase 2 (plan.md) Ingests ENT /
+> Ingests the journey + modify-intent containers — the new FLW
+> (Trigger + Scenarios, business language) born to canonical with
+> `status: proposed`; plus a per-FRS CHG (behavior-language `modifies[]`
+> only) born to the milestone-scoped `chg/` home with `status: draft`
+> when the FRS declares non-empty `touches_nodes:` (R-CHG-1..4). Phase 2
+> (plan.md) Ingests ACT (when the FRS declares `produced_actor:`) + ENT /
 > CMD / STA / CON / INT / DEC / PERM / QRY structures, enriches the
-> Phase-1-born FLW + ACT with wiring (`related:` populated, Sequence,
-> Branches, Compensating actions, structural Postconditions; CMD/QRY/PERM
-> refs on ACT), and consumes the per-FRS CHGs (via FS `consumes_chgs:`)
-> for structural enrichment (`modifies[]` before/after, `adds[]`,
-> `migration_steps[]`). Per R-NEW-1, R-NEW-2, R-NEW-2a, R-CHG-1..7.
+> Phase-1-born FLW with wiring (`related:` populated, Sequence, Branches,
+> Compensating actions, structural Postconditions), and consumes the
+> per-FRS CHGs (via FS `consumes_chgs:`) for structural enrichment
+> (`modifies[]` before/after, `adds[]`, `migration_steps[]`). Per R-NEW-1,
+> R-NEW-2, R-CHG-1..7. (R-NEW-2a retired 2026-05-17 — see
+> [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16).)
 
 > **HARD-GATE:** Do NOT begin Phase 2 (Ingest) until **every** FRS in this
 > milestone has cleared Phase 1.5 (zero unresolved-without-OQ findings,
@@ -59,7 +59,7 @@ Load only what the task type requires. Do not pre-load speculatively.
 |---|---|---|---|
 | **Meta question** ("what is the process", "document phase X") | `design.md` | `frs-validation-rules.md` §Severity + §Bundling detection (lines 1–140) | `KB-LAYOUT.md`, `retrieval-discipline.md`, `FRS.md` template, `WORKFLOW.md` body |
 | **Actual Phase 0 execution** | `design.md` | `WORKFLOW.md` §Phase flows (router only) | `KB-LAYOUT.md`, `retrieval-discipline.md`, `FRS.md` template |
-| **Actual Phase 1 execution** | `design.md`, `_templates/FRS.md`, `_templates/nodes/FLOW.md`, `_templates/nodes/ACTOR.md`, `_templates/nodes/CHANGE.md` (when any FRS in this session declares non-empty `touches_nodes:`) | ADR index (one-line scan) | `KB-LAYOUT.md`, `retrieval-discipline.md`, STDs, CCC index (Phase 1 uses business language; STD/CCC narrow-load fires at Phase 1.5) |
+| **Actual Phase 1 execution** | `design.md`, `_templates/FRS.md`, `_templates/nodes/FLOW.md`, `_templates/nodes/CHANGE.md` (when any FRS in this session declares non-empty `touches_nodes:`) | ADR index (one-line scan) | `KB-LAYOUT.md`, `retrieval-discipline.md`, STDs, CCC index, `_templates/nodes/ACTOR.md` (loaded at Phase 2 — Phase 1 uses business language; STD/CCC narrow-load fires at Phase 1.5) |
 | **Actual Phase 1.5 execution** | `design.md`, `frs-validation-rules.md` | `glossary.md`, `docs/shared/ccc/index.md` (snapshot at gate entry), `sdlc/standards/index.md` (scan for FRS-relevant STDs) | `KB-LAYOUT.md`, `WORKFLOW.md` body |
 
 For `frs-validation-rules.md` partial reads: §Severity classification ends at the gate-verdict block (~line 110 of the file). §Bundling detection follows immediately. Read offset 0, limit 140 for meta questions; read the full file only at an actual Phase 1.5 gate.
@@ -98,12 +98,12 @@ digraph design_flow {
 
     inputs   [shape=oval,  label="Raw requirements\n+ existing nodes\n+ ADR index"];
     phase0   [shape=box,   label="Phase 0\nMilestone Scoping"];
-    phase1   [shape=box,   label="Phase 1\nFRS + FLW + ACT + CHG Authoring\n(one per user-journey;\nCHG only when touches_nodes)"];
+    phase1   [shape=box,   label="Phase 1\nFRS + FLW + CHG Authoring\n(one per user-journey;\nCHG only when touches_nodes)"];
     gate_pass1 [shape=diamond, label="Pass 1\nper-FRS gate?"];
     gate_pass2 [shape=diamond, label="Pass 2\ncross-FRS sweep?"];
 
     out_ms   [shape=doublecircle, label="Milestone portal\n+ milestone-scope.md"];
-    out_frs  [shape=doublecircle, label="Validated FRS set\n+ proposed FLW + ACT\n+ draft CHG (if any)\n+ OQ-NNN files\n(deferred findings)"];
+    out_frs  [shape=doublecircle, label="Validated FRS set\n+ proposed FLW\n+ draft CHG (if any)\n+ OQ-NNN files\n(deferred findings)"];
     next     [shape=doublecircle, label="Phase 2 begins\n(after /clear)"];
 
     inputs -> phase0;
@@ -332,25 +332,35 @@ constraints. Out-of-scope items go in the discovery doc, not the portal.
 **Inputs:** milestone-scope discovery, raw requirement
 **Outputs:**
 - `docs/milestones/M-NN-<slug>/frs/FRS-NNN-<slug>.md` (one per user-journey)
-- `docs/milestones/M-NN-<slug>/discovery/FRS-NNN-<slug>.md` (per-FRS discovery)
+- `docs/milestones/M-NN-<slug>/discovery/FRS-NNN-<slug>.md` (per-FRS discovery) — **omitted when the FRS sets `discovery: inline`** (Path C, simple FRSs); the survey content is absorbed into the FRS's Brownfield impact section.
 - `docs/<component>/nodes/flows/FLW-NNN-<slug>.md` — the FLW this FRS introduces, born to canonical with `status: proposed`, Phase-1-bare body (Trigger + Scenarios + Brownfield notes only; `related: []`). Required when `produced_flw:` is set. Per R-NEW-1, R-NEW-2.
-- `docs/<component>/nodes/actors/ACT-NNN-<slug>.md` — the ACT this FRS introduces when the FRS introduces a new actor role, born to canonical with `status: proposed`, Phase-1-bare body (Description + Goals + business Preconditions + Flows initiated; `related: []`). Required when `produced_actor:` is set; omitted when reusing an existing ACT. Per R-NEW-1, R-NEW-2a.
 - `docs/milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` — the per-FRS CHG this FRS introduces when `touches_nodes:` is non-empty, born to its milestone-scoped permanent home with `status: draft`, Phase-1-bare body (behavior-language `modifies[]` + optional milestone-level `invariants_before/after` + optional `removes[]` / `supersedes[]`; no `adds[]`, no `migration_steps[]`, no structural before/after). One CHG per FRS. Per R-CHG-1..4. (CR track: `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`.)
 
+**ACT-NNN is NOT born at Phase 1.** When the FRS introduces a new actor role
+(`produced_actor:` is set), the ACT-NNN ID is **claimed** at Phase 1 in
+`id-claims.md` (Source = FRS-NNN, Op = introduce) but the canonical ACT file
+is authored at Phase 2 alongside ENT / CMD / STA / etc. — see
+[`plan.md § 3`](plan.md#3-new-node-canonical-ingest--phase-1-born-flw-enrichment).
+The FRS body cites `produced_actor: ACT-NNN` as a forward reference (real ID,
+no file yet) — parallel to the way `produces_nodes:` entries are claimed.
+R-NEW-2a retired 2026-05-17 — Phase-1-bare ACT body shape no longer applies
+because there is no Phase-1 ACT body. Cross-FRS duplicate-actor detection at
+Phase 1.5 is explicitly dropped (accepted trade-off — surfaces at Phase 2 FS
+authoring when both FSs claim the same actor name in `produces_nodes:` /
+`produced_actor:`).
+
 **Templates loaded at Phase 1 entry:** [`../_templates/FRS.md`](../_templates/FRS.md),
-[`../_templates/nodes/FLOW.md`](../_templates/nodes/FLOW.md),
-[`../_templates/nodes/ACTOR.md`](../_templates/nodes/ACTOR.md), and
+[`../_templates/nodes/FLOW.md`](../_templates/nodes/FLOW.md), and
 [`../_templates/nodes/CHANGE.md`](../_templates/nodes/CHANGE.md) (the last
 when any FRS in this session declares non-empty `touches_nodes:` — pure-
-addition FRSs do not load CHANGE.md). The FLOW, ACTOR, and CHANGE templates
-carry phase-keyed authoring notes — Phase 1 authors only the Phase-1
-sections; the Phase-2 sections (Sequence, Branches, Compensating actions,
-structural Postconditions, Decisions on FLW; Commands triggered, Queries
-issued, PERM-NNN refs on ACT; structural before/after on `modifies[]`,
+addition FRSs do not load CHANGE.md). The FLOW and CHANGE templates carry
+phase-keyed authoring notes — Phase 1 authors only the Phase-1 sections; the
+Phase-2 sections (Sequence, Branches, Compensating actions, structural
+Postconditions, Decisions on FLW; structural before/after on `modifies[]`,
 `adds[]`, `migration_steps[]` on CHG) are gated by inline notes and stay
-unauthored at Phase 1.
+unauthored at Phase 1. ACTOR.md is loaded at Phase 2 (plan.md), not here.
 
-**STD / CCC narrow-load posture stays Phase 1.5+.** Phase 1 FRS + FLW + ACT
+**STD / CCC narrow-load posture stays Phase 1.5+.** Phase 1 FRS + FLW
 authoring uses business language only; STDs and CCCs are not narrow-loaded
 here. The Phase 1.5 Pass 1 STD-conformance and CCC-deviation scans are where
 the index narrow-loads fire — see [Phase 1.5 — Validation Gate](#phase-15--validation-gate).
@@ -363,11 +373,12 @@ experience" is too coarse.
 For each user-journey in the milestone:
 
 1. Choose entry path:
-   - **Path A (default):** Author the per-FRS discovery at
+   - **Path A (default, external survey):** Author the per-FRS discovery at
      `docs/milestones/M-NN-<slug>/discovery/FRS-NNN-<slug>.md` using
      [`../_templates/SURVEY.md`](../_templates/SURVEY.md) with
      `level: frs`. Survey scopes discovery; OQs surface during this step.
-   - **Path B (scope known):** Create an FRS skeleton at
+     Set `discovery: ../discovery/FRS-NNN-<slug>.md` on the FRS frontmatter.
+   - **Path B (scope known, external survey):** Create an FRS skeleton at
      `docs/milestones/M-NN-<slug>/frs/FRS-NNN-<slug>.md` (frontmatter +
      scope paragraph + `produces_nodes` + `touches_nodes` only), then
      author the per-FRS Survey bounded by the skeleton's declared nodes.
@@ -377,6 +388,21 @@ For each user-journey in the milestone:
      dialog — i.e., every node ID is already known and confirmed against
      the index. If any node scope is still being negotiated with the
      user, use Path A.
+   - **Path C (inline survey for simple FRSs):** Set `discovery: inline`
+     in the FRS frontmatter. No separate file at `discovery/FRS-NNN-<slug>.md`
+     is created. The survey's node-scan content (Existing-nodes-scanned +
+     Relevant-existing-modules) is absorbed into the FRS's "Brownfield
+     impact → Surveyed surface" sub-bullet; ADRs flow into `adrs:`
+     frontmatter as usual; OQs still surface to
+     `docs/discovery/open-questions/` (the OQ files are workflow-level,
+     not survey-level). **Use Path C when** the FRS is narrow — typically
+     pure-addition new-feature, or single-node change-request — and a
+     separate survey file would be less than one screen of content. **Do
+     NOT use Path C when** `kind: absorb-legacy-doc` applies (absorption
+     surveys are workspace-level and always external) or when the survey
+     would carry ≥ 1 OQ with `gate_effect: blocking` (the OQ file flow
+     handles those independently, but the survey's narrative scope is
+     needed for resolution).
 2. Classify OQs from the Survey using the 4-tier table in
    [`research.md`](research.md) (load when ≥1 OQ requires tier-classification;
    skip entirely when no Survey OQs exist). If any OQ is `blocking-frs`, invoke
@@ -398,16 +424,7 @@ For each user-journey in the milestone:
    `proposed`. Per R-NEW-2. 2-file touch: FLW file + `nodes/flows/index.md`.
    Allocate the FLW-NNN ID from the milestone's `id-claims.md` per R-NEW-9
    (Source column accepts the FRS-NNN as the claimant).
-5. **Author the Phase-1-born ACT** at `docs/<component>/nodes/actors/ACT-NNN-<slug>.md`
-   using [`../_templates/nodes/ACTOR.md`](../_templates/nodes/ACTOR.md) —
-   **only when the FRS introduces a new actor role** (i.e., `produced_actor:`
-   is set). Phase-1 body shape: Description + Goals + Preconditions to act
-   (business language only — no PERM-NNN refs) + Flows they initiate (FLW-NNN
-   IDs — real because FLW is also Phase-1-born). `related: []`. Status
-   `proposed`. Per R-NEW-2a. 2-file touch: ACT file + `nodes/actors/index.md`.
-   When `produced_actor:` is blank (FRS reuses an existing ACT), skip this
-   step; cite the existing ACT-NNN in the FRS Actors section by ID.
-6. **Author the Phase-1-born CHG** at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`
+5. **Author the Phase-1-born CHG** at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`
    (CR track: `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`)
    using [`../_templates/nodes/CHANGE.md`](../_templates/nodes/CHANGE.md) —
    **only when the FRS declares non-empty `touches_nodes:`** (R-CHG-1). One
@@ -427,7 +444,16 @@ For each user-journey in the milestone:
    per row-12 gap note — fire only the CHG file edit when no index
    exists). When the FRS's `touches_nodes:` is empty (pure-addition
    FRS), skip this step.
-7. Append the FRS ID to the milestone portal's `frs:` frontmatter and to its
+
+   **ACT-NNN ID claim (when `produced_actor:` is set).** Even though the
+   ACT file is authored at Phase 2, the ACT-NNN ID is claimed at Phase 1
+   in `id-claims.md` with Source = FRS-NNN, Op = introduce — same row
+   shape as FLW-NNN / CHG-NNN claims. This reserves the ID against
+   sibling FRSs allocating the same number. The FRS frontmatter
+   `produced_actor: ACT-NNN` resolves as a forward reference. When
+   `produced_actor:` is blank (FRS reuses an existing ACT), no claim is
+   made; cite the existing ACT-NNN in the FRS Actors section by ID.
+6. Append the FRS ID to the milestone portal's `frs:` frontmatter and to its
    "FRSs in this milestone" section.
 
 Each FRS must:
@@ -438,8 +464,9 @@ Each FRS must:
   because the FLW is authored alongside the FRS at Phase 1). Blank only when
   no new FLW is introduced (rare; usually a `touches_nodes:`-only FRS).
 - Declare `produced_actor:` — the ACT-NNN this FRS introduces when it
-  introduces a new actor role (scalar; real because the ACT is authored
-  alongside the FRS at Phase 1). Blank when reusing an existing actor.
+  introduces a new actor role (scalar; forward reference because the ACT
+  file is authored at Phase 2, but the ID is claimed at Phase 1 in
+  `id-claims.md`). Blank when reusing an existing actor.
 - Declare `produces_nodes:` — new node IDs this FRS intends to introduce
   at Phase 2 Ingest (ENT / CMD / STA / CON / INT / DEC / PERM / QRY only;
   FLW and ACT are covered by `produced_flw:` / `produced_actor:`).
@@ -491,17 +518,16 @@ later.
   between sections. If something stops making sense, go back; don't paper
   over. The Behavior section is retired (R-NEW-1): journey behavior lives
   on the Phase-1-born FLW (Trigger + Scenarios), not in the FRS body.
-- **Author FLW, ACT, and CHG after the FRS body, before exit.** Once the
-  FRS is drafted, walk the FLW template (Trigger + 3 Scenarios in business
-  language), then — when a new actor role is introduced — the ACT template
-  (Description + Goals + business Preconditions + Flows initiated), then —
-  when `touches_nodes:` is non-empty — the CHANGE template (behavior-
-  language `modifies[]` + optional milestone-level invariant deltas +
-  optional `removes[]` / `supersedes[]`). Each Scenario must map back to
-  at least one Acceptance criterion. Each CHG's `modifies[]` delta must
-  coherently follow from the FRS's ACs / BRs / Postconditions and the
-  target canonical node's state. Phase 1.5 Pass 1 verifies AC→scenario
-  coverage (R-NEW-3) and chg-sanity (R-CHG-5).
+- **Author FLW and CHG after the FRS body, before exit.** Once the FRS
+  is drafted, walk the FLW template (Trigger + 3 Scenarios in business
+  language), then — when `touches_nodes:` is non-empty — the CHANGE
+  template (behavior-language `modifies[]` + optional milestone-level
+  invariant deltas + optional `removes[]` / `supersedes[]`). Each Scenario
+  must map back to at least one Acceptance criterion. Each CHG's
+  `modifies[]` delta must coherently follow from the FRS's ACs / BRs /
+  Postconditions and the target canonical node's state. Phase 1.5 Pass 1
+  verifies AC→scenario coverage (R-NEW-3) and chg-sanity (R-CHG-5). (The
+  ACT is authored at Phase 2, not here — see [`plan.md § 3`](plan.md#3-new-node-canonical-ingest--phase-1-born-flw-enrichment).)
 
 ### Checklist — Phase 1 exit (before Phase 1.5)
 
@@ -514,20 +540,25 @@ later.
 - [ ] Each FRS covers exactly one user-journey, independently testable.
 - [ ] No duplicate FRSs within the milestone.
 - [ ] No silent gaps.
+- [ ] `discovery:` resolves correctly: when `discovery: <path>`, the
+      external survey file exists at the cited path; when `discovery:
+      inline`, the FRS's "Brownfield impact → Surveyed surface" sub-bullet
+      is populated (carries the survey's Existing-nodes-scanned +
+      Relevant-existing-modules content).
 - [ ] `produced_flw:`, `produced_actor:` (blank when reusing), `produces_nodes:`,
       `touches_nodes:`, `adrs:`, and `milestone:` frontmatter fields are filled
       (empty list / blank scalar allowed only when genuinely nothing applies —
-      and that's noted, not assumed). `produced_flw:` and `produced_actor:`
-      resolve to real Phase-1-born node files in canonical.
+      and that's noted, not assumed). `produced_flw:` resolves to a real
+      Phase-1-born node file in canonical; `produced_actor:` resolves to a
+      claimed ID in `id-claims.md` (forward reference; the ACT file is
+      authored at Phase 2).
 - [ ] The Phase-1-born FLW file exists at `docs/<component>/nodes/flows/FLW-NNN-<slug>.md`
       with body shape per R-NEW-2 (Trigger + Scenarios + optional Brownfield;
       `related: []`); the FLW is appended to `nodes/flows/index.md` (2-file
       touch).
-- [ ] When `produced_actor:` is set, the Phase-1-born ACT file exists at
-      `docs/<component>/nodes/actors/ACT-NNN-<slug>.md` with body shape per
-      R-NEW-2a (Description + Goals + business Preconditions + Flows
-      initiated; `related: []`); the ACT is appended to `nodes/actors/index.md`
-      (2-file touch).
+- [ ] When `produced_actor:` is set, the ACT-NNN ID is recorded in
+      `id-claims.md` with Source = this FRS, Op = introduce. **No Phase-1
+      ACT file is authored** — that fires at Phase 2 (plan.md § 3).
 - [ ] When `touches_nodes:` is non-empty, the Phase-1-born CHG file exists
       at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:
       `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`) with body
@@ -567,10 +598,11 @@ later.
       The Flow scenarios *are* the test plan — do not draft a parallel
       test-plan artifact.
 
-Then run the user-review handoff before moving to Phase 1.5 — surface all
-four paths: the FRS, the Phase-1-born FLW, the Phase-1-born ACT (when
-`produced_actor:` is set), and the Phase-1-born CHG (when `touches_nodes:`
-is non-empty).
+Then run the user-review handoff before moving to Phase 1.5 — surface the
+authored paths: the FRS, the Phase-1-born FLW, and the Phase-1-born CHG
+(when `touches_nodes:` is non-empty). The ACT (when `produced_actor:` is
+set) is a forward-reference ID claim only at this stage; the file lands
+at Phase 2.
 
 ---
 
@@ -623,13 +655,13 @@ baseline-snapshot capture per
 [`frs-validation-rules.md`](frs-validation-rules.md) fire as parallel
 inline `Agent(subagent_type=Explore, ...)` dispatches in a single message —
 they are file-disjoint over one FRS (each check reads the FRS plus the
-Phase-1-born FLW / ACT / CHG, but each writes to a disjoint finding row).
+Phase-1-born FLW / CHG, but each writes to a disjoint finding row).
 Run Stage A after each FRS is authored. **`chg-sanity` (check #8) fires
 only when the FRS declares non-empty `touches_nodes:` — pure-addition
 FRSs skip the chg-sanity dispatch.** **Sibling-FRS ordering for
 chg-sanity:** Pass 1 processes sibling FRSs in birth order (per
 `id-claims.md` sequence); chg-sanity re-runs only on the affected CHG
-when any cited sibling FLW / ACT body changes during the round-trip
+when any cited sibling FLW body changes during the round-trip
 (per υ / M1).
 
 **Stage B (milestone cross-FRS, after all FRSs cleared Stage A):**
@@ -665,48 +697,51 @@ step based on the 3-block return, using these outcome handles):
 
 For each FRS, run these eight checks and write findings to the FRS's
 "Validation findings" section. Checks 1, 2, 6, 7 also read the Phase-1-born
-FLW (and ACT, when `produced_actor:` is set) — both files exist at this
-gate per R-NEW-1. Check 8 reads the Phase-1-born CHG when `touches_nodes:`
-is non-empty (the CHG file exists at this gate per R-CHG-1); pure-addition
-FRSs skip check 8.
+FLW — the FLW file exists at this gate per R-NEW-1. Check 8 reads the
+Phase-1-born CHG when `touches_nodes:` is non-empty (the CHG file exists
+at this gate per R-CHG-1); pure-addition FRSs skip check 8. **ACT-NNN is
+not Phase-1-born** (R-NEW-2a retired 2026-05-17 — see HARD-GATE callout
+at top of file). When `produced_actor:` is set, Pass 1 checks the ID is
+claimed in `id-claims.md` but does NOT read an ACT body — there is none
+at this stage.
 
-1. **Existence scan** (widened per R-NEW-6 to match FLW scenario signatures
-   and ACT identity). Search the canonical wiki (including `status:
-   proposed` in-flight nodes from any FS not yet at Phase 3) for nodes
-   that match (a) the FRS's user-journey signature — title, actor ID,
-   command domain — and (b) the Phase-1-born FLW's Scenario signatures
-   (happy-path Given/When/Then phrasing — duplicate-flow detection at this
-   gate, not Phase 2). When `produced_actor:` is set, also verify the
-   ACT file exists at `docs/<component>/nodes/actors/ACT-NNN-<slug>.md` and
-   scan canonical ACT index for duplicate actor-role introductions across
-   FRSs. If a near-duplicate exists, record a finding with
-   `type: existence` and a non-blank `rationale:` for the resolution. When
-   the match is a `proposed` sibling-FS node, the `rationale:` notes the
-   in-flight flavor ("matches proposed ENT-005 introduced by FS-A — confirm
-   distinctness or coordinate"). Read-only references to canonical FLW /
-   ACT in FRS prose are NOT existence-checked here (text grep is the audit
-   hook; author is responsible for citation accuracy — per M2). Possible
-   resolutions:
+1. **Existence scan** (widened per R-NEW-6 to match FLW scenario signatures).
+   Search the canonical wiki (including `status: proposed` in-flight nodes
+   from any FS not yet at Phase 3) for nodes that match (a) the FRS's
+   user-journey signature — title, actor ID, command domain — and (b) the
+   Phase-1-born FLW's Scenario signatures (happy-path Given/When/Then
+   phrasing — duplicate-flow detection at this gate, not Phase 2). If a
+   near-duplicate exists, record a finding with `type: existence` and a
+   non-blank `rationale:` for the resolution. When the match is a
+   `proposed` sibling-FS node, the `rationale:` notes the in-flight flavor
+   ("matches proposed ENT-005 introduced by FS-A — confirm distinctness or
+   coordinate"). Read-only references to canonical FLW / ACT in FRS prose
+   are NOT existence-checked here (text grep is the audit hook; author is
+   responsible for citation accuracy — per M2). **Cross-FRS duplicate-actor
+   detection at this gate is explicitly dropped (R-NEW-2a retired
+   2026-05-17)** — when two sibling FRSs independently introduce the same
+   actor role, the conflict surfaces at Phase 2 FS authoring when both FSs
+   claim the same actor name. Possible resolutions:
    - the FRS is genuinely a change request → flip to `kind: change-request`
      in the per-FRS discovery, declare the conflicting canonical IDs in
      `touches_nodes`, and the FRS births a Phase-1 CHG node (per R-CHG-1)
      that the consuming FS will list in `consumes_chgs:` at Phase 2;
-   - the FRS is duplicative → drop it (and retire the Phase-1-born FLW /
-     ACT via `proposed → deprecated` per
-     [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md));
+   - the FRS is duplicative → drop it (and retire the Phase-1-born FLW
+     via `proposed → deprecated` per
+     [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md); the
+     claimed ACT-NNN ID is released from `id-claims.md`);
    - the FRS is adjacent-but-distinct → narrow the title and the use case to
-     remove the ambiguity (and revise the FLW Scenarios + ACT body in
-     place — 1-file body-edit per R-NEW-7).
-2. **Business-logic sanity** (FRS + Phase-1-born FLW + Phase-1-born ACT).
+     remove the ambiguity (and revise the FLW Scenarios in place — 1-file
+     body-edit per R-NEW-7).
+2. **Business-logic sanity** (FRS + Phase-1-born FLW).
    Walk the FRS's preconditions and postconditions and the FLW Scenarios.
    Do they form a coherent state transition? Any impossible precondition,
    unreachable postcondition, contradiction between acceptance criteria, or
-   FLW Scenario / ACT Precondition that violates the Phase-1 business-language
-   discipline (uses ENT/CMD/STA/PERM-NNN IDs in scenario bodies or ACT
-   Preconditions — the IDs don't exist yet, this is a forward-claim leak)
-   is a finding with `type: sanity`. Also catches: a `created_under:`
-   marker on a FLW with `created:` after the cutover date (illegitimate
-   marker use per B5 risk — Major finding).
+   FLW Scenario that violates the Phase-1 business-language discipline
+   (uses ENT/CMD/STA/PERM-NNN IDs in scenario bodies — the IDs don't exist
+   yet, this is a forward-claim leak) is a finding with `type: sanity`.
+   Also catches: a `created_under:` marker on a FLW with `created:` after
+   the cutover date (illegitimate marker use per B5 risk — Major finding).
 3. **ADR conflict scan.** Re-read each ADR in the FRS's `adrs:`
    frontmatter. Does any `accepted` ADR constrain something the FRS
    proposes? Each conflict is a finding with `type: adr-conflict`. The
@@ -736,21 +771,19 @@ FRSs skip check 8.
    unmapped AC or unrealizable scenario is a finding with `type: sanity`
    (`coverage` flavor in the Rationale). This was the previous Phase 2
    exit check, moved earlier — FLWs now exist at Phase 1 per R-NEW-2.
-7. **Phase-1-bare body-shape sanity** (per R-NEW-2 / R-NEW-2a / R-NEW-8).
-   Verify the Phase-1-born FLW carries `related: []` (empty) and contains
-   only Trigger + Scenarios + optional Brownfield notes — no Sequence,
-   Branches, Compensating actions, structural Postconditions, or Decisions.
-   Verify the Phase-1-born ACT (when `produced_actor:` is set) carries
-   `related: []` and contains only Description + Goals + business
-   Preconditions + Flows initiated — no Commands they trigger, no Queries
-   they issue, no PERM-NNN refs. **Verify the Phase-1-born CHG (when
-   `touches_nodes:` is non-empty) carries empty `adds[]` and
-   `migration_steps[]` and that `modifies[]` entries carry no structural
-   before/after** — Phase-2-wired content in a Phase-1-bare CHG is a
-   forward-claim leak. Any forward-claim leak (Phase-2 content under a
-   Phase-1-bare body) is a `type: sanity` finding. The
+7. **Phase-1-bare body-shape sanity** (per R-NEW-2 / R-NEW-8 — narrowed
+   to FLW + CHG only; R-NEW-2a retired 2026-05-17). Verify the Phase-1-born
+   FLW carries `related: []` (empty) and contains only Trigger + Scenarios
+   + optional Brownfield notes — no Sequence, Branches, Compensating
+   actions, structural Postconditions, or Decisions. **Verify the
+   Phase-1-born CHG (when `touches_nodes:` is non-empty) carries empty
+   `adds[]` and `migration_steps[]` and that `modifies[]` entries carry no
+   structural before/after** — Phase-2-wired content in a Phase-1-bare CHG
+   is a forward-claim leak. Any forward-claim leak (Phase-2 content under
+   a Phase-1-bare body) is a `type: sanity` finding. The
    `created_under: pre-2026-05-17` audit marker exempts a FLW from this
-   check (grandfather only — FLW-003).
+   check (grandfather only — FLW-003). ACT body-shape is no longer checked
+   at this gate — there is no Phase-1 ACT body.
 8. **chg-sanity** (per R-CHG-5). For each CHG born by this FRS (one per
    FRS when `touches_nodes:` is non-empty), verify the `modifies[]`
    behavior delta coherently follows from (a) the FRS's ACs / BRs /
@@ -800,21 +833,22 @@ FRS in `nodes:` / body. The FRS's `Validation findings` row cites the
 
 **Phase 1.5 round-trip (FAIL / PASS_WITH_MAJORS).** When the gate sends the
 FRS back to revise (Blocker or unresolved Major), the revision often
-ripples to the canonical FLW (Scenarios revised per AC change), the
-canonical ACT (Goals / Preconditions revised), and/or the milestone-scoped
-CHG (`modifies[]` delta revised to follow the updated FRS). All three are
-**in-place body edits** with `status:` unchanged — 1-file touch per R-NEW-7
-(canonical node body + `updated:` timestamp; `nodes/<type>/index.md`
-Status column unchanged, no index re-sync) and the parallel carve-out for
-CHG body edits during Phase 1.5 round-trip when `status:` stays `draft`
-(see [`maintenance-discipline.md`](maintenance-discipline.md)). Any
+ripples to the canonical FLW (Scenarios revised per AC change) and/or the
+milestone-scoped CHG (`modifies[]` delta revised to follow the updated
+FRS). Both are **in-place body edits** with `status:` unchanged — 1-file
+touch per R-NEW-7 (narrowed to FLW only; canonical node body + `updated:`
+timestamp; `nodes/<type>/index.md` Status column unchanged, no index
+re-sync) and the parallel carve-out for CHG body edits during Phase 1.5
+round-trip when `status:` stays `draft` (see
+[`maintenance-discipline.md`](maintenance-discipline.md)). Any
 status-change event (Phase 3 activation `proposed → active`, full FRS
 abandonment `proposed → deprecated`, CHG `draft → approved`) keeps the
 standard 2-file touch. Full FRS abandonment during Phase 1 / 1.5 routes to
 [`in-flight-nodes.md → Abandonment`](in-flight-nodes.md) and deprecates
-the Phase-1-born FLW, ACT (if any), and CHG (if any) together. FRS
-split-and-replace retires the originals as `deprecated` and allocates
-fresh IDs for the splits (IDs are never reused).
+the Phase-1-born FLW and CHG (if any) together; any `produced_actor:`
+ID claim is released from `id-claims.md` (no ACT file exists yet to
+deprecate). FRS split-and-replace retires the originals as `deprecated`
+and allocates fresh IDs for the splits (IDs are never reused).
 
 ### Pass 2 — Milestone cross-FRS sweep (runs once after all FRSs in the milestone are per-FRS gated)
 
@@ -865,11 +899,15 @@ appends a corresponding `cross-frs` finding to the FRSs involved.
       and a back-link to the FRS.
 - [ ] The milestone portal's `frs:` list matches the actual set of FRS files
       in `frs/`.
-- [ ] For each FRS that reaches `status: approved` at this gate, flip its
-      per-FRS discovery file's frontmatter `status:` from `draft` (or
-      `done`) to `adopted`. 1-file touch — discovery surface; no
-      `log.md`, no `index.md` re-sync. Background:
+- [ ] For each FRS that reaches `status: approved` at this gate **AND**
+      whose `discovery:` is a path (Path A / Path B), flip its per-FRS
+      discovery file's frontmatter `status:` from `draft` (or `done`) to
+      `adopted`. 1-file touch — discovery surface; no `log.md`, no
+      `index.md` re-sync. Background:
       [`../_templates/SURVEY.md → Status lifecycle`](../_templates/SURVEY.md).
+      **Skip this check when `discovery: inline`** (Path C) — there is no
+      separate survey file to flip; the survey content lives inside the
+      FRS's Brownfield impact section and tracks the FRS's own `status:`.
       Milestone-level discovery (`milestone-scope.md`) flips to `adopted`
       at milestone close, not here — see
       [`close-milestone.md`](close-milestone.md).

@@ -153,30 +153,31 @@ File at: `docs/change-requests/CR-NNN-<slug>/frs/FRS-NNN-<slug>.md`
 
 Add the FRS ID to the portal doc `frs:` frontmatter and body list.
 
-**FLW + ACT + CHG born at Phase CR-1 (per R-NEW-1 / R-CHG-1).** Phase CR-1
-inherits the Phase 1 rules from `design.md`: the FRS's `produced_flw:`
-scalar declares the one new FLW, born to canonical at
-`docs/<component>/nodes/flows/` with `status: proposed`; the
-`produced_actor:` scalar declares the one new ACT (when the FRS
-introduces a new actor role), born to canonical at
-`docs/<component>/nodes/actors/` with `status: proposed`; and when the
-FRS declares non-empty `touches_nodes:`, a per-FRS CHG is born to
-`docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` with
-`status: draft`. All three Phase-1-born artifacts carry Phase-1-bare
-body shape (FLW / ACT: `related: []`; CHG: behavior-language `modifies[]`
-only, no structural before/after, no `adds[]`, no `migration_steps[]`).
-Phase CR-2 enriches each in place (FLW / ACT wiring; CHG structural
-delta + `adds[]` + `migration_steps[]` via FS `consumes_chgs:`); Phase
-CR-3 flips FLW / ACT `proposed → active` and CHG `approved → merged`.
-The CR portal doc does not need to redeclare these — the FRS's
-frontmatter is the source of truth.
+**FLW + CHG born at Phase CR-1 (per R-NEW-1 / R-CHG-1); ACT-NNN ID
+claimed only.** Phase CR-1 inherits the Phase 1 rules from `design.md`:
+the FRS's `produced_flw:` scalar declares the one new FLW, born to
+canonical at `docs/<component>/nodes/flows/` with `status: proposed`;
+when the FRS declares non-empty `touches_nodes:`, a per-FRS CHG is born
+to `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` with
+`status: draft`. Both carry Phase-1-bare body shape (FLW: `related: []`;
+CHG: behavior-language `modifies[]` only, no structural before/after, no
+`adds[]`, no `migration_steps[]`). When the FRS introduces a new actor
+role, the `produced_actor:` scalar declares the ACT-NNN ID — **claimed
+at Phase CR-1 in `id-claims.md` but the ACT file is authored at Phase
+CR-2** (R-NEW-2a retired 2026-05-17). Phase CR-2 births the ACT file
+alongside ENT / CMD / STA / etc., enriches the FLW in place (wiring +
+Sequence + Branches + Compensating + structural Postconditions), and
+enriches the CHG structurally (`adds[]` + `migration_steps[]` via FS
+`consumes_chgs:`). Phase CR-3 flips FLW / ACT `proposed → active` and
+CHG `approved → merged`. The CR portal doc does not need to redeclare
+these — the FRS's frontmatter is the source of truth.
 
 **id-claims.md inherits R-NEW-9.** `docs/change-requests/CR-NNN-<slug>/id-claims.md`
 uses the renamed `Source` column (formerly `FS`) and the lazy-create
-timing of "first FRS or FS claim". Phase CR-1's allocation of FLW-NNN /
-ACT-NNN against the FRS-NNN as `Source` lazy-creates the file if it does
-not yet exist. Pre-cutover CR id-claims.md files keep the `FS` header
-until the next allocation against that file.
+timing of "first FRS or FS claim". Phase CR-1's allocation of FLW-NNN
+and the ACT-NNN ID claim against the FRS-NNN as `Source` lazy-creates
+the file if it does not yet exist. Pre-cutover CR id-claims.md files
+keep the `FS` header until the next allocation against that file.
 
 ---
 

@@ -17,19 +17,20 @@ merged`.
 Do NOT write **method bodies, brace-delimited blocks, SQL bodies, YAML payloads,
 implementation file paths, or line-level code** in the FS, the new canonical nodes, or
 any CHG node. **Structural names ARE the deliverable** — class names, method signatures,
-event names, table names, route paths. Phase 1 names FLW (Trigger + Scenarios), ACT
-(Description + Goals + business Preconditions + Flows initiated), and CHG (behavior-
-language `modifies[]` when the FRS declares non-empty `touches_nodes:`) structures.
-Phase 2 names ENT / CMD / STA / CON / INT / DEC / PERM / QRY structures, enriches the
-Phase-1-born FLW + ACT with wiring (`related:` populated, Sequence, Branches,
-Compensating actions, structural Postconditions; CMD/QRY/PERM refs on ACT), and
-consumes the Phase-1-born CHGs via FS `consumes_chgs:` for structural enrichment
-(`modifies[]` before/after, `adds[]`, `migration_steps[]`). Phase 3 writes code,
-applies CHG deltas, and flips `proposed → active` / `approved → merged`. This
-applies regardless of how obvious the implementation looks. (Structural YAML in
-frontmatter and templates is not what this forbids — payload bodies are.)
-**Phase 2 reload reads the Phase-1-born FLW + ACT + CHG from disk — never from
-Phase 1 session memory; the `/clear` between Phase 1.5 and Phase 2 enforces this.**
+event names, table names, route paths. Phase 1 names FLW (Trigger + Scenarios) and CHG
+(behavior-language `modifies[]` when the FRS declares non-empty `touches_nodes:`)
+structures. Phase 2 names ACT (when the FRS declares `produced_actor:` — Description +
+Goals + business Preconditions + Flows initiated + Commands triggered + Queries issued +
+PERM-NNN refs all authored at birth) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY
+structures, enriches the Phase-1-born FLW with wiring (`related:` populated, Sequence,
+Branches, Compensating actions, structural Postconditions), and consumes the
+Phase-1-born CHGs via FS `consumes_chgs:` for structural enrichment (`modifies[]`
+before/after, `adds[]`, `migration_steps[]`). Phase 3 writes code, applies CHG deltas,
+and flips `proposed → active` / `approved → merged`. This applies regardless of how
+obvious the implementation looks. (Structural YAML in frontmatter and templates is not
+what this forbids — payload bodies are.)
+**Phase 2 reload reads the Phase-1-born FLW + CHG from disk — never from Phase 1
+session memory; the `/clear` between Phase 1.5 and Phase 2 enforces this.**
 Cross-cutting rule canonical home: [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 "Plans contain no syntax".
 </HARD-GATE>
@@ -58,16 +59,17 @@ FRS (R-CHG-1); Phase 2 enriches but does not create. Phase 3 implementation
 applies the deltas.
 
 **Phase mode boundaries:** [`design.md`](design.md) is mixed-mode at Phase 1 —
-Queries canonical (validates the FRS) **and** Ingests journey + identity +
-modify-intent (FLW + ACT born to canonical with `status: proposed`; CHG born
-to milestone with `status: draft` when `touches_nodes:` is non-empty). This
-file (Phase 2) Ingests structure + wiring (creates ENT / CMD / STA / CON /
-INT / DEC / PERM / QRY; enriches the Phase-1-born FLW + ACT with `related:` +
-Sequence + Branches + Compensating + structural Postconditions + Decisions;
-enriches the Phase-1-born CHGs the FS consumes with structural delta + adds[]
-+ migration_steps[]). [`implementation.md`](implementation.md) (Phase 3)
-Merges + Codes. Each phase boundary requires a `/clear` at entry —
-Phase 1.5 → Phase 2 and Phase 2 → Phase 3.
+Queries canonical (validates the FRS) **and** Ingests journey + modify-intent
+(FLW born to canonical with `status: proposed`; CHG born to milestone with
+`status: draft` when `touches_nodes:` is non-empty). This file (Phase 2)
+Ingests structure + wiring (creates ACT when the FRS declares `produced_actor:`
++ ENT / CMD / STA / CON / INT / DEC / PERM / QRY; enriches the Phase-1-born
+FLW with `related:` + Sequence + Branches + Compensating + structural
+Postconditions + Decisions; enriches the Phase-1-born CHGs the FS consumes
+with structural delta + adds[] + migration_steps[]).
+[`implementation.md`](implementation.md) (Phase 3) Merges + Codes. Each phase
+boundary requires a `/clear` at entry — Phase 1.5 → Phase 2 and Phase 2 →
+Phase 3.
 
 **Prerequisites:** the Design flow has produced a milestone with `status: planning`,
 its validated FRSs in `milestones/M-NN-<slug>/frs/`, every FRS's "Validation findings"
@@ -122,7 +124,7 @@ readers should re-read those on each new Phase 2.
 | Resume mid-FS authoring | [The Process → Authoring sequence](#authoring-sequence--3-4-5-interleave) + the §3/§4/§5 sub-sections |
 | Context loading question | [The Process → 1. Context loading](#1-context-loading) |
 | ID-claim collision / cross-FS modify-intent conflict | [The Process → 2. ID-claim protocol](#2-id-claim-protocol) |
-| New-node canonical ingest + Phase-1-born FLW/ACT enrichment | [The Process → 3. New node canonical ingest + Phase-1-born FLW / ACT enrichment](#3-new-node-canonical-ingest--phase-1-born-flw--act-enrichment) |
+| New-node canonical ingest + Phase-1-born FLW enrichment (ACT born here too) | [The Process → 3. New node canonical ingest + Phase-1-born FLW enrichment](#3-new-node-canonical-ingest--phase-1-born-flw-enrichment) |
 | CHG consumption + enrichment (FS consumes a Phase-1-born CHG) | [The Process → 4. CHG node consumption + enrichment](#4-chg-node-consumption--enrichment) |
 | Phase-2 surfaced an undeclared modify-intent | [The Process → 4a. Retroactive `touches_nodes:` loop-back (R-NEW-10)](#4a-retroactive-touches_nodes-loop-back-r-new-10) |
 | FS body authoring (Architecture / Data / Interface / Tasks) | [The Process → 5. FS authoring](#5-fs-authoring) |
@@ -272,8 +274,10 @@ never silently retire).
 Every node ID this FS introduces or modifies must be recorded in
 `docs/milestones/M-NN-<slug>/id-claims.md`. **Lazy-create timing** (per R-NEW-9):
 the file is created on the **first FRS or FS claim** — i.e., the moment Phase 1 first
-allocates an FLW or ACT for its FRS (R-NEW-1), or the moment Phase 2 first allocates an
-ENT / CMD / STA / CON / INT / DEC / PERM / QRY / TC, whichever fires earlier.
+allocates an FLW or claims an ACT-NNN ID for its FRS (R-NEW-1), or the moment Phase 2
+first allocates an ENT / CMD / STA / CON / INT / DEC / PERM / QRY / TC, whichever fires
+earlier. (ACT-NNN is always Phase-1-claimed when `produced_actor:` is set — Phase 2
+authors the ACT file against the existing claim; it does not first-allocate the ID.)
 
 | ID | Source | Op | Date |
 | -- | ------ | -- | ---- |
@@ -283,6 +287,12 @@ ENT / CMD / STA / CON / INT / DEC / PERM / QRY / TC, whichever fires earlier.
 | CMD-010 | FS-007  | modify    | YYYY-MM-DD |
 | ENT-021 | FS-007  | introduce | YYYY-MM-DD |
 | TC-001  | FS-007  | introduce | YYYY-MM-DD |
+
+**Op enum.** Valid values: `introduce` | `modify` | `released`. The third
+value `released` fires when a claimed ID is given up before the file
+materializes — most commonly an ACT-NNN claim under `produced_actor:`
+that's abandoned at Phase 1 / 1.5 FRS abandonment. Released IDs are
+never reused; the row stays in the ledger as the audit trail.
 
 (CHG-NNN is allocated at Phase 1 by the FRS whose `touches_nodes:` is
 non-empty — Source = FRS-NNN, Op = introduce. The IDs the CHG's
@@ -305,8 +315,9 @@ passes — see [`test-plan-ingest.md`](test-plan-ingest.md).
 Before allocating a new ID, **read both** the canonical per-type
 `docs/<component>/nodes/<type>/index.md` (carries every claimed ID: proposed, active,
 superseded, deprecated) **and** the milestone's `id-claims.md` (carries in-flight
-reservations). Pick the next free ID from the higher of the two ceilings. Retired IDs
-are not reused.
+reservations). Pick the next free ID from the higher of the two ceilings **for this
+(component, type) counter** — counters are per-(component, type), per
+[`../KB-LAYOUT.md → Counter scope`](../KB-LAYOUT.md). Retired IDs are not reused.
 
 Two collision signals to surface (never silently resolve):
 
@@ -354,18 +365,17 @@ that box). **First-time authors who linearize §3 → §4 → §5 hit the
 forward-reference problem:** a node with `fs: FS-NNN` written before
 the FS shell exists.
 
-### 3. New node canonical ingest + Phase-1-born FLW / ACT enrichment
+### 3. New node canonical ingest + Phase-1-born FLW enrichment
 
 **Two operations fire here.** (a) New Phase-2-born node files are written to canonical
-(ENT, CMD, STA, CON, INT, DEC, PERM, QRY — every type *except* FLW and ACT). (b) The
-Phase-1-born FLW (declared in the FRS's `produced_flw:`) and Phase-1-born ACT (declared
-in `produced_actor:`, when set) are **enriched in place** — same file, body content
-added, `related:` populated, `status:` unchanged (`proposed`). Both fire the 2-file
-touch independently.
+(ACT — when `produced_actor:` is set — plus ENT, CMD, STA, CON, INT, DEC, PERM, QRY).
+(b) The Phase-1-born FLW (declared in the FRS's `produced_flw:`) is **enriched in
+place** — same file, body content added, `related:` populated, `status:` unchanged
+(`proposed`). Both fire the 2-file touch independently.
 
-**(a) New Phase-2-born nodes.** For every node ID in the FRSs' `produces_nodes:` (ENT /
-CMD / STA / CON / INT / DEC / PERM / QRY only — FLW and ACT are covered by `produced_flw:`
-and `produced_actor:`), write the node file **directly to canonical** with
+**(a) New Phase-2-born nodes.** For every node ID in the FRSs' `produces_nodes:`
+(ENT / CMD / STA / CON / INT / DEC / PERM / QRY) and for the ACT-NNN claimed in
+`produced_actor:` (when set), write the node file **directly to canonical** with
 `status: proposed`:
 
 ```
@@ -390,10 +400,20 @@ on disk. The ID is valid because it was claimed in §2 (ID-claim protocol); the 
 resolves within the same flow. Shape is consistent across all node templates:
 `source_ref: [{frs:, fs:, op:}]` (list-of-objects).
 
-**(b) Phase-1-born FLW + ACT enrichment.** The FLW (per `produced_flw:`) and ACT (per
-`produced_actor:`, when set) already exist in canonical with `status: proposed` and
-Phase-1-bare body shape (`related: []`, Trigger + Scenarios for FLW; Description + Goals
-+ business Preconditions + Flows initiated for ACT). At Phase 2:
+**ACT-NNN authoring at Phase 2 (when `produced_actor:` is set).** Write the ACT file
+in full at this stage — there is no Phase-1-bare ACT body shape; the entire ACT body
+is authored here using structural language. Body shape: **Description** + **Goals**
+(reference the FRS by ID) + **Preconditions to act** (with PERM-NNN refs when
+applicable) + **Flows they initiate** (FLW-NNN IDs — real because the FLW is
+Phase-1-born) + **Commands they trigger** (CMD-NNN IDs from this FS's
+`produces_nodes:` or existing canonical) + **Queries they issue** (QRY-NNN, optional).
+`related:` populated (CMD / QRY / FLW / PERM IDs). 2-file touch (ACT file +
+`nodes/actors/index.md`). (R-NEW-2a retired 2026-05-17 — the Phase-1-bare ACT body
+shape no longer applies because the ACT is born at Phase 2.)
+
+**(b) Phase-1-born FLW enrichment.** The FLW (per `produced_flw:`) already exists in
+canonical with `status: proposed` and Phase-1-bare body shape (`related: []`, Trigger
++ Scenarios). At Phase 2:
 
 - **FLW enrichment** — open the canonical file, populate `related:` (CMD / STA / ACT
   IDs sequenced or referenced by this flow), restore the Trigger's `Initiating command:
@@ -403,15 +423,9 @@ Phase-1-bare body shape (`related: []`, Trigger + Scenarios for FLW; Description
   FLW refs), and **Decisions** (optional inline DEC). Scenarios stay business-language
   from Phase 1 — do NOT rewrite them with node IDs. Fire the 2-file touch (FLW file +
   `nodes/flows/index.md`); `status:` stays `proposed`.
-- **ACT enrichment** (when `produced_actor:` is set) — open the canonical file,
-  populate `related:` (CMD / QRY / FLW / PERM IDs), and fill the Phase-2 sections:
-  **Commands they trigger** (CMD-NNN), **Queries they issue** (QRY-NNN, optional), and
-  **Preconditions** under Permissions with PERM-NNN refs (business-language constraints
-  from Phase 1 stay). Description / Goals / Flows initiated are unchanged. Fire the
-  2-file touch (ACT file + `nodes/actors/index.md`); `status:` stays `proposed`.
-- **Source ref append** — both FLW and ACT enrichment append a Phase-2 entry to
-  `source_ref:` (`{frs: FRS-NNN, fs: FS-NNN, op: detail}`) recording the FS that
-  enriched it, leaving the Phase-1 `{frs: FRS-NNN, op: introduce}` entry intact.
+- **Source ref append** — FLW enrichment appends a Phase-2 entry to `source_ref:`
+  (`{frs: FRS-NNN, fs: FS-NNN, op: detail}`) recording the FS that enriched it,
+  leaving the Phase-1 `{frs: FRS-NNN, op: introduce}` entry intact.
 
 For FLW Scenarios specifically: the three slots (happy / edge / fault) are already
 filled at Phase 1; Phase 2 does NOT rewrite their bodies. If they're underspecified for
@@ -430,11 +444,14 @@ silent rewrite here.
 - [ ] Bidirectional `related:` back-links fired against each target in this node's
       `related:` list (the (2 + N) touch — every target fires its own 2-file
       touch regardless of canonical type — see `maintenance-discipline.md`).
-- [ ] For each Phase-1-born FLW + ACT enriched here: `related:` populated; Phase-2
-      sections filled (per the bullets above); `nodes/<type>/index.md` Status column
+- [ ] For the Phase-1-born FLW enriched here: `related:` populated; Phase-2
+      sections filled (per the bullets above); `nodes/flows/index.md` Status column
       unchanged (still `proposed`); 2-file touch fires because frontmatter `updated:`
       and the body change are non-trivial. Status flip is Phase 3's job alone
       (R-NEW-4).
+- [ ] For the Phase-2-born ACT (when `produced_actor:` is set): file authored
+      in full at `docs/<component>/nodes/actors/ACT-NNN-<slug>.md` with
+      `status: proposed`; row added to `nodes/actors/index.md`.
 
 **For `touches_nodes` (existing canonical nodes any constituent FRS intends to modify):
 do NOT write to canonical at Phase 2.** The canonical file is left untouched; the
@@ -701,10 +718,12 @@ close.
   3. Scope — single coherent slice? No scope creep from adjacent FRSs?
   4. Ambiguity — any task interpretable to build the wrong thing? Pick one interpretation and make it explicit.
   Fix inline. No separate review file, no dispatched reviewer.
-- [ ] Every Phase-1-born FLW + ACT this FS enriches now carries non-empty `related:`
-      (per R-NEW-8 — empty `related:` is the Phase-1-bare body-shape signal; an
-      enriched node MUST move past that). Catches a malformed Phase-2 enrichment that
-      forgets to populate `related:`.
+- [ ] Every Phase-1-born FLW this FS enriches now carries non-empty `related:`
+      (per R-NEW-8 — narrowed to FLW only 2026-05-17; empty `related:` is the
+      Phase-1-bare body-shape signal; an enriched node MUST move past that).
+      Catches a malformed Phase-2 enrichment that forgets to populate `related:`.
+      Phase-2-born ACT carries `related:` populated at birth (no separate
+      enrichment step).
 - [ ] Every FRS acceptance criterion is **fully covered** in the Coverage table — one row
       per Flow scenario it spans; no AC partially covered or duplicated within a scenario.
       Criteria that cannot be mapped to a Flow scenario are raised as `OQ-NNN` files under

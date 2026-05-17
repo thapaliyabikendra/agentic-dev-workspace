@@ -8,14 +8,18 @@ description: "Lifecycle rules for nodes with status: proposed — CHG mechanics,
 New DDD nodes land in canonical `docs/<component>/nodes/<type>/<ID>-<slug>.md`
 with `status: proposed` in frontmatter. The birth phase is **type-keyed**:
 
-- **FLW** and **ACT** are born at **Phase 1** alongside the FRS that introduces
-  them (per R-NEW-1 / R-NEW-2 / R-NEW-2a) — the FRS's `produced_flw:` and
-  `produced_actor:` scalars declare the IDs. See [FLW lifecycle](#flw-lifecycle)
-  and [ACT lifecycle](#act-lifecycle) below.
+- **FLW** is born at **Phase 1** alongside the FRS that introduces it (per
+  R-NEW-1 / R-NEW-2) — the FRS's `produced_flw:` scalar declares the ID.
+  See [FLW lifecycle](#flw-lifecycle) below.
 - **CHG** (milestone-scoped, not canonical) is born at **Phase 1** by the
   FRS when its `touches_nodes:` is non-empty (one CHG per FRS, parallel
-  to `produced_flw:` / `produced_actor:`) — per R-CHG-1. See
-  [CHG mechanics](#chg-mechanics) below.
+  to `produced_flw:`) — per R-CHG-1. See [CHG mechanics](#chg-mechanics)
+  below.
+- **ACT** is born at **Phase 2** when the FS is authored, when the FRS
+  declares `produced_actor:` (per R-NEW-2a retirement 2026-05-17). The
+  ACT-NNN ID is claimed at Phase 1 in `id-claims.md` (Source = FRS-NNN,
+  Op = introduce) but the ACT file does not exist on disk until Phase 2.
+  See [ACT-NNN ID claim lifecycle](#act-nnn-id-claim-lifecycle) below.
 - **ENT, CMD, STA, CON, INT, DEC, PERM, QRY** are born at **Phase 2** when the
   FS is authored (per the FRS's `produces_nodes:` list).
 
@@ -54,37 +58,50 @@ even though the body becomes fully wired (the `related: []` → `related: [...]`
 transition is the body-shape signal per [Phase-1-bare vs. Phase-2-wired
 discriminator](#phase-1-bare-vs-phase-2-wired-discriminator) below).
 
-## ACT lifecycle
+## ACT-NNN ID claim lifecycle
 
-An ACT is born at Phase 1 in canonical with `status: proposed` **only when
-the FRS introduces a new actor role** (i.e., `produced_actor:` is set on the
-FRS). Most FRSs reuse existing canonical ACTs and skip this birth. The
-Phase-1-bare body shape: Description + Goals + Preconditions to act
-(business-language constraints only — no PERM-NNN refs) + Flows they
-initiate (FLW-NNN IDs — real because FLW is also Phase 1 born). `related: []`
-(empty). The 2-file touch fires: ACT file + `nodes/actors/index.md`.
-`source_ref: [{frs: FRS-NNN, op: introduce}]`. Per R-NEW-2a.
+R-NEW-2a retired 2026-05-17. ACT is born at **Phase 2** (alongside ENT /
+CMD / STA / etc.), not Phase 1. At Phase 1, only the ACT-NNN ID is claimed
+when the FRS sets `produced_actor:` — recorded in the milestone /
+CR-scoped `id-claims.md` with Source = FRS-NNN, Op = introduce. No ACT
+file is created at this stage.
 
-Phase 2 enriches the same file in place — populates `related:` (CMD / QRY /
-FLW / PERM IDs), fills **Commands they trigger** (CMD-NNN), **Queries they
-issue** (QRY-NNN, optional), and adds PERM-NNN refs under Preconditions.
-Description / Goals / Flows initiated unchanged. `status:` unchanged. 2-file
-touch fires. Per R-NEW-2a / R-NEW-4.
+**Phase 1.** `produced_actor: ACT-NNN` on the FRS frontmatter. ID claim row
+in `id-claims.md`. No file. Phase 1.5 verifies the ID claim exists but
+does not look up an ACT body (there is none).
 
-Phase 3 merge flips `status: proposed → active`. Per R-NEW-4.
+**Phase 2.** The consuming FS authors the ACT file in full at
+`docs/<component>/nodes/actors/ACT-NNN-<slug>.md` with `status: proposed`
+— all template sections filled at birth: Description, Goals, Preconditions
+to act (PERM-NNN refs allowed), Commands they trigger (CMD-NNN), Queries
+they issue (QRY-NNN, optional), Flows they initiate (FLW-NNN IDs — real).
+`related:` populated. 2-file touch (ACT file + `nodes/actors/index.md`).
+`source_ref: [{frs: FRS-NNN, fs: FS-NNN, op: introduce}]`.
 
-## Phase-1-bare vs. Phase-2-wired discriminator
+**Phase 3.** Merge flips `status: proposed → active`. Per R-NEW-4.
 
-A `status: proposed` FLW / ACT can be either Phase-1-bare (just born,
-awaiting Phase 2 enrichment) or Phase-2-wired (enriched, awaiting Phase 3
-merge). The two are disambiguated by **body shape** per R-NEW-8 — no new
-frontmatter field:
+Cross-FRS duplicate-actor detection at Phase 1.5 is explicitly dropped
+(accepted trade-off — surfaces at Phase 2 FS authoring as an ID collision
+in `id-claims.md` when both FSs claim the same actor name).
+
+## Phase-1-bare vs. Phase-2-wired discriminator (FLW only)
+
+A `status: proposed` FLW can be either Phase-1-bare (just born, awaiting
+Phase 2 enrichment) or Phase-2-wired (enriched, awaiting Phase 3 merge).
+The two are disambiguated by **body shape** per R-NEW-8 (narrowed to FLW
+only 2026-05-17 — see [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16)) —
+no new frontmatter field:
 
 | `related:` frontmatter | Phase state | Reader interpretation |
 |---|---|---|
-| `related: []` (empty) | Phase-1-bare | Body carries Trigger + Scenarios (FLW) or Description + Goals + business Preconditions + Flows initiated (ACT) only. Awaiting Phase 2 enrichment. |
+| `related: []` (empty) | Phase-1-bare | Body carries Trigger + Scenarios only. Awaiting Phase 2 enrichment. |
 | `related: [...]` populated | Phase-2-wired | Body carries full template content. Awaiting Phase 3 merge. |
 | `status: active` | merged | Phase 3 completed; no longer in-flight. |
+
+ACT does NOT use this discriminator — Phase-2-born ACTs are authored with
+`related:` populated at birth, so the empty-vs-populated signal carries no
+phase information for ACTs (an ACT with `related: []` would simply be a
+malformed Phase-2 birth, caught at FS validation).
 
 **One-off exemption per B5:** nodes with frontmatter `created_under:
 pre-2026-05-17` are exempt from the body-shape discriminator — they were
@@ -105,8 +122,9 @@ anchors.
 A new doctrinal carve-out to the universal 2-file touch rule (canonical
 home: [`maintenance-discipline.md → Phase 1.5 round-trip body-edit exception`](maintenance-discipline.md)).
 
-**Trigger:** Phase 1.5 round-trip on a Phase-1-born FLW or ACT, where the
-revision is body-only and `status:` stays `proposed`.
+**Trigger:** Phase 1.5 round-trip on a Phase-1-born FLW, where the revision
+is body-only and `status:` stays `proposed`. (R-NEW-7 narrowed to FLW only
+2026-05-17 — ACT is no longer Phase-1-born.)
 
 **Action:** 1-file touch — edit the canonical node body only. The per-type
 `index.md` is NOT re-synced (Status column unchanged; Title / Description
@@ -115,8 +133,7 @@ frontmatter timestamp DOES fire.
 
 **Scope restrictions — not generalizable:**
 
-- Only Phase-1-born nodes (FLW / ACT). Not Phase-2-born nodes (ENT / CMD /
-  STA / …).
+- Only Phase-1-born FLW. Not Phase-2-born nodes (ACT / ENT / CMD / STA / …).
 - Only during Phase 1.5 round-trip. Not during free-form edits.
 - Only when `status:` does not change. Any status flip → 2-file touch as
   usual.
@@ -196,9 +213,9 @@ Double-consumption aborts merge.
 
 ## CHG `status: draft` discriminator
 
-Per R-CHG-7 (parallel to R-NEW-8 for FLW / ACT). Post-cutover `status:
-draft` overlaps two states; the discriminator is body-shape, not a new
-frontmatter field:
+Per R-CHG-7 (parallel to R-NEW-8 for FLW; R-NEW-8 narrowed to FLW only
+2026-05-17). Post-cutover `status: draft` overlaps two states; the
+discriminator is body-shape, not a new frontmatter field:
 
 | Body-shape signal | CHG phase state | Reader interpretation |
 |---|---|---|
@@ -230,17 +247,20 @@ IDs are not reused. Bidirectional `related:` back-links to a deprecated
 proposed node remain (existing deprecated-node pattern).
 
 **Full FRS abandonment (Phase 1 / 1.5).** If an FRS is abandoned before
-reaching Phase 2, the FRS's Phase-1-born FLW, ACT (if any), **and CHG
-(if any — born when `touches_nodes:` was non-empty)** flip together:
-FLW / ACT flip `proposed → deprecated`; CHG flips `draft → deprecated`.
-Single FRS abandonment event, two-to-four artifact-side touches (FRS,
-FLW, ACT, CHG). 2-file touch fires per canonical node (canonical body +
-per-type `index.md` Status column re-sync) because this is a
-status-change event, not a body-only edit (R-NEW-7's carve-out does not
-apply); for the CHG, the touch is 1-file on the CHG file (CHG has no
-per-type `index.md` today). FRS **split-and-replace** (FRS revised to
-split into two new FRSs) retires the originals as `deprecated` and
-allocates fresh IDs for the splits; IDs are never reused.
+reaching Phase 2, the FRS's Phase-1-born FLW **and CHG (if any — born
+when `touches_nodes:` was non-empty)** flip together: FLW flips
+`proposed → deprecated`; CHG flips `draft → deprecated`. Single FRS
+abandonment event, two-to-three artifact-side touches (FRS, FLW, CHG).
+2-file touch fires per canonical node (canonical body + per-type
+`index.md` Status column re-sync) because this is a status-change event,
+not a body-only edit (R-NEW-7's carve-out does not apply); for the CHG,
+the touch is 1-file on the CHG file (CHG has no per-type `index.md`
+today). **ACT-NNN ID release.** If the abandoned FRS claimed an ACT-NNN
+in `id-claims.md` via `produced_actor:`, the row is annotated with `Op:
+released` and the ID is not reused — no canonical ACT file exists yet to
+deprecate. FRS **split-and-replace** (FRS revised to split into two new
+FRSs) retires the originals as `deprecated` and allocates fresh IDs for
+the splits; IDs are never reused.
 
 ## Workflow self-extension during Phase 2
 

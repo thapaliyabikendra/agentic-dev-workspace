@@ -4,9 +4,9 @@ title: <One-sentence user-journey, imperative voice>
 status: draft                 # draft | reviewed | approved | implemented
 milestone: M-NN               # filled at Phase 0 — milestone is authored first (blank for CR track)
 cr:                           # filled at Phase CR-0 — CR-NNN for CR track (blank for milestone track; mutually exclusive with milestone:)
-discovery: ../discovery/FRS-NNN-<slug>.md
+discovery: ../discovery/FRS-NNN-<slug>.md  # path to per-FRS Survey, OR the literal value `inline` when the survey is absorbed into this FRS's Brownfield impact section. Use `inline` for narrow FRSs (typically pure-addition new-feature or single-node change-request) where a separate survey file would be < 1 screen. See workflow/design.md § Phase 1.
 produced_flw:                 # FLW-NNN — the one new FLW this FRS introduces. Born to canonical at Phase 1 with status: proposed (R-NEW-1). Strict 1:1 — multi-FLW production FRSs are not permitted (split into separate FRSs). Blank when no new FLW is introduced (rare — usually means a touches_nodes:-only FRS modifying existing canonical).
-produced_actor:               # ACT-NNN — the one new ACT this FRS introduces, when it introduces a new actor role. Born to canonical at Phase 1 with status: proposed (R-NEW-1). Strict 0..1 — most FRSs reuse existing actors. Blank when reusing.
+produced_actor:               # ACT-NNN — the one new ACT this FRS introduces, when it introduces a new actor role. Forward reference at Phase 1: the ACT-NNN ID is claimed in id-claims.md (Source = this FRS, Op = introduce), but the canonical ACT file is authored at Phase 2 (plan.md § 3). Strict 0..1 — most FRSs reuse existing actors. Blank when reusing. (R-NEW-2a retired 2026-05-17 — Phase-1-bare ACT body shape no longer applies because ACT is born at Phase 2.)
 produces_nodes: []            # new DDD node IDs this FRS introduces *other than* FLW and ACT — covers ENT, CMD, STA, CON, INT, DEC, PERM, QRY. Claimed at Phase 1, written to canonical at Phase 2 with status: proposed, flipped to active at Phase 3 merge.
 touches_nodes: []             # MODIFY-INTENT ONLY. Canonical DDD node IDs this FRS modifies or extends; modifications captured by the FRS's Phase-1-born CHG (R-CHG-1: non-empty `touches_nodes:` ⇒ one CHG-NNN allocated at Phase 1 alongside the FRS, parallel to `produced_flw:` / `produced_actor:`; allocated via id-claims.md with Source = this FRS) and applied at Phase 3. Do NOT list a node here for read-only reference — if you want to cite an existing canonical FLW or ACT, name it inline in the FRS body (AC / BR / Brownfield notes). The field is modify-only by author judgment (M2).
 adrs: []                      # ADR IDs consulted while drafting (carried from Discovery + dialog)
@@ -37,12 +37,13 @@ duplicate heading).
 
 ## Actors
 
-- ACT-NNN — <role>. ID resolves to a real canonical node — either (a) an
-  existing ACT this FRS reuses (cite by ID; list in `touches_nodes:` only
-  if this FRS modifies it), or (b) the new ACT this FRS introduces,
-  declared in `produced_actor:` and born to canonical at Phase 1 with
-  `status: proposed`. No "will be introduced at Phase 2" claim language —
-  the ID is real at the moment this FRS is authored.
+- ACT-NNN — <role>. ID resolves to either (a) an existing canonical ACT
+  this FRS reuses (cite by ID; list in `touches_nodes:` only if this FRS
+  modifies it), or (b) the new ACT this FRS introduces — declared in
+  `produced_actor:` and authored at Phase 2 with `status: proposed`. The
+  ACT-NNN ID is real at the moment this FRS is authored (claimed in
+  `id-claims.md`); the file itself materializes at Phase 2 alongside ENT
+  / CMD / STA / etc. (R-NEW-2a retired 2026-05-17.)
 
 ## Preconditions
 
@@ -99,6 +100,13 @@ Human-facing side effects the operation emits. One row per recipient
 class. State explicit "None" when the operation emits no notifications
 — do not omit the heading.
 
+Any non-`In-app` channel (`Email`, `SMS`, `Push`, `Webhook`) implies an
+outbound external boundary — declare an `INT-NNN` node in
+`produces_nodes:` (new boundary) or cite an existing canonical `INT-NNN`
+inline in Behavior / Brownfield notes (consumer-of-existing-INT). The
+Phase 1.5 gate enforces this via
+[`../workflow/frs-validation-rules.md → Rule: external-boundary-undeclared`](../workflow/frs-validation-rules.md#rule-external-boundary-undeclared).
+
 | Recipient | Trigger | Channel | Reason |
 | --------- | ------- | ------- | ------ |
 | <role> | <success / failure / state-transition> | <email / sms / in-app / webhook> | <one-line policy justification> |
@@ -134,7 +142,19 @@ restate the BR text verbatim — verification ≠ duplication.
 Drafting-time, author-noticed conflicts. Filled during Phase 1 as you write
 the FRS.
 
+**When `discovery: inline`**, this section also absorbs the per-FRS Survey
+content: list surveyed canonical nodes under "Surveyed surface" below
+(replaces the Survey's Existing-nodes-scanned + Relevant-existing-modules
+tables); ADRs flow into `adrs:` frontmatter as usual; constraints flow into
+the relevant `ccc:` frontmatter + Postconditions; Open questions sub-bullet
+below captures OQs raised. No separate survey file is created.
+
 - Modifies: ENT-NNN, FLW-NNN
+- Surveyed surface (only when `discovery: inline`): one-line-per-node list
+  of canonical nodes scanned and why they're relevant. Mirrors the Survey
+  template's Existing-nodes-scanned + Relevant-existing-modules content.
+  Omit this sub-bullet when `discovery: <path>` (the external survey carries
+  the content).
 - Conflicts with existing nodes (must resolve before approval): cite
   the raised `OQ-NNN` for each (`origin: frs-authoring,
   origin_ref: this FRS`). Do not restate the conflict here; the OQ

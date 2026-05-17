@@ -64,6 +64,11 @@ related: []
 > **File location and naming.**
 > - `level: milestone` → `docs/milestones/M-NN-<slug>/discovery/milestone-scope.md`
 > - `level: frs` → `docs/milestones/M-NN-<slug>/discovery/FRS-NNN-<slug>.md`
+>   — **optional**: if the parent FRS sets `discovery: inline` (Path C in
+>   [`../workflow/design.md → Phase 1`](../workflow/design.md#phase-1--frs-authoring)),
+>   no `level: frs` survey file is created and the survey content is
+>   absorbed into the FRS's Brownfield impact section. Path C applies to
+>   narrow FRSs only.
 > - `level: workspace, kind: absorb-legacy-doc` → `docs/discovery/absorption-plan-<source-slug>.md`
 >
 > **Scope width.** When `level: milestone`, the scope spans the whole

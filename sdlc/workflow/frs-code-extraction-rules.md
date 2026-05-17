@@ -166,16 +166,23 @@ business language:
 | Response payload shapes (fenced JSON / XML body examples) | Drop from FRS body. The response shape lives in `CON-NNN`. |
 | Protocol literals (`grant_type=password`, `error: "invalid_grant"`, `Bearer`) | Drop from FRS body. Business-level claims like "an authenticated session is established" or "authentication is rejected with the generic rejection outcome" are the FRS-level form. The protocol vocabulary lives in `CON-NNN`. |
 | Error codes (`ERR_AUTH_FAILED`, framework error-code strings like `IdentityErrors.DuplicateEmail`) | Exception name in business language: "Unauthorised Access", "Operation Could Not Complete", "Duplicate Email Outcome". The wire-level error-code literal lives in `CON-NNN`'s error map. |
+| Outbound framework abstraction (`IAccountEmailer`, `IEmailSender`, `ISmsSender`, `IPushNotificationService`, named `IHttpClientFactory` clients, vendor SDK adapters like `IStripeClient` / `IS3Client` / `ISendGridClient`) | The abstraction is the **seam**, not the boundary. Declare an `INT-NNN` node for the external system the abstraction reaches (SMTP relay, SMS gateway, push-notification provider, payment processor, object store) and list it in the FRS's `produces_nodes:` (new boundary) or cite the existing canonical `INT-NNN` inline in body prose (consumer-of-existing-INT). The abstraction symbol name remains permitted by ADR-001; the missing boundary declaration is the leak. |
+| Distributed-event publish (`IDistributedEventBus.PublishAsync` to external Kafka topic / RabbitMQ exchange) | Route to `EVT-NNN` + `linked_contract: CON-NNN` per [`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators) — NOT to INT-NNN. In-process framework-local events stay in the CMD's "Domain events raised" subsection. |
 
 If you cannot translate a piece of code into business language, leave the
 question in the candidate's per-FRS discovery.
 
 The right-column relocations above are not optional style — they are
-enforced at the Phase 1.5 gate by the
+enforced at the Phase 1.5 gate by two complementary sanity sub-flavors:
 [`frs-validation-rules.md → Rule: protocol-surface-leak`](frs-validation-rules.md#rule-protocol-surface-leak)
-sanity sub-flavor (introduced 2026-05-17). ABP public-API symbol names
-(classes, methods, configuration option keys, entity property names)
-remain governed by ADR-001 and are not protocol-wire surface.
+(introduced 2026-05-17 — covers HTTP / JSON / query / protocol literal
+rows) and
+[`frs-validation-rules.md → Rule: external-boundary-undeclared`](frs-validation-rules.md#rule-external-boundary-undeclared)
+(introduced 2026-05-17, v1.2 — covers the outbound framework abstraction
+row). ABP public-API symbol names (classes, methods, configuration option
+keys, entity property names) remain governed by ADR-001 and are not
+protocol-wire surface; the symbol name being permitted does not exempt
+the FRS from declaring the external boundary the symbol reaches.
 
 ---
 
@@ -243,6 +250,8 @@ after stakeholder confirmation — see
 | Version | Date | Source |
 |---------|------|--------|
 | 1.0 | 2026-05-11 | Absorbed from the shared FRS code-extraction reference (v3.0) during workflow absorption, remapped to the project's FRS template and `source_ref` frontmatter convention. Subagent dispatch contract, `source_manifest` payload shape, "frs-template.md Canonical Section List" hardcode, and runbook phase references dropped — the project is filesystem-based with a different orchestration shape. Signal mapping, logical source names, translation discipline, one-hop traversal, mixed-source reconciliation, and code-only caveat retained. |
+| 1.1 | 2026-05-17 | Translation discipline table extended with HTTP/JSON/query/protocol-literal rows alongside the introduction of `protocol-surface-leak` in `frs-validation-rules.md` v1.1. |
+| 1.2 | 2026-05-17 | Translation discipline table extended with two more rows: **outbound framework abstraction** (`IAccountEmailer`, `IEmailSender`, named `IHttpClientFactory` clients, vendor SDK adapters) → `INT-NNN` boundary declaration; **distributed-event publish** (`IDistributedEventBus.PublishAsync` to external Kafka / RabbitMQ) → `EVT-NNN` + linked `CON-NNN` per KB-LAYOUT, NOT INT. Enforced at Phase 1.5 by `external-boundary-undeclared` sanity sub-flavor introduced in `frs-validation-rules.md` v1.2 on the same date. |
 
 ---
 

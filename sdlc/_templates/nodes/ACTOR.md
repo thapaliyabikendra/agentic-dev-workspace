@@ -5,7 +5,7 @@ title: <Actor name>
 status: proposed              # proposed | active | superseded | deprecated
 kind: human                   # human | system | background-job — bare system without a named trigger is a smell
 source_ref: []                # [{frs: FRS-NNN, fs: FS-NNN, op: introduce | modify}] · brownfield: [{absorption: <path>, op: introduce | detail}]
-related: []                   # Phase 1: empty []. Phase 2: commands triggered, queries issued, flows initiated, permissions
+related: []                   # Phase 2: commands triggered, queries issued, flows initiated, permissions
 created: YYYY-MM-DD
 version: 1
 updated: YYYY-MM-DD
@@ -13,56 +13,57 @@ updated: YYYY-MM-DD
 
 # ACT-NNN: <Title>
 
-> **Phase-keyed authoring.** ACT is born at Phase 1 (alongside its FRS, when
-> the FRS introduces a new actor role) with the Phase 1 sections filled and
-> `related: []` empty; Phase 2 enriches the same file with wiring
-> (`related:` populated, Commands they trigger, Queries they issue, PERM-NNN
-> refs in Preconditions). Status stays `proposed` across both phases;
-> Phase 3 flips `proposed → active`. Per R-NEW-2a.
->
-> **Body-shape discriminator (R-NEW-8):** `related: []` ⇒ Phase-1-bare;
-> `related: [...]` populated ⇒ Phase-2-wired.
+> **Phase-keyed authoring.** ACT is born at **Phase 2** (alongside ENT / CMD /
+> STA / etc.) when the FRS declares `produced_actor: ACT-NNN` in its
+> frontmatter. The ACT-NNN ID is claimed at Phase 1 in the milestone /
+> CR-scoped `id-claims.md` (Source = FRS-NNN, Op = introduce), but the
+> ACT file does NOT exist on disk until Phase 2. All sections below are
+> authored at birth — there is no Phase-1-bare ACT body shape.
+> Status `proposed` at Phase 2 birth; Phase 3 flips `proposed → active`.
+> (R-NEW-2a retired 2026-05-17 — Phase-1-bare ACT body shape no longer
+> applies because the ACT was relocated to Phase 2 birth.)
 
 ## Description
 
-> **Phase 1 — required.** Who is this actor, in domain terms? Business
-> language, no node IDs.
+> Who is this actor, in domain terms? Business language anchored by
+> structural refs allowed (e.g., "Authenticated user with the
+> `Order.Manage` permission claim, identifiable by `userId`").
 
 ## Goals
 
-> **Phase 1 — required.** Author intent — what they want to accomplish.
+> What they want to accomplish via this system. Reference the FRS by ID
+> when the goal traces to a specific user-journey.
 
 - …
 
 ## Preconditions to act
 
-> **Phase 1 — required at business level** ("must be authenticated", "must
-> have completed onboarding"). NO PERM-NNN references — the permission ID
-> layer is Phase 2.
-> **Phase 2 — enriched.** Adds PERM-NNN refs under Permissions; business-level
-> constraints from Phase 1 stay.
+> Authentication state, permission claims (PERM-NNN refs allowed at
+> Phase 2 birth), and other constraints that must hold before this actor
+> can fire any flow.
 
 - Authentication state:
-- Permissions:                <!-- Phase 1: business-language only. Phase 2: PERM-NNN refs. -->
+- Permissions:                <!-- PERM-NNN refs from this FS's produces_nodes: or existing canonical -->
 - Other:
 
 ## Commands they trigger
 
-> **Phase 2 — required.** CMD-NNN IDs. Do NOT author at Phase 1 — CMD nodes
-> are Phase-2-born, the IDs don't exist yet.
+> CMD-NNN IDs from this FS's `produces_nodes:` or existing canonical
+> commands the actor invokes.
 
 - CMD-NNN — <one line>
 - CMD-NNN — …
 
 ## Queries they issue
 
-> **Phase 2 — optional.** QRY-NNN IDs. Do NOT author at Phase 1.
+> Optional. QRY-NNN IDs.
 
 - QRY-NNN — <one line>
 
 ## Flows they initiate
 
-> **Phase 1 — required.** Lists real FLW-NNN IDs — FLW is also Phase-1-born,
-> so the IDs resolve. One row per flow this actor starts.
+> FLW-NNN IDs — real because FLW is Phase-1-born and the file exists in
+> canonical by the time this ACT is authored. One row per flow this
+> actor starts.
 
 - FLW-NNN — <one line>

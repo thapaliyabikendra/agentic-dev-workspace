@@ -80,6 +80,53 @@ reason-for-existing is to return a projection, it is a QRY — even if a
 cache or telemetry write happens alongside. The user-visible deliverable
 decides, not the implementation steps.
 
+**STA vs. inline-on-entity**: model lifecycle as a standalone STA node
+when the state machine has structure worth enforcing; keep it inline on
+the entity (Fields row + Invariants + Lifecycle subsection) when it is a
+single flag with one transition and nothing else to enforce.
+
+**Mint STA when ANY of:**
+
+- The entity has ≥3 named states.
+- ≥2 transitions exist (forward + inverse, branching forks, or compensating reversals).
+- A transition has a named guard beyond the triggering CMD's preconditions.
+- A transition raises a domain event consumed by another node.
+- A terminal state needs explicit `read-only` / `soft-delete` / `archival` semantics.
+- Illegal transitions need to be explicitly rejected (not merely "not triggered").
+
+**Keep inline when ALL of:**
+
+- ≤2 states (typically a boolean flag).
+- Exactly 1 transition (one CMD flips it; no inverse in scope).
+- No named guards beyond the triggering CMD's preconditions.
+- No domain event raised on transition.
+- No terminal state with non-trivial handling.
+
+**Boundary cases — worked examples:**
+
+| Entity / lifecycle | Classification | Why |
+|---|---|---|
+| `UserAccount.EmailConfirmed: false → true` (one CMD flips it, no inverse, no domain event consumed, no terminal semantics) | **Inline** | Single boolean, single transition. STA file would be a 1-row Transitions table with empty Illegal / Terminal sections — ceremonial. |
+| `Order: draft → submitted → fulfilled → cancelled`, where `cancelled` blocks further writes | **STA** | 4 states; ≥3 transitions; terminal-state semantics on `cancelled` (`read-only`); illegal transitions like `fulfilled → draft` must be rejected. |
+| `Subscription: active ↔ paused` (forward + inverse via separate CMDs) | **STA** | The inverse transition takes it past 1 transition; STA's Transitions table is needed to enumerate both directions explicitly (the entity's `Lifecycle` subsection cannot model two reciprocal CMDs without ambiguity about which is the "Modified by" entry). |
+| `Document.Archived: false → true` raising `DocumentArchived` consumed by a retention purger | **STA** | Single transition crosses the threshold because the raised domain event has a consumer — the `Event raised` column on STA's Transitions table is load-bearing. |
+| `Account.LockedOut: false → true` set by a failed-login counter, auto-cleared by a timeout | **STA** | The inverse transition fires by a non-CMD trigger (timeout / background job); the guard ("timeout elapsed") is not a CMD precondition. |
+
+**Rule of thumb**: count states, transitions, guards, and consumed
+events. If the STA file would be a single-row Transitions table with
+empty Illegal / Terminal sections, keep inline. The first 3rd state,
+second transition, named non-CMD guard, or consumed domain event flips
+the call.
+
+**Promotion path**: when an inline lifecycle crosses the threshold in a
+later milestone (e.g., M-NN adds account-lockout to an entity that
+previously had only `EmailConfirmed`), the FRS introducing the
+threshold-crossing state declares `STA-NNN` in `produces_nodes:`,
+Phase 2 ingest authors the STA node, and the entity's inline `Lifecycle`
+subsection flips `State machine: none` to `State machine: STA-NNN`.
+Phase 1.5 enforcement: [`workflow/frs-validation-rules.md → Rule:
+state-promotion-deferred`](workflow/frs-validation-rules.md#rule-state-promotion-deferred).
+
 **CON** is the unified contract surface — HTTP routes, event topics, queues,
 gRPC methods — discriminated by `protocol:` frontmatter; superseded the
 prior EP (endpoint) prefix on 2026-05-14.
@@ -90,6 +137,15 @@ nodes (they stay in CMD's "Domain events raised" subsection). Every EVT node
 requires a `linked_contract: CON-NNN` pointing at its transport surface.
 
 ID prefixes are intentionally short — they appear in every cross-reference.
+
+**Counter scope.** Each (component, type) pair owns an independent counter:
+`docs/<component>/nodes/<type>/index.md` is the authoritative ID ceiling.
+Single-component projects use the unqualified form (`ACT-NNN`, `CMD-NNN`, …).
+Multi-component projects introduce the `{COMPONENT-PREFIX}-` qualifier
+lazily — only when a cross-component collision would otherwise occur.
+Milestone-scoped [`id-claims.md`](workflow/plan.md#2-id-claim-protocol)
+captures in-flight reservations (primarily modify-intents) and is not
+the ceiling source.
 
 There is no canonical `docs/<component>/nodes/changes/` folder — CHG-NNN nodes
 live permanently under the milestone's FS folder. See

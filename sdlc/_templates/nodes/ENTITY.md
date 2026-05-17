@@ -64,7 +64,7 @@ formal state machine.
 
 - Created by: CMD-NNN
 - Modified by: CMD-NNN, CMD-NNN
-- State machine: STA-NNN (if applicable)
+- State machine: STA-NNN | none — see [`../../KB-LAYOUT.md → Node-type discriminators`](../../KB-LAYOUT.md#node-type-discriminators) (STA vs. inline-on-entity)
 
 ## Relationships
 

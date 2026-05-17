@@ -85,7 +85,8 @@ without modification.
   discoveries).
 - **One canonical tree** at `docs/<component>/nodes/<type>/` with a `status` field
   on every node: `proposed` (Phase 2 ingest — written by an unmerged FS;
-  also Phase 1 FLW / ACT — written by the FRS) / `active` (Phase 3 merge
+  also Phase 1 FLW — written by the FRS; ACT joins the Phase-2 ingest
+  set per R-NEW-2a retirement 2026-05-17) / `active` (Phase 3 merge
   has flipped, or brownfield-absorbed straight) / `superseded` /
   `deprecated`. The only milestone-scoped DDD artifact is the CHG-NNN
   node at `docs/milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` (CR track:

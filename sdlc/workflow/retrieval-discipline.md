@@ -91,11 +91,13 @@ the load defeats the whole point. (Phase 2 specifically: see also
 [`plan.md § 4a Retroactive touches_nodes: loop-back`](plan.md#4a-retroactive-touches_nodes-loop-back-r-new-10)
 when the gap is a modify-intent.)
 
-**Phase 2 reloads Phase-1-born FLW + ACT from disk, not from session
-memory.** Each FRS's `produced_flw:` and `produced_actor:` scalars point
-at canonical files born at Phase 1; the `/clear` between Phase 1.5 and
-Phase 2 enforces that these files are re-read from disk for enrichment,
-never reconstructed from Phase 1 deliberations. Per
+**Phase 2 reloads the Phase-1-born FLW from disk, not from session
+memory.** Each FRS's `produced_flw:` scalar points at a canonical file
+born at Phase 1; the `/clear` between Phase 1.5 and Phase 2 enforces
+that this file is re-read from disk for enrichment, never reconstructed
+from Phase 1 deliberations. (ACT is born at Phase 2, not enriched —
+R-NEW-2a retired 2026-05-17; the `produced_actor:` ID is read from
+`id-claims.md` to claim the file path at birth.) Per
 [`plan.md` HARD-GATE](plan.md).
 
 Phase 2 retrieval reads canonical the same as every other phase — there is
@@ -107,21 +109,15 @@ modify (Phase 3 applies the deltas).
 
 ### Templates loaded at Phase 1 authoring
 
-Phase 1 now authors up to four artifacts (FRS, FLW, ACT — the last when a
-new actor role is introduced — and CHG — when `touches_nodes:` is
-non-empty). The four templates are loaded at Phase 1 entry alongside the
-discovery reads above:
+Phase 1 authors up to three artifacts (FRS, FLW, and CHG when
+`touches_nodes:` is non-empty). The templates loaded at Phase 1 entry
+alongside the discovery reads above:
 
 - [`../_templates/FRS.md`](../_templates/FRS.md) — FRS template.
 - [`../_templates/nodes/FLOW.md`](../_templates/nodes/FLOW.md) — FLOW
   template, with phase-keyed authoring notes per R-NEW-2 (Phase 1 fills
   Trigger + Scenarios + optional Brownfield only; Phase 2 enriches with
   Sequence, Branches, Compensating actions, Postconditions, Decisions).
-- [`../_templates/nodes/ACTOR.md`](../_templates/nodes/ACTOR.md) — ACTOR
-  template, with phase-keyed authoring notes per R-NEW-2a (Phase 1 fills
-  Description + Goals + business Preconditions + Flows initiated only;
-  Phase 2 enriches with Commands triggered + Queries issued + PERM-NNN
-  refs).
 - [`../_templates/nodes/CHANGE.md`](../_templates/nodes/CHANGE.md) —
   CHANGE template, with phase-keyed authoring notes per R-CHG-4 (Phase 1
   fills behavior-language `modifies[]` + optional milestone-level
@@ -131,12 +127,17 @@ discovery reads above:
   FRS authored in this session declares non-empty `touches_nodes:` —
   pure-addition FRSs do not need CHANGE.md.
 
+ACTOR.md is **NOT** loaded at Phase 1 — the ACT file is born at Phase 2
+alongside ENT / CMD / STA / etc. (R-NEW-2a retired 2026-05-17). The
+ACT-NNN ID is claimed at Phase 1 in `id-claims.md` but no ACT body is
+authored. Load ACTOR.md at Phase 2 entry instead.
+
 The STD index and CCC index are **NOT** narrow-loaded at Phase 1 — the
 STD-conformance and CCC-deviation Pass 1 checks fire at Phase 1.5. Phase 1
-FRS + FLW + ACT + CHG authoring uses business language only;
-node-ID-bearing content (CMD/STA/PERM IDs in FLW Scenarios; structural
-before/after on CHG `modifies[]`; etc.) is gated to Phase 2 by the
-templates' authoring notes.
+FRS + FLW + CHG authoring uses business language only; node-ID-bearing
+content (CMD/STA/PERM IDs in FLW Scenarios; structural before/after on
+CHG `modifies[]`; etc.) is gated to Phase 2 by the templates' authoring
+notes.
 
 ## ADRs
 

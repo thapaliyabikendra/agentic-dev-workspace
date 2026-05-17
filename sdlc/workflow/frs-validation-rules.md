@@ -45,19 +45,28 @@ fires the gate; this file is the rule book it loads.
 The project's Phase 1.5 gate runs eight per-FRS checks plus a cross-FRS
 sweep. Type taxonomy: **six first-class types** (`existence`, `sanity`,
 `adr-conflict`, `standard-conflict`, `ccc-deviation`, `chg-sanity`) that
-match the FRS template's `Validation findings` Type enum, plus **two
-sanity-sub-flavors** (`flw-coverage`, `phase-1-bare-body-shape`) added
-on 2026-05-17 — these record under `type: sanity` with the sub-flavor
-named in the Rationale prefix (e.g., `"Blocker: phase-1-bare-body-shape — …"`).
+match the FRS template's `Validation findings` Type enum, plus **five
+sanity-sub-flavors** (`flw-coverage`, `phase-1-bare-body-shape`,
+`protocol-surface-leak`, `external-boundary-undeclared`,
+`state-promotion-deferred`) — these record under `type: sanity` with the
+sub-flavor named in the Rationale prefix (e.g.,
+`"Blocker: phase-1-bare-body-shape — …"`,
+`"Major: external-boundary-undeclared — …"`,
+`"Minor: state-promotion-deferred — …"`). The first two sub-flavors
+were added 2026-05-17 alongside `protocol-surface-leak`;
+`external-boundary-undeclared` was added 2026-05-17 (v1.2);
+`state-promotion-deferred` was added 2026-05-17 (v1.3) — see Revision history.
 `chg-sanity` was added on cutover with the CHG-Phase-1-birth rule
 (R-CHG-1..7). The eight checks fan out as parallel Pass 1 dispatches; the
 Pass 2 cross-FRS sweep produces `cross-frs` rows and now also catches
 **CHG-conflict** sub-flavor (sibling FRSs with conflicting Phase-1-born
 CHGs — per R-CHG-6, see [`design.md → Pass 2`](design.md#pass-2--milestone-cross-frs-sweep-runs-once-after-all-frss-in-the-milestone-are-per-frs-gated)).
-The two original sub-flavors (per R-NEW-3 / R-NEW-2 / R-NEW-2a) verify
-against real anchors rather than forward-claimed IDs — FLW + ACT now
-born at Phase 1 per R-NEW-1; the chg-sanity check verifies against the
-Phase-1-born CHG body (per R-CHG-1). **The cross-FRS sweep is skipped
+The two original sub-flavors (per R-NEW-3 / R-NEW-2) verify against real
+anchors rather than forward-claimed IDs — FLW now born at Phase 1 per
+R-NEW-1 (ACT-NNN is a Phase-1 forward-reference ID claim only; the ACT
+file is born at Phase 2 per plan.md § 3 — R-NEW-2a retired 2026-05-17);
+the chg-sanity check verifies against the Phase-1-born CHG body (per
+R-CHG-1). **The cross-FRS sweep is skipped
 when the milestone has fewer than 2 FRSs** — a single-FRS milestone has
 no cross-FRS conflicts to detect; append "N/A — single FRS milestone"
 to `discovery/milestone-scope.md` for audit trail.
@@ -83,9 +92,9 @@ Every Validation finding is one of:
 
 | Severity | Meaning | Examples |
 |---|---|---|
-| **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in FLW Scenarios (uses ENT/CMD/STA/PERM-NNN IDs in Phase-1-bare body — `phase-1-bare-body-shape` violation per R-NEW-2 / R-NEW-2a); bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion or has no scenario anchor on a real FLW (`flw-coverage` per R-NEW-3); Phase-1-born FLW with no Scenarios filled (Trigger or Scenarios section empty under R-NEW-2); `produced_actor:` set but ACT file does not exist at `docs/<component>/nodes/actors/`; **`touches_nodes:` non-empty but no Phase-1-born CHG file exists at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`** (per R-CHG-1); **CHG `modifies[]` carries structural before/after at Phase 1** (Phase-2-wired content under a Phase-1-bare CHG — `phase-1-bare-body-shape` violation per R-CHG-4 / R-CHG-7); missing or dangling `produced_flw:` / `produced_actor:` / `produces_nodes:` / `touches_nodes:` / `adrs:` declarations that clearly apply; FRS-ID collision; duplicate FLW Scenario signature against canonical (existence scan widened per R-NEW-6); FRS contradicts an `accepted` ADR without an ADR-supersession path; FRS violates an `accepted` STD whose `applies_when.stack:` intersects the FRS's `stack:` without filing a deviation ADR (`type: standard-conflict`); FRS silently overrides a CCC baseline declared in `ccc:` without a back-linked deviation ADR (`type: ccc-deviation`). |
-| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS uses a stack-narrow STD (`applies_when.stack:` intersects `stack:`) without declaring it in `standards:`; FRS cites a CCC by content (restating the baseline prose) instead of by ID; **FRS-CHG mismatch** — FRS implies behavior change X but the Phase-1-born CHG's `modifies[]` doesn't describe X, or the CHG describes a modification the FRS doesn't justify (`type: chg-sanity` per R-CHG-5); **illegitimate `created_under: pre-2026-05-17` marker** on a FLW whose `created:` date is after the cutover (B5 grandfather-only marker — `type: sanity`, revise-before-Phase-2). |
-| **Minor** | Style / clarity issue; does not invalidate the FRS. | Ambiguous phrasing; inconsistent terminology; AC restating a Business rule verbatim (per `R-WITHIN-FRS-RULE-RESTATEMENT`); OQ missing a tag; non-rule trap ("no limit applies" — describes absence of a constraint rather than a constraint); **vague-but-resolvable CHG `modifies[]` delta** — Phase 2 enrichment path is clear (`type: chg-sanity` per R-CHG-5). |
+| **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in FLW Scenarios (uses ENT/CMD/STA/PERM-NNN IDs in Phase-1-bare body — `phase-1-bare-body-shape` violation per R-NEW-2); bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion or has no scenario anchor on a real FLW (`flw-coverage` per R-NEW-3); Phase-1-born FLW with no Scenarios filled (Trigger or Scenarios section empty under R-NEW-2); `produced_actor:` set but ACT-NNN ID not claimed in `id-claims.md` (ID claim is required at Phase 1 even though the ACT file lands at Phase 2); **`touches_nodes:` non-empty but no Phase-1-born CHG file exists at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`** (per R-CHG-1); **CHG `modifies[]` carries structural before/after at Phase 1** (Phase-2-wired content under a Phase-1-bare CHG — `phase-1-bare-body-shape` violation per R-CHG-4 / R-CHG-7); missing or dangling `produced_flw:` / `produced_actor:` / `produces_nodes:` / `touches_nodes:` / `adrs:` declarations that clearly apply; FRS-ID collision; duplicate FLW Scenario signature against canonical (existence scan widened per R-NEW-6); FRS contradicts an `accepted` ADR without an ADR-supersession path; FRS violates an `accepted` STD whose `applies_when.stack:` intersects the FRS's `stack:` without filing a deviation ADR (`type: standard-conflict`); FRS silently overrides a CCC baseline declared in `ccc:` without a back-linked deviation ADR (`type: ccc-deviation`). |
+| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS uses a stack-narrow STD (`applies_when.stack:` intersects `stack:`) without declaring it in `standards:`; FRS cites a CCC by content (restating the baseline prose) instead of by ID; **FRS-CHG mismatch** — FRS implies behavior change X but the Phase-1-born CHG's `modifies[]` doesn't describe X, or the CHG describes a modification the FRS doesn't justify (`type: chg-sanity` per R-CHG-5); **illegitimate `created_under: pre-2026-05-17` marker** on a FLW whose `created:` date is after the cutover (B5 grandfather-only marker — `type: sanity`, revise-before-Phase-2); **external boundary undeclared** — FRS implies an outbound external boundary (non-`In-app` Notifications channel, or a named outbound framework abstraction like `IEmailSender` / `IHttpClientFactory` / vendor SDK) but neither declares an `INT-NNN` in `produces_nodes:` / `touches_nodes:` nor cites one inline in body prose (`external-boundary-undeclared` per the new rule below). |
+| **Minor** | Style / clarity issue; does not invalidate the FRS. | Ambiguous phrasing; inconsistent terminology; AC restating a Business rule verbatim (per `R-WITHIN-FRS-RULE-RESTATEMENT`); OQ missing a tag; non-rule trap ("no limit applies" — describes absence of a constraint rather than a constraint); **vague-but-resolvable CHG `modifies[]` delta** — Phase 2 enrichment path is clear (`type: chg-sanity` per R-CHG-5); **state-promotion-deferred** — FRS describes a lifecycle transition that crosses the inline-on-entity threshold (see [KB-LAYOUT discriminator](../KB-LAYOUT.md#node-type-discriminators)) without declaring `STA-NNN` in `produces_nodes:` or carrying a citable inline-DEC justifying continued inline modeling (`state-promotion-deferred` per the new rule below). |
 
 **Gate verdicts:**
 
@@ -253,9 +262,10 @@ of the CHG's `modifies[]` entry that matches what's there, the delta is
 either vague (Minor: chg-sanity — Phase 2 enrichment path is clear) or
 mismatched (Major: chg-sanity — FRS-CHG divergence). The
 **sibling-FRS birth-order rule** applies per υ / M1: when this CHG
-targets a Phase-1-bare FLW / ACT born by a sibling FRS, validate against
+targets a Phase-1-bare FLW born by a sibling FRS, validate against
 the current Phase-1-bare body; re-run chg-sanity only on the affected
-CHG if that sibling's body changes mid-round-trip.
+CHG if that sibling's body changes mid-round-trip. (ACT is not in scope
+— ACT births at Phase 2, not Phase 1; R-NEW-2a retired 2026-05-17.)
 
 ---
 
@@ -392,6 +402,8 @@ forward; the grandfather is one-shot. Per-rule introduction dates:
   `nfr-baseline-trace` — 2026-05-16.
 - `R-WITHIN-FRS-RULE-RESTATEMENT` — 2026-05-17.
 - `protocol-surface-leak` — 2026-05-17.
+- `external-boundary-undeclared` — 2026-05-17 (v1.2).
+- `state-promotion-deferred` — 2026-05-17 (v1.3).
 
 ### Rule: ac-single-outcome
 
@@ -519,6 +531,65 @@ payload shapes.
 | FRS Trigger: "the browser issues a GET against `/api/account/confirm-email`" + FRS Behavior: "wire surface canonical in CON-002" | Pass (Trigger is the sanctioned single-occurrence; Behavior cites CON by ID) |
 | FRS Behavior: "CMD-002 invokes `UserManager.ConfirmEmailAsync` and flips `IdentityUser.EmailConfirmed` to true; wire surface canonical in CON-002" | Pass (ABP method + property names covered by ADR-001; CON-002 cited for wire) |
 
+### Rule: external-boundary-undeclared
+
+| Trigger | An outbound external boundary is implied by the FRS body but no `INT-NNN` node is declared or cited. Both (a) and (b) hold. **(a) Signal of an outbound boundary:** any of — the FRS Notifications table has a row with `Channel ∈ {Email, SMS, Push, Webhook}` (any non-`In-app` channel) and `Recipient ≠ _None_`; OR an operation-specifying section (Behavior, Postconditions, Business rules, Edge cases, Acceptance criteria) names a recognized outbound framework abstraction. Inline seed list of recognized abstractions: `IAccountEmailer`, `IEmailSender`, `IEmailService`, `ISmsSender`, `IPushNotificationService`, named `IHttpClientFactory` clients addressing an external service, vendor SDK client interfaces (e.g., `IStripeClient`, `IS3Client`, `ISendGridClient`, payment-processor SDKs). **(b) No INT-NNN handle:** `produces_nodes:` does not include an `INT-NNN`, AND `touches_nodes:` does not include an `INT-NNN`, AND the FRS body does not cite an `INT-NNN` inline. **Scope explicitly excludes** distributed events (Kafka topics / RabbitMQ exchanges via `IDistributedEventBus.PublishAsync` to an external bus) — those route to `EVT-NNN` + `linked_contract: CON-NNN` per [`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators), not to INT. |
+| ------- | --- |
+| Type | `sanity` |
+| Severity | **Major** |
+| Resolution | Author or extend an `INT-NNN` node carrying the external boundary's implementation context (System, Trigger, Contract, SLA, Idempotency, Failure handling, Blast radius). Add to `produces_nodes:` when newly introduced; to `touches_nodes:` with a Phase-1-born CHG when modifying an existing INT; or cite the existing canonical `INT-NNN` inline in the FRS body (Behavior or Brownfield notes) when consuming an unchanged boundary. The lazy `integrations/` folder auto-bootstraps on first INT ingest. |
+| Rationale prefix | `"Major: external-boundary-undeclared — …"` |
+
+**Exemptions.**
+
+- **INT-NNN reference is the cure.** Inline references to an `INT-NNN` node in FRS body prose (e.g., "verification email is dispatched via INT-001") satisfy the rule the same way `CON-NNN` references satisfy `protocol-surface-leak` — by handing the external-boundary concern to a canonical node. The rule fires on undeclared boundaries, not on inline citations of declared ones.
+- **CCC citation does NOT exempt.** A `ccc:` frontmatter entry covers the policy layer (notification cadence, audit obligation, retention) — it is not a substitute for the INT node, which carries the boundary's SLA / idempotency / failure-handling / blast-radius decisions. Cite both: `ccc:` for policy, `INT-NNN` for the boundary. (A notifications-policy CCC does not yet exist in this project's `docs/shared/ccc/`; the principle stands for future CCCs in this category.)
+- **Explicit no-INT annotation.** When the framework abstraction does not actually cross a process boundary in this deployment (rare — e.g., a no-op stub `IEmailSender` in a dev profile), the FRS body MUST carry a one-sentence annotation in Brownfield impact: `"No INT-NNN: <rationale>"`. Annotation absence with the trigger present is the rule firing.
+
+**Doctrinal anchor.** Companion to `protocol-surface-leak`: that rule routes wire-format surface to `CON-NNN`; this rule routes external-boundary concerns (SLA, idempotency, blast radius) to `INT-NNN`. The two together formalize the principle that an FRS body describes *operation outcomes in business language* — protocol-wire surface and external-system boundaries are both relocated to canonical nodes for separate-of-concerns review at Phase 2 ingest.
+
+| Violation example | Classification |
+|---|---|
+| FRS Notifications: `Registrant \| Registration succeeds \| Email \| Deliver verification link`; `produces_nodes: [..., CMD-001, FLW-001]` (no INT-NNN, no INT-NNN cited inline) | Major: external-boundary-undeclared (declare INT-NNN for the email-dispatch boundary; add to produces_nodes:) |
+| FRS Behavior: "CMD-NNN invokes `IEmailSender.SendAsync` to dispatch the receipt"; `produces_nodes:` lists no INT-NNN; no inline INT citation | Major: external-boundary-undeclared (named outbound abstraction without a boundary handle; author INT-NNN or cite existing one) |
+| FRS Behavior: "verification email is dispatched via INT-001"; `produces_nodes:` does not include INT-001 because FRS-001 already introduced it | Pass (inline INT-NNN citation satisfies the rule — consumer-of-existing-INT path) |
+| FRS Behavior: `IDistributedEventBus.PublishAsync` publishes `OrderPlaced` to the external Kafka cluster; no EVT-NNN declared | Out of this rule's scope (route to EVT-NNN + linked CON-NNN per KB-LAYOUT; a separate sanity rule may apply) |
+| FRS Notifications: `_None_ \| — \| — \| no notifications fire` | Pass (Recipient `_None_` does not trigger signal (a)) |
+
+### Rule: state-promotion-deferred
+
+| Trigger | An FRS describes a lifecycle transition that would push an entity past the inline-on-entity threshold defined in [`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators) (STA vs. inline-on-entity) AND the FRS does not declare `STA-NNN` in `produces_nodes:` AND the touched / produced entity does not reference an `STA-NNN` in its `Lifecycle` subsection. Two trigger paths. **(a) Modify-existing:** `touches_nodes:` includes `ENT-NNN`, the existing `ENT-NNN` file's Lifecycle says `State machine: none` (or omits the line), and the FRS's Postconditions / Behavior / Acceptance criteria introduces a transition that brings the entity's total transitions to ≥2, OR introduces a new named state taking the count to ≥3, OR introduces a transition with a named guard beyond the triggering CMD's preconditions, OR introduces a transition that raises a domain event consumed by another node. **(b) Introduce-new:** `produces_nodes:` includes a new `ENT-NNN` AND the FRS's Postconditions / Behavior describes a lifecycle that, evaluated against the KB-LAYOUT discriminator's six criteria, crosses the threshold from the start (e.g., introduces an entity with ≥3 states or ≥2 transitions on day one). |
+| ------- | --- |
+| Type | `sanity` |
+| Severity | **Minor** |
+| Resolution | Either **(promote)** declare `STA-NNN` in `produces_nodes:`, queue the STA node for Phase 2 ingest, and at Phase 2 flip the entity's inline `State machine: none` to `State machine: STA-NNN` (or set it on the newly introduced entity); or **(defer)** add an inline `DEC-inline-N` on the entity (or a paragraph in the FRS's Brownfield impact) citing the specific KB-LAYOUT criterion the lifecycle still does not cross, and re-evaluate at the next FRS touching this entity. Silent continuation past the threshold is the violation; either path resolves it. |
+| Rationale prefix | `"Minor: state-promotion-deferred — …"` |
+
+**Exemptions.**
+
+- **STA-NNN reference is the cure.** Declaring `STA-NNN` in `produces_nodes:` (or having an existing STA already referenced on the touched entity) satisfies the rule.
+- **Inline-on-entity is a legitimate choice.** The KB-LAYOUT discriminator is a checklist, not a forced-promotion rule — entities legitimately below all six criteria stay inline. The rule fires only when the lifecycle crosses ≥1 criterion without an STA-NNN or a citable inline-DEC justification, not on every multi-state entity.
+- **In-process framework state.** ASP.NET request lifecycle, ABP unit-of-work scopes, in-memory caching state, and other framework-managed transients are not domain lifecycle and do not trigger this rule. The rule fires on `ENT-NNN`-scoped domain state only.
+- **Field mutations are not transitions.** Updates to fields like `LastLoginAt`, `RetryCount`, or audit timestamps are field writes, not lifecycle transitions. The trigger fires on changes to the entity's lifecycle position (state-flag flip, enum change, or modeled status field), not on every mutation.
+
+**Doctrinal anchor.** Companion to the KB-LAYOUT discriminator: that file
+defines when STA is warranted; this rule enforces the discriminator at
+the Phase 1.5 gate so that a multi-FRS milestone cannot incrementally
+grow an entity's state machine past the threshold without either
+promoting to STA or carrying a citable inline-DEC justification. Minor
+severity reflects that this is a modeling judgement — Phase 2 can still
+ingest the FRS — and that historic entities below the threshold are
+unaffected by retroactive trigger evaluation (grandfather clause
+applies).
+
+| Violation example | Classification |
+|---|---|
+| `touches_nodes: [ENT-001]`; ENT-001 currently has `State machine: none` with a single `EmailConfirmed` transition from a prior FRS; FRS-007 Postconditions: "`LockedOut = true` is persisted on the 5th consecutive failed login" — adds a 2nd transition (and arguably a 3rd state if `LockedOut` is modeled distinctly). `produces_nodes:` does not include `STA-NNN`. | Minor: state-promotion-deferred (declare STA-NNN in produces_nodes; Phase 2 ingest authors STA-001 covering `EmailConfirmed` + `LockedOut` transitions; flip ENT-001 inline `Lifecycle` to `State machine: STA-001`) |
+| `produces_nodes: [ENT-005, CMD-009, FLW-005]`; FRS-009 introduces an `Order` entity with `draft → submitted → fulfilled → cancelled` lifecycle described in Postconditions; no `STA-NNN` in produces_nodes. | Minor: state-promotion-deferred (introduce-new path; threshold crossed at birth — declare STA-005 alongside ENT-005) |
+| `touches_nodes: [ENT-001]`; FRS-NN Postconditions: "the actor's `LastLoginAt` timestamp is updated" — a field write, no new state value, no transition. | Pass (timestamp write is field mutation, not a lifecycle transition; the entity remains a 2-state machine) |
+| `touches_nodes: [ENT-001]`; FRS-NN adds a second transition; `produces_nodes:` includes `STA-NNN`; STA is queued for Phase 2 ingest. | Pass (STA-NNN declared — the cure has fired) |
+| `touches_nodes: [ENT-001]`; FRS-NN adds a second transition; FRS's Brownfield impact says "`EmailConfirmed` and `MarketingOptIn` are independent flags, not a 3-state machine — inline modeling retained per DEC-inline-2 on ENT-001". | Pass (defer path — inline DEC justifies continued inline modeling against the discriminator criteria) |
+
 ---
 
 ## How findings appear in the FRS
@@ -543,13 +614,14 @@ restates a baseline category instead of citing it), `inferred-from-code`
 items present without a corresponding Open Question, `flw-coverage` (an
 AC that does not map to a scenario anchor on a real FLW — per R-NEW-3,
 [`design.md → Pass 1 check 6`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored)),
-`phase-1-bare-body-shape` (a Phase-1-born FLW, ACT, or CHG whose
-body shape violates R-NEW-2 / R-NEW-2a / R-CHG-4 — forward node IDs in
-scenarios, Sequence populated at Phase 1, PERM-NNN refs in ACT
-Preconditions, structural before/after on CHG `modifies[]` at Phase 1,
-`adds[]` or `migration_steps[]` filled at Phase 1, illegitimate
+`phase-1-bare-body-shape` (a Phase-1-born FLW or CHG whose body shape
+violates R-NEW-2 / R-CHG-4 — forward node IDs in scenarios, Sequence
+populated at Phase 1, structural before/after on CHG `modifies[]` at
+Phase 1, `adds[]` or `migration_steps[]` filled at Phase 1, illegitimate
 `created_under:` marker — per
-[`design.md → Pass 1 check 7`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored)),
+[`design.md → Pass 1 check 7`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored);
+ACT body-shape is no longer checked at this gate because ACT is born at
+Phase 2, not Phase 1 — R-NEW-2a retired 2026-05-17),
 `within-frs-rule-restatement` (a constraint appears as prose in
 two or more of Use case / Edge cases / Business rules / Acceptance
 criteria — per the FRS template's section-role discipline; see
@@ -558,23 +630,42 @@ and `protocol-surface-leak` (HTTP routes beyond the Use case Trigger,
 HTTP status codes, payload shapes, OAuth2 / OpenIddict protocol literals,
 or error-code string literals appear inline in the FRS body instead of
 being relocated to a `CON-NNN` node — per
-[Rule: protocol-surface-leak](#rule-protocol-surface-leak)).
+[Rule: protocol-surface-leak](#rule-protocol-surface-leak)),
+and `external-boundary-undeclared` (FRS implies an outbound external
+boundary via a non-`In-app` Notifications channel or a named outbound
+framework abstraction like `IEmailSender` / `IHttpClientFactory` / vendor
+SDK, but no `INT-NNN` is declared in `produces_nodes:` / `touches_nodes:`
+nor cited inline in body prose — per
+[Rule: external-boundary-undeclared](#rule-external-boundary-undeclared);
+distributed-event publishing to external Kafka / RabbitMQ is out of this
+rule's scope and routes to `EVT-NNN` + linked `CON-NNN` per
+[`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators)),
+and `state-promotion-deferred` (FRS describes a lifecycle transition that
+crosses the inline-on-entity threshold defined in
+[`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators)
+— ≥3 states, ≥2 transitions, named non-CMD guard, consumed domain event
+on transition, terminal-state semantics, or illegal-transition
+enforcement — without declaring `STA-NNN` in `produces_nodes:` or
+carrying a citable inline-DEC on the entity justifying continued inline
+modeling — per
+[Rule: state-promotion-deferred](#rule-state-promotion-deferred)).
 Severity (Blocker / Major / Minor) and the audit reproducibility set go in
 the Rationale prefix.
 
 **`type: existence` scope** (widened per R-NEW-6). The existence scan
 (`design.md → Phase 1.5 → Pass 1`) searches the canonical wiki and matches
 against every canonical node regardless of status — `proposed` (a Phase-1-born
-FLW or ACT just landed by this FRS or by an in-flight sibling FRS / FS),
-`active`, `superseded`, or `deprecated`. The scan now matches three
-signatures per FRS: (a) FRS title / actor ID / command domain; (b) **FLW
-Scenario signatures** — happy-path Given/When/Then phrasing, to catch
-duplicate Phase-1-born FLWs across FRSs that the title-only check would
-miss; (c) **ACT identity** — when `produced_actor:` is set, scan canonical
-ACT index for duplicate actor-role introductions across FRSs and verify
-the ACT file exists at the expected path. Read-only references to canonical
-FLW / ACT in FRS prose are NOT existence-checked (text grep is the audit
-hook — per M2). A match against a `proposed` node is still a finding; the
+FLW just landed by this FRS or by an in-flight sibling FRS / FS), `active`,
+`superseded`, or `deprecated`. The scan now matches two signatures per FRS:
+(a) FRS title / actor ID / command domain; (b) **FLW Scenario signatures**
+— happy-path Given/When/Then phrasing, to catch duplicate Phase-1-born
+FLWs across FRSs that the title-only check would miss. **Cross-FRS
+duplicate-actor detection is no longer in scope** (R-NEW-2a retired
+2026-05-17 — the ACT file doesn't exist at this gate, so the canonical ACT
+index scan moves to Phase 2 FS validation where both FSs claiming the same
+actor name will surface as an ID collision in `id-claims.md`). Read-only
+references to canonical FLW / ACT in FRS prose are NOT existence-checked
+(text grep is the audit hook — per M2). A match against a `proposed` node is still a finding; the
 `rationale:` carries the in-flight flavor ("matches proposed FLW-005
 introduced by FRS-007 at Phase 1 — confirm distinctness or coordinate").
 Severity is the same Blocker/Major/Minor triage as for matches against
@@ -597,6 +688,8 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
 |---------|------|--------|
 | 1.0 | 2026-05-11 | Absorbed from the shared FRS validation rules reference (v3.1) during workflow absorption, distilled to the project's FRS template and Phase 1.5 gate. Issue-tracker label automation, harness orchestrator dispatch, the 14-item Self-Review mnemonic legend, and per-section schema enforcement (Section-N references) were dropped — the project is filesystem-based with a different FRS template shape. Severity, bundling detection, NFR rubric, `[inferred from code]` propagation, OQ tag taxonomy, and audit reproducibility set retained. |
 | 1.1 | 2026-05-17 | Added `protocol-surface-leak` sanity sub-flavor (Major) — formalizes the "Common language traps" guidance for HTTP routes / status codes / payload shapes / OAuth2 literals / error-code string literals as an enforced finding. CON-NNN reference is the sanctioned cure; ABP public-API symbol names remain covered by ADR-001. Triggered by retroactive cleanup of FRS-001/002/003 (M-01 user-auth) on the same date. |
+| 1.2 | 2026-05-17 | Added `external-boundary-undeclared` sanity sub-flavor (Major) — formalizes that an outbound external boundary signalled by a non-`In-app` Notifications channel or a named outbound framework abstraction (`IAccountEmailer`, `IEmailSender`, `ISmsSender`, `IPushNotificationService`, named `IHttpClientFactory` clients, vendor SDK adapters) requires an `INT-NNN` node — declared in `produces_nodes:` / `touches_nodes:` or cited inline in body prose. INT-NNN reference is the sanctioned cure (parallel to CON-NNN for `protocol-surface-leak`); CCC citation does NOT exempt (CCC is policy layer, INT is boundary layer). Distributed-event publishing to external Kafka / RabbitMQ is out of this rule's scope (routes to EVT-NNN + linked CON-NNN per KB-LAYOUT). Triggered by FRS-001 M-01 audit identifying email-dispatch boundary as undeclared; companion edits in `frs-code-extraction-rules.md` (Translation discipline table) and `_templates/FRS.md` (Notifications heading prompt). |
+| 1.3 | 2026-05-17 | Added `state-promotion-deferred` sanity sub-flavor (Minor) — formalizes the STA vs. inline-on-entity discriminator newly introduced in [`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators). Fires when an FRS describes a lifecycle transition that crosses any of the six threshold criteria (≥3 states, ≥2 transitions, named non-CMD guard, consumed domain event on transition, terminal-state semantics, illegal-transition enforcement) without declaring `STA-NNN` in `produces_nodes:` or carrying a citable inline-DEC justifying continued inline modeling. STA-NNN reference is the cure; defer path requires an inline DEC on the entity (or a paragraph in FRS Brownfield impact). Minor severity reflects that this is a modeling judgement — Phase 2 can still ingest the FRS — and matches the precedent set by `nfr-baseline-trace`. Triggered by the M-01 user-auth feedback session questioning why `ENT-001.EmailConfirmed` was modeled inline rather than as STA-001; the framework had no objective trigger for "formal state machine" beyond the ENTITY template's `(if applicable)` hedge. Companion edits in `_templates/nodes/ENTITY.md` (Lifecycle section's State machine line now cites the KB-LAYOUT discriminator). No retroactive M-01 trigger: `EmailConfirmed` (single boolean, single transition, no consumed event, no terminal handling) stays below all six criteria and remains inline. |
 
 ---
 

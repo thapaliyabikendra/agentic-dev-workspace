@@ -25,23 +25,21 @@ Detail at [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip
 
 Workflow aligns operations to Karpathy's Ingest/Query pattern with phase-keyed
 node births. The **FRS flow** is mixed-mode: it Queries the canonical DDD wiki
-to validate requirements **and** Ingests journey + identity + modify-intent —
+to validate requirements **and** Ingests journey + modify-intent —
 the new FLW (Trigger + Scenarios, business language) born to canonical with
-`status: proposed`; when the FRS introduces a new actor role, the new ACT
-(Description + Goals + business preconditions + flows initiated) born to
-canonical with `status: proposed`; and when the FRS declares non-empty
-`touches_nodes:`, a CHG-NNN (behavior-language `modifies[]` only — one CHG
-per FRS) born to its milestone-scoped permanent home with `status: draft`.
-The **FS flow** Ingests structure + wiring: new ENT / CMD / STA / CON / INT /
-DEC / PERM / QRY nodes land in canonical with `status: proposed`, the
-Phase-1-born FLW + ACT are enriched in place with `related:` wiring +
-Sequence + Branches + Compensating actions + structural Postconditions +
-Decisions (FLW) and CMD-triggered + QRY-issued + PERM-NNN refs (ACT), and
-the FS declares `consumes_chgs:` listing the per-FRS-born CHGs it owns —
-enriching each with structural before/after on `modifies[]`, `adds[]`
-mirroring new node ingest, and `migration_steps[]`. Implementation Applies
-the CHG deltas to canonical and flips all Phase-1- and Phase-2-born canonical
-nodes `proposed → active` and consumed CHGs `approved → merged`. The **CR track** (`change-request.md`) is a lightweight
+`status: proposed`; and when the FRS declares non-empty `touches_nodes:`, a
+CHG-NNN (behavior-language `modifies[]` only — one CHG per FRS) born to its
+milestone-scoped permanent home with `status: draft`. The **FS flow** Ingests
+structure + wiring: new ACT (when the FRS declares a new actor role via
+`produced_actor:`) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY nodes land
+in canonical with `status: proposed`, the Phase-1-born FLW is enriched in
+place with `related:` wiring + Sequence + Branches + Compensating actions +
+structural Postconditions + Decisions, and the FS declares `consumes_chgs:`
+listing the per-FRS-born CHGs it owns — enriching each with structural
+before/after on `modifies[]`, `adds[]` mirroring new node ingest, and
+`migration_steps[]`. Implementation Applies the CHG deltas to canonical and
+flips all Phase-1- and Phase-2-born canonical nodes `proposed → active` and
+consumed CHGs `approved → merged`. The **CR track** (`change-request.md`) is a lightweight
 alternative to the full dev track for isolated, standalone change requests that
 don't warrant milestone grouping — it produces a CR-scoped container instead of
 a milestone folder, skips Phase 0 and the cross-FRS sweep, and delegates to
@@ -137,7 +135,7 @@ digraph workflow_phases {
     subgraph cluster_dev {
         label="Dev track";
         phase0    [shape=box,   label="Phase 0\nMilestone Scoping"];
-        phase1    [shape=box,   label="Phase 1\nFRS + FLW + ACT\n+ CHG (if touches_nodes)\nAuthoring"];
+        phase1    [shape=box,   label="Phase 1\nFRS + FLW\n+ CHG (if touches_nodes)\nAuthoring"];
         gate15    [shape=diamond, label="Phase 1.5\nValidation Gate?"];
         phase2    [shape=box,   label="Phase 2\nFS + Node Ingest\n+ CHG consumption"];
         fsval     [shape=diamond, label="FS validation?"];
@@ -153,7 +151,7 @@ digraph workflow_phases {
     }
 
     out_ms        [shape=doublecircle, label="Milestone portal\n+ scope discovery"];
-    out_frs       [shape=doublecircle, label="Validated FRSs\n+ proposed FLW + ACT\n+ draft CHG (if any)\n+ OQs"];
+    out_frs       [shape=doublecircle, label="Validated FRSs\n+ proposed FLW\n+ draft CHG (if any)\n+ OQs"];
     out_fs        [shape=doublecircle, label="FS + proposed nodes\n+ consumed/enriched CHG\n(if any)"];
     out_tc        [shape=doublecircle, label="TC files staged"];
     out_impl_code [shape=doublecircle, label="Stage 2 Code complete\n(dev track exit)"];
