@@ -6,7 +6,7 @@ created: 2026-05-15
 updated: 2026-05-17
 supersedes: null
 superseded_by: null
-tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging]
+tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging, mapperly]
 scope: engine
 applies_when:
   stack: [api]
@@ -247,10 +247,12 @@ Folder hierarchy: **`<Module>/<SubModule>/<TypeFamily>/<TypeName>.cs`**. Types a
 | `Application.Contracts` | `<Module>/<SubModule>/Dtos/<DtoName>Dto.cs` | all DTOs (input + output) |
 | `Application.Contracts` | `Permissions/<Module>Permissions.cs` | permission constants |
 | `Application` | `<Module>/<SubModule>/AppServices/<AggregateName>AppService.cs` | AppService implementations |
-| `Application` | `<Module>/<SubModule>/AutoMapperProfiles/<AggregateName>AutoMapperProfile.cs` | AutoMapper profiles |
+| `Application` | `<Module>/<SubModule>/Mappers/<AggregateName>Mapper.cs` | Mapperly mapper class (default; `[Mapper] partial class`; see mapper-backend note below) |
 | `HttpApi` | `Controllers/<Module>/<AggregateName>Controller.cs` | controllers (thin; delegate to AppService) |
 
 `<Module>` = bounded-context folder in PascalCase (`BankGuarantee`, `LetterOfCredit`). `<SubModule>` = feature group (`Issuance`, `Claims`). Omit `<SubModule>` when a module has only one feature group.
+
+> **Mapper backend.** Default is Mapperly (`Volo.Abp.Mapperly`): declare a `[Mapper] partial class <Aggregate>Mapper` (or a single `<Project>ApplicationMappers` class when mappings are few). To use AutoMapper instead, file an ADR referencing STD-005 and use `AutoMapperProfiles/<AggregateName>AutoMapperProfile.cs`.
 
 *Note on `<Module>Keys.cs` (2026-05-17).* The slot replaces the earlier
 `<Module>/<ModuleName>Errors.cs` (which was scoped to error-code constants
@@ -278,7 +280,8 @@ per `CCC-007`); each constant's value is 1:1 with an `en.json` key.
 | Combined create+update DTO | `Dto` | `CreateUpdateBgRequestDto` |
 | Query input DTO | `Dto` | `GetBgRequestListDto` |
 | EF configuration | `Configuration` | `BgRequestConfiguration` |
-| AutoMapper profile | `AutoMapperProfile` | `BgRequestAutoMapperProfile` |
+| Mapperly mapper class (default) | `Mapper` | `BgRequestMapper`, `ClinicManagementApplicationMappers` |
+| AutoMapper profile (per ADR) | `AutoMapperProfile` | `BgRequestAutoMapperProfile` |
 | Specification | `Specification` | `ActiveBgRequestSpecification` |
 | Background job | `Job` | `CbsRetryJob` |
 | Background worker | `Worker` | `CbsOutboxWorker` |
@@ -286,7 +289,7 @@ per `CCC-007`); each constant's value is 1:1 with an `en.json` key.
 | Permission constants class | `Permissions` | `BankGuaranteePermissions` |
 | Permission definition provider | `PermissionDefinitionProvider` | `TradeFinancePermissionDefinitionProvider` |
 
-ABP suffix conventions (`AppService`, `Controller`, `PermissionDefinitionProvider`, `Eto`, `AutoMapperProfile`) are non-negotiable — renaming breaks DI registration or endpoint discovery. **All DTOs end in `Dto` — no `Input` or `Request` suffixes.**
+ABP suffix conventions (`AppService`, `Controller`, `PermissionDefinitionProvider`, `Eto`, `Mapper` / `AutoMapperProfile`) are non-negotiable — renaming breaks DI registration or endpoint discovery. **All DTOs end in `Dto` — no `Input` or `Request` suffixes.**
 
 #### 9.4 Database object naming
 
@@ -374,7 +377,12 @@ node type:
 Managers (Domain Services per Rule 9.3) carry the body: entity invariant
 enforcement, cross-aggregate coordination, and policy decisions. They
 return `ErrorOr<T>` (see STD-002 § ErrorOr Result Pattern) and never throw
-on expected failures.
+on expected failures. QRY bodies that filter, order, or paginate rows
+compose them server-side via `IQueryable` (STD-002 Rule 4 — Repository
+query discipline) — never via `GetListAsync(predicate)` with in-memory
+filtering. Mutation of an aggregate goes through the aggregate's named
+methods (STD-002 Rule 5 — Aggregate-root encapsulation) — direct
+`entity.Property = value` from inside a Manager is prohibited.
 
 Application Services are **thin orchestration boundaries** — they accept
 the input DTO, delegate to the appropriate Manager method(s), unwrap the
@@ -549,6 +557,11 @@ The Phase 3 merge gate greps for `[Authorize` on any class or method
 whose containing type ends in `Manager`, and for
 `[Authorize("<string-literal>")]` (inline literal). Hits block the
 merge.
+
+**PERM authoring threshold.** The bare presence of a permission name does
+not by itself warrant a PERM node — see
+[`../_templates/nodes/PERMISSION.md`](../_templates/nodes/PERMISSION.md)
+for when to inline on the actor vs. promote to PERM.
 
 ---
 

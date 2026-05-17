@@ -622,6 +622,7 @@ cross-cutting practice cited here.
 [`workflow/derived-reports.md`](workflow/derived-reports.md),
 [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md),
 [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md),
+[`workflow/abp-project-bootstrap.md`](workflow/abp-project-bootstrap.md),
 [`workflow/phase-state.md`](workflow/phase-state.md),
 [`workflow/discuss.md`](workflow/discuss.md) (conditional: between Phase 1.5 and `/clear`
 when deferred FRS findings carry high architectural impact),

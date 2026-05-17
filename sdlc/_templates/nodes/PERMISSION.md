@@ -22,6 +22,16 @@ updated: YYYY-MM-DD
 > guard is reused across multiple commands. For simple role checks, keep
 > authorization on the actor and skip PERM.
 
+> **Do not create a PERM whose guard reduces to the CCC-002 baseline.** A
+> guard of `CurrentUser.IsAuthenticated` (or any expression equivalent to
+> "permission is registered and the caller holds it") is what CCC-002
+> already mandates by default — the permission name belongs in
+> `<Project>Permissions.cs` and `PermissionDefinitionProvider` (per STD-005
+> R15) and the claim belongs inline on the actor's `Permissions:` bullet.
+> Promote to PERM only when the guard adds content beyond the baseline:
+> ownership / tenancy / state predicates, attribute combinations, or the
+> same non-trivial expression cited from multiple commands.
+
 ## Description
 
 One or two sentences naming the rule in domain terms. "Account admins can

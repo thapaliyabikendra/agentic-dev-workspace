@@ -6,7 +6,7 @@ created: 2026-05-13
 updated: 2026-05-17
 supersedes: null
 superseded_by: null
-tags: [dotnet, application-layer, errororstd, validation, localization]
+tags: [dotnet, application-layer, errororstd, validation, localization, repository-query, encapsulation]
 scope: engine
 applies_when:
   stack: [api]
@@ -34,14 +34,16 @@ related_adrs: []
 ## Scope
 
 Result-pattern contract for the application layer (`ErrorOr<T>`), input
-validation pipeline (FluentValidation), and user-facing string
-externalisation (`IStringLocalizer<TResource>` with shared per-module
-key constants). Additional framework-agnostic .NET concerns — async /
-await naming, DI container conventions, LINQ vs loop guidance,
-cancellation-token discipline — remain deferred to follow-up sections.
-STD-005 carries the ABP-specific layer (file slots, layer mapping, base
-classes); this standard governs the framework-agnostic patterns that
-STD-005's rules consume.
+validation pipeline (FluentValidation), user-facing string externalisation
+(`IStringLocalizer<TResource>` with shared per-module key constants),
+repository query composition (`IQueryable` + `WhereIf` — no in-memory
+filter / page / sort), and aggregate-root encapsulation (private-write
+properties + named mutation methods). Additional framework-agnostic .NET
+concerns — async / await naming, DI container conventions, LINQ vs loop
+guidance, cancellation-token discipline — remain deferred to follow-up
+sections. STD-005 carries the ABP-specific layer (file slots, layer
+mapping, base classes); this standard governs the framework-agnostic
+patterns that STD-005's rules consume.
 
 ## Standards
 
@@ -251,6 +253,33 @@ is the **input-shape** error path; **domain-rule** errors travel via
 `ErrorOr → UserFriendlyException` per Rule 1. The two paths produce
 different envelope shapes; do not blur them.
 
+#### 2.5 Mandatory-validator enforcement
+
+Every input DTO in `<Project>.Application.Contracts/<Module>/Dtos/` has
+a corresponding validator. An "input DTO" is any DTO whose class name
+starts with `Create`, `Update`, `Book`, `Cancel`, `Approve`, `Reject`,
+`Submit`, `Assign`, or ends with `…ListDto` (query input request).
+Output DTOs (`<Aggregate>Dto`, `<Aggregate>SummaryDto`,
+`<Aggregate>DetailDto`) are exempt — they carry no input shape.
+
+| Input-DTO surface | Required sibling validator |
+|---|---|
+| `BookAppointmentDto` | `BookAppointmentDtoValidator : AbstractValidator<BookAppointmentDto>` |
+| `GetAppointmentsByPhoneDto` (query input) | `GetAppointmentsByPhoneDtoValidator` |
+| `CreateDepartmentDto` | `CreateDepartmentDtoValidator` |
+
+The validator slot is fixed by STD-005 Rule 9.2:
+`<Project>.Application.Contracts/<Module>/Validators/<DtoName>Validator.cs`.
+
+Field-level `[Required]` / `[StringLength]` / `[RegularExpression]`
+annotations on the DTO are acceptable **in addition to** the validator
+but do not replace it — cross-field structural rules (per 2.3) and
+`<Module>Consts` / `<Module>Keys` constant references (per 2.2) only
+live in the validator. The merge gate enumerates each input DTO under
+`Application.Contracts/<Module>/Dtos/` and blocks the merge when no
+matching `<DtoName>Validator.cs` exists in
+`Application.Contracts/<Module>/Validators/`.
+
 ---
 
 ### Rule 3 — Localization-key constants
@@ -367,6 +396,244 @@ The Phase 3 merge gate scans:
 
 ---
 
+### Rule 4 — Repository query discipline (`IQueryable` + `WhereIf`)
+
+**Anchor:** none — engine convention. Companion STD-005 rule: Rule 11
+(Manager carries node body). Companion STD-005 Rule 16 (soft-delete
+data-filter discipline) — `IQueryable` composition respects the ABP
+data filter exactly as `GetListAsync` does.
+
+#### 4.1 Read path — server-side composition then materialise
+
+Manager / repository code that **filters, orders, or paginates** rows
+composes the query server-side via `IQueryable<T>`. The materialising
+call is the last step.
+
+```csharp
+public async Task<ErrorOr<PagedResultDto<Appointment>>> GetByPhoneAsync(
+    GetAppointmentsByPhoneDto input, CancellationToken ct = default)
+{
+    var query = await _appointmentRepo.GetQueryableAsync();
+
+    query = query
+        .Where(a => a.PatientProfileId == input.PatientProfileId)
+        .WhereIf(input.FilterMode == "date-window",
+            a => a.AppointmentDateTime >= input.From!.Value &&
+                 a.AppointmentDateTime <= input.To!.Value)
+        .WhereIf(input.FilterMode == "active",
+            a => a.Status == AppointmentStatus.Pending ||
+                 a.Status == AppointmentStatus.Confirmed);
+
+    var totalCount = await AsyncExecuter.LongCountAsync(query, ct);
+    var items = await AsyncExecuter.ToListAsync(
+        query.OrderBy(input.Sorting ?? nameof(Appointment.AppointmentDateTime))
+             .PageBy(input),
+        ct);
+
+    return new PagedResultDto<Appointment>(totalCount, items);
+}
+```
+
+#### 4.2 Prohibited shapes
+
+- `GetListAsync(<predicate>)` where the predicate is **conditional**,
+  the result is paginated, or the row count is unbounded.
+- `.ToList()` / `.Where(...)` / `.OrderBy(...)` / `.Skip(...)` /
+  `.Take(...)` applied to a **materialised** `List<T>` to implement
+  filter / order / page semantics. Materialisation is the last step,
+  not the first.
+- Multiple round-trips that fetch and then re-query in memory when one
+  composed `IQueryable` expresses the same intent (e.g.,
+  `GetListAsync()` followed by `.Select(x => x.Id).ToList()` followed
+  by another `GetListAsync(x => ids.Contains(x.Id))`).
+
+#### 4.3 Bounded-lookup exemption
+
+Bounded reference / lookup tables — fixed small row count by design,
+documented in the entity node body — may use `GetListAsync()`
+(no predicate). Record the row-count budget in a one-line code comment
+on the call:
+
+```csharp
+// bounded: ≤ 50 active departments (FRS-004 § Reference data)
+var departments = await _departmentRepo.GetListAsync();
+```
+
+Anything else uses the `IQueryable` path.
+
+#### 4.4 Existence / count short-cuts
+
+Replace materialise-then-test patterns with the repository's
+`*Async` overloads:
+
+| Anti-pattern | Use instead |
+|---|---|
+| `(await _repo.GetListAsync(p)).Any()` | `await _repo.AnyAsync(p)` |
+| `(await _repo.GetListAsync(p)).Count > 0` | `await _repo.AnyAsync(p)` |
+| `(await _repo.GetListAsync(p)).Count` | `await _repo.CountAsync(p)` |
+| `(await _repo.GetListAsync(p)).FirstOrDefault()` | `await _repo.FirstOrDefaultAsync(p)` |
+| `(await _repo.GetListAsync(p)).Single()` | `await _repo.GetAsync(p)` |
+
+#### 4.5 Repository API binding
+
+- `await _repo.GetQueryableAsync()` returns ABP's `IRepository<T>`
+  queryable — extend with LINQ-to-EF operators.
+- `.WhereIf(condition, predicate)` is the ABP extension that
+  conditionally composes the predicate. On non-ABP projects substitute
+  the equivalent helper or write `if (condition) query = query.Where(...)`.
+- `.PageBy(input)` consumes `IPagedResultRequest` from the input DTO
+  (typically `PagedAndSortedResultRequestDto`); avoid hand-rolling
+  `Skip / Take` from `int Page` / `int PageSize` fields.
+- `AsyncExecuter.LongCountAsync` / `AsyncExecuter.ToListAsync`
+  materialise through ABP's provider-aware async executor; plain
+  `ToListAsync()` directly on the queryable also works under EF Core.
+
+#### 4.6 Merge-gate scan
+
+The Phase 3 merge gate scans `<Project>.Application/` and
+`<Project>.Domain/`:
+
+- `\.GetListAsync\s*\([^)]+\)` (predicate variant) followed within the
+  same statement / await-result by `.Skip(`, `.Take(`, `.Where(`,
+  `.OrderBy(`, `.Select(`, `.Any(`, `.Count` — collapse to the
+  composed `IQueryable` path or to a repository `*Async` short-cut.
+- `\.GetListAsync\s*\(\s*\)` (no-predicate variant) without an
+  adjacent `// bounded:` comment — flagged.
+
+Hits block the merge.
+
+---
+
+### Rule 5 — Aggregate-root encapsulation (builder-style mutation)
+
+**Anchor:** future STD-001 (DDD standards, placeholder). Companion
+STD-005 rules: Rule 11 (Manager carries node body), Rule 9.2 (Domain
+project folder layout). When STD-001 is authored, this rule migrates
+into it and STD-002 back-links.
+
+Every property on an `AggregateRoot`, `Entity`, or owned-type is
+**private-write at the language level**. Mutation goes through named
+methods on the aggregate that enforce the invariant they protect.
+
+#### 5.1 Property exposure
+
+- Computed projections: `{ get; }`.
+- Set-at-construction: `{ get; init; }` (preferred) or `{ get; private set; }`.
+- `public` setters on a domain type are prohibited.
+
+```csharp
+public class TimeSlot : AggregateRoot<Guid>
+{
+    public Guid DoctorId { get; private set; }
+    public DateTime StartTime { get; private set; }
+    public DateTime EndTime { get; private set; }
+    public TimeSlotStatus Status { get; private set; }
+
+    private TimeSlot() { }   // EF Core materialisation
+
+    public TimeSlot(Guid id, Guid doctorId,
+        DateTime startTime, DateTime endTime)
+    {
+        Id = id;
+        DoctorId = doctorId;
+        StartTime = startTime;
+        EndTime = endTime;
+        Status = TimeSlotStatus.Available;
+    }
+
+    public ErrorOr<Success> Book()
+    {
+        if (Status != TimeSlotStatus.Available)
+            return Error.Conflict(PatientPortalKeys.TimeSlotUnavailable);
+
+        Status = TimeSlotStatus.Booked;
+        return Result.Success;
+    }
+
+    public void Free() => Status = TimeSlotStatus.Available;
+}
+```
+
+#### 5.2 Mutation method naming
+
+Method names read as the transition (`Book`, `Free`, `Cancel`,
+`Activate`, `Deactivate`, `Approve`, `Reject`, `MoveToDepartment`),
+not as the mechanic (`SetStatus`, `UpdateStatus`, `ChangeStatus`).
+
+A mutation method that can fail a domain invariant returns
+`ErrorOr<Success>` (or `ErrorOr<T>` when it surfaces a value) — see
+Rule 1.
+
+#### 5.3 Collection encapsulation
+
+Public surface exposes a read-only view; the backing field is private;
+mutation goes through named methods.
+
+```csharp
+public class DoctorSchedule : AggregateRoot<Guid>
+{
+    public Guid DoctorId { get; private set; }
+
+    private readonly List<WorkingHoursEntry> _workingHours = new();
+    public IReadOnlyCollection<WorkingHoursEntry> WorkingHours => _workingHours;
+
+    public void AddWorkingHours(
+        int dayOfWeek, TimeOnly start, TimeOnly end, int slotMinutes)
+    {
+        _workingHours.Add(new WorkingHoursEntry(dayOfWeek, start, end, slotMinutes));
+    }
+
+    public void ClearWorkingHours() => _workingHours.Clear();
+}
+```
+
+EF Core configuration points the navigation at the backing field:
+
+```csharp
+builder.Metadata.FindNavigation(nameof(DoctorSchedule.WorkingHours))!
+    .SetPropertyAccessMode(PropertyAccessMode.Field);
+```
+
+#### 5.4 Constructors
+
+- One private parameterless constructor — EF Core's materialisation
+  surface; no domain logic.
+- One public constructor (or static factory method) per legitimate
+  birth path; accepts every value needed to satisfy invariants on
+  construction.
+- Public mutator methods (per 5.2) are the only other write path.
+
+#### 5.5 External write prohibition
+
+Direct `entity.Property = value` from outside the aggregate is
+prohibited in `Managers/`, `AppServices/`, `Controllers/`, and
+`DataSeedContributors/`. The Manager calls the named method:
+
+```csharp
+// PROHIBITED
+slot.Status = TimeSlotStatus.Booked;
+
+// REQUIRED
+var booking = slot.Book();
+if (booking.IsError) return booking.Errors;
+```
+
+#### 5.6 Merge-gate scan
+
+The Phase 3 merge gate scans `<Project>.Domain/**/*.cs`:
+
+- `public\s+[\w<>?]+\s+\w+\s*\{\s*get;\s*set;\s*\}` on any type whose
+  base is an `AggregateRoot` / `Entity` / owned-type — flagged.
+- Property assignment to a domain-entity-typed reference inside
+  `<Project>.Application/`, `<Project>.HttpApi/`,
+  `<Project>.Domain/**/Managers/`, `<Project>.Domain/**/DataSeed*` —
+  flagged unless the LHS is a property defined on the assigning type
+  itself (a Manager mutating its own private field is fine).
+
+Hits block the merge.
+
+---
+
 ## Consequences
 
 This standard binds every Domain Manager and AppService authored in a
@@ -381,6 +648,9 @@ This standard binds every Domain Manager and AppService authored in a
   set of merge-gate scans; STD-005's gate enforces the STD-002 rules
   on ABP projects. For non-ABP projects, the gate substitutes the
   project's equivalent exception type and validator-discovery shape.
+  The new Rule 2.5 (mandatory-validator), Rule 4 (repository query
+  discipline), and Rule 5 (aggregate-root encapsulation) scans
+  enumerated in each rule's body extend the merge gate's coverage.
 
 ## Project-specific deviations
 
@@ -401,3 +671,13 @@ justified and what the narrower rule is.
 - FluentValidation is replaced (e.g., by a source-generator-driven
   validator). Rule 2's tooling changes; the boundary between input
   shape (validator) and domain rule (Manager `ErrorOr`) does not.
+- ABP's `IRepository<T>.GetQueryableAsync()` / `.WhereIf` / `.PageBy`
+  / `AsyncExecuter` shape changes (e.g., the engine adopts a different
+  query-composition primitive). Rule 4's call-site surface changes;
+  the underlying contract (server-side composition; materialisation
+  is the last step) survives.
+- STD-001 (engine-level DDD constraints) is authored. Rule 5
+  (aggregate-root encapsulation) migrates from STD-002 to STD-001 and
+  this file back-links — Rule 5's substance survives the move
+  unchanged. STD-002's domain-layer scope narrows back to the
+  framework-agnostic application-layer patterns.
