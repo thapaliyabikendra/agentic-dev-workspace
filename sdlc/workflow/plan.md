@@ -22,7 +22,10 @@ event names, table names, route paths. Phase 1 names FLW (Trigger + Scenarios) a
 structures. Phase 2 names ACT (when the FRS declares `produced_actor:` — Description +
 Goals + business Preconditions + Flows initiated + Commands triggered + Queries issued +
 PERM-NNN refs all authored at birth) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY
-structures, enriches the Phase-1-born FLW with wiring (`related:` populated, Sequence,
+structures — plus any NDF-declared custom-type nodes whose abbreviation appears in the
+target component's `node_definitions:` (per
+[`../../docs/shared/adrs/ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)) —
+enriches the Phase-1-born FLW with wiring (`related:` populated, Sequence,
 Branches, Compensating actions, structural Postconditions), and consumes the
 Phase-1-born CHGs via FS `consumes_chgs:` for structural enrichment (`modifies[]`
 before/after, `adds[]`, `migration_steps[]`). Phase 3 writes code, applies CHG deltas,
@@ -33,6 +36,23 @@ what this forbids — payload bodies are.)
 session memory; the `/clear` between Phase 1.5 and Phase 2 enforces this.**
 Cross-cutting rule canonical home: [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 "Plans contain no syntax".
+</HARD-GATE>
+
+<HARD-GATE>
+**HARD-GATE — Phase 2 type-validity check.** Do NOT ingest a
+Phase-2-born canonical node whose type abbreviation is in **neither** (a)
+the engine-default 15-type catalog (ACT / ENT / CMD / QRY / FLW / STA /
+DEC / INT / MOD / SCR / CON / PERM / SVC / FA / EVT — per
+[`../KB-LAYOUT.md`](../KB-LAYOUT.md)) **nor** (b) the target component's
+`node_definitions:` frontmatter on its `COMPONENT.md` (NDF-declared per
+[`../../docs/shared/adrs/ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).
+A node whose type-abbreviation is unknown to both surfaces is rejected at
+Phase 2 FS validation as a **Blocker**. Pre-existing canonical nodes that
+predate ADR-039 carry no `declared_via:` pointer and are grandfathered (per
+ADR-039 § Brownfield impact). This is the **canonical enforcement home**;
+the wording is identical to its restatement in `WORKFLOW.md § Validation
+gates` and `maintenance-discipline.md § Files to touch on an NDF edit`
+per CLAUDE.md Rule 13 defense-in-depth.
 </HARD-GATE>
 
 ---
@@ -295,6 +315,8 @@ the file is never created — and that is fine.
 | ACT (Phase 1 claim, before file birth) | FRS frontmatter `produced_actor:` glob across the milestone's `frs/` folder |
 | CHG | milestone `chg/` folder glob (filenames are `CHG-NNN-<slug>.md`); CR track: `docs/change-requests/CR-NNN-<slug>/chg/`; pre-cutover grandfathered: `specs/FS-NNN-<slug>/nodes/changes/` |
 | TC | milestone `specs/**/test-plans/**/TC-*.md` glob (TCs nest under `specs/FS-NNN-<slug>/test-plans/<use-case>/`) |
+| NDF | `docs/<component>/node-definitions/index.md` (per-component); `docs/shared/node-definitions/index.md` (cross-component promotions) |
+| NDF-declared instance types (per-component custom types — e.g., `{PREFIX}-ALG-NNN`, `{PREFIX}-SCN-NNN`) | per-type `docs/<component>/nodes/<folder>/index.md` where `<folder>` matches the declaring NDF's `folder:` field |
 
 Counters are per-(component, type); see [`../KB-LAYOUT.md → Counter scope`](../KB-LAYOUT.md).
 Retired IDs are not reused. Across milestones, IDs are globally unique.
@@ -382,9 +404,10 @@ place** — same file, body content added, `related:` populated, `status:` uncha
 (`proposed`). Both fire the 2-file touch independently.
 
 **(a) New Phase-2-born nodes.** For every node ID in the FRSs' `produces_nodes:`
-(ENT / CMD / STA / CON / INT / DEC / PERM / QRY) and for the ACT-NNN claimed in
-`produced_actor:` (when set), write the node file **directly to canonical** with
-`status: proposed`:
+(ENT / CMD / STA / CON / INT / DEC / PERM / QRY — plus any NDF-declared
+custom-type abbreviations registered in the target component's
+`node_definitions:`) and for the ACT-NNN claimed in `produced_actor:` (when
+set), write the node file **directly to canonical** with `status: proposed`:
 
 ```
 docs/<component>/nodes/<type>/<ID>-<slug>.md
@@ -779,6 +802,11 @@ close.
       promoted to a DEC, or raised as `OQ-NNN`.
 - [ ] Every new node has `source_ref` populated (`frs:`, `fs:`, `op: introduce`). Optional
       `section:` key naming the specific FRS heading improves traceability.
+- [ ] **Phase 2 type-validity check** (per §A.2 HARD-GATE). Every node-type
+      abbreviation in `produces_nodes:` is in **either** the engine-default
+      15-type catalog **or** the target component's `node_definitions:`
+      frontmatter. Unknown type-abbreviations are **Blockers**. Pre-existing
+      canonical nodes are grandfathered (per ADR-039 § Brownfield impact).
 - [ ] Every CHG `modifies[]` entry consumed by this FS is recorded as `op: modify`
       in `id-claims.md` (R-NEW-9 amended 2026-05-17 — introduce rows no longer
       written; the per-type `index.md` row for each new node is the introduce

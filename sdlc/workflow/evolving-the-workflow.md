@@ -12,6 +12,14 @@
 > If an existing type covers ≥60% of the new shape, **extend that
 > type** — do not coin. Coining without the discriminator pollutes
 > the workflow with parallel types that only differ in name.
+>
+> The shape-coverage check applies equally to **NDF coining** (per
+> [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)) —
+> the walk covers the engine-default 15-type catalog **plus** every
+> existing NDF in the target component's `node_definitions:` **plus** every
+> NDF promoted to `docs/shared/node-definitions/`. See §A.1 in
+> [`../../docs/exploration/EXP-NDF-engine-diffs.md`](../../docs/exploration/EXP-NDF-engine-diffs.md)
+> for the canonical NDF shape-coverage HARD-GATE wording.
 > (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 > "Existing nodes are authoritative — adapt the template, don't
@@ -86,7 +94,8 @@ escape hatch.
 ## Anti-Pattern: "The Motivated Invention"
 
 Coining a new node type because the in-flight FS "needs" one — without
-walking the 13 existing types and answering whether one covers ≥60%
+walking the engine-default 15-type catalog (plus every existing NDF in the
+target component's `node_definitions:`) and answering whether one covers ≥60%
 of the new shape. The cost: the methodology grows parallel types that
 only differ in naming convention (e.g., a "ProcessFlow" node coined
 alongside the existing FLW because "flows" felt too generic for the
@@ -110,8 +119,10 @@ sequentially — refine first, invent last.
    (current milestone plus the next). Single-instance concerns
    collapse into an ADR (cross-cutting) or DEC (node-scoped) — see
    [`authoring-adr.md → When to file a Standard, ADR, or DEC`](authoring-adr.md#when-to-file-a-standard-adr-or-dec-the-3-way-discriminator).
-2. **No existing type carries the semantics naturally.** Walk the 13
-   types in [`../KB-LAYOUT.md`](../KB-LAYOUT.md).
+2. **No existing type carries the semantics naturally.** Walk the
+   engine-default 15-type catalog in [`../KB-LAYOUT.md`](../KB-LAYOUT.md),
+   plus every existing NDF in the target component's `node_definitions:` and
+   every cross-component-promoted NDF in `docs/shared/node-definitions/`.
    If one covers ≥60% of the new type's shape, extend that type's
    template rather than coining a new one.
 3. **The new type has its own lifecycle or index behavior** that the

@@ -306,3 +306,99 @@ gaps STD-002/STD-005 did not yet enforce.
   gained `repository-query, encapsulation`; rule count in the index
   row bumped `3 rules → 5 rules`. STD-002 `applies_when` unchanged
   (`stack: [api]`).
+
+## [2026-05-19] plan-consolidated | ADR-039 NDF rollout — STD-004 NDF analog paragraph + 9 engine-file extensions + 2 HARD-GATEs
+
+Source: plan `validate-or-refine-the-warm-yeti.md` (Stage 6 execution
+of the NDF-introduction plan). Stage 1 landings (`sdlc/_templates/NDF.md`,
+`docs/shared/adrs/ADR-039`, 5-way discriminator in
+`sdlc/workflow/authoring-adr.md`) are verified intact; this entry
+covers the Stage 6 engine-file diffs only.
+
+- **STD-004 — NDF as per-component analog paragraph + bidirectional
+  escalation (NDF ↔ STD-004) + filename rename (D2 applied).** Appended
+  two paragraphs to the `## Standards` body of
+  `sdlc/standards/STD-004-node-definitions.md` (renamed in the same
+  atomic operation from `sdlc/standards/node-definitions.md` per D2
+  user authorization at Stage 6 close — consistency with STD-002 /
+  STD-005 / STD-006 filename convention). Paragraph 1 explains NDF
+  (per ADR-039) is the operative per-component path that fires now
+  while STD-004 remains deferred for cross-project contracts.
+  Paragraph 2 records the bidirectional escalation rule — when an
+  NDF's contract surfaces a generalization that should apply across
+  projects, STD-004 absorbs it per the file's own `## Revisit if`
+  clause; the NDF remains as the per-component instance, STD-004
+  holds the cross-project contract. STD-004 stays `status: deferred`;
+  `sdlc/standards/index.md` row re-synced — link target changed to
+  `STD-004-node-definitions.md`, Status drift fixed `proposed →
+  deferred`, Tags drift fixed `placeholder → deferred`, title
+  parenthetical refreshed to cite NDF as the per-component analog.
+  Pre-existing status / tags drift was discovered during the
+  defense-in-depth audit and folded into this atomic operation.
+  `git mv` used for the rename to preserve history.
+
+- **Engine file extensions — 9 files updated for ADR-039.** Wiring
+  passes anchored by ADR-039:
+  - `sdlc/_templates/COMPONENT.md` — `node_definitions: []` frontmatter
+    field added; `## Node definitions` body section added after
+    `## Depends on`.
+  - `sdlc/_templates/FRS.md` — `produces_nodes:` and `touches_nodes:`
+    field comments extended to cover NDF-declared custom-type
+    abbreviations; Phase 2 type-validity HARD-GATE referenced.
+  - `sdlc/KB-LAYOUT.md` — engine-default 15-type catalog note added
+    after the lazy-folders paragraph; new `## Node definitions
+    (per-component custom types)` section added with per-component +
+    cross-component-promotion folder trees.
+  - `sdlc/WORKFLOW.md` — FRS-flow narrative extended (line 33-34 in the
+    Overview paragraph; corrected from input plan's 35-37 — see E1);
+    `### Validation gates` subsection gained both HARD-GATE
+    defense-in-depth restatements.
+  - `sdlc/workflow/plan.md` — five edits: (1) Phase 2 ingest paragraph
+    extended; (2) ID-ceiling table gained NDF + NDF-declared-instance
+    rows; (3) `(a) New Phase-2-born nodes` paragraph extended; (4) new
+    Phase 2 type-validity `<HARD-GATE>` callout (canonical home);
+    (5) `## 6. FS validation loop` checklist gained type-validity row.
+  - `sdlc/workflow/new-component-bootstrap.md` — three edits: Step 1
+    COMPONENT.md authoring instruction gained `node_definitions:` field;
+    Phase 2 trigger description extended; Component bootstrap checklist
+    gained `node_definitions:` populated row. Lines 109-117 dropped per
+    E9 (prefix-schema block, not a type catalog).
+  - `sdlc/workflow/evolving-the-workflow.md` — three edits: anti-pattern
+    body fixed 13→15 drift (per E3); discriminator step 2 fixed 13→15
+    drift + extended to walk NDFs; top HARD-GATE block extended to
+    apply equally to NDF coining.
+  - `sdlc/workflow/maintenance-discipline.md` — new `## Files to touch
+    on an NDF edit` section added after `## Files to touch on a CCC
+    edit`, before `## Cross-reference guard at edit time`. Section
+    carries both HARD-GATE defense-in-depth restatements.
+  - `docs/home.md` — IDs convention list gained NDF-NNN (unqualified
+    for shared promotions) and `{PREFIX}-NDF-NNN` (per-component).
+
+- **Two top-of-tree HARD-GATEs landed per CLAUDE.md Rule 13
+  defense-in-depth.** Wording identical at each landing site (only
+  relative-link paths differ). Canonical home is single per gate;
+  restatements at ≥2 additional files.
+  - **HARD-GATE — NDF shape-coverage walk required.** Canonical home:
+    `sdlc/workflow/evolving-the-workflow.md` (top HARD-GATE block
+    extension). Restatements: `sdlc/WORKFLOW.md § Validation gates`,
+    `sdlc/workflow/maintenance-discipline.md § Files to touch on an
+    NDF edit`.
+  - **HARD-GATE — Phase 2 type-validity check.** Canonical home:
+    `sdlc/workflow/plan.md` (new top-of-file `<HARD-GATE>` callout
+    naming itself as the canonical enforcement home). Restatements:
+    `sdlc/WORKFLOW.md § Validation gates`,
+    `sdlc/workflow/maintenance-discipline.md § Files to touch on an
+    NDF edit`.
+
+- **Errata applied (corrections to the input plan, captured in
+  `docs/exploration/EXP-NDF-engine-diffs.md` § E).** E1 WORKFLOW.md
+  line range 35-37 → 33-34; E2 STD-004 path
+  `STD-004-node-definitions.md` → `node-definitions.md`; E3 engine
+  type-count drift 13 → 15 fixed at both occurrences in
+  `evolving-the-workflow.md`; E9 new-component-bootstrap.md lines
+  109-117 confirmed as prefix-schema (no diff); plus a
+  validation-discovered missing field on `COMPONENT.md` template
+  (`node_definitions:`) added in the same pass.
+
+- **EXP-NDF-engine-diffs.md status flip.** `status: proposed →
+  applied`; the file remains as Stage-6 audit trail.

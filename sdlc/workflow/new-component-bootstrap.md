@@ -42,11 +42,13 @@ motivates it; finish bootstrap before the first node ingest.
   at Phase 1 — R-NEW-2a retired 2026-05-17. Pure ACT-into-new-component
   cases route through the Phase 2 trigger below.)
 - **Phase 2 (FS authoring)** — bootstrap fires if the FS introduces a
-  new component via `produces_nodes:` (ACT / ENT / CMD / STA / etc.) or
-  via a Phase-2-born ACT (per the FRS's `produced_actor:`) and the
-  component has not yet been bootstrapped at Phase 1 (i.e., the FRS
-  this FS implements did not introduce a FLW into the new component,
-  but Phase 2 does introduce a Phase-2-born node — including ACT).
+  new component via `produces_nodes:` (ACT / ENT / CMD / STA / … — or
+  any NDF-declared custom-type abbreviation registered on the new
+  component's `node_definitions:`) or via a Phase-2-born ACT (per the
+  FRS's `produced_actor:`) and the component has not yet been
+  bootstrapped at Phase 1 (i.e., the FRS this FS implements did not
+  introduce a FLW into the new component, but Phase 2 does introduce a
+  Phase-2-born node — including ACT or any NDF-declared node).
   Rare — most new components are introduced by an FRS that births at
   least one FLW.
 - **Absorption** — bootstrap fires when a legacy doc absorption brings
@@ -84,7 +86,13 @@ When adding a new standalone deployable component to the workspace:
    `docs/*/COMPONENT.md` files — no duplicates allowed across the workspace).
 2. Create `docs/<component-slug>/COMPONENT.md` from
    [`sdlc/_templates/COMPONENT.md`](../  _templates/COMPONENT.md).
-   Set: `id_prefix`, `title`, `type: standalone`, `depends_on`.
+   Set: `id_prefix`, `title`, `type: standalone`, `depends_on`,
+   `node_definitions:` (list of `{PREFIX}-NDF-NNN` IDs the component will
+   author for custom node types — empty list `[]` is the default; populated
+   only when the component coins NDFs per
+   [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)
+   and the NDF shape-coverage HARD-GATE in
+   [`evolving-the-workflow.md`](evolving-the-workflow.md)).
 
 ## Step 2 — Create the initial node folders (lazy)
 
@@ -146,6 +154,8 @@ go.*
 ## Component bootstrap checklist
 
 - [ ] `docs/<component-slug>/COMPONENT.md` created with `id_prefix:` set
+- [ ] `docs/<component-slug>/COMPONENT.md` `node_definitions:` populated
+      (list of NDF IDs the component will author, or `[]` if none)
 - [ ] At least one `nodes/<type>/` folder created (only types needed immediately)
 - [ ] `index.md` created in each type folder
 - [ ] Component inventory table in `sdlc/LAYOUT.md` updated

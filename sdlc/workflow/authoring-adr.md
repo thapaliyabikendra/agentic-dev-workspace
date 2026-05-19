@@ -6,17 +6,21 @@
 > as a maintenance activity inside Phase 0 / 1 / 2 (occasionally
 > standalone); the Phase 3 QA gate consumes the result.
 
-> **HARD-GATE:** Do NOT author an ADR until the **4-way discriminator**
-> below has been run — STD vs ADR vs CCC vs DEC. The discriminator is not
-> a one-time gate; re-apply it whenever a DEC's `related:` set or scope
-> expands, or when an inline CCC commitment broadens into a project-wide
-> NFR default (see *Scope-creep re-application*). Authoring an ADR for a
-> rule that should be a Standard pollutes the project-specific
+> **HARD-GATE:** Do NOT author an ADR until the **5-way discriminator**
+> below has been run — STD vs ADR vs CCC vs NDF vs DEC. The discriminator
+> is not a one-time gate; re-apply it whenever a DEC's `related:` set or
+> scope expands, when an inline CCC commitment broadens into a project-wide
+> NFR default, or when an NDF's contract surfaces a cross-project
+> generalization (see *Scope-creep re-application*). Authoring an ADR for
+> a rule that should be a Standard pollutes the project-specific
 > commitment store; authoring for a rule that should be a DEC over-weights
 > a node-local decision; authoring for a rule that should be a CCC strands
-> it outside the NFR-baseline retrieval path. (Cross-cutting rule:
-> [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-> "Four governance sources: STD / ADR / CCC / DEC".)
+> it outside the NFR-baseline retrieval path; authoring for a rule that
+> should be an NDF (per-component custom node-type declaration) misses
+> the contract-enforceability the NDF-validator provides. (Cross-cutting
+> rule: [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
+> "Five governance sources: STD / ADR / CCC / NDF / DEC". NDF spec:
+> [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).)
 
 ## When to Use
 
@@ -66,6 +70,9 @@ digraph adr_discriminator {
     q3       [shape=diamond, label="Constrains FUTURE\nfeatures in THIS project?\n(stack, layering, tooling,\nframework idiom)"];
     adr      [shape=doublecircle, label="ADR-NNN\n(docs/<component>/adrs/\nor docs/shared/adrs/)"];
 
+    q3a      [shape=diamond, label="Declares a per-component\ncustom node-type shape?\n(>=3 instances, 60% gate,\ndistinct lifecycle/index)"];
+    ndf      [shape=doublecircle, label="{PREFIX}-NDF-NNN\n(docs/<component>/node-definitions/)\n[per ADR-039]"];
+
     q4       [shape=diamond, label="Standalone trigger?\n(related: spans >=2 nodes,\nlifecycle, length,\nexternal citation)"];
     decstd   [shape=doublecircle, label="Standalone DEC-NNN\n(docs/<component>/nodes/decisions/)"];
     decinl   [shape=doublecircle, label="Inline DEC\n(host node's\n## Decisions block)"];
@@ -76,20 +83,25 @@ digraph adr_discriminator {
     q2 -> ccc [label="yes"];
     q2 -> q3  [label="no"];
     q3 -> adr [label="yes"];
-    q3 -> q4  [label="no"];
+    q3 -> q3a [label="no"];
+    q3a -> ndf [label="yes"];
+    q3a -> q4  [label="no"];
     q4 -> decstd [label="yes"];
     q4 -> decinl [label="no"];
 }
 ```
 
-Order the questions as drawn — STD first, CCC second, ADR third, DEC last.
-Prefer the narrowest classification when multiple seem to apply, then
-lift upward (DEC → ADR → CCC → STD) only when the underlying rule is
-genuinely re-applicable. CCC and ADR are not competitors: a CCC is the
-*baseline default* (what happens absent a deviation); an ADR captures the
-*deviation* that overrides the CCC for a specific operation or scope.
-Tired-solo-dev-at-midnight test: every diamond has a yes/no answer with
-no third option.
+Order the questions as drawn — STD first, CCC second, ADR third, NDF
+fourth, DEC last. Prefer the narrowest classification when multiple seem
+to apply, then lift upward (DEC → NDF → ADR → CCC → STD) only when the
+underlying rule is genuinely re-applicable. CCC and ADR are not
+competitors: a CCC is the *baseline default* (what happens absent a
+deviation); an ADR captures the *deviation* that overrides the CCC for a
+specific operation or scope. NDF and ADR are also not competitors: an
+ADR is a workspace commitment ("we choose Playwright"); an NDF is a
+per-component node-type contract ("Algorithm nodes have these fields and
+allowed relations"). Tired-solo-dev-at-midnight test: every diamond has
+a yes/no answer with no third option.
 
 ## Anti-Pattern: "The Premature ADR"
 
@@ -119,7 +131,7 @@ deviations from CCC baselines. They are not a phase; they're a maintenance
 activity that fires from inside Phase 0, Phase 1, or Phase 2 (and
 occasionally standalone). The Phase 3 QA gate consumes them.
 
-## When to file a STD, CCC, ADR, or DEC (the 4-way discriminator)
+## When to file a STD, CCC, ADR, NDF, or DEC (the 5-way discriminator)
 
 > **Standard (STD)** if the rule applies to **any project** using this
 > methodology (DDD constraints, framework idioms, node-contract rules,
@@ -146,6 +158,16 @@ occasionally standalone). The Phase 3 QA gate consumes them.
 > discriminator in [`BOUNDARY.md`](../BOUNDARY.md#component-structure-docs)).
 > ID prefix `ADR-NNN`.
 >
+> **NDF (Node Definition Node)** if it **declares a per-component custom
+> node-type shape** — frontmatter contract, body sections, allowed
+> `related:` types, lifecycle vocabulary — for a type the engine-default
+> 15-type catalog does not carry naturally (per the 60% shape-coverage
+> gate in [`evolving-the-workflow.md`](evolving-the-workflow.md)). Lives
+> in `docs/<component>/node-definitions/`; cross-component promotions
+> land at `docs/shared/node-definitions/`. ID prefix
+> `{COMPONENT-PREFIX}-NDF-NNN` (or unqualified `NDF-NNN` for the
+> brownfield-exempt APP component). Spec: [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).
+>
 > **DEC** if it's a **node-local atomic decision** that shapes one node's
 > behavior. Lives inline under the node's `## Decisions` heading, or
 > standalone under `docs/<component>/nodes/decisions/`. ID prefix `DEC-NNN`
@@ -159,13 +181,19 @@ A tired solo dev at midnight should be able to apply this. Order the questions:
    absorb unless it explicitly deviates?** Yes → CCC. No → continue.
 3. **Does it constrain how we'd design future features we haven't met yet in
    this project, or capture a one-time deviation from a CCC?** Yes → ADR.
-   No → DEC.
-4. **For a DEC**: would inline placement in the owning node serve discovery
+   No → continue.
+4. **Does it declare a per-component custom node-type shape that the
+   engine-default 15-type catalog does not cover (≥3 expected instances,
+   distinct lifecycle/index/cross-ref shape, 60% shape-coverage gate
+   passes)?** Yes → NDF. No → continue.
+5. **For a DEC**: would inline placement in the owning node serve discovery
    better than a standalone file? See *Inline vs standalone DEC* below.
 
 If multiple seem to apply, prefer the narrowest. Then if the underlying rule
-is genuinely re-applicable, lift it upward (DEC → ADR → CCC → STD) and have
-the narrower artifact reference the broader one.
+is genuinely re-applicable, lift it upward (DEC → NDF → ADR → CCC → STD) and
+have the narrower artifact reference the broader one. NDF → STD-004
+promotion is the cross-project absorption path when a per-component
+type-shape generalizes (per STD-004's `## Revisit if`).
 
 ### Worked examples
 
@@ -175,6 +203,7 @@ the narrower artifact reference the broader one.
 | "Audit-log retention is 7 years by default; operations may extend it via ADR" | **CCC-NNN** (Auditing / Retention category) | Project-wide NFR default. Operation-specific extensions are ADRs back-linked to the CCC. |
 | "REST endpoints in the customer-facing API use `/v1/...` versioning and return RFC-7807 problem details on error" | **ADR** with `stack: [api]` | Project-specific API convention; constrains how every future API feature is designed. Not engine-universal (other projects may use gRPC, GraphQL, or unversioned routes). |
 | "The customer-portal UI uses TanStack Router with file-based routes" | **ADR** with `stack: [ui]` | Project-specific UI commitment; stack scope narrows to UI alone. |
+| "FDE's Algorithm nodes (Haversine, Welford, Z-score, IQR) carry `algorithm_family:`, `java_class:`, `used_by:` and live under `nodes/algorithms/`" | **NDF** (FDE-NDF-001) | Per-component custom node-type shape; ≥3 expected instances; engine-default catalog covers <60%; distinct frontmatter + body contract. Per ADR-039. |
 | "For this single workflow, the BG-number generator skips numbers ending in `13`" | **DEC** (inline under the owning command node) | Node-local quirk; no future feature consumes it. |
 | "Audit retention for legal-hold flags is 25 years instead of the baseline 7" | **ADR** back-linked to the Auditing CCC | A documented deviation from the CCC default for one operation. Baseline stays in CCC; deviation captured in ADR. |
 
@@ -342,7 +371,7 @@ indexes — regenerated on demand, not hand-edited per event.) See
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Four governance sources: STD / ADR / CCC / DEC" is the
+  — "Five governance sources: STD / ADR / CCC / NDF / DEC" is the
   doctrinal anchor of this flow's HARD-GATE; "Tiered touch for
   canonical edits" governs every ADR `created` / `linked` /
   `status-change` / `superseded` event.

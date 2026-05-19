@@ -47,6 +47,13 @@ The lazy folders (`queries/`, `modules/`, `screens/`, `contracts/`,
 `permissions/`, `services/`, `functional-areas/`, `events/`) are created **lazily
 on first Phase 2 ingest of that type.**
 
+This is the **engine-default 15-type catalog**. Per-component custom node
+types are declared via NDF (Node Definition Node) per
+[`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md) and
+live under `docs/<component>/node-definitions/` (per-component) or
+`docs/shared/node-definitions/` (cross-component promotion). See
+`## Node definitions (per-component custom types)` below.
+
 Each node-type folder gets only an `index.md` companion (no `log.md`) — per the
 2026-05-16 rule change in
 [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
@@ -204,6 +211,40 @@ deprecated`. Per-CCC page template:
 [`_templates/CROSS-CUTTING-CONCERNS.md`](_templates/CROSS-CUTTING-CONCERNS.md)
 (one file per concern; the retired v0.1 flat doc is not a template).
 ADRs that override a CCC default carry `related: [CCC-NNN]`.
+
+## Node definitions (per-component custom types)
+
+`docs/<component>/node-definitions/` is a parallel canonical tree for
+**per-component custom node-type declarations** — Algorithm nodes,
+Scenario nodes, Store nodes, etc. — for shapes the engine-default 15-type
+catalog does not carry naturally. NDF (Node Definition Node) is the fifth
+governance kind alongside STD / ADR / CCC / DEC, per
+[`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).
+
+```
+docs/<component>/node-definitions/   # per-component NDF tree (lazy)
+  index.md                           # Karpathy-style content catalog
+  {PREFIX}-NDF-NNN-<slug>.md         # NDF instances; instances of the
+                                     # declared type live under
+                                     # docs/<component>/nodes/<folder>/
+                                     # per the NDF's `folder:` field
+
+docs/shared/node-definitions/         # cross-component promotions (lazy)
+  index.md
+  NDF-NNN-<slug>.md                  # unprefixed after promotion ADR
+```
+
+No `node-definitions/log.md` — chronological audit is git history (canonical
+`log.md` retired 2026-05-16). Lazy-create the folder + `index.md` on first
+NDF instance, per
+[`workflow/maintenance-discipline.md → Lazy creation`](workflow/maintenance-discipline.md#lazy-creation).
+NDF template: [`_templates/NDF.md`](_templates/NDF.md) (top-level — NDF
+*declares* types but is not itself a node-type instance).
+
+Each NDF declares the contract (frontmatter, body sections, allowed
+`related:` types, lifecycle) for its declared type. Phase 2 ingest validates
+new nodes against the contract per the **Phase 2 type-validity HARD-GATE**
+(§A.2 in `docs/exploration/EXP-NDF-engine-diffs.md`).
 
 ---
 

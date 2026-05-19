@@ -31,8 +31,11 @@ the new FLW (Trigger + Scenarios, business language) born to canonical with
 CHG-NNN (behavior-language `modifies[]` only — one CHG per FRS) born to its
 milestone-scoped permanent home with `status: draft`. The **FS flow** Ingests
 structure + wiring: new ACT (when the FRS declares a new actor role via
-`produced_actor:`) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY nodes land
-in canonical with `status: proposed`, the Phase-1-born FLW is enriched in
+`produced_actor:`) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY nodes —
+plus any NDF-declared custom-type nodes whose abbreviation appears in the
+target component's `node_definitions:` per
+[`docs/shared/adrs/ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md) —
+land in canonical with `status: proposed`, the Phase-1-born FLW is enriched in
 place with `related:` wiring + Sequence + Branches + Compensating actions +
 structural Postconditions + Decisions, and the FS declares `consumes_chgs:`
 listing the per-FRS-born CHGs it owns — enriching each with structural
@@ -295,6 +298,37 @@ fix, or escalating to a full FRS when the fix requires design work.
 Each phase ends with a checklist before the next begins. These prevent
 compounding error. A bad FRS becomes a bad node update becomes a bad spec
 becomes bad code.
+
+**Engine-extension HARD-GATEs (per [ADR-039](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).**
+Two top-of-tree HARD-GATEs land here as defense-in-depth summaries;
+canonical homes are `workflow/evolving-the-workflow.md` (shape-coverage)
+and `workflow/plan.md` (type-validity).
+
+> **HARD-GATE — NDF shape-coverage walk required.** Do NOT coin a new Node
+> Definition Node (NDF) until the 60% shape-coverage walk has been run
+> against (a) the engine-default 15-type catalog in
+> [`KB-LAYOUT.md`](KB-LAYOUT.md) and (b) every existing NDF in the target
+> component's `node_definitions:` plus every NDF promoted to
+> `docs/shared/node-definitions/`. If any existing type covers ≥60% of the
+> new shape, **extend that type** (the existing type's template, or the
+> existing NDF's contract) — do not coin. Record the walk in the NDF's
+> `shape_coverage_walk:` frontmatter and the prose narrative in
+> `## Shape-coverage walk`. (NDF spec:
+> [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md);
+> engine-evolution 60% gate:
+> [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md).)
+
+> **HARD-GATE — Phase 2 type-validity check.** Do NOT ingest a
+> Phase-2-born canonical node whose type abbreviation is in **neither** (a)
+> the engine-default 15-type catalog (ACT / ENT / CMD / QRY / FLW / STA /
+> DEC / INT / MOD / SCR / CON / PERM / SVC / FA / EVT — per
+> [`KB-LAYOUT.md`](KB-LAYOUT.md)) **nor** (b) the target component's
+> `node_definitions:` frontmatter on its `COMPONENT.md` (NDF-declared per
+> [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).
+> A node whose type-abbreviation is unknown to both surfaces is rejected at
+> Phase 2 FS validation as a **Blocker**. Pre-existing canonical nodes that
+> predate ADR-039 carry no `declared_via:` pointer and are grandfathered
+> (per ADR-039 § Brownfield impact).
 
 ### Inline dispatch shape for gates
 

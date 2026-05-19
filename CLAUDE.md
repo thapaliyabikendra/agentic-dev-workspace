@@ -13,12 +13,14 @@ relevant flow file are loaded. Applies across sessions.
 
 1. DDD nodes in `docs/<component>/nodes/` are truth. Node ↔ spec
    conflict → node wins or reconcile both.
-2. Four governance sources: STD / ADR / CCC / DEC.
+2. Five governance sources: STD / ADR / CCC / NDF / DEC.
    Discriminator: [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).
    STDs: `sdlc/standards/` (stack-conditional via `applies_when:`).
    CCCs: `docs/shared/ccc/` (NFR baselines; ADRs back-link for deviations).
    Component ADRs: `docs/<component>/adrs/`.
    Cross-component ADRs: `docs/shared/adrs/`.
+   NDFs: `docs/<component>/node-definitions/` (per-component custom node-type
+   declarations; ADR-039).
    Node-local: inline or `docs/<component>/nodes/decisions/`.
 3. Reference, never copy. Link by ID.
 4. Existing nodes are authoritative — adapt the template, don't retrofit.
