@@ -1,6 +1,8 @@
 ---
 name: workflow-index
 description: "Single-read routing table for sdlc/workflow/. Read this file first; find your category; drill into exactly one file."
+applies_when:
+  stack: [agnostic]
 ---
 
 # Workflow Index
@@ -10,10 +12,10 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 
 > **Cross-cutting rules survive `/clear`.**
 > [`CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) auto-loads in every
-> session, so the advisor() call gate, TaskCreate phase-mirror rule, multi-stage
-> progress-checklist rule, and `/clear`-at-flow-boundary rule (including the
-> QA-track per-flow `/clear`) are always in force. Flow files below assume
-> those rules; they do not re-state them.
+> session, so the advisor() call gate, multi-stage progress-checklist rule,
+> and `/clear`-at-flow-boundary rule (including the QA-track per-flow `/clear`)
+> are always in force. Flow files below assume those rules; they do not
+> re-state them.
 
 ---
 
@@ -31,13 +33,13 @@ description: "Single-read routing table for sdlc/workflow/. Read this file first
 
 ## QA track flow files — load at QA-track flow entry / `/clear` boundary
 
-The QA track is **trigger-independent** — three flows that consume dev-track outputs on their own cadence, each with its own `/clear` boundary.
+The QA track is **trigger-independent** — two flows that consume dev-track outputs on their own cadence (the second flow runs as one session with two stages: codegen-stage + gate-stage). `/clear` boundaries: QA-track entry (into `test-plan-ingest`) and between `test-plan-ingest` ↔ `test-suite-codegen` (entry to the codegen+gate combined flow). `test-suite-codegen` → `qa-gate` is a **stage transition inside one flow** — no `/clear` — per CLAUDE.md Rule 5.
 
 | File | One-line summary | Entry contract |
 |------|-----------------|----------------|
 | [test-plan-ingest.md](test-plan-ingest.md) | First QA flow — ingests TC files for every FRS use case; sets `test_plan_path` frontmatter; fills FRS test-plan-view table | FS validation passed (after `plan.md` exit) |
-| [test-suite-codegen.md](test-suite-codegen.md) | Second QA flow — generates Playwright test spec files from TC markdown, one spec per use-case sub-folder | TC selectors resolved against real DOM; Stage 2 Code complete (after `implementation.md` exit) |
-| [qa-gate.md](qa-gate.md) | Third QA flow — QA verification checklist, ADR-conformance check, code-quality gates, FS status flip to `implemented` | `test-suite-codegen.md` generation report emitted |
+| [test-suite-codegen.md](test-suite-codegen.md) | Codegen-stage of the combined codegen+gate flow. Generates Playwright test spec files from TC markdown, one spec per use-case sub-folder | TC selectors resolved against real DOM; Stage 2 Code complete (after `implementation.md` exit) |
+| [qa-gate.md](qa-gate.md) | Gate-stage of the combined codegen+gate flow — QA verification checklist, ADR-conformance check, code-quality gates, FS status flip to `implemented`. **Shares session with `test-suite-codegen.md`; gate-side verification re-reads FS/FRS/ADRs as if fresh — session-share is for token economy, not skipping checks.** | `test-suite-codegen.md` generation report emitted |
 
 ---
 
@@ -46,7 +48,7 @@ The QA track is **trigger-independent** — three flows that consume dev-track o
 | File | One-line summary | When to load |
 |------|-----------------|--------------|
 | [authoring-adr.md](authoring-adr.md) | Land an ADR — pick artifact type, file it, wire cross-references, run supersession path | Phase 0/1/2 or standalone when an architectural commitment needs recording |
-| [maintenance-discipline.md](maintenance-discipline.md) | 2-file touch rule for canonical edits (node, ADR, CCC uniformly = artifact + per-type `index.md`; (base+N) for related edges). Canonical `log.md` retired 2026-05-16. | Any canonical-node, ADR, or CCC edit |
+| [maintenance-discipline.md](maintenance-discipline.md) | Routing gate for canonical edits — 16-row routing table to sub-op files ([`node-edit.md`](node-edit.md), [`bidirectional-link.md`](bidirectional-link.md), [`phase-15-roundtrip.md`](phase-15-roundtrip.md), [`adr-edit.md`](adr-edit.md), [`ccc-edit.md`](ccc-edit.md), [`ndf-edit.md`](ndf-edit.md), [`dec-promotion.md`](dec-promotion.md), [`cross-type-supersession.md`](cross-type-supersession.md), [`tech-stack-touch.md`](tech-stack-touch.md), [`cross-ref-guard.md`](cross-ref-guard.md), [`operation-vocabulary.md`](operation-vocabulary.md), [`discovery-surface.md`](discovery-surface.md), [`lazy-creation.md`](lazy-creation.md), [`node-versioning.md`](node-versioning.md), [`rule-history.md`](rule-history.md), [`anti-pattern-lightweight.md`](anti-pattern-lightweight.md)). 2-file touch (node, ADR, CCC uniformly); (base+N) for related edges; canonical `log.md` retired 2026-05-16. | Any canonical-node, ADR, CCC, or NDF edit — load the gate first, then the matching sub-op |
 | [discuss.md](discuss.md) | Pre-plan discussion — captures architectural decisions after Phase 1.5 gate closure; outputs durable files that survive `/clear` | After Phase 1.5 exit, before `/clear` + `plan.md` |
 | [in-flight-nodes.md](in-flight-nodes.md) | CHG mechanics, cross-FS dependencies, abandonment procedure for `status: proposed` nodes | Phase 2/3 when authoring or merging an FS that touches canonical nodes |
 | [research.md](research.md) | Resolves `blocking-frs` OQs before FRS body sections can be authored | Phase 1 (internal) when ≥1 OQ classified `blocking-frs` |

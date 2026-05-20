@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Verification Flow
 
 > Post-implementation confirmation — verifies that a milestone's delivered

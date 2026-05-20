@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Evolving the workflow
 
 > Procedure for extending the workflow itself — adding a new node
@@ -15,7 +20,7 @@
 >
 > The shape-coverage check applies equally to **NDF coining** (per
 > [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)) —
-> the walk covers the engine-default 15-type catalog **plus** every
+> the walk covers the engine-default 16-type catalog **plus** every
 > existing NDF in the target component's `node_definitions:` **plus** every
 > NDF promoted to `docs/shared/node-definitions/`. See §A.1 in
 > [`../../docs/exploration/EXP-NDF-engine-diffs.md`](../../docs/exploration/EXP-NDF-engine-diffs.md)
@@ -94,7 +99,7 @@ escape hatch.
 ## Anti-Pattern: "The Motivated Invention"
 
 Coining a new node type because the in-flight FS "needs" one — without
-walking the engine-default 15-type catalog (plus every existing NDF in the
+walking the engine-default 16-type catalog (plus every existing NDF in the
 target component's `node_definitions:`) and answering whether one covers ≥60%
 of the new shape. The cost: the methodology grows parallel types that
 only differ in naming convention (e.g., a "ProcessFlow" node coined
@@ -120,7 +125,7 @@ sequentially — refine first, invent last.
    collapse into an ADR (cross-cutting) or DEC (node-scoped) — see
    [`authoring-adr.md → When to file a Standard, ADR, or DEC`](authoring-adr.md#when-to-file-a-standard-adr-or-dec-the-3-way-discriminator).
 2. **No existing type carries the semantics naturally.** Walk the
-   engine-default 15-type catalog in [`../KB-LAYOUT.md`](../KB-LAYOUT.md),
+   engine-default 16-type catalog in [`../KB-LAYOUT.md`](../KB-LAYOUT.md),
    plus every existing NDF in the target component's `node_definitions:` and
    every cross-component-promoted NDF in `docs/shared/node-definitions/`.
    If one covers ≥60% of the new type's shape, extend that type's

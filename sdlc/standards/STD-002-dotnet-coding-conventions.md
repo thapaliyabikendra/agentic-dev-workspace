@@ -52,6 +52,8 @@ patterns that STD-005's rules consume.
 **Anchor:** [CCC-006](../../docs/shared/ccc/CCC-006-exception-handling.md)
 (baseline). Companion STD-005 rules: Rule 11 (Manager carries node body),
 Rule 9.2 amended slot (`<Module>Keys.cs`).
+*(`deferred_until` — project bootstrap creates this CCC at
+`docs/shared/ccc/`; engine cite is a forward reference until then.)*
 
 #### 1.1 Manager return type
 
@@ -190,6 +192,8 @@ fold to the most severe.
 (baseline). Companion STD-005 rules: Rule 13 (`<Module>Consts.cs` for
 length / range / pattern values), Rule 9.2 amended slot
 (`<Module>Keys.cs` for message keys).
+*(`deferred_until` — project bootstrap creates this CCC at
+`docs/shared/ccc/`; engine cite is a forward reference until then.)*
 
 #### 2.1 Validator type and slot
 
@@ -287,6 +291,8 @@ matching `<DtoName>Validator.cs` exists in
 **Anchor:** [CCC-007](../../docs/shared/ccc/CCC-007-localization.md)
 (baseline). Companion STD-005 rule: Rule 9.2 amended slot
 (`Domain.Shared/<Module>/Localization/<Module>Keys.cs`).
+*(`deferred_until` — project bootstrap creates this CCC at
+`docs/shared/ccc/`; engine cite is a forward reference until then.)*
 
 #### 3.1 The constants file
 

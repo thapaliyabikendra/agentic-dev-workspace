@@ -3,7 +3,7 @@ id: STD-001
 title: Engine-level DDD constraints
 status: proposed
 created: 2026-05-13
-updated: 2026-05-13
+updated: 2026-05-20
 supersedes: null
 superseded_by: null
 tags: [placeholder, ddd, domain-layer]
@@ -12,6 +12,8 @@ applies_when:
   stack: [agnostic]
 source: seed
 related_adrs: []
+deferred_until: "first project FRS touches the domain layer; engine-level rules harvested from project ADR(s) at that time"
+operative_source: "docs/<component>/adrs/ (search by tag domain-layer)"
 ---
 
 # STD-001: Engine-level DDD constraints

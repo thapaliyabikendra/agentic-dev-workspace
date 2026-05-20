@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Review
 
 > Maintenance operation for any review pass over the corpus — QA gates,

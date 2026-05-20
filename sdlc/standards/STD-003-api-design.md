@@ -3,7 +3,7 @@ id: STD-003
 title: Engine-level API design rules
 status: proposed
 created: 2026-05-13
-updated: 2026-05-13
+updated: 2026-05-20
 supersedes: null
 superseded_by: null
 tags: [placeholder, api, http]
@@ -12,6 +12,8 @@ applies_when:
   stack: [api]
 source: seed
 related_adrs: []
+deferred_until: "first project FRS touches an HTTP boundary; engine-level rules harvested from project ADR(s) at that time"
+operative_source: "docs/<component>/adrs/ (search by tag api or http)"
 ---
 
 # STD-003: Engine-level API design rules

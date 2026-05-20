@@ -374,8 +374,8 @@ covers the Stage 6 engine-file diffs only.
   - `docs/home.md` — IDs convention list gained NDF-NNN (unqualified
     for shared promotions) and `{PREFIX}-NDF-NNN` (per-component).
 
-- **Two top-of-tree HARD-GATEs landed per CLAUDE.md Rule 13
-  defense-in-depth.** Wording identical at each landing site (only
+- **Two top-of-tree HARD-GATEs landed per CLAUDE.md Rule 12
+  (Output style — framework HARD-GATE defense-in-depth exception).** Wording identical at each landing site (only
   relative-link paths differ). Canonical home is single per gate;
   restatements at ≥2 additional files.
   - **HARD-GATE — NDF shape-coverage walk required.** Canonical home:
@@ -402,3 +402,24 @@ covers the Stage 6 engine-file diffs only.
 
 - **EXP-NDF-engine-diffs.md status flip.** `status: proposed →
   applied`; the file remains as Stage-6 audit trail.
+
+## [2026-05-20] updated | STD-001/003 renamed + STD-001..006 deferred-CCC pass
+
+- **STD-001/003 filename + frontmatter conformance.** Renamed
+  `ddd-standards.md` → `STD-001-ddd-standards.md` and
+  `api-design.md` → `STD-003-api-design.md` to match the
+  `STD-NNN-<slug>.md` convention used by STD-002/004/005/006. Added
+  `deferred_until:` (STD-001: first FRS touches the domain layer;
+  STD-003: first FRS touches an HTTP boundary) and `operative_source:`
+  frontmatter — pattern from STD-004. `status: proposed` retained
+  (placeholder posture, not the `status: deferred` STD-004 uses).
+  Index rows updated to point at the new filenames.
+
+- **STD-002/005/006 inline CCC-deferral annotations.** Added a one-line
+  italic `*(`deferred_until` — project bootstrap creates this CCC at
+  `docs/shared/ccc/`; engine cite is a forward reference until then.)*`
+  immediately below each formal `**Anchor:**` block citing
+  CCC-004/005/006/007. Six insertions: STD-002 R1 (CCC-006), R2
+  (CCC-005), R3 (CCC-007); STD-005 R14 (CCC-006), R17 (CCC-004); STD-006
+  R6 (CCC-004). Preserves forward-reference semantics until project
+  bootstrap lazy-creates the cited CCCs.

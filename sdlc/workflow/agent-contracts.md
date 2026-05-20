@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # agent-contracts.md — Agent I/O Contract Reference
 
 This is a **reference file** (posture: same as `frs-validation-rules.md`) —
@@ -188,6 +193,22 @@ Apply before any dispatch:
 - **One concern**: each subagent gets one verb on one scoped set of files. Two verbs = two dispatches.
 - **Tool floor**: default to read-only (Read / Grep / Glob). Promote to Edit / Write only when the task explicitly demands a mutation.
 - **Parallelism rule**: fan out N subagents in parallel when their work is file-disjoint and order-independent. Serialize when subagents share files or when one output feeds another's input. Gate checks (Phase 1.5 + Phase 3) are the canonical parallel instances.
+
+---
+
+## TaskCreate discipline
+
+TaskCreate (the session-scope task tracker) mirrors phase task lists from
+flow files — it does not replace them. Durable task status lives in
+artifact frontmatter (FRS `status:`, FS `status:`, CHG `status:`, milestone
+`status:`); the TaskCreate list is a session-only working surface.
+
+Rules:
+
+- **One task = one outcome.** No bundled "do A and B" subjects — split into two tasks.
+- **Single `in_progress`.** Set on start, flip to `completed` immediately on finish. No batching completions at end of session.
+- **Skip when single-step.** If the work is one tool call or one edit, ignore TaskCreate — the ceremony costs more than it saves.
+- **Session-scoped only.** The list does not survive `/clear`. Durable status belongs in the artifact, not the tracker.
 
 ---
 

@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Lint
 
 > Periodic debt-scan operation. **Lint detects drift; it does not

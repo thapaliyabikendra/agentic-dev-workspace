@@ -1,6 +1,8 @@
 ---
 name: in-flight-nodes
 description: "Lifecycle rules for nodes with status: proposed — CHG mechanics, cross-FS dependencies, abandonment procedure, and the workflow self-extension note. Load when authoring or merging an FS that introduces new nodes or modifies existing canonical nodes."
+applies_when:
+  stack: [agnostic]
 ---
 
 # In-Flight Nodes (`status: proposed`)
@@ -276,7 +278,7 @@ the splits; IDs are never reused.
 
 Planning sometimes surfaces
 the need to extend the workflow itself — a new node type the current
-13 don't model, a new derived-report type the existing BUSINESS /
+16 don't model, a new derived-report type the existing BUSINESS /
 TECHNICAL templates don't carry, or a doc template that needs
 refinement before the in-flight FS can use it. When it does, the
 extension lands in the methodology **before** the new artifact, not

@@ -172,6 +172,8 @@ is dead code that disagrees with the enricher's source of truth).
 
 **Anchor:** [CCC-004](../../docs/shared/ccc/CCC-004-auditing.md).
 Structural mirror: [STD-005 Rule 17](STD-005-abp-coding-conventions.md#rule-17--audit-logging-via-abp-audit-module-not-ilogger).
+*(`deferred_until` — project bootstrap creates this CCC at
+`docs/shared/ccc/`; engine cite is a forward reference until then.)*
 
 Entity-change audit trails (who-changed-what-when) go through the ABP
 audit module — `IAuditingStore`, `[Audited]`, module-level

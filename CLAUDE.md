@@ -8,80 +8,94 @@ disagree, the canonical doc wins — flag the drift.
 **HARD-GATE:** do not begin a new phase until `## Hard rules` and the
 relevant flow file are loaded. Applies across sessions.
 
+**HARD-GATE:** do not change a doctrinal rule in
+[`sdlc/PRINCIPLES.md`](sdlc/PRINCIPLES.md) without atomically checking
+that the procedural rule in `sdlc/WORKFLOW.md` or `sdlc/workflow/<op>.md`
+does not contradict it. Doctrinal–procedural drift is silent corruption.
+
+**HARD-GATE:** do not ingest a node into a component path that does not
+yet have `docs/<component>/COMPONENT.md` with `id_prefix:` set —
+[`sdlc/workflow/new-component-bootstrap.md`](sdlc/workflow/new-component-bootstrap.md)
+runs first.
+
+**HARD-GATE:** do not run Add / Change / Retire on the glossary or
+`docs/shared/ccc/` baselines while a Phase 1.5 gate is **active** for any
+FRS in the milestone — invalidates the gate snapshot.
+[`sdlc/workflow/baseline-references.md`](sdlc/workflow/baseline-references.md)
+is the rule book.
+
 **Retrieval discipline** (what to load at each phase entry):
 [`sdlc/workflow/retrieval-discipline.md`](sdlc/workflow/retrieval-discipline.md).
 
-1. DDD nodes in `docs/<component>/nodes/` are truth. Node ↔ spec
-   conflict → node wins or reconcile both.
-2. Five governance sources: STD / ADR / CCC / NDF / DEC.
-   Discriminator: [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).
-   STDs: `sdlc/standards/` (stack-conditional via `applies_when:`).
-   CCCs: `docs/shared/ccc/` (NFR baselines; ADRs back-link for deviations).
-   Component ADRs: `docs/<component>/adrs/`.
-   Cross-component ADRs: `docs/shared/adrs/`.
-   NDFs: `docs/<component>/node-definitions/` (per-component custom node-type
-   declarations; ADR-039).
-   Node-local: inline or `docs/<component>/nodes/decisions/`.
+1. DDD nodes in `docs/<component>/nodes/` are truth; on node ↔ spec
+   conflict, node wins or reconcile both.
+2. Five governance sources — **STD** (`sdlc/standards/`),
+   **ADR** (`docs/<component>/adrs/`, `docs/shared/adrs/`),
+   **CCC** (`docs/shared/ccc/`, NFR baselines; ADRs back-link for
+   deviations), **NDF** (`docs/<component>/node-definitions/`, ADR-039),
+   **DEC** (inline or `docs/<component>/nodes/decisions/`).
+   Discriminator:
+   [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).
 3. Reference, never copy. Link by ID.
 4. Existing nodes are authoritative — adapt the template, don't retrofit.
-5. `/clear` at every flow boundary. Phases inside one flow share a session.
-   QA-track flows count as independent boundaries (`test-plan-ingest` →
-   `test-suite-codegen` → `qa-gate`; `/clear` between each and on entry
-   to each).
-6. Every artifact has an ID and links upstream + downstream. IDs:
-   `ADR-NNN`, `FRS-NNN`, `M-NN`, `CR-NNN`, `FS-NNN`, `CHG-NNN`, `TC-NNN`,
-   `OQ-NNN`, node IDs (all `-NNN`). Check the per-type `index.md` (canonical
-   node types) or the milestone-scoped folder (CHG: `chg/`; TC:
-   `specs/**/test-plans/**`) or the FRS frontmatter glob
-   (`produced_actor:` for ACT) before incrementing.
-   `id-claims.md` is the modify-intent + released-claim ledger only post-
-   2026-05-17 — `op: modify` and `op: released` rows only; do not consult
-   it for `introduce` ceilings (R-NEW-9 amended; pre-cutover `op: introduce`
-   rows are grandfathered). OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md).
-   CR-NNN: standalone change-request container (not a milestone).
-   See [`sdlc/workflow/change-request.md`](sdlc/workflow/change-request.md).
-7. Plans contain no syntax. Phase 1 ingests FLW (Trigger + Scenarios)
-   and CHG (behavior-language `modifies[]` when FRS `touches_nodes:` is
-   non-empty — one CHG per FRS) — born to canonical / milestone with
-   `status: proposed` (FLW) or `status: draft` (CHG). Phase 2 names
-   ACT (when the FRS introduces a new actor role) + ENT / CMD / STA /
-   CON / INT / DEC / PERM / QRY structures and enriches FLW + CHG with
-   wiring (`related:` + Sequence + … on FLW; structural before/after +
-   `adds[]` + `migration_steps[]` on CHG, listed in FS `consumes_chgs:`).
-   Phase 3 writes code, applies CHG deltas, and flips `proposed → active`
-   / `approved → merged`.
-   Multi-stage / cross-cohort plans need a progress checklist;
-   mark each stage `[x]` before advancing. Cohort definition + node-ingest
-   / CHG rules: [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md).
-   Progress-checklist procedure: [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
-8. Tiered touch for canonical edits. All canonical artifacts use the
-   2-file touch: node / ADR / CCC + per-type `index.md`. `related:`
-   changes = base + N. Canonical `log.md` retired 2026-05-16 (covers
-   nodes, ADRs, and CCCs) — surviving logs are research and standards.
-   See [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md) § Rule history.
-9. Read the per-type `index.md` before globbing. Glob only when
-   component/type is unknown. Path: `docs/<component>/nodes/<type>/index.md`.
-10. One question per turn during FRS / FS drafting.
-11. TaskCreate mirrors phase task lists; durable status lives in
-    artifacts. One task = one outcome. Mark `in_progress` on start,
-    `completed` immediately. Session-scoped only.
-12. Never `git commit` (or any commit-equivalent — `git commit -am`,
-    `gh pr create`) without explicit user authorization.
-    Authorization for one commit does not carry forward to the next.
-13. Output style: token-optimized.
-    - Compact: no meta-commentary ("I think", "let me…"), no preamble,
-      no sign-offs. Status updates between tool calls are one sentence.
-    - Structured: tables, bullet lists, code fences, one-line descriptions.
-    - Rule-dense: numbered rules or trigger-based anti-pattern tables.
-    - Pointer-heavy: replace long explanations with file paths + short
-      context notes.
-    - Redundancy-free in project-authored content: never restate;
-      cross-reference. **Exception:** framework HARD-GATE rules MAY be
-      restated across canonical workflow files (CLAUDE.md, WORKFLOW.md,
-      flow files, validation checklists) — defense-in-depth against a
-      session loading only part of the rule set. Project-authored
-      artifacts (FRSs, FSs, nodes, ADRs) hold to strict cross-reference.
-    - Lead with the recommendation; rationale only when load-bearing.
+5. `/clear` at every flow boundary; phases / stages inside one flow
+   share a session. QA-track structure: `test-plan-ingest` is one flow;
+   `test-suite-codegen` + `qa-gate` form one combined flow with two
+   stages (codegen-stage + gate-stage). `/clear` boundaries: QA-track
+   entry (into `test-plan-ingest`) and between `test-plan-ingest` ↔
+   `test-suite-codegen`. The codegen-stage → gate-stage transition is
+   intra-flow (no `/clear`); gate-stage inherits codegen-stage's
+   selector-resolved + spec-emitted context. PRINCIPLES.md "Helpful
+   Continuation" doctrine preserved — `/clear` fires at every *flow*
+   boundary; stage transitions inside one flow do not. gate-stage
+   verification independence is preserved by gate-side re-reads of
+   FS/FRS/ADRs/STDs/CCCs (see [`sdlc/workflow/qa-gate.md`](sdlc/workflow/qa-gate.md)).
+6. Every artifact has an ID and links upstream + downstream. Prefixes:
+   `ADR-NNN`, `FRS-NNN`, `M-NN`, `CR-NNN`, `FS-NNN`, `CHG-NNN`,
+   `TC-NNN`, `OQ-NNN`, node IDs (all `-NNN`). Ceiling source: per-type
+   `index.md` (canonical) / milestone folder (CHG: `chg/`;
+   TC: `specs/**/test-plans/**`) / FRS frontmatter (`produced_actor:`
+   for ACT). `id-claims.md` is the modify-intent + released-claim ledger
+   only post-2026-05-17 — `op: modify` / `op: released` rows only;
+   pre-cutover `op: introduce` rows grandfathered (R-NEW-9 amended).
+   OQ scoping: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md). CR-NNN container:
+   [`sdlc/workflow/change-request.md`](sdlc/workflow/change-request.md).
+7. Plans contain no syntax. Phase 1 births FLW (Trigger + Scenarios) +
+   CHG (behavior-language `modifies[]` when `touches_nodes:` non-empty);
+   Phase 2 ingests ACT/ENT/CMD/STA/CON/INT/DEC/PERM/QRY and enriches
+   FLW + CHG (wiring + structural before/after + `adds[]` +
+   `migration_steps[]`, listed in FS `consumes_chgs:`); Phase 3 writes
+   code, applies CHG deltas, flips `proposed → active` / `approved →
+   merged`. Multi-stage plans need a progress checklist; mark each
+   stage `[x]` before advancing. Full procedure:
+   [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md). Progress-checklist
+   procedure:
+   [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
+8. Tiered touch for canonical edits: node / ADR / CCC + per-type
+   `index.md` (base + N when `related:` changes). Canonical `log.md`
+   retired 2026-05-16 (research + standards logs survive).
+   [`sdlc/workflow/maintenance-discipline.md`](sdlc/workflow/maintenance-discipline.md)
+   § Rule history.
+9. Read the per-type `index.md` before globbing
+   (`docs/<component>/nodes/<type>/index.md`). Glob only when component
+   / type is unknown.
+10. One question per turn during FRS / FS drafting. For FS drafting,
+    pause at **section-group boundaries** (Coverage+New nodes /
+    Change maps+Architecture / Data model+Interface contracts /
+    Tasks+Dependencies+QA), not per section — 3–4 question-rounds
+    total, one question per round. PRINCIPLES.md "one question per
+    message" doctrine preserved (each turn still carries one question);
+    the change is cadence, not multiplicity.
+11. Never `git commit` (or any commit-equivalent — `git commit -am`,
+    `gh pr create`) without explicit user authorization. Authorization
+    for one commit does not carry forward to the next.
+12. Output style: token-optimized — compact, structured, rule-dense,
+    pointer-heavy, redundancy-free; lead with the recommendation.
+    **Exception** to redundancy-free: framework HARD-GATE rules MAY be
+    restated across canonical workflow files (CLAUDE.md, WORKFLOW.md,
+    flow files, validation checklists) for defense-in-depth;
+    project-authored artifacts (FRSs, FSs, nodes, ADRs) hold to strict
+    cross-reference.
 
 ## Project framing
 
@@ -96,22 +110,24 @@ scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
 
 ## Index
 
-Framework (always present):
-- Phases, flows, validation gates: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md)
+**Framework:**
+- Phases / flows / gates: [`sdlc/WORKFLOW.md`](sdlc/WORKFLOW.md)
 - Workflow file routing: [`sdlc/workflow/index.md`](sdlc/workflow/index.md)
 - Folder map / multi-repo: [`sdlc/LAYOUT.md`](sdlc/LAYOUT.md)
-- DDD KB layout & node-type table: [`sdlc/KB-LAYOUT.md`](sdlc/KB-LAYOUT.md)
-- New component bootstrap (before Phase 2): [`sdlc/workflow/new-component-bootstrap.md`](sdlc/workflow/new-component-bootstrap.md)
-- Subagent dispatch & completion markers: [`sdlc/workflow/agent-contracts.md`](sdlc/workflow/agent-contracts.md)
+- KB layout + node-type table: [`sdlc/KB-LAYOUT.md`](sdlc/KB-LAYOUT.md)
+- New component bootstrap (before Phase 2):
+  [`sdlc/workflow/new-component-bootstrap.md`](sdlc/workflow/new-component-bootstrap.md)
+- Subagent dispatch / completion markers:
+  [`sdlc/workflow/agent-contracts.md`](sdlc/workflow/agent-contracts.md)
+- TaskCreate discipline (session task tracker):
+  [`sdlc/workflow/agent-contracts.md § TaskCreate discipline`](sdlc/workflow/agent-contracts.md#taskcreate-discipline)
 - Engine standards: [`sdlc/standards/index.md`](sdlc/standards/index.md)
 
-Project (created lazily; framework requires the slot):
-- Cross-type artifact status: `docs/home.md`
-- Component descriptors: `docs/<component>/COMPONENT.md`
-- Component ADRs: `docs/<component>/adrs/index.md`
-- Cross-component ADRs: `docs/shared/adrs/index.md`
-- CCC baselines: [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md)
-- Component nodes: `docs/<component>/nodes/<type>/index.md`
+**Project KB** (lazy; framework requires the slot):
+- `docs/<component>/COMPONENT.md` — descriptor + `id_prefix:`
+- `docs/<component>/adrs/index.md` + `docs/shared/adrs/index.md` — ADRs
+- `docs/<component>/nodes/<type>/index.md` — per-type canonical nodes
+- [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md) — CCC baselines
 
 ## Where to look
 

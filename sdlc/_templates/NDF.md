@@ -25,7 +25,7 @@ lifecycle: [proposed, active, deprecated, superseded]  # status vocabulary for i
 
 # --- Engine-evolution gate evidence (per `sdlc/workflow/evolving-the-workflow.md`) ---
 shape_coverage_walk:
-  # Record the walk against the engine-default 15-type catalog + every existing NDF.
+  # Record the walk against the engine-default 16-type catalog + every existing NDF.
   # Each entry: { type: <ABBR>, coverage: <pct>, why_not: <one-line> } for types <60%.
   - { type: <ABBR>, coverage: <int>, why_not: "<one-line reason>" }
 ---
@@ -51,7 +51,7 @@ instances expected within the foreseeable horizon (per
 
 Justify why no existing type covers ≥60% of the new shape. The
 machine-readable record is `shape_coverage_walk:` in frontmatter; this section
-is the prose narrative. Walk the engine-default 15-type catalog
+is the prose narrative. Walk the engine-default 16-type catalog
 (`sdlc/KB-LAYOUT.md`) + every existing NDF across all components. **One
 paragraph; identify the closest two types and where they fall short.**
 

@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Required Coverage Matrix
 
 > Reference table for TC completeness checking at Phase 2 test-plan

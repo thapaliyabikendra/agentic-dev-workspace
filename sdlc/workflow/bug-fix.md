@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Bug-fix workflow
 
 Bugs use a lightweight track distinct from milestones / FRSs / FSs.

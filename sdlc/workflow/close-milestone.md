@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # close-milestone.md — Close a Milestone
 
 > **Maintenance operation.** Consolidates all steps for cleanly closing a

@@ -149,6 +149,12 @@ artifact). When in doubt about where a new file goes, check here first.
                            Regeneration: sdlc/workflow/derived-reports.md
 ```
 
+> **Note on CHGs.** Pre-cutover CHG paths under
+> `/milestones/.../specs/FS-NNN-<slug>/nodes/changes/` are grandfathered.
+> Current canonical home is `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`
+> (CR track: `change-requests/CR-NNN-<slug>/chg/`). See
+> [`KB-LAYOUT.md`](KB-LAYOUT.md) — authoritative.
+
 ## Component structure (docs/)
 
 A **component** is a named grouping of KB artifacts corresponding to one independently

@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Maintaining baseline references (glossary, cross-cutting concerns)
 
 > Rule book for the four operations (Add / Change / Retire / Drift
@@ -35,7 +40,7 @@ canonical node body (use the 2-file node touch via
 [`maintenance-discipline.md`](maintenance-discipline.md)), or when a
 Phase 1.5 gate is currently open against any FRS that cites the
 baseline. To decide between CCC and ADR for a new governance rule, run
-the 4-way STD / ADR / CCC / DEC discriminator in
+the 5-way STD / ADR / CCC / NDF / DEC discriminator in
 [`authoring-adr.md`](authoring-adr.md).
 
 **Vs. sibling files:** [`maintenance-discipline.md`](maintenance-discipline.md)
@@ -210,7 +215,7 @@ FRS edits.
   FRS to cite the successor or remove the citation). Type C — multiple
   FRSs keep restating the same operation-specific deviation (candidate
   for promoting to a new CCC via Op 1, OR for an ADR that captures the
-  common deviation — apply the 4-way discriminator in
+  common deviation — apply the 5-way discriminator in
   [`authoring-adr.md`](authoring-adr.md)).
 
 ## Hard rules across all ops
@@ -258,7 +263,7 @@ Full tiered-touch mechanics:
 - **Adjacent (not callers but consulted):**
   [`authoring-adr.md`](authoring-adr.md) — when a Change classifies as
   breaking or an FRS deviation needs recording, the ADR captures it;
-  also hosts the 4-way STD / ADR / CCC / DEC discriminator.
+  also hosts the 5-way STD / ADR / CCC / NDF / DEC discriminator.
   [`docs/shared/ccc/index.md`](../../docs/shared/ccc/index.md) — Karpathy-style
   content catalog; read wholesale at Phase 1.5 gate entry.
 - **Sibling rule books:**

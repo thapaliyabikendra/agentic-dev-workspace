@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # FRS Validation Rules
 
 > **Type:** Workflow reference. Consulted at Phase 1.5 (Validation Gate).

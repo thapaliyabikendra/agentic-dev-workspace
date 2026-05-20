@@ -1,6 +1,8 @@
 ---
 name: vcs-migration
 description: "Filesystem-to-issue-tracker mapping table and deprecated path notes for when the team adopts GitLab, GitHub, Azure DevOps, Jira, or similar. Load only when planning or executing a platform migration."
+applies_when:
+  stack: [agnostic]
 ---
 
 # VCS / Issue-Tracker Migration

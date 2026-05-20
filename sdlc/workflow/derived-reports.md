@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Derived reports
 
 > On-demand regeneration operation for curated wiki-derived views

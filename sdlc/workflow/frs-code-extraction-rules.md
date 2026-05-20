@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # FRS Code Extraction Rules
 
 > **Type:** Workflow reference. Consulted at Phase 0 / Phase 1 when the

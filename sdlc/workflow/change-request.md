@@ -1,6 +1,8 @@
 ---
 name: change-request
-description: "Lightweight CR track — standalone, isolated change requests that don't warrant milestone grouping. Covers CR portal authoring, single FRS authoring, per-FRS gate (Pass 1 only), FS authoring, CHG emission, and implementation. Escalation criteria to milestone track when scope grows."
+description: "Lightweight CR track — standalone, isolated change requests that don't warrant milestone grouping. CR portal + single FRS + per-FRS gate (Pass 1 only) + FS + CHG + implementation. Escalation to milestone track when scope grows."
+applies_when:
+  stack: [agnostic]
 ---
 
 # Change-Request Flow
@@ -10,6 +12,9 @@ in a milestone group. Produces a CR-scoped container
 (`docs/change-requests/CR-NNN-<slug>/`) instead of a milestone folder. FRS,
 FS, and CHG artifacts are CR-scoped. Phase 0 (milestone scoping) and Phase
 1.5 Pass 2 (cross-FRS sweep) are omitted — one FRS per CR is the ceiling.
+Phase mechanics delegate to `design.md` / `plan.md` / `implementation.md`;
+this file owns the container layout, path substitutions, and escalation
+procedure only.
 
 <HARD-GATE>
 Do NOT begin Phase CR-2 (FS authoring) until the single FRS has cleared
@@ -21,250 +26,92 @@ CHG node. Phase CR-2 names structures; Phase CR-3 writes them.
 (Cross-cutting rules: [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules).)
 </HARD-GATE>
 
----
-
 ## When to Use
 
-**Use when:** a change request is:
-- Self-contained — single user journey, single FRS
-- Scope is known at start (no discovery needed)
-- Not related to other in-flight or planned work that should group together
+**Use when** the change is self-contained, scope is known at start, and no
+related in-flight work should group it under a milestone. Reroute when:
 
-**Do NOT use when:**
-- Multiple related user journeys surface → escalate to milestone track
-- Cross-FRS conflicts surface at Phase CR-1.5 → escalate to milestone track
-- The change restores broken behavior (not changing intent) → load [`bug-fix.md`](bug-fix.md)
-- Several unrelated small CRs accumulate and grouping adds value → use a
-  `kind: accumulator` milestone (`MILESTONE.md` template) instead; accumulator
-  milestones skip the scope-coherence check and close at 8–12 FRSs
-
-**Vs. sibling files:** [`design.md`](design.md) / [`plan.md`](plan.md) /
-[`implementation.md`](implementation.md) are the milestone-grouped track for
-multi-FRS deliveries; this file is the CR-scoped track for single-FRS
-isolated changes. Both tracks share the same canonical-edit discipline and
-phase structure — they differ only in the container (CR folder vs. milestone
-folder) and the omission of Phase 0 and Pass 2.
-
-**Extend-before-invent record** (`evolving-the-workflow.md` discriminator):
-Bug-fix shape-coverage <60% (no FRS, no CHG, no Pass 1 gate). Milestone
-track shape-coverage ~80% but the container is the explicit gap; the user
-requirement is CR-scoped CHG nodes, not milestone-scoped. ≥3 CR instances
-expected per project. Distinct container lifecycle (`open → in-progress →
-done | escalated`) and path structure — criterion met for a new flow file.
-
----
+| Signal | Routing |
+|---|---|
+| Multiple related user journeys surface | milestone track ([`design.md`](design.md)) |
+| Cross-FRS conflicts surface at Phase CR-1.5 | escalate to milestone track |
+| Change restores broken behavior (intent unchanged) | [`bug-fix.md`](bug-fix.md) |
+| Several unrelated small CRs accumulate | `kind: accumulator` milestone |
 
 ## CR Container Structure
 
 ```
-docs/change-requests/
-  CR-NNN-<slug>/
-    CR-NNN-<slug>.md           # Portal doc (template: sdlc/_templates/CR-PORTAL.md)
-    id-claims.md               # modify-intent + released-claim ledger (lazy — same discipline as milestones; R-NEW-9 amended 2026-05-17)
-    frs/
-      FRS-NNN-<slug>.md        # Single FRS per CR
-    chg/                       # CR-scoped CHG nodes (lazy; created when FRS births a CHG at Phase CR-1)
-      CHG-NNN-<slug>.md        # Phase-1-born per R-CHG-1; permanent home, never promoted to canonical
-    specs/
-      FS-NNN-<slug>/
-        FS-NNN.md              # `consumes_chgs:` lists the FRS's Phase-1-born CHG (when any)
-        test-plans/            # TC files (lazy; created at QA-track flow entry)
-          <use-case>/
-            TC-NNN-<slug>.md
+docs/change-requests/CR-NNN-<slug>/
+  CR-NNN-<slug>.md          # Portal (template: _templates/CR-PORTAL.md)
+  id-claims.md              # modify+released ledger (lazy; R-NEW-9 amended 2026-05-17)
+  frs/FRS-NNN-<slug>.md     # Single FRS per CR
+  chg/CHG-NNN-<slug>.md     # Phase-1-born; permanent CR-scoped home
+  specs/FS-NNN-<slug>/
+    FS-NNN.md               # `cr: CR-NNN`; `consumes_chgs:` lists CR-1 CHGs
+    test-plans/<use-case>/TC-NNN-<slug>.md
 ```
 
-New DDD nodes the FS introduces land in `docs/<component>/nodes/<type>/`
-directly (same as milestone track) with `status: proposed`.
+New canonical DDD nodes the FS introduces land in
+`docs/<component>/nodes/<type>/` with `status: proposed` (same as milestone
+track).
 
-> **Pre-2026-05-17 layout (frozen reference).** Pre-cutover CR containers
+> **Frozen pre-2026-05-17 layout (grandfathered).** Pre-cutover CR containers
 > nested CHG nodes under `specs/FS-NNN-<slug>/nodes/changes/CHG-NNN-<slug>.md`.
-> That layout is **grandfathered** for any pre-cutover CR — files stay where
-> they are until naturally retired (`approved → merged → archived`). New
-> CRs authored post-cutover use the layout above: `chg/` is a sibling of
-> `frs/` and `specs/`, CHGs are born at Phase CR-1 by the FRS (R-CHG-1),
-> and the consuming FS lists them in `consumes_chgs:` at Phase CR-2.
+> Those CRs stay where they are; new CRs use `chg/` as a sibling of `frs/`
+> and `specs/`, CHGs are Phase-1-born per R-CHG-1, and the consuming FS lists
+> them in `consumes_chgs:` at Phase CR-2.
 
----
+## Phase delegations
 
-## Process Flow
+| Phase | Delegates to | CR-specific differences |
+|---|---|---|
+| CR-0 (Portal) | [`_templates/CR-PORTAL.md`](../_templates/CR-PORTAL.md) | Assign next free `CR-NNN` by globbing `docs/change-requests/`. Leave `frs:` / `specs:` empty; fill iteratively. |
+| CR-1 (FRS) | [`design.md § Phase 1 — FRS Authoring`](design.md#phase-1--frs-authoring) | FRS at `frs/FRS-NNN-<slug>.md`; frontmatter `cr: CR-NNN` (leave `milestone:` blank). FLW + CHG born by FRS; ACT-NNN claimed via FRS `produced_actor:` (file at CR-2). |
+| CR-1.5 (Gate) | [`design.md § Pass 1 — Per-FRS gate`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored) + [`frs-validation-rules.md`](frs-validation-rules.md) | Pass 1 only; Pass 2 N/A. Run escalation check below before `/clear` + CR-2. |
+| CR-2 (FS + CHG) | [`plan.md`](plan.md) (follow exactly) | Path substitutions below; CHG mechanics per [`in-flight-nodes.md`](in-flight-nodes.md) + [`plan.md § 4`](plan.md#4-chg-node-consumption--enrichment). |
+| CR-3 (Impl) | [`implementation.md`](implementation.md) (no differences) | — |
 
-```dot
-digraph cr_flow {
-    rankdir=TB;
-    node [fontname="Helvetica"];
+### Phase CR-2 path substitution
 
-    inputs    [shape=oval,    label="Change request\n+ existing DDD nodes\n+ ADR index"];
-    phase_cr0 [shape=box,     label="Phase CR-0\nCR Portal authoring"];
-    phase_cr1 [shape=box,     label="Phase CR-1\nFRS Authoring\n(single FRS)"];
-    gate_p1   [shape=diamond, label="Phase CR-1.5\nPass 1 per-FRS gate?"];
-    escal     [shape=diamond, label="Escalation\ncriteria?"];
-    ms_track  [shape=box,     label="Escalate → milestone track\n(load design.md)"];
-    phase_cr2 [shape=box,     label="Phase CR-2\nFS + CHG emission"];
-    fsval     [shape=diamond, label="FS validation?"];
-    phase_cr3 [shape=box,     label="Phase CR-3\nMerge + Code"];
-
-    out_portal [shape=doublecircle, label="CR portal doc"];
-    out_frs    [shape=doublecircle, label="Validated FRS\n+ OQs"];
-    out_fs     [shape=doublecircle, label="FS + proposed nodes\n+ CHG (if any)"];
-    out_impl   [shape=doublecircle, label="Active canonical\n+ code"];
-
-    inputs    -> phase_cr0;
-    phase_cr0 -> out_portal;
-    phase_cr0 -> phase_cr1;
-    phase_cr1 -> gate_p1;
-    gate_p1   -> phase_cr1 [label="fail — revise FRS"];
-    gate_p1   -> escal      [label="pass"];
-    escal     -> ms_track   [label="yes — scope grew"];
-    escal     -> out_frs    [label="no — isolated"];
-    out_frs   -> phase_cr2  [label="/clear + load plan.md"];
-    phase_cr2 -> fsval;
-    fsval     -> phase_cr2  [label="fail — revise FS"];
-    fsval     -> out_fs     [label="pass"];
-    out_fs    -> phase_cr3  [label="/clear + load implementation.md"];
-    phase_cr3 -> out_impl;
-}
-```
-
----
-
-## Phase CR-0 — CR Portal
-
-Author the portal doc at
-`docs/change-requests/CR-NNN-<slug>/CR-NNN-<slug>.md`.
-Template: [`../../_templates/CR-PORTAL.md`](../../_templates/CR-PORTAL.md).
-
-- Assign `CR-NNN` ID: check `docs/change-requests/` for the highest-numbered
-  existing CR, then increment.
-- Write 1–2 sentence scope (what behavior changes and why).
-- Leave `frs:` and `specs:` frontmatter empty — filled iteratively.
-- No milestone-scope discovery. If scope is genuinely unclear, file an
-  Exploration (`docs/exploration/`) first and return when scope is clear.
-
----
-
-## Phase CR-1 — FRS Authoring
-
-One FRS per CR — the ceiling, not a target. Load
-`design.md § Phase 1 — FRS Authoring` only (not the full file). Use the same
-`sdlc/_templates/FRS.md` template; leave `milestone:` blank and set
-`cr: CR-NNN` in frontmatter (`cr:` and `milestone:` are mutually exclusive).
-
-File at: `docs/change-requests/CR-NNN-<slug>/frs/FRS-NNN-<slug>.md`
-
-Add the FRS ID to the portal doc `frs:` frontmatter and body list.
-
-**FLW + CHG born at Phase CR-1 (per R-NEW-1 / R-CHG-1); ACT-NNN ID
-claimed only.** Phase CR-1 inherits the Phase 1 rules from `design.md`:
-the FRS's `produced_flw:` scalar declares the one new FLW, born to
-canonical at `docs/<component>/nodes/flows/` with `status: proposed`;
-when the FRS declares non-empty `touches_nodes:`, a per-FRS CHG is born
-to `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` with
-`status: draft`. Both carry Phase-1-bare body shape (FLW: `related: []`;
-CHG: behavior-language `modifies[]` only, no structural before/after, no
-`adds[]`, no `migration_steps[]`). When the FRS introduces a new actor
-role, the `produced_actor:` scalar declares the ACT-NNN ID — **claimed
-at Phase CR-1 via the FRS's `produced_actor:` frontmatter itself
-(R-NEW-9 amended 2026-05-17 — the FRS field IS the claim; no
-`id-claims.md` introduce row) but the ACT file is authored at Phase
-CR-2** (R-NEW-2a retired 2026-05-17). Phase CR-2 births the ACT file
-alongside ENT / CMD / STA / etc., enriches the FLW in place (wiring +
-Sequence + Branches + Compensating + structural Postconditions), and
-enriches the CHG structurally (`adds[]` + `migration_steps[]` via FS
-`consumes_chgs:`). Phase CR-3 flips FLW / ACT `proposed → active` and
-CHG `approved → merged`. The CR portal doc does not need to redeclare
-these — the FRS's frontmatter is the source of truth.
-
-**id-claims.md inherits R-NEW-9 amended 2026-05-17.**
-`docs/change-requests/CR-NNN-<slug>/id-claims.md` is the modify-intent
-+ released-claim ledger; it lazy-creates on the first `op: modify`
-(Phase CR-2 FS consumption of a CHG) or `op: released` (FRS
-abandonment retiring an ACT-NNN claim). Phase CR-1's FLW allocation
-goes through `nodes/flows/index.md`; CHG allocation goes through the
-CR's `chg/` folder glob; ACT-NNN is claimed via the FRS frontmatter
-`produced_actor:` itself — none of these write `id-claims.md` rows.
-Pre-cutover CR `id-claims.md` files keep their existing rows
-(grandfathered) and the `FS` column header is renamed to `Source` on
-the next claim against that file.
-
----
-
-## Phase CR-1.5 — Per-FRS Gate (Pass 1 only)
-
-Run the per-FRS gate per [`design.md § Pass 1 — Per-FRS gate`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored),
-which dispatches to [`frs-validation-rules.md`](frs-validation-rules.md)
-for the rule definitions. Pass 2 (cross-FRS sweep) is not applicable —
-one FRS per CR.
-
-**Escalation check** (run after Pass 1 passes):
-
-| Signal | Action |
-|---|---|
-| Pass 1 surfaces a second user journey in scope | Escalate to milestone track |
-| Pass 1 flags a cross-cutting architectural decision spanning components | Escalate to milestone track |
-| CR is related to other planned work that shares a domain | Escalate or group under an existing milestone |
-| All signals absent | Proceed to Phase CR-2 after `/clear` + `plan.md` reload |
-
----
-
-## Phase CR-2 — FS Authoring + CHG Emission
-
-Load [`plan.md`](plan.md) after `/clear`. Follow `plan.md` exactly. The only
-differences from the milestone track are path substitutions:
-
-| Milestone path | CR path |
+| Milestone path / field | CR path / field |
 |---|---|
 | `milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md` | `docs/change-requests/CR-NNN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md` |
 | `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md` | `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md` |
-| `milestone: M-NN` in FS frontmatter | `cr: CR-NNN` in FS frontmatter; leave `milestone:` blank |
-
-The CHG is **born at Phase CR-1 by the FRS** (R-CHG-1) when
-`touches_nodes:` is non-empty — not emitted at Phase CR-2 under the
-old model. Phase CR-2 lists the CHG in the FS's `consumes_chgs:` and
-enriches it structurally per [`plan.md § 4`](plan.md#4-chg-node-consumption--enrichment).
-
-Add the FS ID to the portal doc `specs:` frontmatter and body list.
-
----
-
-## Phase CR-3 — Implementation
-
-Load [`implementation.md`](implementation.md) after `/clear`. No differences
-from the milestone track — CHG deltas are applied to canonical, proposed nodes
-flip `proposed → active`, code is written.
-
----
+| `milestone: M-NN` in FS frontmatter | `cr: CR-NNN`; leave `milestone:` blank |
 
 ## Escalation procedure (→ milestone track)
 
-When escalation criteria fire at Phase CR-1.5 or during Phase CR-2:
+Run the escalation check at Phase CR-1.5 (after Pass 1 passes):
 
-1. Stop — do not continue the CR track.
-2. Load [`design.md`](design.md) under a new or existing milestone.
-3. Adopt the CR FRS into the milestone: add `from_cr: [CR-NNN]` to
-   the milestone FRS frontmatter; update the CR portal doc to
-   `status: escalated` and `escalated_to: [M-NNN]`.
-4. CR portal doc is the audit trail — do not delete it.
+| Signal | Action |
+|---|---|
+| Pass 1 surfaces a second user journey in scope | Escalate |
+| Pass 1 flags a cross-cutting architectural decision spanning components | Escalate |
+| CR is related to other planned work that shares a domain | Escalate or group under existing milestone |
+| All signals absent | Proceed to Phase CR-2 after `/clear` + `plan.md` reload |
 
----
+When escalating: (1) stop the CR track; (2) load [`design.md`](design.md)
+under a new or existing milestone; (3) adopt the CR FRS into the milestone
+by adding `from_cr: [CR-NNN]` to its frontmatter and flipping the CR portal
+to `status: escalated`, `escalated_to: [M-NNN]`; (4) keep the portal as the
+audit trail — do not delete.
 
-## QA track (unchanged)
+## QA track
 
-The QA track applies after Phase CR-3 without modification. Load
+After CR-3, the QA track applies without modification. Load
 [`test-plan-ingest.md`](test-plan-ingest.md),
 [`test-suite-codegen.md`](test-suite-codegen.md), and
-[`qa-gate.md`](qa-gate.md) on their own cadence with `/clear` between each.
+[`qa-gate.md`](qa-gate.md) on their own cadence. `/clear` boundaries:
+QA-track entry (into `test-plan-ingest`) and between `test-plan-ingest`
+↔ `test-suite-codegen`; `test-suite-codegen` ↔ `qa-gate` share a
+session (back-to-back; gate inherits codegen context per CLAUDE.md
+Rule 5).
 TC files live under
 `docs/change-requests/CR-NNN-<slug>/specs/FS-NNN-<slug>/test-plans/`.
 
----
-
 ## Integration
 
-- **Routing:** [`index.md`](index.md) (routing table)
-- **Delegates Phase CR-1 to:** `design.md § Phase 1 — FRS Authoring`
-- **Delegates Phase CR-1.5 to:** `design.md § Pass 1 — Per-FRS gate` (Pass 1 only; Pass 2 cross-FRS sweep is N/A for single-FRS CRs). Rule definitions live in `frs-validation-rules.md`.
-- **Delegates Phase CR-2 to:** `plan.md` (full)
-- **Delegates Phase CR-3 to:** `implementation.md` (full)
-- **Escalation target:** `design.md` (full, under new or existing milestone)
-- **Canonical-edit discipline:** [`maintenance-discipline.md`](maintenance-discipline.md) — fires at every 2-file node touch
-- **ID discipline:** [`maintenance-discipline.md`](maintenance-discipline.md) — check the per-type `index.md` / CR `chg/` folder glob / FRS frontmatter before assigning FRS / FS / CHG IDs (R-NEW-9 amended 2026-05-17 — `id-claims.md` is modify+released only)
+- **Routing:** [`index.md`](index.md)
+- **Phase delegates:** [`design.md`](design.md) (CR-1, CR-1.5), [`plan.md`](plan.md) (CR-2), [`implementation.md`](implementation.md) (CR-3)
+- **Canonical-edit + ID discipline:** [`maintenance-discipline.md`](maintenance-discipline.md) — 2-file touch on every node edit; ID assignment via per-type `index.md` + CR `chg/` folder glob + FRS frontmatter (R-NEW-9 amended 2026-05-17 — `id-claims.md` is modify+released only)
+- **Escalation target:** [`design.md`](design.md) under new or existing milestone

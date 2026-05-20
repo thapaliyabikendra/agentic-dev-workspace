@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Research Gate
 
 > Operation for resolving `blocking-frs` open questions before FRS body

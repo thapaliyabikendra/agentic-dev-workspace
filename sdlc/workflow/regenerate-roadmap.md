@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Regenerate Roadmap
 
 > **Maintenance operation.** Regenerates the tracked planning artifact

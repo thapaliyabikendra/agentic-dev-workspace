@@ -1,15 +1,20 @@
 ---
 name: qa-gate
-description: "Use after test-suite-codegen has emitted its generation report and Stage 2 Code is complete — third and final flow of the QA track. Runs the QA verification checklist, ADR-conformance check, code-quality gates, and flips the FS to implemented. Runs in its own session — `/clear` between test-suite-codegen and this flow."
+description: "Use after test-suite-codegen has emitted its generation report and Stage 2 Code is complete — third and final flow of the QA track. Runs the QA verification checklist, ADR-conformance check, code-quality gates, and flips the FS to implemented. Shares session with test-suite-codegen (back-to-back; inherits codegen context) — no `/clear` between them."
+applies_when:
+  stack: [agnostic]
 ---
 
 # QA Gate
 
 QA gate is the **third and final flow of the QA track**. It verifies the generated test specs against
 the FS's Flow scenarios and acceptance criteria, runs the ADR-conformance check, and flips
-the FS to `implemented` once all gates pass. It runs in its own session — a `/clear` separates
-it from `test-suite-codegen.md`. Logical dependency on `implementation.md` Stage 2 Code completion
-stays (the FS-to-implemented flip is meaningless without code), but no session is shared.
+the FS to `implemented` once all gates pass. **Shares session with
+[`test-suite-codegen.md`](test-suite-codegen.md)** — runs back-to-back on the
+selector-resolved + spec-emitted context; no `/clear` between them. Logical
+dependency on `implementation.md` Stage 2 Code completion stays (the FS-to-implemented
+flip is meaningless without code); the test-suite-codegen → qa-gate boundary is now
+session-shared per CLAUDE.md Rule 5.
 
 Solo doesn't mean QA is skipped — it means the QA hat is the same human at a deliberate
 moment.
@@ -29,6 +34,11 @@ run (load those files first).
 ---
 
 ## QA Verification Checklist
+
+> **Session-share does NOT relax verification independence.** The gate
+> re-reads FS / FRS / ADRs / STDs / CCCs from disk as if from a fresh
+> session — codegen-side reads do not substitute. The /clear was dropped
+> for token economy on back-to-back runs, not to soften the gate.
 
 - Every linked Flow scenario mapped to a passing test (runner conventions
   live in the testing-convention ADR once authored; consult the
@@ -156,9 +166,9 @@ single-FS milestones where the QA checklist already walked all criteria.
 ## Integration
 
 - **Triggered after:** [`test-suite-codegen.md`](test-suite-codegen.md) emits its generation report.
-  Runs in its own QA-track session — `/clear` between codegen and this flow. The logical
-  dependency on `implementation.md` Stage 2 Code completion is preserved; only the shared
-  session is removed.
+  **Shares session with `test-suite-codegen.md`** (back-to-back; no `/clear` between them, per
+  CLAUDE.md Rule 5). The logical dependency on `implementation.md` Stage 2 Code completion
+  is preserved through codegen's own entry contract.
 - **Required before:** [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)
   — the ADR-conformance check dispatch contract lives there.
 - **Maintenance ops that may fire:**

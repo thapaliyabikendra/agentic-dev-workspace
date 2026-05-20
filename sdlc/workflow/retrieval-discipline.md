@@ -1,6 +1,8 @@
 ---
 name: retrieval-discipline
 description: "When and what to load at each phase entry. The primary token lever — wholesale-read the index, narrow-load individual pages. Load this file when entering any phase or when a retrieval decision is in doubt."
+applies_when:
+  stack: [agnostic]
 ---
 
 # Retrieval Discipline
@@ -20,11 +22,11 @@ firing reads only the sections the table names.
 
 | Operation | Sections to read |
 |---|---|
-| Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Templates loaded at Phase 1 authoring](#templates-loaded-at-phase-1-authoring) + [Baselines](#baselines) + [ADRs](#adrs) + [Exceptions](#exceptions) |
-| Phase 1.5 entry (Validation gate) | [Baselines](#baselines) + [STDs and CCCs](#stds-and-cccs) (Phase 1.5 row of the matrix) + [ADRs](#adrs) + [Exceptions](#exceptions) |
-| Phase 2 entry (Ingest) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 2 row + [Index opt-out](#index-opt-out)) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) + [Exceptions](#exceptions) |
-| Phase 3 entry (Merge + Code) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 3 row) + [Tech-stack operational baseline](#tech-stack-operational-baseline) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) + [Exceptions](#exceptions) |
-| QA track entry (test-plan-ingest / test-suite-codegen / qa-gate) | [QA-track retrieval](#qa-track-retrieval) (per `qa_phase`) + [ADRs](#adrs) + [Exceptions](#exceptions) |
+| Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Templates loaded at Phase 1 authoring](#templates-loaded-at-phase-1-authoring) + [Baselines](#baselines) + [ADRs](#adrs) |
+| Phase 1.5 entry (Validation gate) | [Baselines](#baselines) + [STDs and CCCs](#stds-and-cccs) (Phase 1.5 row of the matrix) + [ADRs](#adrs) |
+| Phase 2 entry (Ingest) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 2 row + [Index opt-out](#index-opt-out)) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) |
+| Phase 3 entry (Merge + Code) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 3 row) + [Tech-stack operational baseline](#tech-stack-operational-baseline) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) |
+| QA track entry (test-plan-ingest / test-suite-codegen / qa-gate) | [QA-track retrieval](#qa-track-retrieval) (per `qa_phase`) + [ADRs](#adrs) |
 | Index row schema lookup (any phase) | [ADRs → Index row schemas](#index-row-schemas) |
 | ADR / DEC body-budget or title-cap question | [ADRs](#adrs) |
 | Maintenance op firing (load-on-trigger) | [Maintenance operation references](#maintenance-operation-references) — jump to the firing op's row |
@@ -80,14 +82,16 @@ milestone-scope discovery's "Existing nodes scanned" section and in FRS
 
 ### Phase 2/3 — ingest and merge reads
 
-When entering Phase 2 (Ingest) or Phase 3 (Merge + Code), read
-**only** the nodes the milestone's FRSs declare in `produced_flw:`,
-`produced_actor:`, `touches_nodes:`, and `produces_nodes:` — plus one
-hop of transitive references (nodes those nodes link in `related`). Do
-**not** pre-load `docs/<component>/nodes/` wholesale "to be safe." If a
-node not on that list turns out to be necessary, stop, update the FRS to
-declare it, and surface the omission to the QA hat — silently broadening
-the load defeats the whole point. (Phase 2 specifically: see also
+**R-LOAD-1 — Narrow-load + 1-hop transitive.** When entering Phase 2
+(Ingest) or Phase 3 (Merge + Code), read **only** the nodes the
+milestone's FRSs declare in `produced_flw:`, `produced_actor:`,
+`touches_nodes:`, and `produces_nodes:` — plus **exactly one hop** of
+transitive references (nodes those nodes link in `related`). No
+transitive expansion past 1 hop. Do **not** pre-load
+`docs/<component>/nodes/` wholesale "to be safe." If a node not on that
+list turns out to be necessary, stop, update the FRS to declare it, and
+surface the omission to the QA hat — silently broadening the load
+defeats the whole point. (Phase 2 specifically: see also
 [`plan.md § 4a Retroactive touches_nodes: loop-back`](plan.md#4a-retroactive-touches_nodes-loop-back-r-new-10)
 when the gap is a modify-intent.)
 
@@ -321,65 +325,17 @@ Each is wholesale-read **only** when the matching operation fires; otherwise unr
 
 ## QA-track retrieval
 
-Each QA flow starts a fresh session (its own `/clear` boundary). Load only
-what the flow needs at entry; do not carry forward dev-track reads.
+`/clear` map: QA-track entry (into `test-plan-ingest`) and between
+`test-plan-ingest` ↔ `test-suite-codegen`. `test-suite-codegen` and
+`qa-gate` share a session — `qa-gate` inherits codegen's reads, no
+re-load of FS / TC files / runner config (CLAUDE.md Rule 5).
 
-### test-plan-ingest (`qa_phase: qa-plan`)
+| `qa_phase` | Load |
+|------------|------|
+| `qa-plan` (test-plan-ingest) | Fresh session. FS + every FRS in `frs:` + each FRS's FLW (scenario anchors) + ENT nodes (field constraints) + milestone glob `specs/**/test-plans/**/TC-*.md` for the next free TC-NNN (R-NEW-9: TC files are the ID ledger). Rule books: [`coverage-matrix.md`](coverage-matrix.md), [`test-data-generation.md`](test-data-generation.md). **No production code.** |
+| `qa-suite` (test-suite-codegen) | Fresh session. FS + all TC files under `test-plans/` + runner config (e.g., `playwright.config.ts`) + `tests/.env.example` if present. Rule books: [`test-runner-cookbook.md`](test-runner-cookbook.md), [`test-data-generation.md`](test-data-generation.md). Production code **only** for selector discovery (post-implementation explorer) — not for behavioral context. |
+| `qa-gate` | **Inherits** test-suite-codegen session (no `/clear`). Adds: ADRs/STDs/CCCs per FS frontmatter + convention-tagged ADRs/STDs (per the dev-track narrow-load rules above) + generation report + test results + affected canonical nodes. Rule book: [`agent-contracts.md`](agent-contracts.md) (ADR-/STD-/CCC-conformance dispatch contracts). |
 
-Load the FS, every FRS declared in the FS's `frs:` frontmatter, each FRS's
-referenced FLW nodes (scenario anchors), and each FRS's referenced ENT nodes
-(field constraints). Read the milestone's `specs/**/test-plans/**/TC-*.md`
-glob for the next free TC-NNN (R-NEW-9 amended 2026-05-17 — TC files are
-the ID ledger; no `id-claims.md` introduce row). Wholesale-read [`coverage-matrix.md`](coverage-matrix.md) and
-[`test-data-generation.md`](test-data-generation.md) rule books. Do **not**
-load production code at this phase.
-
-### test-suite-codegen (`qa_phase: qa-suite`)
-
-Load the FS, all TC files under `test-plans/`, the runner config (e.g.,
-`playwright.config.ts`), and `tests/.env.example` if present.
-Wholesale-read [`test-runner-cookbook.md`](test-runner-cookbook.md) and
-[`test-data-generation.md`](test-data-generation.md) rule books.
-Production code may be loaded **only** for selector discovery (a
-post-implementation explorer pass) — not for behavioral context.
-
-### qa-gate (`qa_phase: qa-gate`)
-
-Load the FS, every ADR declared in the FS's `adrs:` frontmatter plus any
-convention-tagged ADRs identified from `docs/<component>/adrs/index.md`,
-every STD declared in the FS's `standards:` plus convention-tagged STDs
-from `sdlc/standards/index.md`, every CCC declared in the FS's `ccc:` (read
-the Baseline section of each), the generation report produced by
-`test-suite-codegen.md`, the test results (pass/fail), and all affected
-canonical nodes. Wholesale-read
-[`agent-contracts.md`](agent-contracts.md) for the ADR-conformance,
-STD-conformance, and CCC-deviation dispatch contracts.
-
-## Exceptions
-
-Always-on index reads (every phase consumes these as one-line summaries;
-individual pages are narrow-loaded):
-- ADR index — `docs/<component>/adrs/index.md` + `docs/shared/adrs/index.md`.
-- STD index — `sdlc/standards/index.md`.
-- CCC index — `docs/shared/ccc/index.md` (except at Phase 2 / Phase 3
-  entry when the consuming artifact declares `ccc: []` — see
-  [§ Index opt-out](#index-opt-out)).
-
-Phase 0 / Phase 1 only:
-- Change-request KB scan — reads per-type `docs/<component>/nodes/<type>/index.md`
-  for each node type in scope; globs the type folder only when no `index.md` exists
-  for that type yet. See [`design.md`](design.md) and `§Phase 0/1 — discovery reads` above.
-
----
-
-## Integration
-
-**Canonical home of:** the retrieval posture for nodes, ADRs, baselines,
-tech-stack, test rule books, and maintenance operation references across
-all phases.
-
-**Parent:** [`../WORKFLOW.md → Retrieval discipline`](../WORKFLOW.md#retrieval-discipline) —
-WORKFLOW.md carries the always-loaded summary; this file is the full procedure.
-
-**Related:** [`../PRINCIPLES.md`](../PRINCIPLES.md) — "Wholesale-reading the
-KB" is the named anti-pattern; this file is the preventive discipline.
+The always-on index reads (ADR / STD / CCC) plus the Phase 0/1 change-request
+KB scan still apply — see `## Nodes`, `## ADRs`, `## STDs and CCCs` above for
+the canonical posture and the [Index opt-out](#index-opt-out) for CCC.

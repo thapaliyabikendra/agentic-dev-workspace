@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [test]
+---
+
 # Test-Runner Cookbook
 
 > **Type:** Project-owned test-runner cookbook. Consulted at Phase 3

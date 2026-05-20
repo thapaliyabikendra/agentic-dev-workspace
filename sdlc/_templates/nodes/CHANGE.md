@@ -27,32 +27,18 @@ updated: YYYY-MM-DD
 
 # CHG-NNN: <Title>
 
-> **Lifecycle (per R-CHG-1..7, post-2026-05-17 cutover):**
-> - **Phase 1:** Born by FRS when its `touches_nodes:` is non-empty.
->   One CHG per FRS at Phase 1 (parallel to `produced_flw:` /
->   `produced_actor:` scalar shape). Body carries business-language
->   `modifies[]`, optional milestone-level `invariants_before/after`,
->   optional `removes[]` / `supersedes[]`. `status: draft`.
-> - **Phase 2:** FS author lists this CHG ID in the FS's
->   `consumes_chgs: [CHG-NNN, ...]` frontmatter, then enriches: structural
->   before/after on each `modifies[]` entry, fills `adds[]` (mirroring
->   new node ingest), fills `migration_steps[]`. `status:` stays `draft`
->   until FS-validation exit, which flips it to `approved`.
-> - **Phase 3:** Merge applies the deltas to canonical and flips
->   `approved → merged`.
+> **Lifecycle + mechanics:** see
+> [`../../workflow/in-flight-nodes.md → CHG mechanics`](../../workflow/in-flight-nodes.md#chg-mechanics)
+> (Phase-1 birth, Phase-2 enrichment, Phase-3 merge;
+> `draft → approved → merged`; `target_fs:` retired per R-CHG-3).
+> **FS consumption procedure:** see
+> [`../../workflow/plan.md`](../../workflow/plan.md)
+> (`consumes_chgs:` reverse-glob, sibling-CHG fold, splitting heuristics).
 >
 > **File location** (permanent milestone-scoped home — never promoted to
 > canonical):
 > - Milestone track: `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`
 > - CR track: `docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md`
->
-> The FS-CHG coupling is by frontmatter reference (FS `consumes_chgs:`),
-> not filesystem nesting. Reverse-glob audit: grep every FS for CHG-NNN
-> in `consumes_chgs:` to find its consuming FS.
->
-> **`target_fs:` field retired** (per R-CHG-3 / τ) — replaced by
-> `source_ref:` (FRS list) + FS `consumes_chgs:` reverse-glob. Pre-cutover
-> CHGs with `target_fs:` are grandfathered.
 
 ## Scope
 

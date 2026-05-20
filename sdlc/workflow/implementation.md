@@ -1,6 +1,8 @@
 ---
 name: implement-feat
 description: "Use when an approved FS with merged: false exists, all new nodes are proposed in canonical, and all CHGs are approved — applies CHG deltas, flips statuses, and writes production code. Routes to test-suite-codegen.md after Stage 2 Code is complete."
+applies_when:
+  stack: [agnostic]
 ---
 
 # Implementation Flow
@@ -138,7 +140,7 @@ You MUST complete these in order:
 1. Load context (FS-declared sets only — FS, new canonical nodes, CHG files, ADRs, tech-stack)
 2. Stage 1 — Merge (flip every new node `proposed → active`, apply CHG deltas to canonical targets, flip every CHG `approved → merged`)
 3. Stage 2 — Code (implement against now-active canonical nodes, one cohort at a time, build-validate between cohorts)
-4. Hand off to the **QA track** — `test-suite-codegen.md` and `qa-gate.md` run as independent flows in their own sessions. Do not load them in this session.
+4. Hand off to the **QA track** — `test-suite-codegen.md` (fresh session after `/clear`) then `qa-gate.md` (session-shared with codegen per CLAUDE.md Rule 5). Do not load them in this session.
 
 ---
 
@@ -193,10 +195,12 @@ This flow runs in two stages, in order:
    operation, not a file copy.)
 2. **Code** — implement against the now-active canonical nodes.
 
-After Stage 2 Code is complete, this flow exits. The **QA track** then runs as three independent
-flows in their own sessions (`test-suite-codegen.md` then `qa-gate.md`). The FS-to-`implemented`
-flip happens in `qa-gate.md` once its checks pass — milestone close depends on that flip, but
-cadence is up to the QA-track operator.
+After Stage 2 Code is complete, this flow exits. The **QA track** then runs:
+`test-suite-codegen.md` (fresh session after `/clear` from this file) followed
+by `qa-gate.md` (session-shared with codegen per CLAUDE.md Rule 5). The
+FS-to-`implemented` flip happens in `qa-gate.md` once its checks pass —
+milestone close depends on that flip, but cadence is up to the QA-track
+operator.
 
 Do not skip ahead — coding before the Merge stage applies the CHG deltas defeats the
 source-of-truth invariant.

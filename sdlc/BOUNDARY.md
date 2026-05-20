@@ -64,7 +64,7 @@ without modification.
   with the per-FRS CHG nodes under `chg/` (sibling to `specs/`), born at
   Phase 1 by their owning FRS and consumed at Phase 2 by the FS via
   `consumes_chgs:`.
-- Validation gates and context-reset rule: five named `/clear` boundaries — two in the dev track (Phase 1.5→2, Phase 2→3), and three at each QA-track flow entry (from `plan.md` to `test-plan-ingest.md`, from `implementation.md` to `test-suite-codegen.md`, and from `test-suite-codegen.md` to `qa-gate.md`).
+- Validation gates and context-reset rule: four named `/clear` boundaries — two in the dev track (Phase 1.5→2, Phase 2→3), and two in the QA track (from `plan.md` to `test-plan-ingest.md`, and from `implementation.md` to `test-suite-codegen.md`). `test-suite-codegen.md` ↔ `qa-gate.md` is **session-shared** (back-to-back; gate inherits codegen context) per CLAUDE.md Rule 5.
 - Author self-review + user-review handoff at phase exits.
 
 ### DDD knowledge base structure
@@ -294,9 +294,9 @@ before adding it to any rule book.
 > binds on. Engine-prescribed; the enum vocabulary is canonical here and
 > referenced by templates and indexes elsewhere.
 
-Every STD / ADR / FRS / FS / DEC / CCC carries a `stack:` (or, for STDs,
-`applies_when.stack:`) frontmatter field whose value is a non-empty subset
-of:
+Every STD / ADR / FRS / FS / DEC / CCC carries a `stack:` (or, for STDs
+and workflow flow files, `applies_when.stack:`) frontmatter field whose
+value is a non-empty subset of:
 
 - **`api`** — backend HTTP / service-layer rules.
 - **`ui`** — frontend / view-layer rules.
@@ -309,6 +309,13 @@ Multi-value lists are allowed (an ADR may bind both `api` and `ui`).
 Engine-universal rules default to `[agnostic]`. The Phase 2/3 retrieval
 filters by intersection between the consuming artifact's `stack:` and the
 governance artifact's stack declaration.
+
+Workflow flow files in [`workflow/`](workflow/) carry `applies_when:` in
+the same shape as STDs — `[agnostic]` for engine-universal procedures,
+stack-conditional values (e.g. `[api]`, `[test]`) when the procedure
+binds to a specific stack, plus `applies_when.framework:` when the
+procedure is framework-conditional (e.g. the `abp-bootstrap/*` set).
+Generalization performed 2026-05-21 per `sdlc-framework-plan-v2.md` T4.1.
 
 ---
 

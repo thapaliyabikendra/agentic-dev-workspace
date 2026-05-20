@@ -1,6 +1,8 @@
 ---
 name: generate-feat-spec
 description: "Use when Phase 1.5 has closed and you need to author a Feature Spec, ingest new DDD nodes to canonical (status: proposed), consume + enrich the Phase-1-born CHG nodes the FRSs introduced (via FS consumes_chgs:), and run the FS validation loop. Do NOT use for Test plan ingest (test-plan-ingest.md) or implementation (implementation.md). Discoverability alias: authoring-fs."
+applies_when:
+  stack: [agnostic]
 ---
 
 # Plan Flow
@@ -41,8 +43,9 @@ Cross-cutting rule canonical home: [`../../CLAUDE.md ## Hard rules`](../../CLAUD
 <HARD-GATE>
 **HARD-GATE — Phase 2 type-validity check.** Do NOT ingest a
 Phase-2-born canonical node whose type abbreviation is in **neither** (a)
-the engine-default 15-type catalog (ACT / ENT / CMD / QRY / FLW / STA /
-DEC / INT / MOD / SCR / CON / PERM / SVC / FA / EVT — per
+the 15 Phase-2-born canonical types in KB-LAYOUT.md's 16-type catalog
+(ACT / ENT / CMD / QRY / FLW / STA / DEC / INT / MOD / SCR / CON / PERM /
+SVC / FA / EVT — CHG is Phase-1-born and milestone-scoped, per
 [`../KB-LAYOUT.md`](../KB-LAYOUT.md)) **nor** (b) the target component's
 `node_definitions:` frontmatter on its `COMPONENT.md` (NDF-declared per
 [`../../docs/shared/adrs/ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).
@@ -52,7 +55,7 @@ predate ADR-039 carry no `declared_via:` pointer and are grandfathered (per
 ADR-039 § Brownfield impact). This is the **canonical enforcement home**;
 the wording is identical to its restatement in `WORKFLOW.md § Validation
 gates` and `maintenance-discipline.md § Files to touch on an NDF edit`
-per CLAUDE.md Rule 13 defense-in-depth.
+per CLAUDE.md Rule 12 defense-in-depth.
 </HARD-GATE>
 
 ---
@@ -66,7 +69,7 @@ canonical node ingest (status: proposed) + CHG consumption + enrichment (via FS
 ingest is the first **QA-track** flow ([`test-plan-ingest.md`](test-plan-ingest.md)) — it
 runs in its own session after `/clear`, on the QA-track operator's cadence (not
 necessarily immediately). See [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-— "QA-track flows count as independent flow boundaries."
+— QA-track entry is a flow boundary (with intra-track session-share for `test-suite-codegen` ↔ `qa-gate`).
 
 **Mode: Ingest.** Existing canonical nodes are NOT modified here. When the FS
 consumes a Phase-1-born CHG (via `consumes_chgs:`), this flow enriches that
@@ -160,15 +163,14 @@ the first time, read the full file in order: Overview → Anti-Pattern
 
 ## Checklist
 
-Scan-level gate before diving into The Process. All seven must hold before Phase 3 begins.
+Scan-level gate before diving into The Process. All six must hold before Phase 3 begins.
+FRS-coverage validation lives in §6 (the formal Phase-2 close gate) — not duplicated here.
 
-1. Every FRS acceptance criterion appears in the FS Coverage table — one row per Flow
-   scenario it spans; no AC partially covered or duplicated within a scenario.
-2. Every new node is written to canonical (`docs/<component>/nodes/<type>/<ID>-<slug>.md`)
+1. Every new node is written to canonical (`docs/<component>/nodes/<type>/<ID>-<slug>.md`)
    with `status: proposed` and the 2-file node touch fired (node + per-type `index.md`
    row with Status = `proposed`).
-3. Every new node has `source_ref` tracing to a specific FRS criterion or body section (Use case / Business rules / Edge cases) or Phase-1-born FLW Scenario.
-4. Every Phase-1-born CHG produced by the FS's constituent FRSs is listed
+2. Every new node has `source_ref` tracing to a specific FRS criterion or body section (Use case / Business rules / Edge cases) or Phase-1-born FLW Scenario.
+3. Every Phase-1-born CHG produced by the FS's constituent FRSs is listed
    in the FS's `consumes_chgs:` (subset consumption / merging per R-CHG-3
    noted in the FS's "Change maps"); each consumed CHG has been
    structurally enriched (`modifies[]` before/after, `adds[]`,
@@ -176,9 +178,9 @@ Scan-level gate before diving into The Process. All seven must hold before Phase
    in `id-claims.md` as `op: modify` (R-NEW-9 amended 2026-05-17 —
    `op: introduce` rows no longer written; per-type `index.md` is the
    introduce audit).
-5. No syntax (method bodies, SQL, YAML) appears anywhere in the FS or new nodes.
-6. Every architecture decision is routed: promoted to ADR, filed as DEC, or kept inline.
-7. FS validation loop passes: zero Blockers, zero Majors.
+4. No syntax (method bodies, SQL, YAML) appears anywhere in the FS or new nodes.
+5. Every architecture decision is routed: promoted to ADR, filed as DEC, or kept inline.
+6. FS validation loop passes: zero Blockers, zero Majors.
 
 ---
 
@@ -227,7 +229,7 @@ The FS-validation diamond is the **node ingest gate** — Phase 2 is not complet
 until zero Blockers and zero Majors remain. Repair is surgical, not full re-draft.
 Test plan ingest is in the QA track and runs in its own session after a separate
 `/clear` — see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-("QA-track flows count as independent flow boundaries").
+(QA-track entry is a flow boundary; intra-track session-share only between `test-suite-codegen` ↔ `qa-gate`).
 
 ---
 
@@ -257,9 +259,11 @@ Read **only** the nodes and ADRs the milestone's FRSs declare:
    missed. Narrow-load every CCC declared in `ccc:`. If you find a relevant STD or CCC
    missing from the FRS's declared sets, surface it (update the FRS, do not silently
    load); the FS inherits `standards:` and `ccc:` from its FRSs.
-5. Read the canonical node files for IDs in `touches_nodes`. Follow `related` one hop and
-   read those too. For IDs in `produces_nodes`, there is no canonical node yet — they will
-   be created at the ingest step.
+5. Read the canonical node files for IDs in `touches_nodes`. Follow `related` exactly
+   one hop and read those too (per R-LOAD-1, canonical home
+   [`retrieval-discipline.md § Phase 2/3 — ingest and merge reads`](retrieval-discipline.md#phase-23--ingest-and-merge-reads);
+   no transitive expansion past 1 hop). For IDs in `produces_nodes`, there is no
+   canonical node yet — they will be created at the ingest step.
 6. Narrow-load the declared ADR pages. No transitive expansion.
 7. Do **not** glob `docs/*/nodes/**` or pre-load wholesale. If a node, ADR, STD, or CCC
    not on the list turns out necessary mid-draft, stop, update the source FRS to declare
@@ -720,10 +724,20 @@ specific node looks the way it does → DEC; otherwise → inline.*
 #### Section-by-section drafting
 
 Walk the FS template in order — Coverage → New nodes → Change maps → Architecture
-decisions → Data model → Interface contracts → Implementation tasks → Dependencies → QA —
-and pause for confirmation between sections. **Apply CLAUDE.md's "one question per turn"
-hard rule** — ask at most one question between sections, wait for the answer, then
-proceed. If something stops making sense partway, go back; don't paper over.
+decisions → Data model → Interface contracts → Implementation tasks → Dependencies → QA
+— and pause for confirmation at **section-group boundaries** (CLAUDE.md Rule 10):
+
+| Group | Sections |
+|---|---|
+| 1. Foundation | Coverage + New nodes |
+| 2. Design rationale | Change maps + Architecture decisions |
+| 3. Structural shapes | Data model + Interface contracts |
+| 4. Execution | Implementation tasks + Dependencies + QA |
+
+Ask at most one question per group (3–4 rounds total), wait for the answer, then
+proceed through the next group. PRINCIPLES.md "one question per message" doctrine
+is preserved — each turn still carries one question; the change is cadence, not
+multiplicity. If something stops making sense partway, go back; don't paper over.
 
 #### Implementation-task cohort ordering
 
@@ -804,7 +818,9 @@ close.
       `section:` key naming the specific FRS heading improves traceability.
 - [ ] **Phase 2 type-validity check** (per §A.2 HARD-GATE). Every node-type
       abbreviation in `produces_nodes:` is in **either** the engine-default
-      15-type catalog **or** the target component's `node_definitions:`
+      catalog's 15 Phase-2-born canonical types (see §A.2 HARD-GATE for the
+      enumeration; CHG is Phase-1-born and out of scope here) **or** the
+      target component's `node_definitions:`
       frontmatter. Unknown type-abbreviations are **Blockers**. Pre-existing
       canonical nodes are grandfathered (per ADR-039 § Brownfield impact).
 - [ ] Every CHG `modifies[]` entry consumed by this FS is recorded as `op: modify`
@@ -864,7 +880,7 @@ leave the `{ ... }` body for Phase 3.
 **❌ Globbing `docs/*/nodes/**` during context loading** — floods the session and violates
 the token discipline that makes the workflow sustainable.
 **✅ Narrow-load only** the node IDs declared in the FRSs' `touches_nodes` and
-`produces_nodes`, plus one `related` hop.
+`produces_nodes`, plus exactly one `related` hop (per R-LOAD-1).
 
 **❌ Editing an existing canonical node body during Phase 2** — canonical nodes are the
 source of truth; mid-phase edits create un-audited drift.

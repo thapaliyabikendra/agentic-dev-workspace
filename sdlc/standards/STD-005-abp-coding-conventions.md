@@ -479,6 +479,8 @@ introduced.
 **Anchor:** [CCC-006](../../docs/shared/ccc/CCC-006-exception-handling.md)
 (baseline; companion to STD-002 R1 — ErrorOr is the preferred path,
 this rule governs the residual direct-throw cases).
+*(`deferred_until` — project bootstrap creates this CCC at
+`docs/shared/ccc/`; engine cite is a forward reference until then.)*
 
 Raw `throw new Exception(...)` and `throw new ApplicationException(...)`
 are **prohibited solution-wide**. When code must throw directly (e.g.,
@@ -602,6 +604,8 @@ hits block the merge.
 
 **Anchor:** [CCC-004](../../docs/shared/ccc/CCC-004-auditing.md).
 Logging-side mirror: [STD-006 Rule 6](STD-006-logging-conventions.md).
+*(`deferred_until` — project bootstrap creates this CCC at
+`docs/shared/ccc/`; engine cite is a forward reference until then.)*
 
 Entity-change audit trails (who changed what, when, with what
 before/after values) flow through ABP's audit-logging module —

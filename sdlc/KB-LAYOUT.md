@@ -47,7 +47,7 @@ The lazy folders (`queries/`, `modules/`, `screens/`, `contracts/`,
 `permissions/`, `services/`, `functional-areas/`, `events/`) are created **lazily
 on first Phase 2 ingest of that type.**
 
-This is the **engine-default 15-type catalog**. Per-component custom node
+This is the **engine-default 16-type catalog**. Per-component custom node
 types are declared via NDF (Node Definition Node) per
 [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md) and
 live under `docs/<component>/node-definitions/` (per-component) or
@@ -88,26 +88,17 @@ cache or telemetry write happens alongside. The user-visible deliverable
 decides, not the implementation steps.
 
 **STA vs. inline-on-entity**: model lifecycle as a standalone STA node
-when the state machine has structure worth enforcing; keep it inline on
-the entity (Fields row + Invariants + Lifecycle subsection) when it is a
-single flag with one transition and nothing else to enforce.
+when ANY axis below tips; keep inline (entity Fields row + Invariants +
+Lifecycle subsection) when ALL axes stay in the inline column.
 
-**Mint STA when ANY of:**
-
-- The entity has ≥3 named states.
-- ≥2 transitions exist (forward + inverse, branching forks, or compensating reversals).
-- A transition has a named guard beyond the triggering CMD's preconditions.
-- A transition raises a domain event consumed by another node.
-- A terminal state needs explicit `read-only` / `soft-delete` / `archival` semantics.
-- Illegal transitions need to be explicitly rejected (not merely "not triggered").
-
-**Keep inline when ALL of:**
-
-- ≤2 states (typically a boolean flag).
-- Exactly 1 transition (one CMD flips it; no inverse in scope).
-- No named guards beyond the triggering CMD's preconditions.
-- No domain event raised on transition.
-- No terminal state with non-trivial handling.
+| Axis | Inline | Mint STA |
+|------|--------|----------|
+| Named states | ≤2 (typically a boolean flag) | ≥3 |
+| Transitions | Exactly 1 (one CMD flips it; no inverse in scope) | ≥2 (forward + inverse, branching forks, compensating reversals) |
+| Guards | None beyond triggering CMD's preconditions | Named guard beyond CMD preconditions |
+| Domain events on transition | None raised | Raised and consumed by another node |
+| Terminal state | No non-trivial handling | Needs `read-only` / `soft-delete` / `archival` semantics |
+| Illegal transitions | Not enumerated | Must be explicitly rejected (not merely "not triggered") |
 
 **Boundary cases — worked examples:**
 
@@ -216,7 +207,7 @@ ADRs that override a CCC default carry `related: [CCC-NNN]`.
 
 `docs/<component>/node-definitions/` is a parallel canonical tree for
 **per-component custom node-type declarations** — Algorithm nodes,
-Scenario nodes, Store nodes, etc. — for shapes the engine-default 15-type
+Scenario nodes, Store nodes, etc. — for shapes the engine-default 16-type
 catalog does not carry naturally. NDF (Node Definition Node) is the fifth
 governance kind alongside STD / ADR / CCC / DEC, per
 [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).
@@ -248,10 +239,33 @@ new nodes against the contract per the **Phase 2 type-validity HARD-GATE**
 
 ---
 
+## Node content ownership
+
+Every piece of content has exactly one owner node. When two node types
+naturally share a surface — most commonly a CON node and an INT node
+describing the same integration boundary — the type hierarchy determines
+who owns what:
+
+| Layer | Owner | Content owned | References to… |
+|-------|-------|---------------|----------------|
+| CON (`protocol: events`) | Contract node | Partition key, delivery semantics, retention, DLQ policy, contract-surface fields only (the fields consumers must know to filter or route) | INT node for full schema, DDL, blast radius |
+| INT | Integration node | Full field schema, DDL/KSQL stream definitions, SLA targets, failure handling, blast radius | CON node for contract surface |
+| FLW (journey-level) | The authoritative end-to-end flow | Shared mechanics: whitelist JOIN pattern, offset recovery, deduplication invariants | — |
+| FLW (per-rule / per-command) | The narrower flow | Rule-specific diff only (window, threshold, source filter) | Journey FLW for shared mechanics, INT for whitelist producer |
+
+**Enforcement:** when authoring a node, for each section ask "does this
+content originate here, or does it originate on a node already in
+`related:`?" If the latter, replace the section body with `see NODE-ID
+§Section` and a one-sentence context note. The templates for CON and INT
+carry authoring reminders at the relevant sections.
+
+---
+
 ## Integration
 
 **Canonical home of:** the component wiki folder structure, node-type table,
-ID-prefix list, lazy-creation rules, and external research tree.
+ID-prefix list, lazy-creation rules, node content ownership when types share
+a surface, and external research tree.
 
 **Parent:** [`WORKFLOW.md → Knowledge base layout`](WORKFLOW.md#knowledge-base-layout) —
 WORKFLOW.md carries the always-loaded summary; this file is the full reference.

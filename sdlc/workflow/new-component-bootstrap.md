@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # New Standalone Component Bootstrap
 
 > Procedure for declaring a new standalone deployable component in the

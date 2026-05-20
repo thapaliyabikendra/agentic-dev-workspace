@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Test Data Generation Rules
 
 > **Type:** Workflow reference. Consulted at Phase 2 (Test plan ingest) and

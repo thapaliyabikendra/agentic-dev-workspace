@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # FS QA Verification Checklist
 
 > **Type:** Workflow reference. Sibling to

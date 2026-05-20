@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Absorb Concept
 
 > **Maintenance operation.** Routes insights discovered during report

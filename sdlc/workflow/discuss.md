@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Pre-Planning Discussion Operation
 
 > Pre-plan discussion — captures architectural decisions surfaced after Phase 1.5

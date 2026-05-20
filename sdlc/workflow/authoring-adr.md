@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Authoring an ADR
 
 > Procedure for landing an Architecture Decision Record — picking the
@@ -161,7 +166,7 @@ occasionally standalone). The Phase 3 QA gate consumes them.
 > **NDF (Node Definition Node)** if it **declares a per-component custom
 > node-type shape** — frontmatter contract, body sections, allowed
 > `related:` types, lifecycle vocabulary — for a type the engine-default
-> 15-type catalog does not carry naturally (per the 60% shape-coverage
+> 16-type catalog does not carry naturally (per the 60% shape-coverage
 > gate in [`evolving-the-workflow.md`](evolving-the-workflow.md)). Lives
 > in `docs/<component>/node-definitions/`; cross-component promotions
 > land at `docs/shared/node-definitions/`. ID prefix
@@ -183,7 +188,7 @@ A tired solo dev at midnight should be able to apply this. Order the questions:
    this project, or capture a one-time deviation from a CCC?** Yes → ADR.
    No → continue.
 4. **Does it declare a per-component custom node-type shape that the
-   engine-default 15-type catalog does not cover (≥3 expected instances,
+   engine-default 16-type catalog does not cover (≥3 expected instances,
    distinct lifecycle/index/cross-ref shape, 60% shape-coverage gate
    passes)?** Yes → NDF. No → continue.
 5. **For a DEC**: would inline placement in the owning node serve discovery

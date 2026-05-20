@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Legacy absorption
 
 > Operation: `absorb-legacy-doc`. A maintenance activity that ingests

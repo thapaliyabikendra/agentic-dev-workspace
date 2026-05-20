@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # Design Flow
 
 > Design flow — generates the milestone container, its discoveries, its FRSs,

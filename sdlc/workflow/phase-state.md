@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # phase-state.md — Milestone Phase State Tracking
 
 ## When to Use

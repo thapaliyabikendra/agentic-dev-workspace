@@ -1,3 +1,8 @@
+---
+applies_when:
+  stack: [agnostic]
+---
+
 # open-milestone.md — Open a Milestone
 
 > **Maintenance operation.** Consolidates all steps for opening a new milestone:
