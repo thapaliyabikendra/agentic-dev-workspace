@@ -45,7 +45,7 @@ standard governs the ABP-specific layer on top — binding is declared in
 
 ## Standards
 
-### Rule 1 — Built-in entity catalog is consulted before any Entity is synthesised
+### Rule 1 — Built-in entity catalog is consulted before any Entity is synthesised <!-- layers: Domain -->
 
 Every new entity node — whether produced during Phase 1 FRS authoring,
 Phase 2 feat-spec synthesis, or Phase 3 brownfield absorption — must
@@ -85,7 +85,7 @@ feat-spec validator both block on it.
 
 ---
 
-### Rule 2 — Every entity declares its base class and rationale
+### Rule 2 — Every entity declares its base class and rationale <!-- layers: Domain -->
 
 The entity node template requires two fields immediately above the **Fields** table:
 
@@ -123,7 +123,7 @@ A child entity's audit level must be **equal to or lighter than** its parent roo
 
 ---
 
-### Rule 3 — DTOs mirror the entity's audit level
+### Rule 3 — DTOs mirror the entity's audit level <!-- layers: Application.Contracts -->
 
 Phase 2 feat specs must cite a DTO base class for every output DTO, and the level must match the source entity:
 
@@ -141,7 +141,7 @@ Input DTOs: mutable `public class`, DataAnnotations for field-level validation, 
 
 ---
 
-### Rule 4 — Query inputs and outputs use the standard request/result wrappers
+### Rule 4 — Query inputs and outputs use the standard request/result wrappers <!-- layers: Application.Contracts -->
 
 Phase 2 feat-specs default to:
 - **Query input** extends `PagedAndSortedResultRequestDto`.
@@ -151,7 +151,7 @@ Use `LimitedResultRequestDto` only when paging is explicitly out of scope (a fix
 
 ---
 
-### Rule 5 — Companion entity pattern for project extensions to built-ins
+### Rule 5 — Companion entity pattern for project extensions to built-ins <!-- layers: Domain, Application.Contracts -->
 
 When the project needs fields beyond what an ABP built-in stores:
 
@@ -165,7 +165,7 @@ A companion entity is a regular aggregate root — it goes through the same temp
 
 ---
 
-### Rule 6 — Property names use PascalCase
+### Rule 6 — Property names use PascalCase <!-- layers: cross-cutting -->
 
 Every property on an entity, owned-type, value object, or DTO is named in **PascalCase** (`ReferenceNumber`, `BeneficiaryNature`, `BgNumber`).
 
@@ -179,7 +179,7 @@ The Phase 2 feat-spec validator flags any non-PascalCase identifier in a staged 
 
 ---
 
-### Rule 7 — Bounded-value fields are C# enums
+### Rule 7 — Bounded-value fields are C# enums <!-- layers: Domain.Shared, Application.Contracts, EntityFrameworkCore -->
 
 Any field whose value is drawn from a closed, named set — more than one value, all known at design time — is modelled as a **C# enum**, not a `string` with a validation list.
 
@@ -215,13 +215,13 @@ In the entity's **Fields** table the `Type` column names the enum. A separate **
 
 ---
 
-### Rule 8 — No data annotations on domain entities
+### Rule 8 — No data annotations on domain entities <!-- layers: Domain, EntityFrameworkCore -->
 
 Every persistence concern (table name, column type, max length, owned-type mapping) lives in the `IEntityTypeConfiguration<T>` class in the `EntityFrameworkCore` project. Domain entities stay POCO. DataAnnotations live on **input DTOs only**.
 
 ---
 
-### Rule 9 — File and table naming conventions
+### Rule 9 — File and table naming conventions <!-- layers: cross-cutting, EntityFrameworkCore -->
 
 #### 9.1 One C# type per file; file name matches type name
 
@@ -324,7 +324,7 @@ The folder hierarchy maps 1:1 to the namespace. The solution root namespace come
 
 ---
 
-### Rule 10 — Auto API Controllers are the default HTTP exposure
+### Rule 10 — Auto API Controllers are the default HTTP exposure <!-- layers: Application -->
 
 Every `IApplicationService` in the contracts assembly is auto-exposed as
 an HTTP endpoint through ABP's auto API controller pipeline. The host
@@ -362,7 +362,7 @@ The Phase 3 merge gate flags any manual controller without a backing DEC
 
 ---
 
-### Rule 11 — Node-body to service-layer mapping
+### Rule 11 — Node-body to service-layer mapping <!-- layers: Domain, Application -->
 
 Every business node has exactly one C# type that carries its body, by
 node type:
@@ -400,7 +400,7 @@ that carry logic beyond unwrap-and-project.
 
 ---
 
-### Rule 12 — `IEntityTypeConfiguration<T>` enforcement (tightens Rule 8 + Rule 9.2)
+### Rule 12 — `IEntityTypeConfiguration<T>` enforcement (tightens Rule 8 + Rule 9.2) <!-- layers: EntityFrameworkCore -->
 
 Every entity has its own configuration class at the slot Rule 9.2
 declares:
@@ -433,7 +433,7 @@ missing configuration files block the merge.
 
 ---
 
-### Rule 13 — Shared validation / schema constants per module
+### Rule 13 — Shared validation / schema constants per module <!-- layers: Domain.Shared, EntityFrameworkCore -->
 
 Each module declares one `Domain.Shared/<Module>/<Module>Consts.cs` file
 holding the numeric and pattern literals shared between persistence and
@@ -474,7 +474,7 @@ introduced.
 
 ---
 
-### Rule 14 — Typed ABP exceptions only; HTTP status mapping
+### Rule 14 — Typed ABP exceptions only; HTTP status mapping <!-- layers: Application -->
 
 **Anchor:** [CCC-006](../../docs/shared/ccc/CCC-006-exception-handling.md)
 (baseline; companion to STD-002 R1 — ErrorOr is the preferred path,
@@ -512,7 +512,7 @@ hits block the merge.
 
 ---
 
-### Rule 15 — Authorization placement and grouping
+### Rule 15 — Authorization placement and grouping <!-- layers: Application.Contracts, Application -->
 
 **Anchor:** [CCC-002](../../docs/shared/ccc/CCC-002-authorization.md).
 
@@ -567,7 +567,7 @@ for when to inline on the actor vs. promote to PERM.
 
 ---
 
-### Rule 16 — Soft-delete data filter discipline
+### Rule 16 — Soft-delete data filter discipline <!-- layers: Domain, Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-012](../../docs/shared/ccc/CCC-012-soft-delete-and-retention.md).
 Companion to Rule 2 (`FullAudited*` base classes implicitly enable
@@ -600,7 +600,7 @@ hits block the merge.
 
 ---
 
-### Rule 17 — Audit logging via ABP audit module, not `ILogger`
+### Rule 17 — Audit logging via ABP audit module, not `ILogger` <!-- layers: Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-004](../../docs/shared/ccc/CCC-004-auditing.md).
 Logging-side mirror: [STD-006 Rule 6](STD-006-logging-conventions.md).

@@ -423,3 +423,56 @@ covers the Stage 6 engine-file diffs only.
   (CCC-005), R3 (CCC-007); STD-005 R14 (CCC-006), R17 (CCC-004); STD-006
   R6 (CCC-004). Preserves forward-reference semantics until project
   bootstrap lazy-creates the cited CCCs.
+
+## [2026-05-22] plan-consolidated | STD-002/005/006 layer tags + by-layer pointer files + workflow wiring
+
+Source: plan `can-you-review-the-encapsulated-kitten.md`.
+
+- **STD-002 — `convention` tag added + 5 rule-heading layer comments.** Added
+  `convention` to `tags:` frontmatter (aligns with the convention-autoload
+  scanner). Appended `<!-- layers: ... -->` inline comments to all 5 rule
+  headings: R1 (Domain, Application.Contracts, Application), R2
+  (Application.Contracts, Domain), R3 (Domain.Shared), R4 (Domain), R5
+  (Domain). Comments are invisible to lint and do not change rule semantics.
+
+- **STD-005 — 17 rule-heading layer comments.** Appended `<!-- layers: ... -->`
+  to R1–R17. R9 covers cross-cutting + EntityFrameworkCore (sub-rules
+  9.1/9.2/9.3/9.6 are cross-cutting; 9.4/9.5 are EntityFrameworkCore); R11
+  covers Domain + Application (Manager half + AppService half); R16 covers
+  Domain + Application + EntityFrameworkCore. No rule text changed.
+
+- **STD-006 — 6 rule-heading layer comments.** R1/R3/R4 →
+  Application + EntityFrameworkCore; R2 → Domain + Application +
+  EntityFrameworkCore; R5/R6 → Application only.
+
+- **NEW — `sdlc/standards/by-layer/` (7 pointer files).** Per-layer pointer
+  files for the 5 ABP layers + 1 cross-cutting file + 1 index file:
+  `cross-cutting.md` (all layers), `shared.md` (Cohort A), `domain.md`
+  (Cohort A), `contracts.md` (Cohort B), `application.md` (Cohort B),
+  `infrastructure.md` (Cohort C), `index.md` (routing table). Each pointer
+  file cites rule IDs only — no rule-text restatement. Cohort D
+  (`HttpApi.Host`) is out of scope; pointer file added when an FRS requires
+  host code.
+
+- **`sdlc/standards/index.md` — `## By layer` section + STD-002 row tag.**
+  Added `## By layer` section linking to `by-layer/index.md`. STD-002 Tags
+  cell updated to include `convention` (sync with frontmatter).
+
+- **Workflow wiring (no rule-semantic changes):**
+  - `sdlc/workflow/implementation.md` — Stage 2 Code convention paragraph
+    rewritten to name STD-002/005/006 explicitly + add per-layer narrow-load
+    bullet + routing link; new `### Stage 2 Code — per-layer dispatch`
+    sub-section with round structure and precondition; stale
+    `ADR-002-abp-layer-cohort-ordering.md` link fixed to
+    `ADR-009-implementation-task-cohort-ordering.md` at four locations
+    (`implementation.md` × 2 + `plan.md` × 2); accompanying numeric-cohort
+    references updated to ADR-009's A/B/C/D vocabulary (`Cohort 3` → `Cohort C`
+    in `implementation.md`; `Cohort 1` → `Cohort A` and the six-cohort prose
+    block compressed to "see ADR-009 § Decision" in `plan.md`).
+  - `sdlc/workflow/agent-contracts.md` — new `### Code-writing dispatch`
+    sub-section under `## Dispatch shapes` (envelope, outputs, forbidden,
+    verification).
+  - `sdlc/workflow/retrieval-discipline.md` — Phase 3 row addendum: per-layer
+    narrow-load step + orchestrator reads `by-layer/index.md`.
+  - `sdlc/workflow/planning-conventions.md` — `### Phase 3 layer dispatch`
+    paragraph under `## Sub-agent dispatch`.

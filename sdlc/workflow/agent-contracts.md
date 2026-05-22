@@ -194,6 +194,34 @@ Apply before any dispatch:
 - **Tool floor**: default to read-only (Read / Grep / Glob). Promote to Edit / Write only when the task explicitly demands a mutation.
 - **Parallelism rule**: fan out N subagents in parallel when their work is file-disjoint and order-independent. Serialize when subagents share files or when one output feeds another's input. Gate checks (Phase 1.5 + Phase 3) are the canonical parallel instances.
 
+### Code-writing dispatch
+
+Code-writing sub-agents (Phase 3, Stage 2) dispatch with this required envelope:
+
+**Inputs (orchestrator must include):**
+- Layer name (`shared` | `domain` | `contracts` | `application` | `infrastructure`).
+- Pointer file path — `sdlc/standards/by-layer/<layer>.md` — and
+  `sdlc/standards/by-layer/cross-cutting.md`.
+- FS path — the agent reads its `consumes_chgs:`, `new_nodes:`, and
+  Implementation-tasks rows tagged with the agent's cohort.
+- ABP project root for write scope — file-disjoint by project per STD-005 R9.2.
+- Active CHG entries (`modifies[]` + `adds[]`) the agent must apply.
+
+**Outputs:** standard `## Findings` / `## Risks` / `## Open questions` ≤ 400
+words (Layer 1 return shape above), plus a `## Files written` block listing each
+created or modified path. The agent cites by `STD-NNN R<n>` — does NOT restate
+rule text.
+
+**Forbidden:** writing outside the ABP project root passed in. Reading STDs not
+cited by the pointer files (waste of tokens). Editing canonical nodes (that path
+goes through the orchestrator per
+[`implementation.md § Node content updates`](implementation.md#node-content-updates-during-implementation)).
+
+**Verification by the orchestrator** (per
+[`§ Mutation verification`](#mutation-verification-write-capable-dispatches-only)
+above): diff each `Files written` path against the cited rules; grep for the
+layer's "common defects" callouts in the pointer file.
+
 ---
 
 ## TaskCreate discipline

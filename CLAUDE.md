@@ -71,6 +71,9 @@ is the rule book.
    [`sdlc/workflow/plan.md`](sdlc/workflow/plan.md). Progress-checklist
    procedure:
    [`sdlc/WORKFLOW.md § Validation gates`](sdlc/WORKFLOW.md#validation-gates).
+   Plan structure conventions (multi-phase default, sub-agent dispatch,
+   Karpathy gate):
+   [`sdlc/workflow/planning-conventions.md`](sdlc/workflow/planning-conventions.md).
 8. Tiered touch for canonical edits: node / ADR / CCC + per-type
    `index.md` (base + N when `related:` changes). Canonical `log.md`
    retired 2026-05-16 (research + standards logs survive).

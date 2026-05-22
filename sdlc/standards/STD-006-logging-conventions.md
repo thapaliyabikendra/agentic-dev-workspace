@@ -48,7 +48,7 @@ scope — they are deferred to the first production-observability FRS
 
 ## Standards
 
-### Rule 1 — `ILogger<T>` injection only
+### Rule 1 — `ILogger<T>` injection only <!-- layers: Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-013](../../docs/shared/ccc/CCC-013-observability.md).
 
@@ -66,7 +66,7 @@ for `Serilog.ILogger` as a field or parameter type, and for static
 
 ---
 
-### Rule 2 — Per-layer log levels
+### Rule 2 — Per-layer log levels <!-- layers: Domain, Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-013](../../docs/shared/ccc/CCC-013-observability.md).
 Companion to STD-002 R1 (Domain Manager returns `ErrorOr<T>` rather
@@ -83,7 +83,7 @@ under any `Domain/` (or `*.Domain/`) folder — hits block the merge.
 
 ---
 
-### Rule 3 — Structured logging with named properties
+### Rule 3 — Structured logging with named properties <!-- layers: Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-013](../../docs/shared/ccc/CCC-013-observability.md).
 
@@ -106,7 +106,7 @@ a `+`-concatenated template literal — hits block the merge.
 
 ---
 
-### Rule 4 — Never log sensitive data
+### Rule 4 — Never log sensitive data <!-- layers: Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-013](../../docs/shared/ccc/CCC-013-observability.md);
 companion to CCC-001 (Authentication & Identity) and CCC-002
@@ -141,7 +141,7 @@ hits block the merge.
 
 ---
 
-### Rule 5 — Correlation enrichment via ABP Serilog
+### Rule 5 — Correlation enrichment via ABP Serilog <!-- layers: Application -->
 
 **Anchor:** [CCC-013](../../docs/shared/ccc/CCC-013-observability.md).
 
@@ -168,7 +168,7 @@ is dead code that disagrees with the enricher's source of truth).
 
 ---
 
-### Rule 6 — Audit logging via ABP audit module, not `ILogger`
+### Rule 6 — Audit logging via ABP audit module, not `ILogger` <!-- layers: Application -->
 
 **Anchor:** [CCC-004](../../docs/shared/ccc/CCC-004-auditing.md).
 Structural mirror: [STD-005 Rule 17](STD-005-abp-coding-conventions.md#rule-17--audit-logging-via-abp-audit-module-not-ilogger).

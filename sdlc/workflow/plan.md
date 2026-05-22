@@ -461,8 +461,8 @@ and
   `application` value as a Blocker).
 - **ENT** nodes declare each persisted property's validation constants
   (max-length, range, decimal-precision, regex-pattern) in the body,
-  named to match the `<Module>Consts.cs` constants Cohort 1 of
-  [`ADR-002`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md)
+  named to match the `<Module>Consts.cs` constants Cohort A of
+  [`ADR-009`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md)
   will author. The ENT body names the constant (e.g.,
   `DepartmentNameMaxLength = 128`); the actual `.cs` file is Phase 3 Cohort
   1's deliverable. Phase 2 stops at the names + values. Numeric literals
@@ -747,12 +747,13 @@ Scan `docs/<component>/adrs/index.md` for the ADR tagged `task-ordering` and con
 cohort table. Each task references the relevant convention ADR by ID rather than restating
 the convention.
 
-> **APP component:** [`ADR-002`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md)
-> (`task-ordering` tag) — six cohorts: (1) `Domain.Shared`, (2) `Domain`,
-> (3) `EntityFrameworkCore`, (4) `Application.Contracts`, (5) `Application`,
-> (6) `HttpApi.Host`, plus a cross-cutting cohort (seed contributors, `en.json`,
-> tests). Other components: look up their own `task-ordering`-tagged ADR; if
-> the slot is empty, author the ADR before authoring Implementation tasks.
+> **APP component:** [`ADR-009`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md)
+> (`task-ordering` tag) — see ADR-009 § Decision for the authoritative cohort
+> table (A: Domain + Domain.Shared; B: Application + Application.Contracts;
+> C: EntityFrameworkCore; D: HttpApi + HttpApi.Host). Cross-cutting work
+> (seed contributors, `en.json`, tests) interleaves per scenario. Other
+> components: look up their own `task-ordering`-tagged ADR; if the slot is
+> empty, author the ADR before authoring Implementation tasks.
 
 Cross-cutting tasks (test scaffolding, seed data) land at the end as a final cohort or
 interleaved per scenario, but never before the cohort they validate compiles.

@@ -6,7 +6,7 @@ created: 2026-05-13
 updated: 2026-05-17
 supersedes: null
 superseded_by: null
-tags: [dotnet, application-layer, errororstd, validation, localization, repository-query, encapsulation]
+tags: [dotnet, application-layer, errororstd, validation, localization, repository-query, encapsulation, convention]
 scope: engine
 applies_when:
   stack: [api]
@@ -47,7 +47,7 @@ patterns that STD-005's rules consume.
 
 ## Standards
 
-### Rule 1 — ErrorOr Result Pattern (Domain Service contract)
+### Rule 1 — ErrorOr Result Pattern (Domain Service contract) <!-- layers: Domain, Application.Contracts, Application -->
 
 **Anchor:** [CCC-006](../../docs/shared/ccc/CCC-006-exception-handling.md)
 (baseline). Companion STD-005 rules: Rule 11 (Manager carries node body),
@@ -186,7 +186,7 @@ fold to the most severe.
 
 ---
 
-### Rule 2 — FluentValidation (AppService input validation)
+### Rule 2 — FluentValidation (AppService input validation) <!-- layers: Application.Contracts, Domain -->
 
 **Anchor:** [CCC-005](../../docs/shared/ccc/CCC-005-validation.md)
 (baseline). Companion STD-005 rules: Rule 13 (`<Module>Consts.cs` for
@@ -286,7 +286,7 @@ matching `<DtoName>Validator.cs` exists in
 
 ---
 
-### Rule 3 — Localization-key constants
+### Rule 3 — Localization-key constants <!-- layers: Domain.Shared -->
 
 **Anchor:** [CCC-007](../../docs/shared/ccc/CCC-007-localization.md)
 (baseline). Companion STD-005 rule: Rule 9.2 amended slot
@@ -402,7 +402,7 @@ The Phase 3 merge gate scans:
 
 ---
 
-### Rule 4 — Repository query discipline (`IQueryable` + `WhereIf`)
+### Rule 4 — Repository query discipline (`IQueryable` + `WhereIf`) <!-- layers: Domain -->
 
 **Anchor:** none — engine convention. Companion STD-005 rule: Rule 11
 (Manager carries node body). Companion STD-005 Rule 16 (soft-delete
@@ -510,7 +510,7 @@ Hits block the merge.
 
 ---
 
-### Rule 5 — Aggregate-root encapsulation (builder-style mutation)
+### Rule 5 — Aggregate-root encapsulation (builder-style mutation) <!-- layers: Domain -->
 
 **Anchor:** future STD-001 (DDD standards, placeholder). Companion
 STD-005 rules: Rule 11 (Manager carries node body), Rule 9.2 (Domain

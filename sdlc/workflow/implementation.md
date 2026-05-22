@@ -387,23 +387,30 @@ Stage 1 bug, not a Stage 2 working state).
 **Convention ADRs, STDs, and CCCs to consult during coding.** Stage 2 honors:
 - Every ADR in `docs/<component>/adrs/index.md` tagged `convention` (or labelled
   as a project-wide commitment) in addition to the FS's declared `adrs:` set.
-- Every STD in the FS's `standards:` set whose `applies_when.stack:` intersects
-  the FS's `stack:`, plus any STD tagged `convention` / `task-ordering` /
-  `code-quality` from `sdlc/standards/index.md`.
+- **All `convention` / `task-ordering` / `code-quality` STDs from
+  `sdlc/standards/index.md` (currently: STD-002, STD-005, STD-006)** — load
+  wholesale at Stage 2 entry via the indexes, in addition to any STDs explicitly
+  declared in the FS's `standards:`.
+- **Per-layer narrow-load:** when dispatching a coding sub-agent for a layer,
+  the sub-agent loads `sdlc/standards/by-layer/<layer>.md` +
+  `sdlc/standards/by-layer/cross-cutting.md` — and *only* the STD rules those
+  pointer files cite. Routing table:
+  [`sdlc/standards/by-layer/index.md`](../standards/by-layer/index.md).
 - Every CCC in the FS's `ccc:` set — the Baseline section names the default
   behavior; an operation-specific deviation requires a back-linked ADR (with
   `related: [CCC-NNN]`) already declared in `adrs:`.
 
-Read each relevant index first; narrow-load individual pages when authoring
-code that touches their area. The FS's `adrs:` + `standards:` + `ccc:` lists
-together with the convention-tagged ADRs and STDs from the indexes form the
-conformance set [`qa-gate.md`](qa-gate.md) verifies.
+Read `sdlc/standards/index.md` and `sdlc/standards/by-layer/index.md` first;
+narrow-load individual STD pages and the relevant layer pointer file when
+authoring or dispatching code for a layer. The FS's `adrs:` + `standards:`
++ `ccc:` lists together with the convention-tagged ADRs and STDs from the
+indexes form the conformance set [`qa-gate.md`](qa-gate.md) verifies.
 
 Cohort ordering inside the FS's Implementation tasks maps to these ADRs —
 see
 [`plan.md → Implementation-task cohort ordering`](plan.md#implementation-task-cohort-ordering)
 and the project's `task-ordering`-tagged ADR (APP component:
-[`ADR-002`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md);
+[`ADR-009`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md);
 look up `docs/<component>/adrs/index.md` for other components). The
 ADR's cohort table is the source of truth for layer order, per-cohort
 STD/CCC anchors, and per-cohort parallel-dispatch eligibility (file-
@@ -418,9 +425,36 @@ failures inside the just-touched cohort are local and fixed in place;
 failures in unrelated projects, missing-type errors across cohort
 boundaries, or DI-resolution errors at startup indicate the cohort
 ordering or dependency declaration is wrong — halt and revisit the FS
-task ordering rather than papering over. Cohort 3 is the canonical
+task ordering rather than papering over. Cohort C is the canonical
 surface for STD-005 R12 violations — see
-[`ADR-002 § Build-validate at each boundary`](../../docs/app/adrs/ADR-002-abp-layer-cohort-ordering.md).
+[`ADR-009 § Rationale`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md#rationale).
+
+### Stage 2 Code — per-layer dispatch
+
+**Precondition:** the orchestrator MAY dispatch per-layer agents only when the
+FS's "Implementation tasks" rows for the target cohort are mechanically
+specified — each row names the file path, type name, method signatures, and
+references the relevant CHG `adds[]` / `modifies[]` entries. Vague rows
+("implement the query") fall back to main-session authoring per
+[`sdlc/PRINCIPLES.md`](../PRINCIPLES.md) ("Mechanical work ≠ judgment work").
+
+Round structure (mirrors [ADR-009](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md) cohort ordering):
+
+**Round 1 (Cohort A):** parallel — `shared` agent + `domain` agent.
+Each loads `sdlc/standards/by-layer/<shared|domain>.md` + `cross-cutting.md`. Build-gate after round.
+
+**Round 2 (Cohort B):** parallel — `contracts` agent + `application` agent.
+Each loads its pointer file + `cross-cutting.md`. Build-gate after round.
+
+**Round 3 (Cohort C):** `infrastructure` agent.
+Loads `sdlc/standards/by-layer/infrastructure.md` + `cross-cutting.md`. Build-gate after round.
+
+Cohort D (`HttpApi.Host`) stays in the main session — no pointer file is defined in this plan.
+
+Per-round file-disjointness: each agent writes only to its ABP project root (STD-005 R9.2).
+Cross-layer references go through already-merged code from earlier cohorts — not concurrent writes.
+
+Agent envelope: per [`agent-contracts.md § Code-writing dispatch`](agent-contracts.md#code-writing-dispatch).
 
 Four disciplines distinguish this from "just write the code":
 

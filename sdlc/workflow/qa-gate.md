@@ -82,10 +82,89 @@ run (load those files first).
   A silent override of a CCC default is a finding; resolution is to either back
   out the override in code, or author/file the back-linking ADR before the flip.
   Same 3-block contract and outcome routing.
+- **Code-pattern conformance check** — parallel inline
+  `Agent(subagent_type=Explore, ...)` dispatch scanning source files at the
+  FS's `service_repos:` (or the workspace root for monolith deployments)
+  against the **project-baseline** patterns declared by the FS's `adrs:` and
+  the component's `convention` / `code-quality` ADRs — **independent of**
+  `standards:` declarations. Exists to surface drift the STD-conformance
+  check cannot see when a stack-applicable STD goes undeclared in
+  `standards:` and the STD-conformance dispatch skips it (defense in depth
+  against the silent-drift failure mode that motivated promoting
+  "undeclared stack-narrow STD" to a Blocker — see
+  [`frs-validation-rules.md`](frs-validation-rules.md) Severity
+  classification, `type: standard-conflict`). Pattern catalog and
+  dispatch contract: [Code-pattern conformance](#code-pattern-conformance)
+  below. Returns the same 3-block contract and outcome routing.
+  **Gating:** fires when `service_repos:` (or workspace root) is non-empty;
+  does NOT gate on `standards:` being declared.
 - Affected canonical nodes updated to reflect actual implementation.
 - No silent canonical edits outside what the FS declared.
 - No silent ADR edits — any ADR change goes through the proper authoring /
   supersession procedure in [`authoring-adr.md`](authoring-adr.md).
+
+---
+
+## Code-pattern conformance
+
+The code-pattern subagent runs **alongside** the three declared-input
+checks (ADR / STD / CCC), not as a substitute. The declared-input checks
+verify what the FS lists; the code-pattern check verifies what the
+project's currently-`accepted` ADRs **mandate** — even when the FS
+forgot to declare the STD that encodes the same pattern. This closes
+the failure mode where a stack-applicable STD goes undeclared in
+`standards:`, the STD-conformance dispatch skips it, and the resulting
+drift ships silently. Companion edit:
+[`frs-validation-rules.md`](frs-validation-rules.md) promotes
+"undeclared stack-narrow STD" from Major to Blocker at Phase 1.5 so the
+upstream half of the gap is also closed.
+
+**Pattern source.** Patterns derive from the project's currently
+`accepted` ADRs at `docs/<component>/adrs/` (located via
+`docs/<component>/adrs/index.md` — the `convention` / `code-quality`
+tags) plus any ADR explicitly cited in the FS's `adrs:` whose body
+mandates a code-level pattern. The catalog is **project data**, not
+framework data — the subagent re-reads the source ADR body at gate
+entry, so a doctrinal flip (a superseding ADR that changes the
+mandated pattern) propagates atomically without a `qa-gate.md` edit.
+
+**Pattern shape.** Each entry is a (locator, expected) pair. The
+locator names where to scan — a source-file glob plus a structural
+filter (class suffix, method visibility, file-name regex). The
+expected is the project's currently-`accepted` ADR whose body
+declares the pattern; the subagent re-reads that ADR at gate entry
+to resolve the expected value. The subagent reports the locator
+hit set and the expected-vs-actual diff — it does not adjudicate
+whether the pattern is correct.
+
+| Locator (project supplies) | Expected source-of-truth (project supplies) |
+|---|---|
+| File glob + structural filter | The currently-`accepted` ADR whose body declares the pattern (re-read at gate entry) |
+
+> **Your project:** Maintain the concrete (locator, expected) catalog
+> in the project's `convention` / `code-quality` ADRs (or a sidecar
+> referenced by them). The catalog lives where the convention is
+> declared, not in this engine file — the workflow stays
+> project-agnostic. The subagent reads the catalog at gate entry from
+> the ADR(s) tagged `convention` / `code-quality` in
+> `docs/<component>/adrs/index.md` plus any ADR cited in the FS's
+> `adrs:` whose body declares a code-level pattern. Typical pattern
+> classes include error-modeling on domain service methods, input-DTO
+> validation contracts, aggregate-root encapsulation, and repository
+> query shape — but the actual rows are whatever the project's
+> currently-`accepted` ADRs mandate.
+
+**Dispatch contract — scans, not judgment.** Returns the 3-block
+contract (`## Findings / ## Risks / ## Open questions`) per
+[`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape).
+Outcome routing matches the other three conformance checks (DONE /
+DONE_WITH_CONCERNS / NEEDS_CONTEXT / BLOCKED) — see
+[Handling QA Status](#handling-qa-status).
+
+**Gating.** Fires when the FS's `service_repos:` is non-empty, or for
+a monolith repo when the workspace root is detected. Does **not** gate
+on `standards:` being non-empty — that is precisely the failure mode
+this check exists to catch.
 
 ---
 
@@ -110,10 +189,10 @@ code-quality ADR — not a quiet exception. See
 
 ## Handling QA Status
 
-The ADR-conformance check dispatches parallel
-`Agent(subagent_type=Explore, ...)` subagents, each returning the 3-block
-contract (`## Findings / ## Risks / ## Open questions`). Contract canonical
-home:
+All four conformance checks (ADR / STD / CCC / code-pattern) dispatch
+parallel `Agent(subagent_type=Explore, ...)` subagents, each returning
+the 3-block contract (`## Findings / ## Risks / ## Open questions`).
+Contract canonical home:
 [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape).
 
 **DONE** → 0 Findings or only Minor — proceed to complete the QA
