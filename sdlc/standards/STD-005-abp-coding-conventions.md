@@ -3,7 +3,7 @@ id: STD-005
 title: ABP framework coding conventions
 status: accepted
 created: 2026-05-15
-updated: 2026-05-17
+updated: 2026-05-22
 supersedes: null
 superseded_by: null
 tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging, mapperly]

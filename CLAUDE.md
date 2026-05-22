@@ -24,6 +24,18 @@ FRS in the milestone — invalidates the gate snapshot.
 [`sdlc/workflow/baseline-references.md`](sdlc/workflow/baseline-references.md)
 is the rule book.
 
+**HARD-GATE:** every FRS / FS authored on or after 2026-05-22 MUST
+declare `framework:` in frontmatter (enum at
+[`sdlc/BOUNDARY.md § Framework axis`](sdlc/BOUNDARY.md#framework-axis-frontmatter-enum);
+use `[agnostic]` for framework-independent specs). Symmetric with the
+existing mandatory `stack:`; closes the silent-miss class where a
+framework-conditional STD like STD-005 fell out of the Phase 1.5
+intersection because the consumer omitted `framework:`. Pre-2026-05-22
+artifacts are grandfathered; the next substantive edit to any of them
+backfills both `stack:` and `framework:`. Phase 1.5 Blocker
+(`type: frontmatter-presence`) per
+[`sdlc/workflow/frs-validation-rules.md`](sdlc/workflow/frs-validation-rules.md).
+
 **Retrieval discipline** (what to load at each phase entry):
 [`sdlc/workflow/retrieval-discipline.md`](sdlc/workflow/retrieval-discipline.md).
 

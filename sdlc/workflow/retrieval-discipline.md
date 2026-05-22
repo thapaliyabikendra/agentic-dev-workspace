@@ -214,7 +214,7 @@ Phase-by-phase retrieval matrix:
 
 | Phase | STD index | CCC index | Narrow-load posture |
 |-------|-----------|-----------|---------------------|
-| 1.5   | scan      | snapshot  | STDs whose `applies_when.stack:` matches FRS `stack:`; CCCs declared in FRS `ccc:`. Drives the STD-conformance + CCC-deviation Pass 1 checks. |
+| 1.5   | scan      | snapshot  | STDs whose `applies_when.stack:` matches FRS `stack:` **and** whose `applies_when.framework:` (when declared) matches FRS `framework:` — intersection on both axes per [`../BOUNDARY.md § Framework axis`](../BOUNDARY.md#framework-axis-frontmatter-enum) (mandatory on consumers since 2026-05-22); CCCs declared in FRS `ccc:`. Drives the STD-conformance + CCC-deviation Pass 1 checks. |
 | 2     | wholesale | wholesale | STDs from FS `standards:` ∪ convention-tagged; CCCs from FS `ccc:`. |
 | 3     | wholesale | wholesale | Same as Phase 2, plus convention-tagged STDs not yet in FS (currently: STD-002, STD-005, STD-006). **Per-layer narrow-load:** each code-writing sub-agent loads `sdlc/standards/by-layer/<layer>.md` + `cross-cutting.md`; the orchestrator reads `sdlc/standards/index.md` and `sdlc/standards/by-layer/index.md` to confirm routing before dispatching. |
 | QA gate | wholesale | wholesale | Drives STD-conformance + CCC-deviation subagent dispatches alongside the existing ADR-conformance check. |

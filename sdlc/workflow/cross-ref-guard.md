@@ -59,11 +59,35 @@ for the trigger.
    ```
    grep -rEn '\b(ADR|STD|CCC|FRS|FS|CHG|TC|OQ)-[0-9]{3,4}\b' sdlc/ docs/*/COMPONENT.md
    grep -rEn '(tagged|tag:)\s+(`?)(task-ordering|code-quality|convention|naming-conventions|error-handling)\b' sdlc/ docs/*/COMPONENT.md
+   grep -rEn '\[STD-[0-9]{3} § Rule [0-9.]+\]' sdlc/standards/by-layer/
    ```
 
 2. For each cited **ID**, verify the file exists at its declared path
    (per the type's slot in [`KB-LAYOUT.md`](../KB-LAYOUT.md) or
    [`LAYOUT.md`](../LAYOUT.md)). Misses are dangling.
+
+   **Pointer-file sub-check** (`sdlc/standards/by-layer/*.md`): rule
+   citations there are anchor-bearing —
+   `[STD-NNN § Rule X.Y](../STD-NNN-…md#anchor)`. Verify both (a) the
+   target STD file exists, and (b) the `#anchor` fragment resolves to a
+   real heading in the target STD under GitHub-flavored auto-anchor
+   rules. Generation steps (apply in order to each heading's text):
+
+   1. Strip any trailing HTML comment from the heading (e.g.,
+      `<!-- layers: Domain -->` — common on STD-002 / 005 / 006
+      headings) before normalizing.
+   2. Lowercase the remainder.
+   3. Strip punctuation: `.`, `,`, `?`, `!`, `(`, `)`, `'`, `` ` ``,
+      em-dash `—`, en-dash `–`.
+   4. Replace whitespace and `:` with `-`.
+
+   Gotcha: an em-dash surrounded by spaces (e.g., `boundary — never`)
+   collapses to a doubled `--` in the anchor — the dash itself strips,
+   then the two surrounding spaces each become `-`. Anchor mismatches —
+   not file misses — were the failure mode caught by the 2026-05-22
+   hygiene pass (`errororstd` typo silently propagated into two broken
+   anchor links in `by-layer/application.md` and `by-layer/contracts.md`;
+   see [`../standards/log.md`](../standards/log.md) entry of that date).
 
 3. For each cited **tag**, grep the matching index for the tag value;
    if zero matches AND the citation reads as load-bearing (not as a

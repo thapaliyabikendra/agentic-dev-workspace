@@ -24,7 +24,7 @@ Key folders:
 
 | Rule | Source § heading | One-line rationale |
 | ---- | ---------------- | ------------------ |
-| STD-002 R1.3 | [STD-002 § Rule 1.3](../STD-002-dotnet-coding-conventions.md#13-errororstd-boundary--never-past-the-appservice) | `ErrorOr<T>` must NOT appear in DTOs or interfaces |
+| STD-002 R1.3 | [STD-002 § Rule 1.3](../STD-002-dotnet-coding-conventions.md#13-erroror-boundary--never-past-the-appservice) | `ErrorOr<T>` must NOT appear in DTOs or interfaces |
 | STD-002 R2.1 | [STD-002 § Rule 2.1](../STD-002-dotnet-coding-conventions.md#21-validator-type-and-slot) | `AbstractValidator<TDto>` at `Validators/` slot |
 | STD-002 R2.2 | [STD-002 § Rule 2.2](../STD-002-dotnet-coding-conventions.md#22-no-magic-numbers-no-inline-messages) | No magic numbers; no inline messages in validators |
 | STD-002 R2.4 | [STD-002 § Rule 2.4](../STD-002-dotnet-coding-conventions.md#24-validation-failure-path) | Validator fails → `AbpValidationException` (HTTP 400) |

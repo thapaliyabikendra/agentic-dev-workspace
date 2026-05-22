@@ -3,7 +3,7 @@ id: STD-006
 title: Engine-level logging conventions
 status: accepted
 created: 2026-05-17
-updated: 2026-05-17
+updated: 2026-05-22
 supersedes: null
 superseded_by: null
 tags: [logging, observability, structured-logging, convention, pii, abp]
@@ -48,7 +48,7 @@ scope — they are deferred to the first production-observability FRS
 
 ## Standards
 
-### Rule 1 — `ILogger<T>` injection only <!-- layers: Application, EntityFrameworkCore -->
+### Rule 1 — `ILogger<T>` injection only <!-- layers: Domain, Application, EntityFrameworkCore -->
 
 **Anchor:** [CCC-013](../../docs/shared/ccc/CCC-013-observability.md).
 

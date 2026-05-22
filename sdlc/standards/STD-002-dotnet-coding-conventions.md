@@ -3,10 +3,10 @@ id: STD-002
 title: Engine-level .NET implementation conventions
 status: accepted
 created: 2026-05-13
-updated: 2026-05-17
+updated: 2026-05-22
 supersedes: null
 superseded_by: null
-tags: [dotnet, application-layer, errororstd, validation, localization, repository-query, encapsulation, convention]
+tags: [dotnet, application-layer, erroror, validation, localization, repository-query, encapsulation, convention]
 scope: engine
 applies_when:
   stack: [api]

@@ -13,6 +13,7 @@ adrs: []                      # ADR IDs consulted while drafting (carried from D
 standards: []                 # STD IDs this FRS consumes (e.g., STD-005); narrowed at Phase 1.5 from sdlc/standards/index.md
 ccc: []                       # CCC IDs this FRS cites by category (e.g., CCC-004 Auditing); deviations from these baselines must be filed as ADRs in `adrs:`
 stack: []                     # subset of api | ui | test | full-stack | infra | agnostic — canonical enum in sdlc/BOUNDARY.md § Stack axis
+framework: []                 # MANDATORY since 2026-05-22 — subset of abp-net | agnostic — canonical enum in sdlc/BOUNDARY.md § Framework axis. Use [agnostic] for framework-independent specs. Phase 1.5 fails on missing (grandfathered for pre-2026-05-22 FRSs).
 related_frs: []
 from_cr: []                   # CR-NNN IDs — when this FRS was escalated from a CR track; blank otherwise
 resolves: []                  # OQ-NNN IDs this FRS closes (most often the OQs the FRS itself surfaced earlier, or pre-existing OQs the FRS finally answers); reciprocal — each OQ's `resolved_by:` cites this FRS

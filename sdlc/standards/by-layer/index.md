@@ -38,8 +38,10 @@
 
 ## Cohort dispatch summary
 
-Mirrors [ADR-009](../../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md) §
+Mirrors `docs/<component>/adrs/ADR-009-implementation-task-cohort-ordering.md` §
 cohort table — see ADR-009 for the authoritative ordering rationale.
+`<component>` resolves to the project's primary code-emitting component, declared
+in `docs/project.md`.
 
 | Round | Cohort | Parallel agents | Build-gate |
 | ----- | ------ | --------------- | ---------- |

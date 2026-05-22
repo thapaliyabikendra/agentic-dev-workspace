@@ -22,7 +22,7 @@ Key folders:
 
 | Rule | Source § heading | One-line rationale |
 | ---- | ---------------- | ------------------ |
-| STD-002 R1.3 | [STD-002 § Rule 1.3](../STD-002-dotnet-coding-conventions.md#13-errororstd-boundary--never-past-the-appservice) | AppService interface returns `T`, not `ErrorOr<T>` |
+| STD-002 R1.3 | [STD-002 § Rule 1.3](../STD-002-dotnet-coding-conventions.md#13-erroror-boundary--never-past-the-appservice) | AppService interface returns `T`, not `ErrorOr<T>` |
 | STD-002 R1.4 | [STD-002 § Rule 1.4](../STD-002-dotnet-coding-conventions.md#14-appservice-unwrap-pattern) | AppService unwraps `ErrorOr<T>` → `UserFriendlyException` |
 | STD-002 R1.5 | [STD-002 § Rule 1.5](../STD-002-dotnet-coding-conventions.md#15-multiple-errors) | Multiple errors: iterate `result.Errors`, fold to one exception |
 | STD-005 R10 | [STD-005 § Rule 10](../STD-005-abp-coding-conventions.md#rule-10--auto-api-controllers-are-the-default-http-exposure) | `IApplicationService` auto-exposed; manual controllers need DEC |

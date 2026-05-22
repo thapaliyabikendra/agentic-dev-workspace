@@ -6,7 +6,7 @@ created: 2026-05-13
 updated: 2026-05-19
 supersedes: null
 superseded_by: null
-tags: [deferred, methodology, node-types]
+tags: [deferred, methodology, node-types, ndf-pilot-log]
 scope: engine
 applies_when:
   stack: [agnostic]

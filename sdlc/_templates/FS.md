@@ -14,6 +14,7 @@ adrs: []                      # ADR IDs consulted (carried from FRSs + anything 
 standards: []                 # STD IDs this FS consumes (carried from FRSs + anything mid-draft); narrowed at Phase 2 context load
 ccc: []                       # CCC IDs this FS cites (carried from FRSs); deviations filed as ADRs in `adrs:`
 stack: []                     # subset of api | ui | test | full-stack | infra | agnostic — canonical enum in ../BOUNDARY.md § Stack axis
+framework: []                 # MANDATORY since 2026-05-22 — subset of abp-net | agnostic — canonical enum in ../BOUNDARY.md § Framework axis. Use [agnostic] for framework-independent specs. Phase 1.5 fails on missing (grandfathered for pre-2026-05-22 FSs).
 resolves: []                  # OQ-NNN IDs this FS closes; reciprocal — each OQ's `resolved_by:` cites this FS
 test_plan_path:               # filled by the QA-track Test plan ingest flow (post-Phase-2, independent session), relative to this FS folder (e.g. "test-plans/")
 created: YYYY-MM-DD

@@ -325,22 +325,39 @@ Generalization performed 2026-05-21 per `sdlc-framework-plan-v2.md` T4.1.
 > application framework a governance / spec artifact binds on. Used
 > primarily on STDs whose rules apply only under a specific framework
 > (e.g., ABP coding conventions). Engine-prescribed enum.
+>
+> **Mandatory presence on consumers, 2026-05-22.** Promoted from
+> optional-on-consumer to mandatory-on-consumer in parallel with
+> `stack:`; previously a consumer could omit `framework:` and silently
+> miss framework-conditional STDs at intersection time. See
+> [CLAUDE.md § Hard rules](../CLAUDE.md#hard-rules) HARD-GATE.
+> Pre-2026-05-22 FRSs / FSs are grandfathered; the next substantive edit
+> backfills both `stack:` and `framework:`.
 
 A STD whose applicability is framework-conditional carries
-`applies_when.framework:` in addition to `applies_when.stack:`. A
-consuming artifact intersects on **both** axes — a STD binds only when
-the consumer's `stack:` intersects `applies_when.stack:` *and* the
-consumer's declared `framework:` (if any) intersects
-`applies_when.framework:`.
+`applies_when.framework:` in addition to `applies_when.stack:`. Every
+**consuming** FRS / FS declares `framework:` (non-empty subset of the
+enum below — `[agnostic]` when framework-independent) and intersects on
+**both** axes: a STD binds only when the consumer's `stack:` intersects
+`applies_when.stack:` *and* the consumer's `framework:` intersects
+`applies_when.framework:`. Symmetric with `stack:`; the prior optional
+"(if any)" carve-out is retired.
 
 Current enum:
 
-- **`abp-net`** — ABP Framework on .NET (project default).
-- **`agnostic`** — framework-independent; rules bind regardless of framework choice.
+- **`abp-net`** — ABP Framework on .NET (project default for the APP
+  component).
+- **`agnostic`** — framework-independent; rules bind regardless of
+  framework choice. The fallback value on FRSs / FSs whose work is
+  stack-bound but not framework-bound (e.g., infra / streaming specs
+  targeting the FDE component until an FDE-specific framework token is
+  added to the enum).
 
 Add entries here when a new framework becomes a project target. STDs
 that omit `applies_when.framework:` bind regardless of framework (treat
-as `[agnostic]`).
+as `[agnostic]`). Consumers no longer have that option — omission is a
+Phase 1.5 Blocker per
+[`workflow/frs-validation-rules.md`](workflow/frs-validation-rules.md).
 
 ---
 

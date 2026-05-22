@@ -21,6 +21,10 @@
 Introduced `sdlc/_templates/PROJECT.md` as the canonical project configuration
 manifest template. Projects seed `docs/project.md` from this template.
 
+*Note (annotated 2026-05-22): engine-wide change, off-topic for the standards
+log; retained for audit trail. Future engine-wide entries that are not standards
+lifecycle events should land in a future engine-meta log rather than here.*
+
 ## [2026-05-15] created | STD-005 ABP framework coding conventions
 
 Absorbed from `guidelines/abp-guidelines.md`. Covers 9 rules: built-in entity
@@ -476,3 +480,201 @@ Source: plan `can-you-review-the-encapsulated-kitten.md`.
     narrow-load step + orchestrator reads `by-layer/index.md`.
   - `sdlc/workflow/planning-conventions.md` — `### Phase 3 layer dispatch`
     paragraph under `## Sub-agent dispatch`.
+
+## [2026-05-22] plan-consolidated | Standards-folder hygiene pass — tag typo + anchor repair, date sync, schema reconciliation, status enum, layer-comment widening, engine/project path leak, log-topic annotation
+
+Source: plan `review-the-d-projects-amnil-secure-flux-enumerated-raven.md`.
+Metadata + boundary hygiene only — no rule renumbering, no rule-text edits,
+no file additions / deletions.
+
+- **STD-002 + index.md + 2 pointer files — `errororstd` typo cleanup.**
+  Fixed the `errororstd` concatenation artifact at three call sites
+  (`STD-002:9` frontmatter `tags:`, `index.md:46` Tags cell) → canonical
+  `erroror`. Discovered during the pass that the same typo had propagated
+  into two broken anchor links: `by-layer/application.md:25` and
+  `by-layer/contracts.md:27` both linked to
+  `#13-errororstd-boundary--never-past-the-appservice`. Repaired both to
+  the correct GitHub-auto anchor
+  `#13-erroror-boundary--never-past-the-appservice` (sourced from
+  STD-002:112 heading `#### 1.3 ErrorOr boundary — never past the
+  AppService`). The plan named only the two tag sites; the anchor repair
+  was a within-scope extension.
+
+- **STD-005 / STD-006 — `updated:` date sync.** Both frontmatters carried
+  `updated: 2026-05-17` despite the 2026-05-22 layer-comment additions
+  (logged at the preceding `plan-consolidated` entry). Bumped to
+  `2026-05-22`.
+
+- **STD-004 — tag bidirectional sync.** `ndf-pilot-log` was present on
+  the index row (`index.md:48`) but missing from STD-004's frontmatter
+  `tags:`. Added to the frontmatter to restore bidirectional sync.
+
+- **STANDARD.md template — field reconciliation with live STDs.**
+  Removed the unused `resolves: []` field from the template (no live STD
+  uses it; re-add when a future STD actually closes an OQ). Added two
+  optional commented fields: `deferred_until:` (required when `status:
+  proposed` or `status: deferred` — names the firing condition) and
+  `operative_source:` (companion path that fills the gap until the
+  standard graduates). Pattern in active use at STD-001, STD-003,
+  STD-004 — the template now documents it. Status comment extended
+  `proposed | accepted | deferred | deprecated | superseded`.
+
+- **`standards/index.md § Conventions` — Status enum + `deferred`
+  definition.** Extended the Status bullet to enumerate `deferred`
+  alongside the existing four values, with a one-sentence definition
+  ("scope clear, content not yet authored because the trigger condition
+  has not fired; reference the operative substitute via
+  `operative_source:`"). STD-004 already uses `deferred`; the docs now
+  match.
+
+- **STD-006 R1 layer comment — widened to include Domain.** R1
+  prohibits `Serilog.ILogger` / `Serilog.Log.*` outside the host module
+  in **any** non-host layer including Domain (which is logger-free per
+  R2 but still inside the prohibition's reach). Layer comment changed
+  from `<!-- layers: Application, EntityFrameworkCore -->` to
+  `<!-- layers: Domain, Application, EntityFrameworkCore -->` so the
+  per-layer pointer-sync routing is correct if/when the
+  pointer-sync lint is built.
+
+- **`by-layer/index.md` — engine/project path leak.** The Cohort
+  dispatch summary preamble cited `../../../docs/app/adrs/ADR-009-...`
+  (project-specific `app/` segment in an engine file). Replaced with
+  `docs/<component>/adrs/ADR-009-...` plus a footnote naming
+  `docs/project.md` as the canonical resolver for `<component>`.
+
+- **`log.md:19` — topic discipline annotation.** The 2026-05-15
+  PROJECT.md template entry is engine-wide, not a standards-lifecycle
+  event. Annotated in place with an italic note flagging it as
+  off-topic for the standards log and signalling that future
+  engine-wide entries should land in a future engine-meta log rather
+  than here. No new log file created in this pass (deferred).
+
+- **T1f skipped — premise was incorrect.** The plan flagged
+  `status-change` (cited at `STD-005:689`) as an undefined op and
+  recommended removing the reference. `status-change` IS in the
+  closed-set op vocabulary
+  (`sdlc/workflow/operation-vocabulary.md:16`,
+  `sdlc/workflow/maintenance-discipline.md:142`); STD-005:689 is
+  already correct. No edit applied. Captured here for audit so future
+  reviewers do not re-raise the false positive.
+
+- **Tier-3 deferred items — no body changes, captured in this entry +
+  the plan file.** STD-005 split, STD-002 split (both gated on STD-001
+  graduation, triggers already named in each file's § Revisit if);
+  `log.md` archival (threshold: >12 entries or >700 lines; current 8 /
+  483); pointer-file ↔ source-STD reconciliation lint (own plan);
+  `framework:` axis intersection-default change (own plan); separate
+  engine-meta log (annotation suffices for now).
+
+## [2026-05-22] rule-history | cross-ref-guard.md — pointer-file rule-anchor lint folded into periodic dangling-reference audit
+
+Source: plan `standards-folder-deferred-followups.md` item #1. The audit
+recipe in `sdlc/workflow/cross-ref-guard.md § Periodic dangling-reference
+audit` was extended in two places: step 1's grep block gained a third
+line targeting `\[STD-\d{3} § Rule [\d.]+\]` citations under
+`sdlc/standards/by-layer/`; step 2 gained a "Pointer-file sub-check"
+paragraph requiring both file-existence **and** anchor-fragment
+resolution under GitHub-flavored auto-anchor rules (lowercase; spaces
+and `:` → `-`; `.`, `(`, `)`, `'` stripped). The 2026-05-22 `errororstd`
+anchor regression (named at the preceding `plan-consolidated` entry) is
+the documented failure mode that motivated the lint. Lint surface area:
+57 rule-anchor citations currently spread across the six pointer files
+(`cross-cutting.md`, `shared.md`, `domain.md`, `contracts.md`,
+`application.md`, `infrastructure.md`). Closes plan item #1; the
+remaining five items in the same plan are tracked in
+`c:\Users\bikendrathapaliya\.claude\plans\standards-folder-deferred-followups.md`.
+
+## [2026-05-22] plan-consolidated | BOUNDARY.md + FRS.md + FS.md + retrieval-discipline.md + frs-validation-rules.md + CLAUDE.md — `framework:` promoted to mandatory consumer-side declaration (HARD-GATE)
+
+Source: plan `standards-folder-deferred-followups.md` item #2. The
+intersection-default decision landed on **option (a) — always-mandatory
+with `agnostic` fallback** (the literal "if `docs/project.md` declares
+`framework:`" trigger from the plan didn't fit this multi-component
+project, where APP=ABP and FDE=Kafka/Flink; the symmetric "always
+mandatory" matches `stack:`'s posture in BOUNDARY.md § Stack axis).
+Pre-2026-05-22 FRSs / FSs are grandfathered to avoid a brownfield mass
+backfill; the next substantive edit to any of them MUST backfill both
+`stack:` and `framework:` in the same operation.
+
+- **`sdlc/BOUNDARY.md § Framework axis` — mandatory-on-consumer promotion.**
+  Dropped the "(if any)" carve-out from the consumer-side intersection
+  prose. Added a per-section note dating the promotion to 2026-05-22 and
+  pointing at the CLAUDE.md HARD-GATE. Reworded the intersection rule to
+  state both axes are mandatory ("Every consuming FRS / FS declares
+  `framework:`... and intersects on both axes"). Annotated the `agnostic`
+  enum value as the explicit fallback for stack-bound-but-not-framework-bound
+  specs (e.g., FDE component until an FDE-specific framework token is added).
+  Final paragraph: "Consumers no longer have that option — omission is a
+  Phase 1.5 Blocker."
+
+- **`sdlc/_templates/FRS.md` + `sdlc/_templates/FS.md` — `framework: []`
+  field added adjacent to `stack:`.** Inline comment names the enum,
+  flags MANDATORY since 2026-05-22, names `[agnostic]` as the fallback,
+  and points at the Phase 1.5 Blocker + grandfather clause. Field
+  position: directly after the existing `stack:` line so authors see
+  both axes together.
+
+- **`sdlc/workflow/retrieval-discipline.md § STDs and CCCs` — Phase 1.5
+  retrieval row updated.** Row now says "STDs whose `applies_when.stack:`
+  matches FRS `stack:` **and** whose `applies_when.framework:` (when
+  declared) matches FRS `framework:` — intersection on both axes" with
+  a cross-link to BOUNDARY.md § Framework axis. Closes the silent-miss
+  class where STD-005 (`applies_when.framework: [abp-net]`) fell out
+  whenever the consuming FS omitted `framework:`.
+
+- **`sdlc/workflow/frs-validation-rules.md` Blockers table — new clause.**
+  Appended to the Blockers cell (the long pipe-separated list at the
+  PASS / PASS_WITH_MAJORS / FAIL severity table): "FRS authored on or
+  after 2026-05-22 omits `framework:` in frontmatter or declares it
+  with an out-of-enum value... (`type: frontmatter-presence`;
+  pre-2026-05-22 FRSs grandfathered, but the next substantive edit MUST
+  backfill both `stack:` and `framework:`)." First explicit
+  frontmatter-presence Blocker in the gate vocabulary; `type:` token
+  `frontmatter-presence` introduced here.
+
+- **`CLAUDE.md ## Hard rules` — new HARD-GATE.** Placed after the
+  `docs/shared/ccc/` baseline HARD-GATE and before the "Retrieval
+  discipline" pointer. Wording follows the existing imperative shape
+  ("do not / MUST") and back-links to BOUNDARY.md + frs-validation-rules.md.
+
+- **Tier-3 deferred sub-bullet — pre-2026-05-22 backfill.** 9 milestone
+  artifacts lack `stack:`, `framework:`, `standards:`, and `ccc:`
+  frontmatter (FRS-001..006 in M-01 minus FRS-005; FRS-002 in M-02; FS-001..003
+  in M-01; FS-002 in M-02). These were authored before the 2026-05-16
+  stack-axis addition and are silently grandfathered today. Trigger
+  for backfill: any substantive edit to one of these files (the
+  HARD-GATE wording forces in-edit backfill of both `stack:` and
+  `framework:` together). No separate plan spawned; precedent
+  follows the 2026-05-22 hygiene-pass entry's Tier-3 deferred items
+  list. Closes plan item #2; remaining four items in the same plan
+  (#3 STD-001 authoring, #4 STD-005 split, #5 STD-002 split, #6 / #7 /
+  #8 trigger-gated) tracked in
+  `c:\Users\bikendrathapaliya\.claude\plans\standards-folder-deferred-followups.md`.
+
+## [2026-05-22] rule-history | cross-ref-guard.md — pointer-file sub-check normalization rules tightened (em-dash + HTML-comment handling)
+
+Source: amendment to the prior `rule-history` entry on the same day. Spot-verification of the new lint surfaced that the original normalization list (`lowercase; spaces and ':' → '-'; '.', '(', ')', "'" stripped`) was incomplete — it missed em-dash `—` / en-dash `–` stripping and the trailing layer-comment tail `<!-- layers: ... -->` on STD-002 / 005 / 006 headings, both of which appear throughout the live STDs. A future auditor following the unamended recipe would generate false MISSes (the citations resolve correctly on GitHub-rendered preview; the recipe under-described the algorithm). Recipe step 2 in `sdlc/workflow/cross-ref-guard.md § Periodic dangling-reference audit` now lists the four normalization steps in order (HTML-comment strip → lowercase → punctuation strip including em-/en-dash → whitespace + `:` → `-`) plus a "gotcha" note on space-em-dash-space → `--` collapse. Original log entry's parenthetical left intact as historical record.
+
+## [2026-05-22] rule-history | STD-001 — trigger check executed; graduation deferred (nominal but not operational)
+
+Source: plan `standards-folder-deferred-followups.md` item #3. Trigger
+check per the plan's procedure: any FRS with Domain-layer body content
+(aggregate-root design, entity vs VO, identity strategy, domain-event
+semantics) demanding STD-001 doctrine that the `operative_source:`
+fallback (domain-layer-tagged ADRs) can't answer. Verdict: **nominally
+satisfied, operationally not**. FRS-001 (`docs/milestones/M-01-...`)
+touches Domain (ENT-001 reshape to `ScreeningList` aggregate) but the
+aggregate-root design choice is owned by ADR-001 and the encapsulation
+pattern by STD-002 R5 — no new doctrine question raised. FRS-002
+(`docs/milestones/M-02-...`) is streaming infrastructure (Kafka / Flink
+/ Druid via the FDE component) and produces no Domain entities at all.
+STD-001 remains `status: proposed` with body empty; STD-002 R5 stays in
+place as the operative aggregate-root anchor (cited by
+`by-layer/domain.md:31, 49`). Re-trigger condition: any future FRS that
+surfaces a doctrine question across entity-vs-VO selection, identity
+strategy (GUID vs long; sequential vs random; external vs internal),
+domain-event semantics (LocalEventBus vs DistributedEventBus discriminator),
+or invariant-placement (constructor vs named mutation method). Closes
+plan item #3 by deferral (not by authoring); item #5 (STD-002 R5 split
+to STD-001) remains blocked on STD-001 graduation per the original
+dependency chain.

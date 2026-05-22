@@ -1,7 +1,7 @@
 ---
 id: STD-NNN
 title: <Engine-level rule, imperative voice, one sentence>
-status: proposed              # proposed | accepted | deprecated | superseded
+status: proposed              # proposed | accepted | deferred | deprecated | superseded
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 supersedes: null              # STD-NNN if this replaces a prior standard
@@ -13,7 +13,8 @@ applies_when:                 # conditional applicability — engine-wide defaul
   # framework: [abp-net]      # optional; add when the standard is framework-conditional (enum in BOUNDARY.md § Framework axis)
 source: seed | harvested-from-ADR-NNN | proposal
 related_adrs: []              # docs/adrs/ ADRs that codify project-specific deviations from this standard, or ADRs harvested-from
-resolves: []                  # OQ-NNN IDs this standard closes; reciprocal — each OQ's `resolved_by:` cites this standard
+# deferred_until: "<trigger condition>"   # optional; required when status: proposed or status: deferred — names the event that flips the standard to `accepted`
+# operative_source: "<path>"              # optional; companion to `deferred_until:` — names the path (template, NDF, or other standard) that fills the gap until this standard graduates
 ---
 
 # STD-NNN: <Title>
