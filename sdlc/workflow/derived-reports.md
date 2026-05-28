@@ -6,13 +6,20 @@ applies_when:
 # Derived reports
 
 > On-demand regeneration operation for curated wiki-derived views
-> under `reports/`. Each report has a stable name, a template
-> declaring its `Pulls from:` source list, and a regeneration prompt.
-> Reports are **build artifacts** — never hand-edited, never
-> participating in tiered touch. Sibling to [`lint.md`](lint.md)
-> (drift detection) and [`regenerate-roadmap.md`](regenerate-roadmap.md)
-> (roadmap-specific regen procedure; note: `docs/ROADMAP.md` is project
-> state — it is NOT an audience overview report and is not covered here).
+> under `docs/reports/`. Two output shapes: **aggregate snapshots** —
+> singleton files (`BUSINESS.md`, `TECHNICAL.md`) with a stable name,
+> a template declaring `Pulls from:`, and a regen prompt; and
+> **multi-instance category outputs** — slug-named publications under
+> `docs/reports/<category>/` (release-notes, articles, api, overviews),
+> one per release / topic / version / feature, catalogued by a
+> per-category `index.md`. Both are **build artifacts** — never
+> hand-edited, never participating in tiered touch (the per-category
+> `index.md` for multi-instance outputs is a Karpathy catalog over
+> derived views, not a canonical-touch trigger). Sibling to
+> [`lint.md`](lint.md) (drift detection) and
+> [`regenerate-roadmap.md`](regenerate-roadmap.md) (roadmap-specific
+> regen procedure; note: `docs/ROADMAP.md` is project state — it is
+> NOT an audience overview report and is not covered here).
 
 ## When to Use
 
@@ -47,7 +54,7 @@ its own template). [`maintenance-discipline.md`](maintenance-discipline.md)
 governs canonical-node edits — this file explicitly does NOT apply to
 canonical content, only to derived views.
 
-Curated wiki-derived views live (lazily) under `reports/`. Each
+Curated wiki-derived views live (lazily) under `docs/reports/`. Each
 report has a **stable name**, a **template** that declares its `Pulls
 from:` source list, and a **regeneration prompt**. The wiki — nodes,
 ADRs, FRSs, milestones, discoveries — is the source of truth; the
@@ -58,10 +65,10 @@ node bodies.
 
 The shipped report types:
 
-- [`BUSINESS.md`](../../reports/BUSINESS.md) — for product / business
+- [`BUSINESS.md`](../../docs/reports/BUSINESS.md) — for product / business
   stakeholders. What's being built, for whom, in what order, why.
   Template: [`_templates/OVERVIEW-BUSINESS.md`](../_templates/OVERVIEW-BUSINESS.md).
-- [`TECHNICAL.md`](../../reports/TECHNICAL.md) — for engineering /
+- [`TECHNICAL.md`](../../docs/reports/TECHNICAL.md) — for engineering /
   architecture stakeholders. Architecture commitments, module map,
   integrations, contract surface, authorization. Template:
   [`_templates/OVERVIEW-TECHNICAL.md`](../_templates/OVERVIEW-TECHNICAL.md).
@@ -96,20 +103,30 @@ so readers see the snapshot date and underlying wiki state.
    any section whose source rows are empty rather than leaving a
    `_none yet_` placeholder for a populated wiki.
 4. Update `generated_at:` and `source_commit:` at the top.
-5. Overwrite `reports/<KIND>.md`. This is a derived report, not a
+5. Overwrite `docs/reports/<KIND>.md`. This is a derived report, not a
    log — no append-only history kept.
 
-**No `index.md` / `log.md` pair for `reports/`.** Reports are
-derived; the canonical per-type indexes they read from already carry
-the wiki-side history. The tiered touch rule in
-[`maintenance-discipline.md`](maintenance-discipline.md) applies to
-canonical content only.
+**Index-pair rule (singleton vs. multi-instance discriminator).**
+Aggregate-snapshot reports — singleton files such as
+`docs/reports/BUSINESS.md`, `docs/reports/TECHNICAL.md`, and `docs/ROADMAP.md`
+— get **no** `index.md` / `log.md` pair: each file *is* its own
+audience view, and the canonical per-type indexes they read from
+already carry the wiki-side history. Multi-instance category
+outputs (see [Multi-instance category outputs](#multi-instance-category-outputs)
+below) **do** get a per-category `index.md` (Karpathy catalog over
+the N instances in that folder); they still get no `log.md` —
+chronological audit is git history, consistent with the canonical
+`log.md` retirement of 2026-05-16. The tiered touch rule in
+[`maintenance-discipline.md`](maintenance-discipline.md) still
+applies to canonical content only; the per-category `index.md`
+under `docs/reports/` is a Karpathy catalog over derived views, not a
+canonical-touch trigger.
 
 ## Anti-Pattern: "The Report Patch"
 
 A derived report misstates a fact (a node summary in BUSINESS.md is
 out of date, a TECHNICAL.md module count is off), the operator opens
-`reports/` directly, edits the rendered file in place, and commits the
+`docs/reports/` directly, edits the rendered file in place, and commits the
 patch.
 The temptation: the source fix is "involved" (touch the node, update
 its `index.md` row); the report fix is one line.
@@ -152,7 +169,7 @@ frontmatter), then add the report type.
    generator reads only what `Pulls from:` declares.
 3. Define the regeneration prompt verb: "regenerate the `<kind>`
    overview." Stable across runs.
-4. The rendered output lands at `reports/<KIND>.md`. Build artifact —
+4. The rendered output lands at `docs/reports/<KIND>.md`. Build artifact —
    never hand-edited, never tracked with an `index.md`/`log.md` pair.
 
 Worked example — an ARCHITECTURE report queried from MOD + INT + ADR
@@ -161,6 +178,120 @@ coverage is dense enough to derive from. It is NOT the same as a
 hand-authored `docs/architecture.md` file at the docs root — that
 would be a silent legacy-to-canonical write (see
 [`../PRINCIPLES.md → Anti-patterns to refuse`](../PRINCIPLES.md)).
+
+---
+
+## Multi-instance category outputs
+
+Alongside the aggregate snapshots above (BUSINESS / TECHNICAL —
+one file per audience), the framework supports **multi-instance
+category outputs**: per-instance wiki-derived publications grouped
+by category folder under `docs/reports/`. The shipped categories:
+
+```
+docs/reports/
+├── BUSINESS.md                # aggregate snapshot (singleton)
+├── TECHNICAL.md               # aggregate snapshot (singleton)
+├── release-notes/             # multi-instance category
+│   ├── index.md               # Karpathy catalog over instances
+│   └── <release-slug>.md      # one per release
+├── articles/                  # multi-instance category
+│   ├── index.md
+│   └── <topic-slug>.md        # one per topic
+├── api/                       # multi-instance category
+│   ├── index.md
+│   └── <version-slug>.md      # one per API version
+└── overviews/                 # multi-instance category
+    ├── index.md
+    └── <component-or-feature-slug>.md
+```
+
+A publication is *curated, category-keyed, human-facing synthesis* —
+author-initiated (triggered by a release event, onboarding gap, or
+audience request — never speculative) but source-bound (the wiki is
+the truth, the publication is a derived view). Singleton vs.
+multi-instance discriminator: a singleton fully replaces its
+predecessor on regen (one file per audience); a category output is
+one instance among many (release v1.4 sits next to v1.3, neither
+replaces the other).
+
+**Naming and IDs.** Slug-only — `release-notes/2026-q2.md`,
+`api/v2-public.md`, `overviews/patient-portal.md`. No `id:` field, no
+new ID prefix, no `id-claims.md` row — publications are
+slug-addressable (matching BUSINESS / TECHNICAL / ROADMAP).
+Nothing canonical cross-references a publication; the dependency is
+one-way (canonical → publication), so an ID would be vestigial.
+
+**Frontmatter contract:**
+
+```yaml
+---
+title: <human title>
+category: release-notes | articles | api | overviews
+audience: developer | stakeholder | api-consumer | contributor
+status: draft | published | superseded
+scope: app | shared | cross-component
+pulls_from:                     # canonical sources synthesized — link by ID
+  - FRS-NNN, FS-NNN, ENT-NNN, CMD-NNN, ADR-NNN, CCC-NNN, ...
+regenerate_when:                # subset of pulls_from: that triggers re-synthesis
+  - <subset of pulls_from:>
+created: YYYY-MM-DD
+updated: YYYY-MM-DD
+---
+```
+
+`pulls_from:` is the contract — generators read only what it
+declares. `regenerate_when:` is its subset: when any ID in it changes
+in canonical, the publication is flagged for re-synthesis. Cross-ref
+guard treats `pulls_from:` / `regenerate_when:` IDs like any other
+citation — IDs must dereference to a real artifact at the moment of
+edit (see [`cross-ref-guard.md`](cross-ref-guard.md)).
+
+**When to author:** release event (cut a release-notes entry),
+onboarding gap (cut an overview or article), audience request (cut
+an API doc for a new external consumer). Never speculative.
+
+**Procedure on author / regenerate:**
+
+1. Copy [`../_templates/PUBLICATION.md`](../_templates/PUBLICATION.md);
+   set `category:` and `audience:`.
+2. Walk `pulls_from:` Karpathy-index-first — open the per-type
+   `index.md` files referenced, narrow-load specific pages only where
+   their summaries match a section being filled. Same retrieval
+   discipline as Phase 2 / Phase 3 — see
+   [`retrieval-discipline.md`](retrieval-discipline.md).
+3. Fill body sections with link-by-ID summaries. Do not paraphrase
+   node bodies; reference, never copy (CLAUDE.md hard rule #3).
+4. Add a row to the category `index.md` (slug, title, audience,
+   status, source IDs).
+5. Update `updated:` to today's date on regen; leave `created:` as
+   first authored.
+
+**Regeneration trigger.** Manual today — re-author when a
+`regenerate_when:` ID has changed in canonical since the
+publication's `updated:` date. Automatable later via a linter that
+diffs `regenerate_when:` IDs against git HEAD; out of scope for this
+operation.
+
+**Categories are folders, not tags.** Each category has its own
+Karpathy `index.md`, its own slug namespace, and (over time) its
+own audience-tuned body conventions inside the shared
+PUBLICATION.md scaffold. New categories are added by creating a new
+subfolder + `index.md` — no engine change required.
+
+**Format.** Markdown source. Browser-ergonomic HTML rendering is a
+deferred, build-side concern: pick a markdown→HTML generator
+(mkdocs, Quarto, Pandoc per-file) as a separate later task. The
+source design is build-agnostic — never author publications in HTML
+(breaks the markdown-as-source-of-truth invariant; zero `.html` in
+`sdlc/` or `docs/` today).
+
+**Anti-pattern carryover.** "The Report Patch" anti-pattern above
+applies identically to publications: when a release-notes entry
+misstates a node's behavior, fix the node and regenerate the
+entry — do not patch the publication in place. The
+fix-the-source-then-regenerate discipline is the entire reason
+publications carry `pulls_from:` instead of free-form prose.
 
 ---
 
@@ -176,7 +307,9 @@ would be a silent legacy-to-canonical write (see
   derived reports are excluded.
 - **Reads:** per-type `index.md` files (APP, Shared);
   per-component `adrs/index.md`; master `home.md`. Specific
-  `Pulls from:` lists live in each template under `_templates/`.
+  `Pulls from:` lists live in each template under `_templates/`
+  (see [`../_templates/PUBLICATION.md`](../_templates/PUBLICATION.md)
+  for the multi-instance template).
 - **Adjacent (not callers but consulted):**
   [`regenerate-roadmap.md`](regenerate-roadmap.md) — specialised
   regen for ROADMAP.md with the five Stuck classes;

@@ -201,7 +201,7 @@ declared source set has silently fabricated its scope.
   milestone / FRS / OQ / CHG IDs and never paraphrases their bodies.
 - **Required before:** [`derived-reports.md`](derived-reports.md) —
   generic regen rule book this file specialises; the "no `index.md` /
-  `log.md` pair" rule for `reports/` is canonical there.
+  `log.md` pair" rule for `docs/reports/` is canonical there.
 - **Required before:** [`retrieval-discipline.md`](retrieval-discipline.md)
   — Karpathy-index-first reading order applies during the
   `Pulls from` walk.

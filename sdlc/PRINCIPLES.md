@@ -149,7 +149,7 @@ at the foot of this file.
   **✅ Fill the wiki first, then regenerate.** If you can't derive the report from the wiki, the wiki is the gap — not the report.
 
 - **❌ Copying `docs-backup/<file>.md` (or any legacy doc) directly into `docs/<topic>.md` or `docs/architecture.md`.** Bypasses the node + ADR + glossary discipline.
-  **✅ Route through nodes + ADRs + glossary first; the derived report under `reports/` comes after.** The legacy original stays in `docs-backup/` as audit trail.
+  **✅ Route through nodes + ADRs + glossary first; the derived report under `docs/reports/` comes after.** The legacy original stays in `docs-backup/` as audit trail.
 
 - **❌ Restating another node's field table, invariant, SQL block, or failure scenario inline.** "Reference, never copy" applies node-to-node just as it applies spec-to-node — a restatement is a drift surface, not a convenience.
   **✅ Replace the restatement with `NODE-ID §Section` plus a one-sentence context note.** Own your content, reference everything else. Procedural detail in [`WORKFLOW.md → Node content ownership`](WORKFLOW.md).

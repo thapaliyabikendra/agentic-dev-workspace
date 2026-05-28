@@ -165,7 +165,7 @@ corresponding canonical targets.
 
 | Legacy artifact kind          | Maps to canonical targets                                                                  |
 | ----------------------------- | ------------------------------------------------------------------------------------------ |
-| Architecture / topology doc   | MOD nodes + INT nodes + ADRs + glossary terms + a derived `reports/ARCHITECTURE.md` |
+| Architecture / topology doc   | MOD nodes + INT nodes + ADRs + glossary terms + a derived `docs/reports/ARCHITECTURE.md` |
 | API spec                      | CMD nodes (writes) + QRY nodes (reads) + CON nodes (`protocol: http` routes / event topics / queues) + SCR nodes (UI surfaces)  |
 | Convention / coding-standard  | Three-rule routing: architecture/coding-conv → ADR (component-scoped under `docs/<component>/adrs/`, or cross-component under `docs/shared/adrs/`); process-conv → `docs/shared/ccc/` (relevant CCC page); overlap with existing ADRs → footer-link only |
 | Integration deep-dive         | INT nodes (one per external system) + ADRs if integration patterns are reusable           |

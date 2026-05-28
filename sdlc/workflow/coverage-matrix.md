@@ -234,7 +234,7 @@ by saying "the FRS doesn't mention it" — the matrix is what the source leaves 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
   — "Existing nodes are authoritative" governs precedence between
   FRS / FLW scenarios and matrix rows when both apply.
-- **Required before:** [`plan.md → Test plan ingest`](plan.md#test-plan-ingest-after-fs-validation)
+- **Required before:** [`plan.md → Test plan ingest`](plan.md#6-fs-validation-loop)
   — Phase 2 caller; this matrix is consulted during test-plan ingest.
 - **Caller:** [`plan.md`](plan.md) — Phase 2 test-plan ingest reads
   this file per use case the FS exercises.

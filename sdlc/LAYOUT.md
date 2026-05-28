@@ -68,8 +68,10 @@ artifact). When in doubt about where a new file goes, check here first.
                            for multi-service topologies; CONTRACT supersedes
                            the prior ENDPOINT template 2026-05-14);
                            plus OVERVIEW-BUSINESS.md and
-                           OVERVIEW-TECHNICAL.md for derived stakeholder
-                           reports
+                           OVERVIEW-TECHNICAL.md for aggregate-snapshot
+                           reports, and PUBLICATION.md for the
+                           multi-instance category outputs under
+                           docs/reports/{release-notes,articles,api,overviews}/
   /docs                    project knowledge base
     home.md              ← index of ADRs / FRSs / milestones / specs / nodes
     ROADMAP.md           ← tracked planning artifact: milestones in flight,
@@ -139,13 +141,32 @@ artifact). When in doubt about where a new file goes, check here first.
                            test-suite-codegen.md from the FS-staged TC files.
                            See workflow/test-runner-cookbook.md for
                            file-naming and layout conventions.
-  /reports               audience overview reports — generated on demand,
-                           never hand-edited, no tiered touch (lazy)
-    BUSINESS.md          ← stakeholder business overview
-    TECHNICAL.md         ← engineering/architecture overview
+  /reports               wiki-derived views — generated on demand,
+                           never hand-edited, no tiered touch (lazy).
+                           Two shapes: aggregate snapshots (singleton
+                           files, no index pair) and multi-instance
+                           category outputs (slug-named publications
+                           with a per-category Karpathy index.md, no
+                           log.md). Discriminator: singleton vs.
+                           multi-instance.
+    BUSINESS.md          ← aggregate snapshot — stakeholder business overview
+    TECHNICAL.md         ← aggregate snapshot — engineering/architecture overview
                            Note: docs/ROADMAP.md is project state
                            (milestones in-flight, stuck signals) —
                            it stays under /docs, NOT here.
+    /release-notes       ← multi-instance category (lazy)
+      index.md           ← Karpathy catalog over <release-slug>.md files
+      <release-slug>.md  ← one per release
+    /articles            ← multi-instance category (lazy)
+      index.md
+      <topic-slug>.md
+    /api                 ← multi-instance category (lazy)
+      index.md
+      <version-slug>.md
+    /overviews           ← multi-instance category (lazy)
+      index.md
+      <component-or-feature-slug>.md
+                           Template: sdlc/_templates/PUBLICATION.md
                            Regeneration: sdlc/workflow/derived-reports.md
 ```
 

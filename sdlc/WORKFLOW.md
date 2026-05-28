@@ -224,7 +224,7 @@ referenced by other files; load the canonical file for actual procedure.
 
 > Filename ID on every artifact; frontmatter links (`source_ref`,
 > `touches_nodes`, `produces_nodes`, `related`, `adrs`, etc.);
-> [`docs/home.md`](home.md) is the cross-type quick-scan; per-type
+> [`docs/home.md`](../docs/home.md) is the cross-type quick-scan; per-type
 > [`index.md`](adrs/index.md) carries one row per page (the file generators
 > wholesale-read). Surviving `log.md` companions: `docs/research/log.md` and
 > `sdlc/standards/log.md` only. Canonical lifecycle events (nodes, ADRs, CCCs)
@@ -257,7 +257,7 @@ referenced by other files; load the canonical file for actual procedure.
 > surface the conflict in the FRS ("Brownfield impact" at Phase 1, or
 > "Validation finding" at Phase 1.5) — do not absorb silently in Phase 2/3.
 > Cross-node / cross-ADR conflicts found outside an active FRS become OQ-NNN
-> files under [`discovery/open-questions/`](discovery/open-questions/) with
+> files under [`discovery/open-questions/`](../docs/discovery/open-questions/) with
 > `origin: legacy-absorption` or `origin: workflow-evolution`. Discovery
 > surface discipline: [`workflow/maintenance-discipline.md → Discovery surface discipline`](workflow/maintenance-discipline.md#discovery-surface-discipline).
 
@@ -276,6 +276,15 @@ referenced by other files; load the canonical file for actual procedure.
 > Subagent dispatcher preamble, 3-block return contract (≤400 words), mutation
 > verification, orchestrator outcome routing.
 > Canonical home: [`workflow/agent-contracts.md → Contract Layer 1`](workflow/agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape).
+
+### Execution invocation
+
+> Standard invocation phrase: "execute the plan. use subagents where feasible
+> and needed to not pollute the main agent context. `<plan-file-path>`"
+> Orchestrator contract: main agent routes + verifies only; file I/O and writes
+> dispatched to sub-agents; results summarized ≤400 words before returning to
+> orchestrator turn.
+> Canonical home: [`workflow/planning-conventions.md § Execution invocation`](workflow/planning-conventions.md#execution-invocation).
 
 ### Author self-review
 
@@ -297,11 +306,17 @@ referenced by other files; load the canonical file for actual procedure.
 
 ### Derived reports
 
-> `reports/BUSINESS.md` and `reports/TECHNICAL.md` are wiki-derived views;
-> the wiki is the source of truth, reports are build artifacts. Regenerate on
-> demand; never patch directly. KB absorption when synthesis surfaces a concept
-> with no canonical node: [`workflow/absorb-concept.md`](workflow/absorb-concept.md).
-> Regeneration procedure: [`workflow/derived-reports.md`](workflow/derived-reports.md).
+> Two output shapes under `docs/reports/`: **aggregate snapshots** —
+> singletons (`BUSINESS.md`, `TECHNICAL.md`) — and **multi-instance
+> category outputs** — per-instance publications under
+> `docs/reports/{release-notes,articles,api,overviews}/`, each with a
+> per-category Karpathy `index.md`. All are wiki-derived views; the
+> wiki is the source of truth, reports are build artifacts.
+> Regenerate on demand; never patch directly. KB absorption when
+> synthesis surfaces a concept with no canonical node:
+> [`workflow/absorb-concept.md`](workflow/absorb-concept.md).
+> Regeneration procedure:
+> [`workflow/derived-reports.md`](workflow/derived-reports.md).
 
 ### Node content ownership
 

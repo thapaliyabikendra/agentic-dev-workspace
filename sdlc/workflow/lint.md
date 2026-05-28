@@ -42,7 +42,7 @@ file is mechanical with predetermined detection rules per class.
 Periodic debt scan of the workspace. **Lint detects drift; it does not
 regenerate artifacts.** Distinct from
 [`derived-reports.md`](derived-reports.md) (which rebuilds
-`docs/home.md` and `reports/*` from source) — lint walks the
+`docs/home.md` and `docs/reports/*` from source) — lint walks the
 canonical content and flags violations of the discipline rules in
 [`../../CLAUDE.md`](../../CLAUDE.md),
 [`../WORKFLOW.md`](../WORKFLOW.md),

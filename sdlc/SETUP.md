@@ -24,7 +24,7 @@ Confirm:
 ### 1. Author the project `CLAUDE.md`
 
 Create `CLAUDE.md` at the repo root. Copy the structure from
-[`sdlc/CLAUDE.md`](CLAUDE.md) if an engine template exists, or scaffold
+[`sdlc/CLAUDE.md`](../CLAUDE.md) if an engine template exists, or scaffold
 from scratch with these required sections:
 
 - `## Project framing` — project name, `project_type`, domain summary,

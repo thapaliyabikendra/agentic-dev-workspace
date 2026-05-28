@@ -160,16 +160,32 @@ without modification.
   type with per-OQ files + index + log.
 - **Maintenance discipline** — the tiered touch rule (all canonical artifacts — node, ADR, CCC — fire the 2-file touch: artifact + per-type `index.md`; master README is derived and regenerated on demand).
   See [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
-- **Derived stakeholder overviews.** The two-template pattern
-  (BUSINESS / TECHNICAL), the wiki-as-source rule, and the
-  regenerate-on-demand discipline. The *shape* is team-agnostic —
-  Karpathy-index-first read, link-by-ID summaries, never-patch-derived,
-  no `index.md` / `log.md` pair on the overview folder (reports are not node-type folders). The specific
-  "Pulls from" lists in
-  [`_templates/OVERVIEW-BUSINESS.md`](_templates/OVERVIEW-BUSINESS.md)
-  and [`_templates/OVERVIEW-TECHNICAL.md`](_templates/OVERVIEW-TECHNICAL.md)
+- **Derived stakeholder overviews and publications.** Two output
+  shapes share one discipline: **aggregate snapshots** (the
+  BUSINESS / TECHNICAL singletons) and **multi-instance category
+  outputs** (per-instance publications under
+  `docs/reports/{release-notes,articles,api,overviews}/`). Common shape
+  is team-agnostic — Karpathy-index-first read, link-by-ID
+  summaries, never-patch-derived, wiki-as-source, regenerate-on-demand.
+  Index-pair rule splits on the singleton-vs-multi-instance axis:
+  aggregate snapshots get **no** `index.md` / `log.md` pair (the
+  file *is* its own view); multi-instance category folders get a
+  per-category Karpathy `index.md` over their instances (still no
+  `log.md` — git history covers chronology, consistent with the
+  2026-05-16 retirement). Per-category `index.md` files under
+  `docs/reports/` are Karpathy catalogs over derived views, not
+  canonical-touch triggers (tiered touch still applies to
+  canonical content only). The specific "Pulls from" lists in
+  [`_templates/OVERVIEW-BUSINESS.md`](_templates/OVERVIEW-BUSINESS.md),
+  [`_templates/OVERVIEW-TECHNICAL.md`](_templates/OVERVIEW-TECHNICAL.md),
+  and [`_templates/PUBLICATION.md`](_templates/PUBLICATION.md)
   reference this workspace's node types and will need editing if
-  another team adopts a different node set. See
+  another team adopts a different node set. Karpathy-catalog
+  indexes for the multi-instance categories live at
+  `docs/reports/release-notes/index.md`,
+  `docs/reports/articles/index.md`,
+  `docs/reports/api/index.md`, and
+  `docs/reports/overviews/index.md`. See
   [`workflow/derived-reports.md`](workflow/derived-reports.md).
 
 ### Principles and anti-patterns

@@ -219,7 +219,7 @@ or ADR edits" and "If it can drift, the operation isn't atomic enough" are
 the named anti-patterns this rule book prevents. See also
 [`anti-pattern-lightweight.md`](anti-pattern-lightweight.md).
 
-**Required before:** [`../BOUNDARY.md ## Engine-vs-project axis`](../BOUNDARY.md#engine-vs-project-axis)
+**Required before:** [`../BOUNDARY.md ## Engine-vs-project axis`](../BOUNDARY.md#engine-vs-project-axis-governance-topic-classification)
 — canonical home for the four status vocabularies (node / ADR / FRS / OQ)
 that the `status-change` op references.
 

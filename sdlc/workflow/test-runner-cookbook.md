@@ -45,7 +45,7 @@ that consumes those values. The three are the **TC authoring trio**
 at Phase 2 / Phase 3.
 
 Converts each TC step from
-[`plan.md → Test plan ingest`](plan.md#test-plan-ingest-after-fs-validation)
+[`plan.md → Test plan ingest`](plan.md#6-fs-validation-loop)
 into executable Playwright TypeScript. The Steps table's `Step` column
 text is mapped to a Playwright action; the `Selector` column is mapped
 to either a CSS locator, a role-based selector, or a TODO comment; the

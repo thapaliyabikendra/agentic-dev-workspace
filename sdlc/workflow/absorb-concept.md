@@ -17,7 +17,7 @@ applies_when:
 ## When to Use
 
 **Use when:** while generating or reviewing a derived report
-(`reports/BUSINESS.md`, `reports/TECHNICAL.md`, or any `<kind>` report),
+(`docs/reports/BUSINESS.md`, `docs/reports/TECHNICAL.md`, or any `<kind>` report),
 you notice a concept, relationship, or domain rule that:
 
 - has no corresponding canonical node in `docs/<component>/nodes/`, and
@@ -179,7 +179,7 @@ The report now picks up the new node via its `Pulls from:` source list.
 
 Report synthesis surfaces a missing concept. Instead of following the
 absorption pathway, the operator inlines a description of the concept
-directly into `reports/BUSINESS.md` (or another derived report). The
+directly into `docs/reports/BUSINESS.md` (or another derived report). The
 cost: the concept never enters the canonical KB; the next report
 regeneration **silently removes** the inline description (because the
 KB still has no node for it); the concept must be rediscovered from

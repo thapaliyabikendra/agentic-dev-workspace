@@ -102,7 +102,7 @@ on the CHG file (no per-type `index.md` today). Full mechanics:
 The master catalog [`docs/home.md`](../../docs/home.md) is **derived**, not
 hand-maintained per event. Its node-type and ADR tables regenerate on
 demand from the per-type indexes — same treatment as the derived reports at
-`reports/` (see [`derived-reports.md`](derived-reports.md)). The Planning
+`docs/reports/` (see [`derived-reports.md`](derived-reports.md)). The Planning
 Artifacts section in `home.md` (milestones, FRSs, feature specs, discovery)
 stays hand-maintained until per-type indexes exist for those artifacts.
 

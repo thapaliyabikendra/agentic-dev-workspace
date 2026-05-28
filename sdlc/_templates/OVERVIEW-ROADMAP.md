@@ -18,7 +18,7 @@ audience: planning
 > File location when rendered: `docs/ROADMAP.md` (lazy —
 > created on first regenerate). This is a **tracked planning artifact**,
 > not a derived overview report — it lives at the docs root alongside
-> `docs/home.md`, not under `reports/`.
+> `docs/home.md`, not under `docs/reports/`.
 
 ## Pulls from
 

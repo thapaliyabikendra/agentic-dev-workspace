@@ -123,7 +123,7 @@ sequentially — refine first, invent last.
 1. **At least ~3 instances expected** within the foreseeable horizon
    (current milestone plus the next). Single-instance concerns
    collapse into an ADR (cross-cutting) or DEC (node-scoped) — see
-   [`authoring-adr.md → When to file a Standard, ADR, or DEC`](authoring-adr.md#when-to-file-a-standard-adr-or-dec-the-3-way-discriminator).
+   [`authoring-adr.md → When to file a Standard, ADR, or DEC`](authoring-adr.md#when-to-file-a-std-ccc-adr-ndf-or-dec-the-5-way-discriminator).
 2. **No existing type carries the semantics naturally.** Walk the
    engine-default 16-type catalog in [`../KB-LAYOUT.md`](../KB-LAYOUT.md),
    plus every existing NDF in the target component's `node_definitions:` and
@@ -167,11 +167,17 @@ it after the artifact kind.
 ## Defining a new derived-report type
 
 Forward-reference to
-[`derived-reports.md → Defining a new report type`](derived-reports.md#defining-a-new-report-type).
-Same discriminator, same procedure, same log entry. The distinction
-from node types and templates: reports are build artifacts under
-`reports/`, never carry an `index.md`/`log.md` pair, and are
-always regenerable from the wiki.
+[`derived-reports.md → Defining a new report type`](derived-reports.md#defining-a-new-report-type)
+(aggregate snapshots — singletons such as BUSINESS / TECHNICAL) and
+[`derived-reports.md → Multi-instance category outputs`](derived-reports.md#multi-instance-category-outputs)
+(per-instance publications under `docs/reports/<category>/`). Same
+discriminator, same procedure, same log entry. The distinction from
+node types and templates: reports are build artifacts under
+`docs/reports/`, always regenerable from the wiki. Index-pair rule splits
+on the singleton-vs-multi-instance axis — aggregate snapshots carry
+no `index.md`/`log.md` pair; multi-instance category folders carry a
+per-category Karpathy `index.md` (and no `log.md` — git history
+covers chronology).
 
 ## Landing extensions
 

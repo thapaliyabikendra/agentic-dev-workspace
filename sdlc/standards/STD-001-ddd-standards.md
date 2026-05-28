@@ -20,7 +20,7 @@ operative_source: "docs/<component>/adrs/ (search by tag domain-layer)"
 
 > **Engine-level technical standard.** Applies to any project using this
 > methodology. Project-specific deviations are ADRs in
-> [`../../docs/adrs/`](../../docs/adrs/) that back-link here; node-local
+> [`../../docs/app/adrs/`](../../docs/app/adrs/) that back-link here; node-local
 > atomic decisions are DECs (inline under a host node's `## Decisions`
 > heading, or standalone). See
 > [`../workflow/authoring-adr.md`](../workflow/authoring-adr.md) for the

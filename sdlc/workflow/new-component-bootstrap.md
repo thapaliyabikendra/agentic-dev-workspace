@@ -90,7 +90,7 @@ When adding a new standalone deployable component to the workspace:
 1. Choose a unique 2–4 char uppercase prefix (check `id_prefix:` in all existing
    `docs/*/COMPONENT.md` files — no duplicates allowed across the workspace).
 2. Create `docs/<component-slug>/COMPONENT.md` from
-   [`sdlc/_templates/COMPONENT.md`](../  _templates/COMPONENT.md).
+   [`sdlc/_templates/COMPONENT.md`](../_templates/COMPONENT.md).
    Set: `id_prefix`, `title`, `type: standalone`, `depends_on`,
    `node_definitions:` (list of `{PREFIX}-NDF-NNN` IDs the component will
    author for custom node types — empty list `[]` is the default; populated

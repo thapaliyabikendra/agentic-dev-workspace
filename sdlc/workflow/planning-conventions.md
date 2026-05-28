@@ -282,6 +282,40 @@ no observable predicate.
 - Run sub-agents in series when they could run in parallel — dispatch in
   one message, max 3 per round.
 
+## Execution invocation
+
+**Standard invocation:**
+> execute the plan. use subagents where feasible and needed to not pollute
+> the main agent context.
+>   `<plan-file-path>`
+
+**What this triggers (orchestrator contract):**
+
+- Main agent reads the plan file and becomes a **pure orchestrator** — it
+  routes, sequences, and verifies; it does not perform substantive reads or
+  writes itself.
+- Each phase or stage with file I/O (reads, node ingest, code writes) is
+  dispatched to a sub-agent (`subagent_type` per the dispatch table above).
+- Sub-agents return the 3-block shape (`## Findings` / `## Risks` /
+  `## Open questions`) or the code-writing envelope (`## Files written`)
+  per [`agent-contracts.md`](agent-contracts.md).
+- Main agent advances to the next phase only after verifying the prior
+  sub-agent's output (mutation-verification rule,
+  `agent-contracts.md § Mutation verification`).
+- Progress checklist in the plan file is marked `[x]` by the orchestrator
+  after each verified step — this is the durable state across `/clear`
+  boundaries.
+
+**Context-protection rule:** "not pollute the main agent context" means: do
+not wholesale-read large files, diffs, or generated outputs into the
+orchestrator turn. If a result is needed for routing decisions, have the
+sub-agent summarize it to ≤400 words; full content stays inside the
+sub-agent's context window.
+
+**Shorthand:** once this rule is loaded, the user may invoke with just the
+plan path and the phrase "execute the plan" — the subagent constraint is
+implied.
+
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —

@@ -151,6 +151,11 @@ scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
 - `docs/milestones/` — milestone portals, FRSs, FSs, CHG nodes, TC files
 - `docs/discovery/` — open questions (per-OQ folder)
 - `docs/home.md` — cross-component catalog and ID high-water marks
+- `docs/reports/` — wiki-derived views (lazy): aggregate snapshots
+  (`BUSINESS.md`, `TECHNICAL.md`) and multi-instance category
+  outputs (`release-notes/`, `articles/`, `api/`, `overviews/` — each
+  with a per-category `index.md`). Procedure:
+  [`sdlc/workflow/derived-reports.md`](sdlc/workflow/derived-reports.md).
 
 ## Advisor gate
 
@@ -159,6 +164,27 @@ scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
 - About to make a structural change in a shared governance file.
 - Stuck after 2+ failed approaches.
 - Before declaring a phase / milestone / operation complete.
+
+## Session handover
+
+**Trigger:** user types
+"create a handover prompt so that I can continue in next session"
+(close paraphrases accepted — "handover prompt please", etc.).
+
+Emit a single fenced code block — paste-ready, no prose before or
+after. The block contains five fields:
+
+1. **Task** — one sentence: what we're working on.
+2. **Progress** — bullets: what's done this session (files created
+   or edited, decisions reached, commands run that matter).
+3. **Next step** — the exact first action for the new session.
+4. **Re-load first** — ordered list of files to read at the start
+   of the new session.
+5. **Open threads** — unresolved questions, blocked work,
+   disagreements; empty bullet if none.
+
+Output ONLY the code block — the user copies it into a new Claude
+Code session as the first prompt.
 
 ## When in doubt
 

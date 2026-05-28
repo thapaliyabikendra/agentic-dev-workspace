@@ -60,7 +60,7 @@ nodes). Per R-NEW-4.
 Status flip is Phase 3's job alone — Phase 2 enrichment does not flip it,
 even though the body becomes fully wired (the `related: []` → `related: [...]`
 transition is the body-shape signal per [Phase-1-bare vs. Phase-2-wired
-discriminator](#phase-1-bare-vs-phase-2-wired-discriminator) below).
+discriminator](#phase-1-bare-vs-phase-2-wired-discriminator-flw-only) below).
 
 ## ACT-NNN ID claim lifecycle
 

@@ -160,7 +160,7 @@ occasionally standalone). The Phase 3 QA gate consumes them.
 > **deviation** from a CCC baseline for one operation. Lives in
 > `docs/<component>/adrs/` (when it constrains a single component) or
 > `docs/shared/adrs/` (when it spans ≥2 components — use the component
-> discriminator in [`BOUNDARY.md`](../BOUNDARY.md#component-structure-docs)).
+> discriminator in [`BOUNDARY.md`](../BOUNDARY.md#engine-vs-project-axis-governance-topic-classification)).
 > ID prefix `ADR-NNN`.
 >
 > **NDF (Node Definition Node)** if it **declares a per-component custom
@@ -349,7 +349,7 @@ Same mechanics, fields swapped. Precedent: ADR-029 superseding DEC-009
 
 ## Status lifecycle
 
-> **Canonical home:** [`../BOUNDARY.md ## Engine-vs-project axis`](../BOUNDARY.md#engine-vs-project-axis)
+> **Canonical home:** [`../BOUNDARY.md ## Engine-vs-project axis`](../BOUNDARY.md#engine-vs-project-axis-governance-topic-classification)
 > carries the authoritative status-vocabulary table for all four
 > artifact families (node / ADR / FRS / OQ). The summary below is a
 > reading aid for the ADR family; on any discrepancy, the BOUNDARY.md
