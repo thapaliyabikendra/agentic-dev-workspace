@@ -52,6 +52,7 @@ artifact). When in doubt about where a new file goes, check here first.
       implementation.md    ← phase 3 (implement-feat, Merge + Code)
                            plus rule books (frs-validation-rules.md,
                            frs-code-extraction-rules.md,
+                           frs-prototype-extraction-rules.md,
                            test-data-generation.md,
                            test-runner-cookbook.md) and maintenance-op
                            references (maintenance-discipline.md,

@@ -138,7 +138,10 @@ scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
   [`sdlc/workflow/agent-contracts.md § TaskCreate discipline`](sdlc/workflow/agent-contracts.md#taskcreate-discipline)
 - Engine standards: [`sdlc/standards/index.md`](sdlc/standards/index.md)
 
-**Project KB** (lazy; framework requires the slot):
+### Project KB
+
+Lazy; framework requires the slot:
+
 - `docs/<component>/COMPONENT.md` — descriptor + `id_prefix:`
 - `docs/<component>/adrs/index.md` + `docs/shared/adrs/index.md` — ADRs
 - `docs/<component>/nodes/<type>/index.md` — per-type canonical nodes

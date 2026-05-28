@@ -426,6 +426,7 @@ the `from_cr:` field is defined in [`_templates/FRS.md`](_templates/FRS.md).
 **Rule books wholesale-read at gates / ingests:**
 [`workflow/frs-validation-rules.md`](workflow/frs-validation-rules.md),
 [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md),
+[`workflow/frs-prototype-extraction-rules.md`](workflow/frs-prototype-extraction-rules.md),
 [`workflow/coverage-matrix.md`](workflow/coverage-matrix.md),
 [`workflow/test-data-generation.md`](workflow/test-data-generation.md),
 [`workflow/test-runner-cookbook.md`](workflow/test-runner-cookbook.md),

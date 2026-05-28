@@ -98,7 +98,7 @@ Every Validation finding is one of:
 | Severity | Meaning | Examples |
 |---|---|---|
 | **Blocker** | Hard rule violated; FRS cannot enter Phase 2. | Missing FRS section; technical detail in FLW Scenarios (uses ENT/CMD/STA/PERM-NNN IDs in Phase-1-bare body — `phase-1-bare-body-shape` violation per R-NEW-2); bundled operations (two user-journeys in one FRS); AC that cannot be expressed as a test runner assertion or has no scenario anchor on a real FLW (`flw-coverage` per R-NEW-3); Phase-1-born FLW with no Scenarios filled (Trigger or Scenarios section empty under R-NEW-2); `produced_actor:` set but ACT-NNN ID dangling (per R-NEW-9 amended 2026-05-17, the FRS frontmatter `produced_actor:` field IS the claim — this Blocker fires when the field is set to a value already claimed by a sibling FRS's `produced_actor:` glob or already present in canonical `nodes/actors/index.md`); **`touches_nodes:` non-empty but no Phase-1-born CHG file exists at `milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md`** (per R-CHG-1); **CHG `modifies[]` carries structural before/after at Phase 1** (Phase-2-wired content under a Phase-1-bare CHG — `phase-1-bare-body-shape` violation per R-CHG-4 / R-CHG-7); missing or dangling `produced_flw:` / `produced_actor:` / `produces_nodes:` / `touches_nodes:` / `adrs:` declarations that clearly apply; FRS-ID collision; duplicate FLW Scenario signature against canonical (existence scan widened per R-NEW-6); FRS contradicts an `accepted` ADR without an ADR-supersession path; FRS violates an `accepted` STD whose `applies_when.stack:` intersects the FRS's `stack:` without filing a deviation ADR (`type: standard-conflict`); FRS uses a stack-narrow STD whose `applies_when.stack:` intersects the FRS's `stack:` without declaring it in `standards:` (`type: standard-conflict`); FRS silently overrides a CCC baseline declared in `ccc:` without a back-linked deviation ADR (`type: ccc-deviation`); FRS authored on or after 2026-05-22 omits `framework:` in frontmatter or declares it with an out-of-enum value — canonical enum at [`../BOUNDARY.md § Framework axis`](../BOUNDARY.md#framework-axis-frontmatter-enum) (`type: frontmatter-presence`; pre-2026-05-22 FRSs grandfathered, but the next substantive edit MUST backfill both `stack:` and `framework:`). |
-| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS cites a CCC by content (restating the baseline prose) instead of by ID; **FRS-CHG mismatch** — FRS implies behavior change X but the Phase-1-born CHG's `modifies[]` doesn't describe X, or the CHG describes a modification the FRS doesn't justify (`type: chg-sanity` per R-CHG-5); **illegitimate `created_under: pre-2026-05-17` marker** on a FLW whose `created:` date is after the cutover (B5 grandfather-only marker — `type: sanity`, revise-before-Phase-2); **external boundary undeclared** — FRS implies an outbound external boundary (non-`In-app` Notifications channel, or a named outbound framework abstraction like `IEmailSender` / `IHttpClientFactory` / vendor SDK) but neither declares an `INT-NNN` in `produces_nodes:` / `touches_nodes:` nor cites one inline in body prose (`external-boundary-undeclared` per the new rule below). |
+| **Major** | Domain / NFR / traceability problem; FRS is usable but must be revised before Phase 2 kickoff. | Cross-module actor in scope; NFR stated in engineer language; FRS restates baseline content instead of citing it (`baseline-not-cited`); `[inferred from code]` or `[inferred from prototype]` item present with no Open Question; glossary term used but not in `glossary.md`; deviation from a CCC baseline with no ADR back-link; FRS cites a CCC by content (restating the baseline prose) instead of by ID; **FRS-CHG mismatch** — FRS implies behavior change X but the Phase-1-born CHG's `modifies[]` doesn't describe X, or the CHG describes a modification the FRS doesn't justify (`type: chg-sanity` per R-CHG-5); **illegitimate `created_under: pre-2026-05-17` marker** on a FLW whose `created:` date is after the cutover (B5 grandfather-only marker — `type: sanity`, revise-before-Phase-2); **external boundary undeclared** — FRS implies an outbound external boundary (non-`In-app` Notifications channel, or a named outbound framework abstraction like `IEmailSender` / `IHttpClientFactory` / vendor SDK) but neither declares an `INT-NNN` in `produces_nodes:` / `touches_nodes:` nor cites one inline in body prose (`external-boundary-undeclared` per the new rule below). |
 | **Minor** | Style / clarity issue; does not invalidate the FRS. | Ambiguous phrasing; inconsistent terminology; AC restating a Business rule verbatim (per `R-WITHIN-FRS-RULE-RESTATEMENT`); OQ missing a tag; non-rule trap ("no limit applies" — describes absence of a constraint rather than a constraint); **vague-but-resolvable CHG `modifies[]` delta** — Phase 2 enrichment path is clear (`type: chg-sanity` per R-CHG-5); **state-promotion-deferred** — FRS describes a lifecycle transition that crosses the inline-on-entity threshold (see [KB-LAYOUT discriminator](../KB-LAYOUT.md#node-type-discriminators)) without declaring `STA-NNN` in `produces_nodes:` or carrying a citable inline-DEC justifying continued inline modeling (`state-promotion-deferred` per the new rule below). |
 
 **Gate verdicts:**
@@ -321,6 +321,82 @@ raised OQ; the user may downgrade to `post-approval`), then resume.
 |---|---|
 | `[inferred from code]` item present in an approved FRS with no corresponding OQ | Major |
 | `[inferred from code]` item stripped without confirmation in any OQ | Major |
+
+---
+
+## `[inferred from prototype]` propagation (greenfield)
+
+When a FRS is derived even partly from a UI prototype (the
+greenfield-prototyping path — see
+[`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md)),
+every business-level item that came from the prototype alone carries
+the tag `[inferred from prototype — confirm with stakeholder]` until
+corroborated by stakeholder prose, meeting notes, or explicit
+stakeholder confirmation. The tag is the **peer** of `[inferred from
+code]` — same discipline, different input medium. A prototype is a
+strong signal of intended behavior but not a substitute for
+stakeholder confirmation; the rule book in
+[`frs-prototype-extraction-rules.md → Anti-Pattern: "The
+Prototype-First FRS"`](frs-prototype-extraction-rules.md#anti-pattern-the-prototype-first-frs)
+explains the trap.
+
+The same sections that carry `[inferred from code]` also carry
+`[inferred from prototype]`:
+
+- **Actors** — when an actor's existence comes from a role-gated
+  screen or conditional UI in the prototype.
+- **Preconditions** — when the precondition comes from a disabled
+  control, role-gated screen, or branching navigation.
+- **Business rules** — when a `BR-NN` policy claim comes from a
+  validation hint, error state UI, modal confirmation copy, or
+  inline constraint indicator.
+- **Edge cases** — when an `EC-NN` summary comes from an empty
+  state, error state, or branching UI surface. (Fault-path behavior
+  lives in the Phase-1-born FLW's `#fault` Scenario, outside the
+  FRS; the `[inferred from prototype]` tag is FRS-scoped.)
+- **Acceptance criteria** — when the criterion's testable shape
+  comes from a prototype interaction sequence rather than
+  stakeholder language.
+
+**The tagging rule is unconditional.** If an item in those sections
+came from the prototype, it carries the tag, full stop. Do not omit
+the tag because the prototype "is the stakeholder-approved artifact"
+or because the draft "reads well as-is" — stakeholder approval of a
+*prototype shape* is not stakeholder approval of every *business
+rule* inferable from that shape. The resolution path is a Phase 1.5
+Open Question; that is the only path to strip the tag.
+
+The tag is stripped only after the corresponding Open Question is
+resolved:
+
+- **Confirm** → strip tag, retain item.
+- **Revise** → strip tag, rewrite item.
+- **Defer** → keep the tag in the FRS body; raise an `OQ-NNN` under
+  `docs/discovery/open-questions/` with
+  `origin: frs-authoring, origin_ref: FRS-NNN, gate_effect: blocking`
+  (or `post-approval` if explicitly downgraded).
+
+**Late-discovered tags.** When Phase 1 drafting surfaces a
+prototype-inferred item that wasn't visible at the discovery stage
+(e.g., a disabled-without-explanation control noticed only on a
+second pass through the prototype), halt drafting for that FRS, run
+a clarification pass (default `gate_effect: blocking` on the raised
+OQ; the user may downgrade to `post-approval`), then resume.
+
+**Mixed sources (prototype + code).** When an FRS is derived from
+**both** a prototype and existing application source code (brownfield
+project that started a redesign with a prototype before reshaping the
+code), each tag applies to its own source: items derived from code
+carry `[inferred from code]`, items derived from the prototype carry
+`[inferred from prototype]`, and items derived from **both** carry
+both tags (`[inferred from code, prototype — confirm with
+stakeholder]`). The OQ-resolution paths are identical; the dual tag
+just documents which input(s) the inference traces to.
+
+| Violation | Severity |
+|---|---|
+| `[inferred from prototype]` item present in an approved FRS with no corresponding OQ | Major |
+| `[inferred from prototype]` item stripped without confirmation in any OQ | Major |
 
 ---
 
@@ -698,6 +774,7 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
 | 1.2 | 2026-05-17 | Added `external-boundary-undeclared` sanity sub-flavor (Major) — formalizes that an outbound external boundary signalled by a non-`In-app` Notifications channel or a named outbound framework abstraction (`IAccountEmailer`, `IEmailSender`, `ISmsSender`, `IPushNotificationService`, named `IHttpClientFactory` clients, vendor SDK adapters) requires an `INT-NNN` node — declared in `produces_nodes:` / `touches_nodes:` or cited inline in body prose. INT-NNN reference is the sanctioned cure (parallel to CON-NNN for `protocol-surface-leak`); CCC citation does NOT exempt (CCC is policy layer, INT is boundary layer). Distributed-event publishing to external Kafka / RabbitMQ is out of this rule's scope (routes to EVT-NNN + linked CON-NNN per KB-LAYOUT). Triggered by FRS-001 M-01 audit identifying email-dispatch boundary as undeclared; companion edits in `frs-code-extraction-rules.md` (Translation discipline table) and `_templates/FRS.md` (Notifications heading prompt). |
 | 1.3 | 2026-05-17 | Added `state-promotion-deferred` sanity sub-flavor (Minor) — formalizes the STA vs. inline-on-entity discriminator newly introduced in [`../KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators). Fires when an FRS describes a lifecycle transition that crosses any of the six threshold criteria (≥3 states, ≥2 transitions, named non-CMD guard, consumed domain event on transition, terminal-state semantics, illegal-transition enforcement) without declaring `STA-NNN` in `produces_nodes:` or carrying a citable inline-DEC justifying continued inline modeling. STA-NNN reference is the cure; defer path requires an inline DEC on the entity (or a paragraph in FRS Brownfield impact). Minor severity reflects that this is a modeling judgement — Phase 2 can still ingest the FRS — and matches the precedent set by `nfr-baseline-trace`. Triggered by the M-01 user-auth feedback session questioning why `ENT-001.EmailConfirmed` was modeled inline rather than as STA-001; the framework had no objective trigger for "formal state machine" beyond the ENTITY template's `(if applicable)` hedge. Companion edits in `_templates/nodes/ENTITY.md` (Lifecycle section's State machine line now cites the KB-LAYOUT discriminator). No retroactive M-01 trigger: `EmailConfirmed` (single boolean, single transition, no consumed event, no terminal handling) stays below all six criteria and remains inline. |
 | 1.4 | 2026-05-22 | Promoted "FRS uses a stack-narrow STD without declaring it in `standards:`" (`type: standard-conflict`) from Major to Blocker. The Major classification let undeclared stack-applicable STDs propagate FRS → FS, where the live FSs' `standards:` slot shipped `[]` and the QA gate's STD-conformance dispatch never fired against rules that materially applied — the failure mode that left STD-002 (.NET / ABP coding conventions: `ErrorOr<T>` returns, FluentValidation, aggregate encapsulation) invisible to FS-001 / FS-002 / FS-003. Promotion forces FRS authors to enumerate the stack-applicable STD set at Phase 1.5, closing the upstream half of the gap. Applies prospectively — pre-2026-05-22 FRSs that already cleared Phase 1.5 are grandfathered. Defense-in-depth companion edit: [`qa-gate.md`](qa-gate.md) gains a fourth code-pattern conformance dispatch (parallel to ADR / STD / CCC) that scans project-baseline patterns even when `standards:` is empty. |
+| 1.5 | 2026-05-28 | Added `[inferred from prototype]` propagation rule as peer to `[inferred from code]`, completing the input-medium symmetry: brownfield code-mining and greenfield prototype-seeding now share Phase 1.5 tag-enforcement discipline. Same Major severity on the two violations (untagged prototype-inferred item; tag stripped without OQ confirmation). Dual-tag form `[inferred from code, prototype]` covered for mixed-source extractions. Companion to new file [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md) (v1.0 same date), which governs how the tag is attached at extraction time. Severity table's Major row also widened to name both tags. |
 
 ---
 
@@ -719,6 +796,9 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
 - **Adjacent (not callers but consulted):**
   [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md) —
   produces the `[inferred from code]` items this gate then classifies;
+  [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md)
+  — produces the `[inferred from prototype]` items this gate then
+  classifies (greenfield peer);
   [`baseline-references.md`](baseline-references.md) — the
   `baseline-not-cited` Major finding routes a fix here when the
   resolution is a baseline edit;
@@ -730,6 +810,7 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
   in the FRS's `Validation findings` table.
 - **Sibling rule books:**
   [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md),
+  [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md),
   [`lint.md`](lint.md),
   [`coverage-matrix.md`](coverage-matrix.md),
   [`test-data-generation.md`](test-data-generation.md).

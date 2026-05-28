@@ -76,8 +76,9 @@ section IS the TC index for that FS.
 
 These two refs are wholesale-read during their respective operations
 (this file reads `test-data-generation.md`; Phase 3 Test suite codegen reads
-both). They are peers of [`frs-validation-rules.md`](frs-validation-rules.md)
-and [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md).
+both). They are peers of [`frs-validation-rules.md`](frs-validation-rules.md),
+[`frs-code-extraction-rules.md`](frs-code-extraction-rules.md), and
+[`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md).
 
 ---
 

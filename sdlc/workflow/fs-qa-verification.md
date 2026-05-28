@@ -80,6 +80,7 @@ in a one-line annotation in the FS body — do not silently skip.
 - **Sibling rule books:** [`frs-validation-rules.md`](frs-validation-rules.md),
   [`coverage-matrix.md`](coverage-matrix.md),
   [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md),
+  [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md),
   [`lint.md`](lint.md),
   [`test-data-generation.md`](test-data-generation.md).
 - **Required before:** [`maintenance-discipline.md`](maintenance-discipline.md)
