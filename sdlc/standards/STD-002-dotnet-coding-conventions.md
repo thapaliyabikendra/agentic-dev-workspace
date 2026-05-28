@@ -115,7 +115,7 @@ inline literal.
 
 - `Application.Contracts/` DTOs (input or output) — DTOs carry the
   success-branch shape only.
-- AppService interfaces (`I<Aggregate>AppService`) — the interface
+- AppService interfaces (`I<Page>AppService`) — the interface
   return type is `T` (or `Task<T>`), not `ErrorOr<T>`. The unwrap
   happens inside the AppService implementation.
 - `HttpApi/` controllers — auto-controllers consume the AppService
@@ -131,12 +131,12 @@ The AppService delegates to the Manager, unwraps the `ErrorOr<T>`, and
 translates the error branch:
 
 ```csharp
-public class DepartmentAppService : ApplicationService, IDepartmentAppService
+public class DepartmentManagementAppService : ApplicationService, IDepartmentManagementAppService
 {
     private readonly DepartmentManager _manager;
     private readonly IStringLocalizer<PatientPortalResource> _l;
 
-    public DepartmentAppService(
+    public DepartmentManagementAppService(
         DepartmentManager manager,
         IStringLocalizer<PatientPortalResource> l)
     {

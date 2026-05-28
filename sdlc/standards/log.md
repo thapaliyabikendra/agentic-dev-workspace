@@ -678,3 +678,71 @@ or invariant-placement (constructor vs named mutation method). Closes
 plan item #3 by deferral (not by authoring); item #5 (STD-002 R5 split
 to STD-001) remains blocked on STD-001 graduation per the original
 dependency chain.
+
+## [2026-05-28] plan-consolidated | STD-005 R9.2/R11/R15 + R11.1 — page-driven AppService
+
+Source: plan `is-this-rule-being-purring-liskov.md`. Codifies the
+codebase + KB convention (AppService = portal page, BFF-like;
+DomainService = aggregate; AppService composes DomainServices) that
+STD-005 still contradicted. Universal — applies to all new features,
+not prototype-conditional. No new ADR; STD-005 amend only.
+
+- **R9.2 — AppService folder rows + Permissions row.** Replaced both
+  AppService rows (interface + impl) with page-driven shape
+  `<Portal>/<Page>AppService.cs` (simple page) /
+  `<Portal>/<Page>/<Page><Section>AppService.cs` (sectioned). Permissions
+  row updated `<Module>Permissions.cs` → `<Project>Permissions.cs` (R15
+  alignment). Placeholder gloss extended to define `<Portal>`, `<Page>`,
+  and `<Project>`.
+- **R11 — CON row.** Maps to `<Page>AppService` (page-scoped, not
+  aggregate-scoped); sectioned pages name `<Page><Section>AppService`.
+  Slot moved to `Application/<Portal>/` (or
+  `Application/<Portal>/<Page>/` for sectioned pages).
+- **R11.1 added — Page-AppService composition invariant.** Sub-rule
+  formalises the BFF-like boundary: accepts page input, authorises,
+  delegates to one-or-more `<Aggregate>Manager` methods, unwraps each
+  `ErrorOr<T>`, projects to a composite output DTO. MAY span multiple
+  aggregates; MUST NOT carry business rules or cross-aggregate
+  coordination — that stays in a Manager (cross-link to STD-002 R5).
+  Simple page = one `<Page>AppService`; sectioned/tabbed page = one
+  `<Page><Section>AppService` per tab/section, each aligned to a single
+  aggregate's DomainService.
+- **R15 — Permission constants reshape.** Single per-project file
+  `<Project>Permissions.cs` with nested portal → page → action
+  sub-classes; wire pattern `<Project>.<Portal>.<Page>.<Action>`
+  (e.g. `TradeFinance.AdminPortal.Users.Create`). Example replaced
+  (`BankGuaranteePermissions` → `TradeFinancePermissions`). Provider
+  named `<Project>PermissionDefinitionProvider`. The earlier
+  `<Module>Permissions.cs` parenthetical mismatch removed.
+- **R9.3 — AppService and Permission examples updated** (non-normative).
+  `BgRequestAppService` / `IBgRequestAppService` → `BgSubmissionAppService`
+  / `IBgSubmissionAppService` (page-named). `BankGuaranteePermissions` →
+  `TradeFinancePermissions` (single per-project class).
+- **Frontmatter / index.md.** STD-005 `updated: 2026-05-22 → 2026-05-28`;
+  tags gained `bff, page-driven` (frontmatter + index row, bidirectional
+  sync).
+- **Cascading edits.** `by-layer/application.md` + `by-layer/contracts.md`
+  Key-folders rows and common-defects bullets re-shaped to `<Page>` /
+  `<Project>` placeholders. `_templates/nodes/PERMISSION.md` prose
+  updated `<Module>Permissions.cs` → `<Project>Permissions.cs`.
+  `_templates/nodes/CONTRACT.md` verified — no rule-text reference to
+  AppService naming; left untouched.
+
+Cascading fix: `STD-002-dotnet-coding-conventions.md` R1.3 prose
+(`I<Aggregate>AppService` → `I<Page>AppService`, line 118) and its
+illustrative code block (class renamed to `DepartmentManagementAppService`
+/ `IDepartmentManagementAppService`) updated in the same operation.
+
+Grandfathering:
+- CON nodes created before 2026-05-28 (CON-012..CON-017) retain
+  aggregate-named AppService titles. Next substantive edit MUST backfill
+  page-driven naming in the same operation.
+- CMD/QRY nodes created before 2026-05-28 that contain permission string
+  references using the two-level `TradeFinancePermissions.<Resource>.<Action>`
+  pattern (without portal level) are also grandfathered. Next substantive
+  edit to any such node MUST backfill the three-level
+  `<Project>.<Portal>.<Page>.<Action>` wire pattern in the same operation.
+  (Mirrors the 2026-05-22 `framework:` HARD-GATE grandfather pattern in
+  CLAUDE.md.)
+No CLAUDE.md edit — grandfather clause captured here to keep scope
+contained.

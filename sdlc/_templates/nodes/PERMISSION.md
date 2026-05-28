@@ -25,9 +25,11 @@ updated: YYYY-MM-DD
 > **Do not create a PERM whose guard reduces to the CCC-002 baseline.** A
 > guard of `CurrentUser.IsAuthenticated` (or any expression equivalent to
 > "permission is registered and the caller holds it") is what CCC-002
-> already mandates by default — the permission name belongs in
-> `<Project>Permissions.cs` and `PermissionDefinitionProvider` (per STD-005
-> R15) and the claim belongs inline on the actor's `Permissions:` bullet.
+> already mandates by default — the permission name belongs in the
+> single per-project `<Project>Permissions.cs` (nested portal → page →
+> action; wire pattern `<Project>.<Portal>.<Page>.<Action>`) and
+> `<Project>PermissionDefinitionProvider` (per STD-005 R15) and the
+> claim belongs inline on the actor's `Permissions:` bullet.
 > Promote to PERM only when the guard adds content beyond the baseline:
 > ownership / tenancy / state predicates, attribute combinations, or the
 > same non-trivial expression cited from multiple commands.

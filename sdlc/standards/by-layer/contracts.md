@@ -15,10 +15,10 @@ description: "Phase 3 narrow-load pointer for the Application.Contracts layer su
 `<Project>.<Module>.Application.Contracts` per STD-005 R9.2
 
 Key folders:
-- `<Module>/<SubModule>/AppServices/` — `I<AggregateName>AppService.cs` interfaces
+- `<Portal>/` — `I<Page>AppService.cs` interfaces (page-driven per STD-005 R11 / R11.1; sectioned-page form `<Portal>/<Page>/I<Page><Section>AppService.cs`)
 - `<Module>/<SubModule>/Dtos/` — all input and output DTOs
 - `<Module>/<SubModule>/Validators/` — `<DtoName>Validator.cs` files
-- `Permissions/` — `<Module>Permissions.cs` constants + `<Project>PermissionDefinitionProvider`
+- `Permissions/` — `<Project>Permissions.cs` constants (single file, nested portal → page → action) + `<Project>PermissionDefinitionProvider`
 
 ## Rules to load
 
@@ -43,7 +43,7 @@ Key folders:
 
 ## Common defects this layer must avoid
 
-- `ErrorOr<T>` leaking into DTO or `I<Aggregate>AppService` interface (STD-002 R1.3)
+- `ErrorOr<T>` leaking into DTO or `I<Page>AppService` interface (STD-002 R1.3)
 - Missing validator for an input DTO (`Create…Dto`, `Update…Dto`, etc.) (STD-002 R2.5)
 - Magic number inline in validator — read from `<Module>Consts.cs` (STD-002 R2.2)
 - Inline string message in `.WithMessage(...)` — read from `_l[<Module>Keys.<Member>]` (STD-002 R2.2)

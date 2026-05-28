@@ -15,7 +15,7 @@ description: "Phase 3 narrow-load pointer for the Application layer sub-agent (C
 `<Project>.<Module>.Application` per STD-005 R9.2
 
 Key folders:
-- `<Module>/<SubModule>/AppServices/` — `<AggregateName>AppService.cs` implementations
+- `<Portal>/` — `<Page>AppService.cs` implementations (page-driven per STD-005 R11 / R11.1; sectioned-page form `<Portal>/<Page>/<Page><Section>AppService.cs`)
 - `<Module>/<SubModule>/Mappers/` — Mapperly `[Mapper] partial class <Aggregate>Mapper`
 
 ## Rules to load
@@ -51,4 +51,5 @@ Key folders:
 - `[Authorize]` on a Manager-suffixed type (STD-005 R15)
 - Manual `_logger.Log*` audit trail — use `IAuditingStore` / `[Audited]` (STD-006 R6)
 - `$"…"` string interpolation inside a log call (STD-006 R3)
-- `ErrorOr<T>` returned from an `I<Aggregate>AppService` interface method (STD-002 R1.3)
+- `ErrorOr<T>` returned from an `I<Page>AppService` interface method (STD-002 R1.3)
+- AppService method that carries cross-aggregate coordination logic — that belongs in a Manager (STD-005 R11.1)

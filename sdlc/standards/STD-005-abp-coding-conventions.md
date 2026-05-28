@@ -3,10 +3,10 @@ id: STD-005
 title: ABP framework coding conventions
 status: accepted
 created: 2026-05-15
-updated: 2026-05-22
+updated: 2026-05-28
 supersedes: null
 superseded_by: null
-tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging, mapperly]
+tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging, mapperly, bff, page-driven]
 scope: engine
 applies_when:
   stack: [api]
@@ -243,14 +243,14 @@ Folder hierarchy: **`<Module>/<SubModule>/<TypeFamily>/<TypeName>.cs`**. Types a
 | `EntityFrameworkCore` | `<Module>/EntityConfigurations/<AggregateName>Configuration.cs` | `IEntityTypeConfiguration<T>` |
 | `EntityFrameworkCore` | `<RootNamespace>DbContext.cs` | DbContext — one per solution |
 | `EntityFrameworkCore` | `Migrations/<UtcTimestamp>_<DescriptiveName>.cs` | EF Core migrations |
-| `Application.Contracts` | `<Module>/<SubModule>/AppServices/I<AggregateName>AppService.cs` | AppService interfaces |
+| `Application.Contracts` | `<Portal>/I<Page>AppService.cs` | AppService interfaces — one per portal page (simple) or per page-section (sectioned). Sectioned form: `<Portal>/<Page>/I<Page><Section>AppService.cs` |
 | `Application.Contracts` | `<Module>/<SubModule>/Dtos/<DtoName>Dto.cs` | all DTOs (input + output) |
-| `Application.Contracts` | `Permissions/<Module>Permissions.cs` | permission constants |
-| `Application` | `<Module>/<SubModule>/AppServices/<AggregateName>AppService.cs` | AppService implementations |
+| `Application.Contracts` | `Permissions/<Project>Permissions.cs` | permission constants — single file per project (R15) |
+| `Application` | `<Portal>/<Page>AppService.cs` | AppService implementations — one per portal page (simple) or per page-section (sectioned). Sectioned form: `<Portal>/<Page>/<Page><Section>AppService.cs` |
 | `Application` | `<Module>/<SubModule>/Mappers/<AggregateName>Mapper.cs` | Mapperly mapper class (default; `[Mapper] partial class`; see mapper-backend note below) |
-| `HttpApi` | `Controllers/<Module>/<AggregateName>Controller.cs` | controllers (thin; delegate to AppService) |
+| `HttpApi` | `Controllers/<Module>/<AggregateName>Controller.cs` | controllers (thin; delegate to AppService — intentionally aggregate-scoped, not page-scoped) |
 
-`<Module>` = bounded-context folder in PascalCase (`BankGuarantee`, `LetterOfCredit`). `<SubModule>` = feature group (`Issuance`, `Claims`). Omit `<SubModule>` when a module has only one feature group.
+`<Module>` = bounded-context folder in PascalCase (`BankGuarantee`, `LetterOfCredit`). `<SubModule>` = feature group (`Issuance`, `Claims`). Omit `<SubModule>` when a module has only one feature group. `<Portal>` = UI portal folder in PascalCase (`AdminPortal`, `CustomerPortal`); `<Page>` = a single page (or page-section, when the page is tabbed/sectioned) the AppService backs — see R11 + R11.1 for the page-driven AppService convention. `<Project>` = solution-root PascalCase token (`TradeFinance`) used for the single permission constants file (R15).
 
 > **Mapper backend.** Default is Mapperly (`Volo.Abp.Mapperly`): declare a `[Mapper] partial class <Aggregate>Mapper` (or a single `<Project>ApplicationMappers` class when mappings are few). To use AutoMapper instead, file an ADR referencing STD-005 and use `AutoMapperProfiles/<AggregateName>AutoMapperProfile.cs`.
 
@@ -273,8 +273,8 @@ per `CCC-007`); each constant's value is 1:1 with an `en.json` key.
 | Domain service / factory | `Manager` | `BgRequestManager` |
 | Domain event | `Event` | `BgRequestCreatedEvent` |
 | Integration event | `Eto` | `BgRequestCreatedEto` |
-| AppService impl | `AppService` | `BgRequestAppService` |
-| AppService interface | `I` + `AppService` | `IBgRequestAppService` |
+| AppService impl | `AppService` | `BgSubmissionAppService` (page-named per R11 / R11.1) |
+| AppService interface | `I` + `AppService` | `IBgSubmissionAppService` (page-named per R11 / R11.1) |
 | Output DTO | `Dto` | `BgRequestDto`, `BgRequestDetailDto` |
 | Input DTO (command) | `Dto` | `CreateBgRequestDto`, `ApproveBgRequestDto` |
 | Combined create+update DTO | `Dto` | `CreateUpdateBgRequestDto` |
@@ -286,7 +286,7 @@ per `CCC-007`); each constant's value is 1:1 with an `en.json` key.
 | Background job | `Job` | `CbsRetryJob` |
 | Background worker | `Worker` | `CbsOutboxWorker` |
 | Controller | `Controller` | `BgRequestController` |
-| Permission constants class | `Permissions` | `BankGuaranteePermissions` |
+| Permission constants class | `Permissions` | `TradeFinancePermissions` (single file per project, see R15) |
 | Permission definition provider | `PermissionDefinitionProvider` | `TradeFinancePermissionDefinitionProvider` |
 
 ABP suffix conventions (`AppService`, `Controller`, `PermissionDefinitionProvider`, `Eto`, `Mapper` / `AutoMapperProfile`) are non-negotiable — renaming breaks DI registration or endpoint discovery. **All DTOs end in `Dto` — no `Input` or `Request` suffixes.**
@@ -372,7 +372,28 @@ node type:
 | FLW (flow) | `<AggregateName>Manager` | `Domain/<Module>/<SubModule>/Managers/` |
 | QRY (query) | `<AggregateName>Manager` | `Domain/<Module>/<SubModule>/Managers/` |
 | CMD (command) | `<AggregateName>Manager` | `Domain/<Module>/<SubModule>/Managers/` |
-| CON (wire surface) | `<AggregateName>AppService` | `Application/<Module>/<SubModule>/AppServices/` |
+| CON (wire surface) | `<Page>AppService` (one per portal page; multiple per sectioned/tabbed page — one per section, named `<Page><Section>AppService`) | `Application/<Portal>/` (or `Application/<Portal>/<Page>/` for sectioned pages) |
+
+#### 11.1 Page-AppService composition invariant
+
+A `<Page>AppService` is the BFF-like thin boundary for exactly one portal
+page (or one section of a sectioned/tabbed page). It:
+
+- Accepts the page's input DTO(s), authorizes, delegates to one or more
+  `<Aggregate>Manager` methods (DomainServices), unwraps each
+  `ErrorOr<T>`, and projects to the page's composite output DTO.
+- MAY call multiple `<Aggregate>Manager` methods within a single
+  AppService method when the page spans more than one aggregate.
+- MUST NOT contain business rules, cross-aggregate invariant enforcement,
+  or coordination logic that determines which mutations must co-succeed
+  — that belongs in a Manager (see [STD-002 § Rule 5](STD-002-dotnet-coding-conventions.md#rule-5--aggregate-root-encapsulation-builder-style-mutation)
+  for aggregate-root mutation; cross-aggregate coordination is the
+  Manager's responsibility, not the AppService's).
+
+**Simple page:** one `<Page>AppService` composes across all relevant
+DomainServices.
+**Sectioned/tabbed page:** one `<Page><Section>AppService` per
+tab/section, each aligned to a single aggregate's DomainService.
 
 Managers (Domain Services per Rule 9.3) carry the body: entity invariant
 enforcement, cross-aggregate coordination, and policy decisions. They
@@ -522,22 +543,35 @@ method, an entity, a specification, or any domain-layer type. Domain
 Managers stay authorization-agnostic; the AppService is the
 authorization boundary.
 
-Permission constants are grouped by feature module inside
-`<Project>Permissions.cs` at the Rule 9.2 slot
-(`Application.Contracts/Permissions/<Module>Permissions.cs`). Each
-group corresponds to a feature module; nested static classes carry
-per-resource permissions:
+Permission constants live in a **single per-project file** at the Rule 9.2
+slot (`Application.Contracts/Permissions/<Project>Permissions.cs`),
+organised into nested static sub-classes one level per portal, one level
+per page, with leaf string constants per action. The wire pattern is
+`<Project>.<Portal>.<Page>.<Action>` (e.g.
+`TradeFinance.AdminPortal.Users.Create`) — symmetric with the page-driven
+AppService shape (R9.2, R11, R11.1):
 
 ```csharp
-public static class BankGuaranteePermissions
+public static class TradeFinancePermissions
 {
-    public const string GroupName = "BankGuarantee";
+    public const string GroupName = "TradeFinance";
 
-    public static class BgRequests
+    public static class AdminPortal
     {
-        public const string Default = GroupName + ".BgRequests";
-        public const string Create  = Default + ".Create";
-        public const string Approve = Default + ".Approve";
+        public static class Users
+        {
+            public const string Default = GroupName + ".AdminPortal.Users";
+            public const string Create  = Default + ".Create";
+            public const string Edit    = Default + ".Edit";
+            public const string Delete  = Default + ".Delete";
+        }
+
+        public static class BgRequests
+        {
+            public const string Default = GroupName + ".AdminPortal.BgRequests";
+            public const string Submit  = Default + ".Submit";
+            public const string Approve = Default + ".Approve";
+        }
     }
 }
 ```
@@ -545,7 +579,8 @@ public static class BankGuaranteePermissions
 Inline string literals at `[Authorize("...")]` call sites are
 **prohibited** — every attribute argument resolves to a constant.
 
-The `<Project>PermissionDefinitionProvider` registers every group and
+The `<Project>PermissionDefinitionProvider` (e.g.
+`TradeFinancePermissionDefinitionProvider`) registers every group and
 permission definition and **is** the canonical authorization surface.
 Scattered `IAuthorizationService.AuthorizeAsync(...)` checks inside
 Domain Managers are prohibited; AppService methods declare their
