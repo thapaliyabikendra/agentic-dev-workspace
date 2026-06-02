@@ -11,6 +11,9 @@ observes: []                  # STA-NNN IDs whose value affects display
 nav_from: []                  # SCR-NNN IDs that link to this screen
 nav_to: []                    # SCR-NNN IDs this screen links to
 module: MOD-NNN               # the bounded context this screen lives in
+code_ref: []                  # screen-level realizing file(s) (ADR-035). [{path: ui/src/..., role: primary | panel | variant}]
+                              # primary = the page that is this screen; panel = sub-surface on a host page; variant = an alternate (portal/on-behalf) realization.
+                              # Machine-queryable join key for kb:trace; paths only, never spec text. [] when no realizing file exists yet.
 related: []
 created: YYYY-MM-DD
 version: 1
@@ -101,4 +104,7 @@ which actions are enabled.
 
 ## Brownfield notes
 
-Existing route / page / component file this screen maps to:
+Existing route / page / component file this screen maps to. Narrative context
+(which tab, what it replaces, counterexamples) lives here; the bare realizing
+file path(s) are mirrored into the queryable `code_ref:` frontmatter slot
+(ADR-035) so `kb:trace` can reconcile the screen↔code edge.

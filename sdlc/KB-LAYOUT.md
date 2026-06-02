@@ -34,7 +34,7 @@ docs/<component>/nodes/             # canonical wiki (one per component)
   decisions/          DEC-NNN-*.md
   integrations/       INT-NNN-*.md
   modules/            MOD-NNN-*.md  # bounded context (engineering-facing)
-  screens/            SCR-NNN-*.md  # conceptual UI surface
+  screens/            SCR-NNN-*.md  # conceptual UI surface; code_ref: slot maps to realizing file(s) (ADR-035)
   contracts/          CON-NNN-*.md  # inter-component surface — HTTP / events / queue / gRPC
                                     # (discriminated by frontmatter protocol:)
   permissions/        PERM-NNN-*.md # first-class authorization rules
