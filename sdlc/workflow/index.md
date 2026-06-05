@@ -59,6 +59,7 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 | [lint.md](lint.md) | Debt-scan — detects orphan-node, stale-proposed, baseline-not-cited, stale-version-ref, index-entry-missing | On demand (before milestone close, after long absence, periodic) |
 | [review.md](review.md) | Review pass — QA gates, author self-review, ADR-conformance checks; files findings under `design-fit` or `execution-debt` | Phase 3 QA completion; author self-review at Phase 2 close |
 | [verify.md](verify.md) | Post-implementation UAT — walks FRS acceptance criteria in aggregate, routes gaps, produces durable `UAT.md` record | After Phase 3 QA has passed for every FS in the milestone, before milestone close |
+| [prototype-first.md](prototype-first.md) | Bidirectional prototype-first operation — build a clickable UI prototype then drive FRS authoring + reimplementation; supports prototype→milestone seeding AND milestone/CR→prototype validation | When prototype-first flow is active (either direction) |
 
 ---
 
@@ -69,8 +70,8 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 | [retrieval-discipline.md](retrieval-discipline.md) | What to load at each phase entry — the primary token lever | Load when entering any phase or when a retrieval decision is in doubt |
 | [frs-validation-rules.md](frs-validation-rules.md) | Phase 1.5 gate — severity tiers (Blocker/Major/Minor), bundling detection, NFR rubric, OQ gate-effect taxonomy | Phase 1.5 (Validation Gate) |
 | [fs-qa-verification.md](fs-qa-verification.md) | QA-hat sweep checklist run before flipping an FS from `approved` to `implemented` — referenced from the FS template's `## QA verification` section | Phase 3 (before FS `implemented` flip) |
-| [frs-code-extraction-rules.md](frs-code-extraction-rules.md) | Mining existing source code for FRS candidates — signal-to-FRS mapping, code-to-business translation, `[inferred from code]` discipline | Phase 0/1 (brownfield path) |
-| [frs-prototype-extraction-rules.md](frs-prototype-extraction-rules.md) | Mining a UI prototype for FRS candidates — screen-to-FRS signal mapping, prototype-to-business translation, `[inferred from prototype]` discipline | Phase 0/1 (greenfield-prototyping path — peer to code-extraction) |
+| [frs-code-extraction-rules.md](frs-code-extraction-rules.md) | Mining existing source code for FRS candidates — signal-to-FRS mapping, code-to-business translation, `[inferred from code]` discipline | Phase 0/1 (brownfield path); code-sourced is inherently brownfield; prototype-sourced is posture-independent. |
+| [frs-prototype-extraction-rules.md](frs-prototype-extraction-rules.md) | Mining a UI prototype for FRS candidates — screen-to-FRS signal mapping, prototype-to-business translation, `[inferred from prototype]` discipline | Phase 0/1 (prototype-sourced path — peer to code-extraction) |
 | [coverage-matrix.md](coverage-matrix.md) | TC completeness reference table — per-use-case tables for identifying which TCs apply | Phase 2 test-plan ingest |
 | [test-data-generation.md](test-data-generation.md) | Rule book for `## Test Data` sections — placeholder tokens, directive vocabulary, per-field-type generation rules | Phase 2 (TC authoring) and Phase 3 (test suite codegen) |
 | [test-runner-cookbook.md](test-runner-cookbook.md) | Converts Phase 2 TC step text into executable Playwright TypeScript — action inference table, selector resolution, spec-file template | Phase 3 (test suite codegen) |

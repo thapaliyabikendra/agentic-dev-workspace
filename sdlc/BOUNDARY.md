@@ -210,21 +210,30 @@ actual choice when adopting the engine.
 ### Toolchain assumptions
 
 - **`<your UI prototyping tool>` as Phase 0 input.** `[Phase A —
-  Resolved 2026-05-28]` Engine-side discipline is fixed: the
-  prototype artifact lives at
-  `docs/exploration/EXP-<slug>.md` as an **Exploration disposition**
-  (`tag: prototype`, lazy-created file per
-  [`CLAUDE.md → Project KB`](../CLAUDE.md#project-kb)), cited from
-  the milestone SURVEY via the `prototype_ref:` typed slot (see
-  [`_templates/SURVEY.md`](_templates/SURVEY.md)). Phase 0 / Phase 1
-  signal extraction is governed by
+  Resolved 2026-05-28; prototype home repointed 2026-06-05]`
+  Engine-side discipline is fixed: the prototype artifact lives at
+  `docs/prototypes/<slug>/PROTO-<slug>.md` as a dedicated **Prototype
+  disposition** (`id: PROTO-<slug>`, template
+  [`_templates/PROTOTYPE.md`](_templates/PROTOTYPE.md), lazy-created
+  per [`CLAUDE.md → Project KB`](../CLAUDE.md#project-kb)), with the
+  verbatim artifact under `docs/prototypes/<slug>/raw/` and a catalog
+  row in `docs/prototypes/index.md`. It is cited from the milestone
+  SURVEY via the `prototype_ref:` typed slot (see
+  [`_templates/SURVEY.md`](_templates/SURVEY.md)). The bidirectional
+  operation doctrine is
+  [`workflow/prototype-first.md`](workflow/prototype-first.md); Phase 0
+  / Phase 1 signal extraction is governed by
   [`workflow/frs-prototype-extraction-rules.md`](workflow/frs-prototype-extraction-rules.md)
-  — the greenfield-prototyping peer to
-  [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md).
-  The tool *name* itself remains project-time — `<your UI
-  prototyping tool>` could be any wireframing / hi-fi / clickable
-  prototype tool; the engine binds to the **disposition** and
-  **extraction discipline**, not the format.
+  — the **prototype-sourced** peer to
+  [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md)
+  (**code-sourced is inherently brownfield; prototype-sourced is
+  posture-independent** — the asymmetry is intentional). Generic
+  Exploration (spikes / research / bug investigations) stays at
+  `docs/exploration/`; only the prototype disposition was split out to
+  `docs/prototypes/`. The tool *name* itself remains project-time —
+  `<your UI prototyping tool>` could be any wireframing / hi-fi /
+  clickable prototype tool; the engine binds to the **disposition**
+  and **extraction discipline**, not the format.
 - **`<your VCS/CI platform>` as migration target.** [`WORKFLOW.md`](WORKFLOW.md)
   has a platform-mapping table; adapt it to your forge (GitLab, GitHub,
   Azure DevOps, Bitbucket, etc.).
@@ -311,7 +320,7 @@ Topic-by-topic classification:
 | Brownfield-vs-greenfield posture | **project-time** | Set in CLAUDE.md `project_type:`. |
 | Component structure (`docs/<component-slug>/`) | **engine-recommended** | Engine defines the `COMPONENT.md` format and folder convention (see [`LAYOUT.md § Component structure`](LAYOUT.md#component-structure-docs)). Projects may omit components (keeping the flat `docs/<component>/nodes/` structure) when they have only one deployable component. Projects must not reuse component-slug names across projects within the same workspace. Bootstrap procedure: [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md). |
 | Standalone component ID prefix | **engine-recommended** | When the component layer is adopted, each standalone component must declare a globally unique 2–4 char uppercase `id_prefix` in `COMPONENT.md`. Brownfield-imported legacy components are exempt. The engine defines the format; the project chooses the prefix values. |
-| Prototype artifact disposition (`docs/exploration/EXP-<slug>.md` with Exploration `tag: prototype`; SURVEY `prototype_ref:` typed slot) | **engine-prescribed** | Added 2026-05-28. Disposition is fixed: prototypes are Phase 0 input artifacts, not nodes, and live as Exploration disposition. Signal-extraction discipline governed by [`workflow/frs-prototype-extraction-rules.md`](workflow/frs-prototype-extraction-rules.md) — greenfield peer to [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md). The tool *name* itself (`<your UI prototyping tool>`) remains project-time; the engine binds the disposition and extraction discipline, not the prototype format. |
+| Prototype artifact disposition (`docs/prototypes/<slug>/PROTO-<slug>.md` dedicated **Prototype disposition**; template [`_templates/PROTOTYPE.md`](_templates/PROTOTYPE.md); SURVEY `prototype_ref:` typed slot) | **engine-prescribed** | Added 2026-05-28; prototype home **repointed 2026-06-05** from `docs/exploration/EXP-<slug>` (Exploration `tag: prototype`) to a dedicated `docs/prototypes/` disposition (`PROTO-<slug>`, slug-based, no numeric ceiling), split out from generic Exploration. Disposition is fixed: prototypes are Phase 0/1 input artifacts, not nodes. Operation doctrine: [`workflow/prototype-first.md`](workflow/prototype-first.md) (bidirectional — prototype→milestone seeding or milestone/CR→prototype validation). Signal-extraction discipline governed by [`workflow/frs-prototype-extraction-rules.md`](workflow/frs-prototype-extraction-rules.md) — the **prototype-sourced** peer to [`workflow/frs-code-extraction-rules.md`](workflow/frs-code-extraction-rules.md) (code-sourced is inherently brownfield; prototype-sourced is posture-independent). Generic Exploration (spikes / research / bug investigations) stays at `docs/exploration/`. The tool *name* itself (`<your UI prototyping tool>`) remains project-time; the engine binds the disposition and extraction discipline, not the prototype format. |
 
 When a new governance topic arises, classify it explicitly using this axis
 before adding it to any rule book.

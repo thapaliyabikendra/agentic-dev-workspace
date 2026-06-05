@@ -324,10 +324,10 @@ raised OQ; the user may downgrade to `post-approval`), then resume.
 
 ---
 
-## `[inferred from prototype]` propagation (greenfield)
+## `[inferred from prototype]` propagation
 
 When a FRS is derived even partly from a UI prototype (the
-greenfield-prototyping path — see
+prototype-sourced path — see
 [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md)),
 every business-level item that came from the prototype alone carries
 the tag `[inferred from prototype — confirm with stakeholder]` until
@@ -798,7 +798,7 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
   produces the `[inferred from code]` items this gate then classifies;
   [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md)
   — produces the `[inferred from prototype]` items this gate then
-  classifies (greenfield peer);
+  classifies (prototype-sourced peer);
   [`baseline-references.md`](baseline-references.md) — the
   `baseline-not-cited` Major finding routes a fix here when the
   resolution is a baseline edit;

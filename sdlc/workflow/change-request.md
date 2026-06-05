@@ -38,6 +38,8 @@ related in-flight work should group it under a milestone. Reroute when:
 | Change restores broken behavior (intent unchanged) | [`bug-fix.md`](bug-fix.md) |
 | Several unrelated small CRs accumulate | `kind: accumulator` milestone |
 
+Significant new UI surface → consider building a prototype first via CR-0.5 ([`prototype-first.md`](prototype-first.md)).
+
 ## CR Container Structure
 
 ```
@@ -66,6 +68,7 @@ track).
 | Phase | Delegates to | CR-specific differences |
 |---|---|---|
 | CR-0 (Portal) | [`_templates/CR-PORTAL.md`](../_templates/CR-PORTAL.md) | Assign next free `CR-NNN` by globbing `docs/change-requests/`. Leave `frs:` / `specs:` empty; fill iteratively. |
+| CR-0.5 (Prototype) — optional | [`prototype-first.md`](prototype-first.md) | Applies only when the change introduces significant new UI surface. Build a clickable prototype first to visualize and validate the change before FRS authoring and implementation. The CR/CHG/milestone is recorded in the prototype's `motivated_by:`. Skip if no meaningful new UI surface. |
 | CR-1 (FRS) | [`design.md § Phase 1 — FRS Authoring`](design.md#phase-1--frs-authoring) | FRS at `frs/FRS-NNN-<slug>.md`; frontmatter `cr: CR-NNN` (leave `milestone:` blank). FLW + CHG born by FRS; ACT-NNN claimed via FRS `produced_actor:` (file at CR-2). |
 | CR-1.5 (Gate) | [`design.md § Pass 1 — Per-FRS gate`](design.md#pass-1--per-frs-gate-runs-after-each-frs-is-authored) + [`frs-validation-rules.md`](frs-validation-rules.md) | Pass 1 only; Pass 2 N/A. Run escalation check below before `/clear` + CR-2. |
 | CR-2 (FS + CHG) | [`plan.md`](plan.md) (follow exactly) | Path substitutions below; CHG mechanics per [`in-flight-nodes.md`](in-flight-nodes.md) + [`plan.md § 4`](plan.md#4-chg-node-consumption--enrichment). |

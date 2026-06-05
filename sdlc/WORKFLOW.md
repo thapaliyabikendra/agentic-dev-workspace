@@ -265,6 +265,7 @@ referenced by other files; load the canonical file for actual procedure.
 
 > Survey vs. Exploration discriminator, shape detection, cross-linking.
 > Full procedure: [`workflow/design.md → Pre-FRS artifact types`](workflow/design.md#pre-frs-artifact-types).
+> When the input medium is a UI prototype, see [`workflow/prototype-first.md`](workflow/prototype-first.md) for the bidirectional prototype-first operation (prototype→milestone seeding or milestone/CR→prototype validation).
 
 ### Bugs
 

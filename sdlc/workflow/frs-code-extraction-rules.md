@@ -33,7 +33,11 @@ it does not re-derive them from code).
 classifies a tagged item's severity at the Phase 1.5 gate; this file
 governs how the tag gets attached in the first place. The two operate
 at adjacent points in the same brownfield path: extract → tag (here),
-then gate → classify (there).
+then gate → classify (there). Note the asymmetry with the prototype
+path: code-as-input is inherently brownfield (you only have existing
+code in brownfield); its prototype-sourced peer
+([`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md))
+is posture-independent.
 
 How to mine the existing application's source code for FRS candidates
 without leaking implementation detail into the FRS itself.

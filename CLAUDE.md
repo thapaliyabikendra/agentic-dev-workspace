@@ -153,6 +153,7 @@ Lazy; framework requires the slot:
 - `docs/shared/` — glossary, CCC baselines, cross-component ADRs, tech-stack
 - `docs/milestones/` — milestone portals, FRSs, FSs, CHG nodes, TC files
 - `docs/discovery/` — open questions (per-OQ folder)
+- `docs/prototypes/` — UI prototype dispositions (`PROTO-<slug>`); catalog + descriptors, Phase-0/1 input artifacts
 - `docs/home.md` — cross-component catalog and ID high-water marks
 - `docs/reports/` — wiki-derived views (lazy): aggregate snapshots
   (`BUSINESS.md`, `TECHNICAL.md`) and multi-instance category

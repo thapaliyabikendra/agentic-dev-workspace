@@ -32,12 +32,12 @@ High-level steps (detail owned by `ui/docs/PROTOTYPE-API-INTEGRATION.md`):
 1. **Declare the contract slot** — docblock `@endpoint`, `@permission`, `@implements` (or `@exploration` for net-new screens).
 2. **Add the endpoint** — DTO types, real caller, mock handler, api-factory wiring.
 3. **Gate permissions** — permission catalog, `<PermissionGuard>`, endpoint-permissions map; byte-identical string in the ABP backend (ADR-036).
-4. **Extract KB nodes** — each `@endpoint` → CON node (`protocol: http`); screen → SCR node (`code_ref:` per ADR-035); behavior → FRS via `EXP-<slug>` with `[inferred from prototype]` tags (`frs-prototype-extraction-rules.md`).
+4. **Extract KB nodes** — each `@endpoint` → CON node (`protocol: http`); screen → SCR node (`code_ref:` per ADR-035); behavior → FRS via `PROTO-<slug>` with `[inferred from prototype]` tags (`frs-prototype-extraction-rules.md`).
 5. **Verify** — `bun run kb:trace` (0 broken/dangling) + coverage tests.
 
 ## Produces
 
-Per page: `@endpoint`/`@permission`/`@implements` docblock slots declared; real caller + mock handler registered; permission guard wired UI and backend; CON-NNN, SCR-NNN, PERM-NNN nodes in `planning/`; FRS extraction queued via `EXP-<slug>`.
+Per page: `@endpoint`/`@permission`/`@implements` docblock slots declared; real caller + mock handler registered; permission guard wired UI and backend; CON-NNN, SCR-NNN, PERM-NNN nodes in `planning/`; FRS extraction queued via `PROTO-<slug>`.
 
 ## On completion
 

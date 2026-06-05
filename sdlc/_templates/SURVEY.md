@@ -12,7 +12,7 @@ source_ref: []                # workspace-level absorption only: [{absorption: <
 # Cross-link fields (optional):
 motivated_by: []
 validated_by: []
-prototype_ref: []             # Exploration IDs (tag: prototype) or external URLs of prototype artifacts seeding this survey
+prototype_ref: []             # PROTO-<slug> IDs (docs/prototypes/) or external URLs of prototype artifacts that seed OR validate this survey
 adopted_into: []
 related: []
 ---
@@ -84,14 +84,17 @@ related: []
 > places, 0 counterexamples"). Hand-wavy assertions decay; counts re-run.
 >
 > **`prototype_ref:` — typed slot for prototype artifacts.** When the
-> milestone is seeded from a UI prototype (greenfield-prototyping
-> path), cite the prototype Exploration (`docs/exploration/EXP-<slug>.md`
-> with `tag: prototype`) here. `level: milestone` → Phase 0 seeding
-> (the prototype that primed the milestone narrative); `level: frs` →
-> Phase 1 extraction (the prototype the FRS extracts from). Signal
-> mining and tagging discipline live in
-> [`../workflow/frs-prototype-extraction-rules.md`](../workflow/frs-prototype-extraction-rules.md).
-> `validated_by:` may also cite the same Exploration ID — it is the
+> milestone is **seeded from** a UI prototype (prototype-sourced path)
+> OR a prototype was **built to validate** an existing milestone/CR
+> brief (change-driven), cite the prototype disposition
+> (`docs/prototypes/<slug>/PROTO-<slug>.md`) here. `level: milestone` →
+> Phase 0 seeding (the prototype that primed the milestone narrative);
+> `level: frs` → Phase 1 extraction (the prototype the FRS extracts
+> from). Signal mining and tagging discipline live in
+> [`../workflow/frs-prototype-extraction-rules.md`](../workflow/frs-prototype-extraction-rules.md);
+> the bidirectional operation doctrine is
+> [`../workflow/prototype-first.md`](../workflow/prototype-first.md).
+> `validated_by:` may also cite the same `PROTO-<slug>` ID — it is the
 > broader "this survey was validated by …" slot; `prototype_ref:` is
 > the typed UI-prototype slot.
 

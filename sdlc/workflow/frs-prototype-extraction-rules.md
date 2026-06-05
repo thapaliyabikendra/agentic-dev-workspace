@@ -6,7 +6,7 @@ applies_when:
 # FRS Prototype Extraction Rules
 
 > **Type:** Workflow reference. Consulted at Phase 0 / Phase 1 when the
-> milestone scope starts from a UI prototype (the greenfield-prototyping
+> milestone scope starts from a UI prototype (the prototype-sourced
 > path). See [`design.md`](design.md) for phase mechanics; this file is
 > the rule book it consults. Codifies the screen-to-FRS signal mapping,
 > stable screen-identifier convention, prototype → business translation
@@ -17,8 +17,8 @@ applies_when:
 ## When to Use
 
 **Use when:** the milestone scope explicitly cites a UI prototype as
-input (greenfield path — stakeholders react to clickable screens before
-written specs exist), an FRS candidate is being seeded from prototype
+input (prototype-sourced path — stakeholders react to clickable screens
+before written specs exist), an FRS candidate is being seeded from prototype
 screens rather than from prose, or a mixed-source extraction
 encounters a conflict between prose and prototype that needs a tagging
 decision.
@@ -35,9 +35,13 @@ pre-tagged FRS rows; it does not re-derive them from the prototype).
 
 **Vs. sibling files:**
 [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md) is the
-brownfield-path peer — code-as-existing-artifact vs.
+code-sourced peer — code-as-existing-artifact vs.
 prototype-as-existing-artifact. Same signal-to-FRS mapping shape; same
-`[inferred from …]` tagging discipline; different input medium.
+`[inferred from …]` tagging discipline; different input medium. **The
+asymmetry is intentional: code-sourced is inherently brownfield (you only
+have existing code in brownfield); prototype-sourced is
+posture-independent.** The bidirectional operation doctrine that calls
+this rule book is [`prototype-first.md`](prototype-first.md).
 [`frs-validation-rules.md`](frs-validation-rules.md) classifies a
 tagged item's severity at the Phase 1.5 gate; this file governs how
 the tag gets attached in the first place.
@@ -59,31 +63,33 @@ business rule, edge path, fault path, actor, or precondition you infer
 from the prototype alone with
 `[inferred from prototype — confirm with stakeholder]`. The Phase 1.5
 validation gate enforces the tag — see
-[`frs-validation-rules.md → [inferred from prototype] propagation`](frs-validation-rules.md#inferred-from-prototype-propagation-greenfield).
+[`frs-validation-rules.md → [inferred from prototype] propagation`](frs-validation-rules.md#inferred-from-prototype-propagation).
 
 ## Prototype artifact disposition
 
-The prototype itself lives at `docs/exploration/EXP-<slug>.md` as an
-**Exploration disposition** — Phase 0 input, not a canonical node and
-not a Survey. Frontmatter shape per
-[`../_templates/EXPLORATION.md`](../_templates/EXPLORATION.md):
-`id: EXP-<slug>`, `tag: prototype` (not `kind:` — Exploration has no
-`kind:` field), `status: draft` during Phase 0 authoring + stakeholder
-iteration, flips to `adopted` when the consuming FRS reaches
-`approved` at Phase 1.5 exit (Exploration `adopted_into:` cites the
-FRS ID). The Exploration body cites the external tool URL or
-local file path of the prototype artifact; the workflow does not
-manage the artifact format itself, only the disposition slot.
+The prototype itself lives at `docs/prototypes/<slug>/PROTO-<slug>.md`
+as a dedicated **Prototype disposition** — Phase 0/1 input, not a
+canonical node and not a Survey. Frontmatter shape per
+[`../_templates/PROTOTYPE.md`](../_templates/PROTOTYPE.md):
+`id: PROTO-<slug>` (slug-based, no numeric ceiling), `status: draft`
+during Phase 0 authoring + stakeholder iteration, flips to `adopted`
+when the consuming FRS reaches `approved` at Phase 1.5 exit
+(`adopted_into:` cites the FRS ID). The verbatim artifact lives under
+`docs/prototypes/<slug>/raw/`; the descriptor body cites it plus any
+external tool URL. `motivated_by:` records direction — empty for a
+prototype-sourced milestone, or the CR/CHG/`M-NN` for a change-driven
+prototype. The workflow does not manage the artifact format itself,
+only the disposition slot.
 
-The `docs/exploration/` directory is **lazy-created** on first
-Exploration file (the prototype Exploration is just one of the
-file kinds that may seed it — same posture as other lazy KB paths
-in [`../../CLAUDE.md → Project KB`](../../CLAUDE.md#project-kb)).
-The milestone SURVEY cites the prototype via:
+The `docs/prototypes/` directory is **lazy-created** on first prototype
+(same posture as other lazy KB paths in
+[`../../CLAUDE.md → Project KB`](../../CLAUDE.md#project-kb)); generic
+spikes / research / bug investigations stay at `docs/exploration/`. The
+milestone SURVEY cites the prototype via:
 
-- `prototype_ref: [EXP-<slug>]` — the typed slot for prototype
+- `prototype_ref: [PROTO-<slug>]` — the typed slot for prototype
   artifacts (see [`../_templates/SURVEY.md`](../_templates/SURVEY.md)).
-- `validated_by: [EXP-<slug>]` — optional; the same Exploration ID
+- `validated_by: [PROTO-<slug>]` — optional; the same `PROTO-<slug>` ID
   also fits the generic "this survey was validated by …" slot. Use
   `prototype_ref:` when the input medium is specifically a prototype;
   `validated_by:` is broader (covers e.g., user-research notes).
@@ -107,7 +113,7 @@ born at Phase 2; Phase 3 flips all proposed-state nodes to `active`.
 |---|---|
 | Screen / page representing a primary user-flow (a single observable behavior the actor can complete end-to-end) | One FRS candidate (one user-journey). The Phase-1-born FLW carries the Trigger + Scenarios; the FRS body carries Use case + ACs + BRs + Brownfield impact (when applicable). |
 | Form fields on a screen (input, dropdown, date-picker, file-upload, etc.) | Form fields go into a canonical Entity (ENT) node (existing, or Phase-2-born with `status: proposed` per the FRS's `produces_nodes:`), not into the FRS body directly. The FRS references the ENT ID inline. Field labels are already in business language — translation is trivial vs. code. |
-| **Explicit API-contract declaration** emitted by the prototype — a structured, machine-readable statement of the wire surface a data-bound screen consumes: HTTP method + path + request/response DTO shape, plus the permission policy the action requires (in the trade-finance UI repo these are docblock tags — e.g. `@endpoint POST /api/... -> ResultDto` and `@permission <policy>`; any prototype tool that emits an equivalent declaration is treated the same). | Split by structure-vs-intent. **Wire contract** (method + path + DTO shape) is *structure*: extract aggressively and **untagged** into a canonical Contract (CON) node, `protocol: http` (Phase-2-born, claimed at Phase 1 in `produces_nodes:` as `CON-NNN`; the DTO shape becomes the CON's request/response field tables, translated to business language — drop type primitives per the translation table). This is the *declared-contract → land-in-CON* direction and does **not** contradict the translation-discipline row that drops UI-*displayed* URL strings from the FRS body: a displayed route is presentation, a declared contract is a proposed wire surface. The FRS body references `CON-NNN` by ID; a wire literal recurring in Behavior / AC / BR is a [`protocol-surface-leak`](frs-validation-rules.md#rule-protocol-surface-leak) finding. **Permission policy** (who may invoke the action) is *intent*, not structure (it is a business rule — see the anti-pattern below): the policy string lands **on** the CON node, and promotes to a standalone PERM node only when the guard expression is non-trivial — this complements, and does not duplicate, the role-gated-screen row below (which resolves the actor to ACT-NNN). When the prototype is the sole source of the policy, tag it `[inferred from prototype]` and raise an `OQ-NNN` per [the propagation rule](frs-validation-rules.md#inferred-from-prototype-propagation-greenfield). |
+| **Explicit API-contract declaration** emitted by the prototype — a structured, machine-readable statement of the wire surface a data-bound screen consumes: HTTP method + path + request/response DTO shape, plus the permission policy the action requires (in the trade-finance UI repo these are docblock tags — e.g. `@endpoint POST /api/... -> ResultDto` and `@permission <policy>`; any prototype tool that emits an equivalent declaration is treated the same). | Split by structure-vs-intent. **Wire contract** (method + path + DTO shape) is *structure*: extract aggressively and **untagged** into a canonical Contract (CON) node, `protocol: http` (Phase-2-born, claimed at Phase 1 in `produces_nodes:` as `CON-NNN`; the DTO shape becomes the CON's request/response field tables, translated to business language — drop type primitives per the translation table). This is the *declared-contract → land-in-CON* direction and does **not** contradict the translation-discipline row that drops UI-*displayed* URL strings from the FRS body: a displayed route is presentation, a declared contract is a proposed wire surface. The FRS body references `CON-NNN` by ID; a wire literal recurring in Behavior / AC / BR is a [`protocol-surface-leak`](frs-validation-rules.md#rule-protocol-surface-leak) finding. **Permission policy** (who may invoke the action) is *intent*, not structure (it is a business rule — see the anti-pattern below): the policy string lands **on** the CON node, and promotes to a standalone PERM node only when the guard expression is non-trivial — this complements, and does not duplicate, the role-gated-screen row below (which resolves the actor to ACT-NNN). When the prototype is the sole source of the policy, tag it `[inferred from prototype]` and raise an `OQ-NNN` per [the propagation rule](frs-validation-rules.md#inferred-from-prototype-propagation). |
 | Submit button / primary CTA on a screen | Candidate operation. FRS Use case Trigger + FLW Trigger + Phase-1-born FLW's happy-path Scenario. |
 | Secondary CTA / non-form action (e.g., "Cancel", "Save draft", "Resend") | Candidate operation when the action has a distinct postcondition (usually a separate FLW). If the action only changes UI state with no business effect, drop it — not an FRS-level concern. |
 | Error state UI (inline error block, error screen, "something went wrong" surface) | Fault paths on the Phase-1-born FLW's `#fault` Scenario; tagged `[inferred from prototype]`. The error UI copy translates into a business-language fault outcome. |
@@ -122,12 +128,12 @@ born at Phase 2; Phase 3 flips all proposed-state nodes to `active`.
 | Disabled / greyed-out state on a control with no explanatory text | Precondition hint — tagged `[inferred from prototype]` and raised as an `OQ-NNN` (the prototype shows the constraint exists; only stakeholder confirmation reveals the policy). Disabled-without-explanation is a high-value OQ surface. |
 
 **Output of extraction per candidate:** Use case title; source
-location (Exploration ID + screen identifier — see below);
+location (prototype ID + screen identifier — see below);
 pre-populated FLW Scenarios (happy / edge / fault, business language,
 each tagged `[inferred from prototype]`); inferred actor list
 resolving to ACT-NNN (existing canonical or new via
 `produced_actor:`); pre-populated `touches_nodes:` declaration when
-existing canonical nodes match the domain (rare on a greenfield
+existing canonical nodes match the domain (rare on a
 prototype-seeded milestone; check
 `docs/<component>/nodes/*/index.md` regardless); pre-populated
 `produced_flw:` scalar (the FLW this FRS births at Phase 1 — real,
@@ -148,7 +154,7 @@ the stakeholder-approved artifact" or the draft "reads well as-is".
 The cost: the Phase 1.5 gate has no signal to fire on (no tag → no
 `OQ` trigger), the FRS enters Phase 2 with prototype-inferred
 business rules masquerading as stakeholder-confirmed ones, and the
-greenfield discovery loop (prototype → review → revise) is
+prototype discovery loop (prototype → review → revise) is
 short-circuited at extraction time. A prototype is a strong signal
 of intended behavior but not a substitute for stakeholder
 confirmation of business rules, edge handling, or precondition
@@ -165,7 +171,7 @@ intent.
 
 ## Stable screen identifiers
 
-In addition to citing the Exploration ID, emit a **stable screen
+In addition to citing the prototype ID, emit a **stable screen
 identifier** for each prototype source — a refactor-resilient
 identifier composed as `<Module>.<Area>.<Screen>`:
 
@@ -176,15 +182,15 @@ identifier composed as `<Module>.<Area>.<Screen>`:
 The stable identifier is independent of the prototype tool's internal
 screen ID, URL, or frame name — renaming, reorganizing, or migrating
 the prototype between tools does not break traceability. Both the
-Exploration ID and the stable identifier go into the canonical
+prototype ID and the stable identifier go into the canonical
 node's `source_ref` frontmatter (the node is canonical from Phase 2
 ingest onward):
 
 ```yaml
 source_ref:
-  - exploration: EXP-onboarding-prototype
+  - prototype: PROTO-onboarding
     screen: Onboarding.Checklist.Verify
-  - exploration: EXP-onboarding-prototype
+  - prototype: PROTO-onboarding
     screen: Onboarding.Checklist.Submit
 ```
 
@@ -251,7 +257,7 @@ screen and apply the signal table to it as well.
   rule or precondition.
 
 Every traversed screen contributes to the canonical node's
-`source_ref` (each with the Exploration ID and stable screen
+`source_ref` (each with the prototype ID and stable screen
 identifier). When a one-hop traversal crosses a user-journey boundary
 (the destination screen clearly belongs to a different FRS), record
 the boundary in the FRS's Brownfield impact section — it's a hint
@@ -301,7 +307,7 @@ tagged `[inferred from prototype — confirm with stakeholder]` and
 raised as an `OQ-NNN` under `docs/discovery/open-questions/` with
 `origin: frs-authoring, origin_ref: FRS-NNN`. The tag is stripped
 only after stakeholder confirmation — see
-[`frs-validation-rules.md → [inferred from prototype] propagation`](frs-validation-rules.md#inferred-from-prototype-propagation-greenfield).
+[`frs-validation-rules.md → [inferred from prototype] propagation`](frs-validation-rules.md#inferred-from-prototype-propagation).
 
 High-value OQ surfaces specific to prototype-only inputs:
 
@@ -326,8 +332,9 @@ High-value OQ surfaces specific to prototype-only inputs:
 
 | Version | Date | Source |
 |---------|------|--------|
-| 1.0 | 2026-05-28 | New file. Authored as the greenfield-prototyping peer to [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md), addressing the gap in [`../BOUNDARY.md § Toolchain assumptions`](../BOUNDARY.md#toolchain-assumptions) (the `<your UI prototyping tool>` placeholder was the only mention of prototyping in the framework). Mirrors code-extraction's structure exactly — signal-to-FRS mapping, stable identifier convention, translation discipline, one-hop traversal, mixed-source reconciliation, prototype-only caveat — adapted to UI prototype signals. Prototype artifact disposition lands at `docs/exploration/<slug>/` (Exploration disposition, `tag: prototype`); SURVEY's `prototype_ref:` is the typed slot for citation. Tool-agnostic throughout (signals described as "screen" / "form field" / "modal" rather than naming any specific design tool). |
+| 1.0 | 2026-05-28 | New file. Authored as the prototype-sourced peer to [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md), addressing the gap in [`../BOUNDARY.md § Toolchain assumptions`](../BOUNDARY.md#toolchain-assumptions) (the `<your UI prototyping tool>` placeholder was the only mention of prototyping in the framework). Mirrors code-extraction's structure exactly — signal-to-FRS mapping, stable identifier convention, translation discipline, one-hop traversal, mixed-source reconciliation, prototype-only caveat — adapted to UI prototype signals. *(At v1.0 the prototype artifact lived under `docs/exploration/` as an Exploration disposition; repointed to the dedicated `docs/prototypes/` Prototype disposition in v1.2.)* SURVEY's `prototype_ref:` is the typed slot for citation. Tool-agnostic throughout (signals described as "screen" / "form field" / "modal" rather than naming any specific design tool). |
 | 1.1 | 2026-06-02 | Signal-to-FRS mapping extended with an **explicit API-contract declaration** row — for prototypes that emit a structured, machine-readable wire-contract statement (method + path + DTO shape + permission policy). Splits structure from intent: wire contract → untagged CON node (`protocol: http`, Phase-2-born), permission policy → on the CON node (standalone PERM only for a non-trivial guard) and `[inferred from prototype]`-tagged + OQ when prototype-only — preserving the anti-pattern's "access policy is a business rule, not a confirmed fact" doctrine. Complements (not duplicates) the role-gated-screen row's actor→ACT-NNN mapping and the translation-discipline row that drops UI-displayed URLs (displayed route vs. declared contract). Tool-agnostic; the trade-finance UI repo's docblock tags appear once as a parenthetical example. |
+| 1.2 | 2026-06-05 | **Prototype home repointed** from `docs/exploration/EXP-<slug>` (Exploration disposition, `tag: prototype`) to a dedicated **Prototype disposition** at `docs/prototypes/<slug>/PROTO-<slug>.md` (`PROTO-<slug>`, template [`../_templates/PROTOTYPE.md`](../_templates/PROTOTYPE.md)), split out from generic Exploration. `source_ref` key `exploration:` → `prototype:`. Doctrine reframed as **input-medium** (*prototype-sourced*, posture-independent) — the "greenfield-prototyping path" framing is dropped; the code-sourced peer stays inherently brownfield (the asymmetry is intentional and now stated). New bidirectional operation doctrine [`prototype-first.md`](prototype-first.md) wired as caller (prototype→milestone seeding and milestone/CR→prototype validation). Atomic with [`../BOUNDARY.md`](../BOUNDARY.md) engine-prescribed row, [`design.md`](design.md) Phase-0 callout, and [`../_templates/SURVEY.md`](../_templates/SURVEY.md) `prototype_ref:` slot. |
 
 ---
 
@@ -341,7 +348,9 @@ High-value OQ surfaces specific to prototype-only inputs:
   — "Surface conflicts, never absorb" is the doctrinal anchor of the
   mixed-source reconciliation rule, applied at extraction time
   rather than at absorption time.
-- **Caller:** [`design.md → Phase 0`](design.md#phase-0--milestone-scoping)
+- **Caller:** [`prototype-first.md`](prototype-first.md) (the
+  bidirectional prototype-first operation that drives both directions),
+  [`design.md → Phase 0`](design.md#phase-0--milestone-scoping)
   (Brownfield code-mining sub-block has a peer prototype-seeding
   sub-block) and [`design.md → Phase 1`](design.md#phase-1--frs-authoring)
   — fires this rule book when an FRS candidate is being derived

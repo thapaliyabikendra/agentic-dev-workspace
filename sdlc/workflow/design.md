@@ -261,19 +261,26 @@ already been drafted. Both paths are valid; the directory layout is the same.
   the `Module.Area.Name` logical source-name convention that lands in
   canonical node `source_ref` frontmatter. The rule book is optional
   for new-feature milestones with no existing code.
-- **Prototype-seeding (greenfield, optional).** When the milestone
-  scope starts from a UI prototype rather than source code or
-  written brief (stakeholders react to clickable screens before
-  written specs exist), consult
+- **Prototype-seeding (optional).** When the milestone scope starts
+  from a UI prototype rather than source code or written brief
+  (stakeholders react to clickable screens before written specs
+  exist) — or when a brief already exists and a prototype is built to
+  validate it — consult
   [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md)
   for the screen-to-FRS signal mapping, `[inferred from prototype]`
   tagging discipline, and the `Module.Area.Screen` stable identifier
   convention that lands in canonical node `source_ref` frontmatter.
-  The prototype artifact itself lives at `docs/exploration/EXP-<slug>.md`
-  as an Exploration disposition (`tag: prototype`) and is cited from
-  the milestone SURVEY via `prototype_ref:` — see
-  [`../_templates/SURVEY.md`](../_templates/SURVEY.md). Peer rule
-  book to brownfield code-mining above; route on input medium.
+  The prototype artifact itself lives at
+  `docs/prototypes/<slug>/PROTO-<slug>.md` as a dedicated **Prototype
+  disposition** (`PROTO-<slug>`) and is cited from the milestone SURVEY
+  via `prototype_ref:` — see
+  [`../_templates/SURVEY.md`](../_templates/SURVEY.md). The bidirectional
+  operation doctrine (both directions — prototype→milestone seeding and
+  milestone/CR→prototype validation) is
+  [`prototype-first.md`](prototype-first.md). The **prototype-sourced**
+  peer rule book to brownfield code-mining above; route on input medium
+  (code-sourced is inherently brownfield; prototype-sourced is
+  posture-independent).
 
 Then find the canonical DDD nodes the milestone touches.
 
@@ -979,7 +986,8 @@ Next: [`plan.md`](plan.md) (Phase 2, Ingest) after context reset.
   [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md)
   (brownfield code-mining at Phase 0),
   [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md)
-  (greenfield prototype-seeding at Phase 0 — peer to code-mining).
+  (prototype-sourced prototype-seeding at Phase 0 — posture-independent
+  peer to code-mining).
 - **Maintenance ops that may fire during this flow:**
   [`research.md`](research.md) (conditional: load when Survey OQs exist;
   invoke research-gate only on `blocking-frs` classification),
