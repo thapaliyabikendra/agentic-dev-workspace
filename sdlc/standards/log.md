@@ -748,3 +748,28 @@ Grandfathering:
   CLAUDE.md.)
 No CLAUDE.md edit — grandfather clause captured here to keep scope
 contained.
+
+## [2026-06-10] created | STD-007 NDF governance — spec promoted from project ADR-039 to engine
+
+Source: REVIEW-SDLC-REPORT.md Rec-01 (engine-purity finding F-006/F-007
+class). The NDF specification lived only in the originating project's
+`docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md` while ~24
+engine sites across 13 files cited it as binding authority — a fresh
+deployment (no `docs/`) had the fifth governance kind specified
+nowhere. `STD-007-ndf-governance.md` (status: accepted,
+`source: harvested-from-ADR-039`) now carries the normative content:
+definition (R1), placement/ID (R2), `node_definitions:` registration
+(R3), template-as-contract (R4), coining + ingest gate pointers (R5/R6
+— canonical homes unchanged: `evolving-the-workflow.md` / `plan.md`),
+`declared_via:` binding (R7), pre-2026-05-19 grandfathering (R8 — new
+canonical home for the former "ADR-039 § Brownfield impact";
+`grandfather-registry.md` row added), STD-004 escalation (R9), 5-way
+discriminator pointer (R10). All engine cites re-pointed
+ADR-039 → STD-007 in the same operation (CLAUDE.md, KB-LAYOUT.md,
+WORKFLOW.md, `_templates/{COMPONENT,FRS,NDF}.md`,
+`workflow/{authoring-adr,evolving-the-workflow,new-component-bootstrap,ndf-edit,plan}.md`,
+STD-004, this index's STD-004 row). The originating project's ADR-039
+is demoted to adoption record (STD-007 § Provenance / § Project-specific
+deviations); historical ADR-039 mentions in this append-only log are
+intentionally left intact. Doctrine narrative:
+`workflow/rule-history.md` § NDF spec promoted (2026-06-10).

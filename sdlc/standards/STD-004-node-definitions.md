@@ -43,7 +43,7 @@ pointer together signal that consulting `_templates/nodes/` is the correct
 substitute, not a workaround. Lint checks should treat this STD as
 intentionally unpopulated, not orphaned.
 
-**NDF as per-component analog (per [ADR-039](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).**
+**NDF as per-component analog (per [STD-007](STD-007-ndf-governance.md)).**
 While STD-004 remains deferred for cross-project contracts, **NDF (Node
 Definition Node)** is the operative per-component path that fires now: a
 component coins an NDF in `docs/<component>/node-definitions/` to declare a
@@ -90,9 +90,10 @@ to absorb the generalization.
 
 Sourced from Stage 7 cross-instance validation of FDE-NDF-001/002/003 +
 their three pilot instances. Each candidate is a feature that would plausibly
-recur across components if STD-004 were activated. Logged here per ADR-039
-"bidirectional escalation"; activation still waits on the deferred-until
-trigger.
+recur across components if STD-004 were activated. Logged here per the
+bidirectional escalation in [STD-007 R9](STD-007-ndf-governance.md)
+(originally the project's ADR-039); activation still waits on the
+deferred-until trigger.
 
 **From FDE-NDF-001 (Algorithm):**
 

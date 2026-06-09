@@ -18,9 +18,8 @@ applies_when:
 > type** — do not coin. Coining without the discriminator pollutes
 > the workflow with parallel types that only differ in name.
 >
-> The shape-coverage check applies equally to **NDF coining** (per the
-> project's NDF-governance ADR — originating project:
-> `docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md`) —
+> The shape-coverage check applies equally to **NDF coining** (per
+> [`STD-007`](../standards/STD-007-ndf-governance.md)) —
 > the walk covers the engine-default 16-type catalog **plus** every
 > existing NDF in the target component's `node_definitions:` **plus** every
 > NDF promoted to `docs/shared/node-definitions/`. **This block is the

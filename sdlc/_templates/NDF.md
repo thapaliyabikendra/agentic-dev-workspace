@@ -9,7 +9,7 @@ created: YYYY-MM-DD
 version: 1
 updated: YYYY-MM-DD
 coined_by: FRS-NNN                # FRS that motivated coining this type
-related: [ADR-NNN]                # ADR-039 (the NDF spec ADR) + any per-type ADRs
+related: [ADR-NNN]                # per-type ADRs + the project's NDF-adoption ADR if one exists (NDF spec: engine STD-007)
 supersedes: null                  # NDF-NNN if this replaces a prior declaration
 superseded_by: null               # NDF-NNN if this has been replaced
 
@@ -37,8 +37,9 @@ shape_coverage_walk:
 > node type living under `docs/<component>/nodes/<folder>/`. Instances of the type
 > carry `declared_via: {COMPONENT}-NDF-NNN` and validate against this contract.
 >
-> See [ADR-039](../../shared/adrs/ADR-039-ndf-fifth-governance-kind.md) for the
-> NDF specification and the STD-vs-ADR-vs-CCC-vs-NDF-vs-DEC discriminator.
+> See `STD-007` (`sdlc/standards/STD-007-ndf-governance.md`) for the NDF
+> specification; the STD-vs-ADR-vs-CCC-vs-NDF-vs-DEC discriminator lives in
+> `sdlc/workflow/authoring-adr.md`.
 
 ## Why this type
 

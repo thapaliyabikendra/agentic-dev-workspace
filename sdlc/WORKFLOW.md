@@ -29,7 +29,7 @@ non-empty — a Phase-1-born CHG (behavior-language `modifies[]`; one per FRS;
 milestone-scoped permanent home). **FS flow**: Ingests structure + wiring —
 new ACT (ID claimed at Phase 1 via the FRS's `produced_actor:`; file authored
 at Phase 2) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY + any NDF-declared
-custom-type nodes per [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md);
+custom-type nodes per [`STD-007`](standards/STD-007-ndf-governance.md);
 enriches the Phase-1-born FLW in place (`related:` wiring + Sequence + Branches
 + Compensating + Postconditions); declares `consumes_chgs:` and enriches each
 CHG structurally (before/after on `modifies[]`, `adds[]`, `migration_steps[]`).
@@ -157,7 +157,7 @@ validation in [`plan.md § 6`](workflow/plan.md#6-fs-validation-loop); Phase 3
 QA gate in [`qa-gate.md`](workflow/qa-gate.md). Multi-stage plans need a
 progress checklist; mark each stage `[x]` before advancing.
 
-**Engine-extension HARD-GATEs (per [ADR-039](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).**
+**Engine-extension HARD-GATEs (per [STD-007](standards/STD-007-ndf-governance.md)).**
 Two top-of-tree HARD-GATEs land here as defense-in-depth summaries; canonical
 homes are `workflow/evolving-the-workflow.md` (shape-coverage) and
 `workflow/plan.md` (type-validity).
@@ -171,7 +171,7 @@ homes are `workflow/evolving-the-workflow.md` (shape-coverage) and
 > new shape, **extend that type** — do not coin. Record the walk in the
 > NDF's `shape_coverage_walk:` frontmatter and the prose narrative in
 > `## Shape-coverage walk`. (NDF spec:
-> [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md);
+> [`STD-007`](standards/STD-007-ndf-governance.md);
 > engine-evolution 60% gate:
 > [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md).)
 
@@ -182,10 +182,11 @@ homes are `workflow/evolving-the-workflow.md` (shape-coverage) and
 > SVC / FA / EVT — CHG is Phase-1-born and milestone-scoped) **nor** (b) the
 > target component's `node_definitions:` frontmatter on its `COMPONENT.md`
 > (NDF-declared per
-> [`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)). A
+> [`STD-007`](standards/STD-007-ndf-governance.md)). A
 > node whose type-abbreviation is unknown to both surfaces is rejected at
-> Phase 2 FS validation as a **Blocker**. Pre-ADR-039 canonical nodes are
-> grandfathered.
+> Phase 2 FS validation as a **Blocker**. Pre-existing canonical nodes that
+> predate NDF introduction (2026-05-19) carry no `declared_via:` pointer and
+> are grandfathered (per STD-007 R8).
 
 ---
 

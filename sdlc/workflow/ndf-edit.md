@@ -8,7 +8,7 @@ applies_when:
 # Files to touch on an NDF edit
 
 NDF (Node Definition Node) is the fifth governance kind per
-[`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).
+[`STD-007`](../standards/STD-007-ndf-governance.md).
 An NDF declares a per-component custom node-type contract; instances of
 the declared type live under `docs/<component>/nodes/<folder>/` per the
 NDF's `folder:` field. Touch shape:
@@ -40,7 +40,7 @@ wording** (CLAUDE.md Rule 12 defense-in-depth).
 > existing NDF's contract) — do not coin. Record the walk in the NDF's
 > `shape_coverage_walk:` frontmatter and the prose narrative in
 > `## Shape-coverage walk`. (NDF spec:
-> [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md);
+> [`STD-007`](../standards/STD-007-ndf-governance.md);
 > engine-evolution 60% gate:
 > [`evolving-the-workflow.md`](evolving-the-workflow.md).)
 
@@ -51,11 +51,11 @@ wording** (CLAUDE.md Rule 12 defense-in-depth).
 > SVC / FA / EVT — CHG is Phase-1-born and milestone-scoped, per
 > [`../KB-LAYOUT.md`](../KB-LAYOUT.md)) **nor** (b) the target component's
 > `node_definitions:` frontmatter on its `COMPONENT.md` (NDF-declared per
-> [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).
+> [`STD-007`](../standards/STD-007-ndf-governance.md)).
 > A node whose type-abbreviation is unknown to both surfaces is rejected at
 > Phase 2 FS validation as a **Blocker**. Pre-existing canonical nodes that
-> predate ADR-039 carry no `declared_via:` pointer and are grandfathered
-> (per ADR-039 § Brownfield impact).
+> predate NDF introduction (2026-05-19) carry no `declared_via:` pointer and
+> are grandfathered (per STD-007 R8).
 
 ## Integration
 

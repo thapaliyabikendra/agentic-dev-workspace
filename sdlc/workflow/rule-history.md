@@ -1,6 +1,6 @@
 ---
 name: rule-history
-description: "Doctrinal rule changes that shaped the current canonical-edit discipline — CCC promoted to first-class artifacts (2026-05-16), Phase 1 birth list trimmed (2026-05-17), canonical log.md retired (2026-05-16)."
+description: "Doctrinal rule changes that shaped the current canonical-edit discipline — CCC promoted to first-class artifacts (2026-05-16), Phase 1 birth list trimmed (2026-05-17), canonical log.md retired (2026-05-16), NDF spec promoted to engine STD-007 (2026-06-10)."
 applies_when:
   stack: [agnostic]
 ---
@@ -104,6 +104,29 @@ If even the surviving 2-file touch proves too heavy, the next fallback
 would be to drop the per-type `index.md` re-sync on routine content edits
 (retaining it only for status flips and `related:` changes) — make that
 call explicitly; don't let it erode by drift.
+
+## NDF spec promoted from project ADR to engine STD-007 (2026-06-10)
+
+When NDF became the fifth governance kind (2026-05-19), its
+specification landed in the originating project's
+`docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md`, and ~24 engine
+sites across 13 files cited that project artifact as binding authority.
+REVIEW-SDLC Rec-01 flagged the engine-purity violation: a fresh
+deployment carries no `docs/`, so the NDF spec resolved nowhere.
+
+On 2026-06-10 the normative content was harvested into
+[`../standards/STD-007-ndf-governance.md`](../standards/STD-007-ndf-governance.md)
+(`source: harvested-from-ADR-039`) and every engine cite re-pointed in
+the same operation. The originating project's ADR-039 is demoted to an
+**adoption record** — the pattern STD-007 § Project-specific deviations
+now names for any project. The former "ADR-039 § Brownfield impact"
+grandfathering lives at STD-007 R8 with a
+[`grandfather-registry.md`](grandfather-registry.md) row (cutover
+2026-05-19). Gate canonical homes are unchanged:
+[`evolving-the-workflow.md`](evolving-the-workflow.md) (shape-coverage),
+[`plan.md`](plan.md) (type-validity). Historical ADR-039 mentions in
+append-only logs are intentionally intact. Full landing record:
+[`../standards/log.md`](../standards/log.md) `[2026-06-10]`.
 
 ## Integration
 

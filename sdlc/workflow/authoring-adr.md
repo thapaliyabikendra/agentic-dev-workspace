@@ -25,7 +25,7 @@ applies_when:
 > the contract-enforceability the NDF-validator provides. (Cross-cutting
 > rule: [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 > "Five governance sources: STD / ADR / CCC / NDF / DEC". NDF spec:
-> [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).)
+> [`STD-007`](../standards/STD-007-ndf-governance.md).)
 
 ## When to Use
 
@@ -76,7 +76,7 @@ digraph adr_discriminator {
     adr      [shape=doublecircle, label="ADR-NNN\n(docs/<component>/adrs/\nor docs/shared/adrs/)"];
 
     q3a      [shape=diamond, label="Declares a per-component\ncustom node-type shape?\n(>=3 instances, 60% gate,\ndistinct lifecycle/index)"];
-    ndf      [shape=doublecircle, label="{PREFIX}-NDF-NNN\n(docs/<component>/node-definitions/)\n[per ADR-039]"];
+    ndf      [shape=doublecircle, label="{PREFIX}-NDF-NNN\n(docs/<component>/node-definitions/)\n[per STD-007]"];
 
     q4       [shape=diamond, label="Standalone trigger?\n(related: spans >=2 nodes,\nlifecycle, length,\nexternal citation)"];
     decstd   [shape=doublecircle, label="Standalone DEC-NNN\n(docs/<component>/nodes/decisions/)"];
@@ -171,7 +171,7 @@ occasionally standalone). The Phase 3 QA gate consumes them.
 > in `docs/<component>/node-definitions/`; cross-component promotions
 > land at `docs/shared/node-definitions/`. ID prefix
 > `{COMPONENT-PREFIX}-NDF-NNN` (or unqualified `NDF-NNN` for the
-> brownfield-exempt APP component). Spec: [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).
+> brownfield-exempt APP component). Spec: [`STD-007`](../standards/STD-007-ndf-governance.md).
 >
 > **DEC** if it's a **node-local atomic decision** that shapes one node's
 > behavior. Lives inline under the node's `## Decisions` heading, or
@@ -208,7 +208,7 @@ type-shape generalizes (per STD-004's `## Revisit if`).
 | "Audit-log retention is 7 years by default; operations may extend it via ADR" | **CCC-NNN** (Auditing / Retention category) | Project-wide NFR default. Operation-specific extensions are ADRs back-linked to the CCC. |
 | "REST endpoints in the customer-facing API use `/v1/...` versioning and return RFC-7807 problem details on error" | **ADR** with `stack: [api]` | Project-specific API convention; constrains how every future API feature is designed. Not engine-universal (other projects may use gRPC, GraphQL, or unversioned routes). |
 | "The customer-portal UI uses TanStack Router with file-based routes" | **ADR** with `stack: [ui]` | Project-specific UI commitment; stack scope narrows to UI alone. |
-| "FDE's Algorithm nodes (Haversine, Welford, Z-score, IQR) carry `algorithm_family:`, `java_class:`, `used_by:` and live under `nodes/algorithms/`" | **NDF** (FDE-NDF-001) | Per-component custom node-type shape; ≥3 expected instances; engine-default catalog covers <60%; distinct frontmatter + body contract. Per ADR-039. |
+| "FDE's Algorithm nodes (Haversine, Welford, Z-score, IQR) carry `algorithm_family:`, `java_class:`, `used_by:` and live under `nodes/algorithms/`" | **NDF** (FDE-NDF-001) | Per-component custom node-type shape; ≥3 expected instances; engine-default catalog covers <60%; distinct frontmatter + body contract. Per STD-007. |
 | "For this single workflow, the BG-number generator skips numbers ending in `13`" | **DEC** (inline under the owning command node) | Node-local quirk; no future feature consumes it. |
 | "Audit retention for legal-hold flags is 25 years instead of the baseline 7" | **ADR** back-linked to the Auditing CCC | A documented deviation from the CCC default for one operation. Baseline stays in CCC; deviation captured in ADR. |
 

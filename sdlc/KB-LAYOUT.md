@@ -49,7 +49,7 @@ on first Phase 2 ingest of that type.**
 
 This is the **engine-default 16-type catalog**. Per-component custom node
 types are declared via NDF (Node Definition Node) per
-[`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md) and
+[`STD-007`](standards/STD-007-ndf-governance.md) and
 live under `docs/<component>/node-definitions/` (per-component) or
 `docs/shared/node-definitions/` (cross-component promotion). See
 `## Node definitions (per-component custom types)` below.
@@ -210,7 +210,7 @@ ADRs that override a CCC default carry `related: [CCC-NNN]`.
 Scenario nodes, Store nodes, etc. — for shapes the engine-default 16-type
 catalog does not carry naturally. NDF (Node Definition Node) is the fifth
 governance kind alongside STD / ADR / CCC / DEC, per
-[`ADR-039`](../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md).
+[`STD-007`](standards/STD-007-ndf-governance.md).
 
 ```
 docs/<component>/node-definitions/   # per-component NDF tree (lazy)

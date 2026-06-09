@@ -95,7 +95,7 @@ When adding a new standalone deployable component to the workspace:
    `node_definitions:` (list of `{PREFIX}-NDF-NNN` IDs the component will
    author for custom node types — empty list `[]` is the default; populated
    only when the component coins NDFs per
-   [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)
+   [`STD-007`](../standards/STD-007-ndf-governance.md)
    and the NDF shape-coverage HARD-GATE in
    [`evolving-the-workflow.md`](evolving-the-workflow.md)).
 

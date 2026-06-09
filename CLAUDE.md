@@ -44,7 +44,8 @@ backfills both `stack:` and `framework:`. Phase 1.5 Blocker
 2. Five governance sources — **STD** (`sdlc/standards/`),
    **ADR** (`docs/<component>/adrs/`, `docs/shared/adrs/`),
    **CCC** (`docs/shared/ccc/`, NFR baselines; ADRs back-link for
-   deviations), **NDF** (`docs/<component>/node-definitions/`, ADR-039),
+   deviations), **NDF** (`docs/<component>/node-definitions/`,
+   [`sdlc/standards/STD-007`](sdlc/standards/STD-007-ndf-governance.md)),
    **DEC** (inline or `docs/<component>/nodes/decisions/`).
    Discriminator:
    [`sdlc/workflow/authoring-adr.md`](sdlc/workflow/authoring-adr.md).

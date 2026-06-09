@@ -26,7 +26,7 @@ Goals + business Preconditions + Flows initiated + Commands triggered + Queries 
 PERM-NNN refs all authored at birth) + ENT / CMD / STA / CON / INT / DEC / PERM / QRY
 structures — plus any NDF-declared custom-type nodes whose abbreviation appears in the
 target component's `node_definitions:` (per
-[`../../docs/shared/adrs/ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)) —
+[`STD-007`](../standards/STD-007-ndf-governance.md)) —
 enriches the Phase-1-born FLW with wiring (`related:` populated, Sequence,
 Branches, Compensating actions, structural Postconditions), and consumes the
 Phase-1-born CHGs via FS `consumes_chgs:` for structural enrichment (`modifies[]`
@@ -48,14 +48,16 @@ the 15 Phase-2-born canonical types in KB-LAYOUT.md's 16-type catalog
 SVC / FA / EVT — CHG is Phase-1-born and milestone-scoped, per
 [`../KB-LAYOUT.md`](../KB-LAYOUT.md)) **nor** (b) the target component's
 `node_definitions:` frontmatter on its `COMPONENT.md` (NDF-declared per
-[`../../docs/shared/adrs/ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)).
+[`STD-007`](../standards/STD-007-ndf-governance.md)).
 A node whose type-abbreviation is unknown to both surfaces is rejected at
 Phase 2 FS validation as a **Blocker**. Pre-existing canonical nodes that
-predate ADR-039 carry no `declared_via:` pointer and are grandfathered (per
-ADR-039 § Brownfield impact). This is the **canonical enforcement home**;
+predate NDF introduction (2026-05-19) carry no `declared_via:` pointer and
+are grandfathered (per STD-007 R8). This is the **canonical enforcement home**;
 the wording is identical to its restatement in `WORKFLOW.md § Validation
-gates` and `maintenance-discipline.md § Files to touch on an NDF edit`
-per CLAUDE.md Rule 12 defense-in-depth.
+gates` and `ndf-edit.md` per CLAUDE.md Rule 12 defense-in-depth.
+(`maintenance-discipline.md § Files to touch on an NDF edit` summarizes
+the two HARD-GATEs but carries no wording copy — corrected 2026-06-10,
+the prior claim named it as a restatement site.)
 </HARD-GATE>
 
 ---
@@ -823,7 +825,7 @@ close.
       enumeration; CHG is Phase-1-born and out of scope here) **or** the
       target component's `node_definitions:`
       frontmatter. Unknown type-abbreviations are **Blockers**. Pre-existing
-      canonical nodes are grandfathered (per ADR-039 § Brownfield impact).
+      canonical nodes are grandfathered (per STD-007 R8).
 - [ ] Every CHG `modifies[]` entry consumed by this FS is recorded as `op: modify`
       in `id-claims.md` (R-NEW-9 amended 2026-05-17 — introduce rows no longer
       written; the per-type `index.md` row for each new node is the introduce
