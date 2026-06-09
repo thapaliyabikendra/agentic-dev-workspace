@@ -42,10 +42,11 @@ This command is user-invoked. Invoking it **is** the explicit per-commit authori
 
 5. **Commit (clean path only).**
    - Write a concise, conventional commit message derived from the staged diff (summary line ≤ ~72 chars, body only if it adds signal).
-   - End the message with the trailer required by this project:
+   - End the message with the trailer required by this project (model-agnostic
+     — do not hardcode a model name; it goes stale across model upgrades):
 
      ```
-     Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+     Co-Authored-By: Claude <noreply@anthropic.com>
      ```
    - Commit: `git -C "<repo>" commit -m "<message>"`. Commit **only** what is already staged — do not `git add` anything new and do not use `-a`.
    - Do **not** push, and do **not** create a branch unless the user asked. If the staged commit would land on a protected/default branch and that seems wrong, flag it before committing.

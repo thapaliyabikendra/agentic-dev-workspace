@@ -30,7 +30,7 @@ Number phases contiguously; the last is usually **Verification**. Lead with the 
 
 Create one TaskCreate task per phase outcome (or per major step). Discipline (`agent-contracts.md § TaskCreate`):
 - One task = one outcome — no bundled "do A and B".
-- Exactly one task `in_progress` at a time; set on start, flip to `completed` on finish.
+- Exactly one task `in_progress` at a time; set on start, flip to `completed` on finish — immediately, no batching completions at end of session.
 - Skip the tracker only for genuinely single-step work.
 
 ## 4 — Gate before executing (HARD-GATE)

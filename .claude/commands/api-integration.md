@@ -19,6 +19,8 @@ Wire a prototype page or domain from mock data to the real backend. This command
 
 ## Entry gate (HARD-GATE)
 
+**Precondition:** the `ui/` repo (with `ui/docs/PROTOTYPE-API-INTEGRATION.md`) and `api/` backend must exist under the working dir. In an engine-only checkout (no `ui/`), this command is inoperable — stop and report rather than improvising the wiring protocol.
+
 Verify the target page/domain is identified and the prototype screen exists before starting. This command is standalone and cross-repo — no preceding `/clear` is prescribed by this flow, but enter with a clean scope. Page-by-page: do not batch unrelated domains in a single run.
 
 **The one rule (restate for defense-in-depth):** app code always calls `apiFetch('/api/...')`; never call `fetch` directly; never branch mock-vs-real in a component. The flow file owns the enforcement details and exceptions.

@@ -26,6 +26,7 @@ A **governed planning monorepo** applying structured SDLC discipline — phase b
 /
   CLAUDE.md                    ← project memory; loaded every session
   README.md                    ← this file
+  /.claude/commands            ← slash commands (one per operation; thin wrappers over sdlc/workflow/ flows)
   /sdlc                        ← workflow engine (project-agnostic scaffolding)
     WORKFLOW.md                ← phase pipeline index + cross-cutting practices
     PRINCIPLES.md              ← doctrinal "why" behind every rule
@@ -57,7 +58,11 @@ The pipeline has five phases across three flows:
 | 2 | FS + Node Ingest | `sdlc/workflow/plan.md` |
 | 3 | Merge + Code + QA | `sdlc/workflow/implementation.md` |
 
-**Hard gate**: run `/clear` and reload the next flow file at every phase boundary. Context that survives a boundary is a bug, not a feature.
+Two further tracks run alongside the dev track: the **QA track** (`test-plan-ingest.md` → combined `test-suite-codegen.md` + `qa-gate.md`) and the **CR track** (`change-request.md`, milestone-free). Routing for all flows: [`sdlc/workflow/index.md`](sdlc/workflow/index.md).
+
+**Hard gates** (full list in [`CLAUDE.md § Hard rules`](CLAUDE.md)): run `/clear` and reload the next flow file at every *flow* boundary — context that survives a boundary is a bug, not a feature; every FRS / FS must declare `stack:` **and** `framework:` frontmatter (mandatory since 2026-05-22); never commit without explicit per-commit authorization.
+
+**Slash commands**: `.claude/commands/` carries one command per operation (`/author-frs`, `/author-fs`, `/implement-milestone`, `/open-milestone`, `/test-plan`, `/test-suite`, `/plan`, `/execute-plan`, `/absorb-codebase`, `/create-prototype`, `/api-integration`, `/review-staged`, `/review-prototype-merge`, `/commit-staged`, `/handoff`). Commands are thin wrappers — if a command and its canonical flow file diverge, the flow file wins.
 
 ## Key entry points
 
