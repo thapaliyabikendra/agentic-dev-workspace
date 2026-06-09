@@ -100,9 +100,11 @@ concatenation **inside log calls** are prohibited — they defeat
 Serilog's structured-property capture, collapse every event into an
 unsearchable text blob, and break correlation across log sinks.
 
-The Phase 3 merge gate greps for `_logger.Log*\(\$"`, for
-`_logger.Log*\(string\.Format(`, and for `_logger.Log*\(` followed by
-a `+`-concatenated template literal — hits block the merge.
+The Phase 3 merge gate greps for `_logger\.Log\w+\(\$"`, for
+`_logger\.Log\w+\(string\.Format\(`, and for `_logger\.Log\w+\(` followed by
+a `+`-concatenated template literal — hits block the merge. (Patterns are
+regex: `Log\w+` matches `LogInformation`, `LogError`, etc.; a glob-style
+`Log*` would match nothing useful.)
 
 ---
 
@@ -136,8 +138,13 @@ deployment-time finding, not a code finding.
 
 The Phase 3 merge gate greps log-call argument lists for property
 names matching the regex
-`(?i)password|token|otp|secret|cardNumber|cvv|authorizationHeader|bearer|refreshToken` —
-hits block the merge.
+`(?i)(password|secret|cardNumber|cvv|authorizationHeader|bearer|refresh_?token|\btoken\b|\botp\b)`
+— hits block the merge. The short alternatives `token` and `otp` are
+word-boundary-anchored: bare substrings would flag `CancellationToken`,
+`tokenizer`, `footprint`-class identifiers and train reviewers to
+ignore the gate. The longer alternatives stay substring-matched so
+compounds (`PasswordHash`, `ClientSecret`, `BearerToken` via `bearer`)
+still fire.
 
 ---
 

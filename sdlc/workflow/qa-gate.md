@@ -31,6 +31,8 @@ run (load those files first).
 
 **Vs. sibling flows:** [`implementation.md`](implementation.md) (dev track) does Stage 1 Merge + Stage 2 Code; [`test-plan-ingest.md`](test-plan-ingest.md) (QA track flow 1) authors TCs; [`test-suite-codegen.md`](test-suite-codegen.md) (QA track flow 2) generates executable specs; this file (QA track flow 3) runs the gate and flips statuses.
 
+**Vs. [`fs-qa-verification.md`](fs-qa-verification.md):** that file is the FS-template-linked spec-obligation checklist (FS-side rows: TC existence, trace lines, OQ resolution, no-invented-nodes). Both surfaces must clear before the flip; this gate owns the four conformance scans and executes the flip itself. Reaching the flip via the checklist alone — without this gate's scans — is a gate bypass.
+
 ---
 
 ## QA Verification Checklist

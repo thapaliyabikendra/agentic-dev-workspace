@@ -28,9 +28,10 @@ audience: business
 - `docs/adrs/index.md` — filter to rows tagged business / product /
   scope for the Key business decisions section. Narrow-load individual
   ADR pages only when one-line tags don't disambiguate.
-- `docs/discovery/open-questions.md` — operator judgement filter. The
-  file has no audience tag today; pick rows the regenerating operator
-  considers business-relevant.
+- `docs/discovery/open-questions/index.md` — operator judgement filter
+  (per-OQ folder layout; the pre-cutover flat `open-questions.md` is
+  grandfathered where it still exists). No audience tag today; pick rows
+  the regenerating operator considers business-relevant.
 
 Reference-never-copy applies: every row below links by ID, never
 paraphrases the source page's body.

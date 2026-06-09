@@ -289,9 +289,14 @@ surfacing-not-absorbing. See [`evolving-the-workflow.md`](evolving-the-workflow.
 
 ## Integration
 
-**Canonical home of:** the `status: proposed` lifecycle rules, CHG-NNN
-mechanics, cross-FS dependency enforcement, abandonment procedure, and
-workflow self-extension during Phase 2.
+**Canonical home of:** the `status: proposed` lifecycle rules, the
+**ACT-NNN ID-claim lifecycle** (§ above — the end-to-end Phase 1 claim →
+Phase 2 birth → Phase 3 flip statement; other files restate fragments
+operationally and point here), **CHG-NNN mechanics** (the full
+birth → enrichment → merge lifecycle; ~20 files carry phase-local CHG
+restatements — on conflict, this file wins), cross-FS dependency
+enforcement, abandonment procedure, and workflow self-extension during
+Phase 2.
 
 **Parent:** [`../WORKFLOW.md → In-flight nodes`](../WORKFLOW.md#in-flight-nodes-status-proposed) —
 WORKFLOW.md carries the always-loaded summary; this file is the full procedure.

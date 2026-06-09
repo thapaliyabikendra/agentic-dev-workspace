@@ -10,6 +10,14 @@
 > to confirm routing before dispatching. Per-rule body text is narrow-loaded
 > from the source STD page only when authoring code that touches that rule's
 > surface.
+>
+> **Framework guard:** the STD-005 rule citations in every pointer file
+> bind only when the consuming FS declares `framework: [abp-net]`
+> (STD-005 `applies_when:`). For a non-ABP .NET project, dispatch the
+> same cohorts but instruct sub-agents to skip STD-005 rows; STD-002 /
+> STD-006 rows bind regardless. Check the FS's `framework:` frontmatter
+> before dispatching — do not let the layer routing silently re-import
+> a framework-conditional standard the Phase 1.5 intersection excluded.
 
 ---
 
@@ -17,8 +25,10 @@
 
 - **Layer** — the ABP project / layer name (matches the pointer file name).
 - **ABP project** — the `.csproj`-level project this pointer governs.
-- **Cohort** — ADR-009 cohort (`A` / `B` / `C`). Cohort D (`HttpApi.Host`) is
-  out of scope; that project gets a pointer file when an FRS requires host code.
+- **Cohort** — build-order cohort (`A` / `B` / `C`), engine default; a project
+  `task-ordering`-tagged ADR overrides where present (originating project:
+  APP ADR-009). Cohort D (`HttpApi.Host`) is out of scope; that project gets
+  a pointer file when an FRS requires host code.
 - **Pointer file** — relative path inside `by-layer/`.
 
 ---
@@ -38,10 +48,12 @@
 
 ## Cohort dispatch summary
 
-Mirrors `docs/<component>/adrs/ADR-009-implementation-task-cohort-ordering.md` §
-cohort table — see ADR-009 for the authoritative ordering rationale.
-`<component>` resolves to the project's primary code-emitting component, declared
-in `docs/project.md`.
+Engine-default round structure (same table as
+`workflow/implementation.md § Stage 2 Code`). Where the project has a
+`task-ordering`-tagged ADR (look up `docs/<component>/adrs/index.md`;
+`<component>` = the primary code-emitting component declared in
+`docs/project.md`), that ADR's cohort table is authoritative and this
+summary mirrors it.
 
 | Round | Cohort | Parallel agents | Build-gate |
 | ----- | ------ | --------------- | ---------- |

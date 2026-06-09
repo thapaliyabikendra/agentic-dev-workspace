@@ -11,6 +11,11 @@ Append-only record of doctrinal rule changes shaping the canonical-edit
 discipline. Surface for readers who encounter unfamiliar references in
 older artifacts or who need to trace why the current rule is what it is.
 
+> Covers the why-narrative for a subset of cutovers. The complete
+> active-clause table (who is grandfathered, by which cutover, with
+> what retirement trigger) is
+> [`grandfather-registry.md`](grandfather-registry.md).
+
 ## CCC promoted to first-class artifacts (2026-05-16)
 
 CCCs promoted from a single baseline file (`docs/shared/cross-cutting-concerns.md`,

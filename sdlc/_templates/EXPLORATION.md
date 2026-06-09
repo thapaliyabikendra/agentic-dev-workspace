@@ -2,7 +2,8 @@
 Exploration discipline:
 - Routine edit: 1-file touch (just this file)
 - Lifecycle event (status → adopted | rejected | merged | done):
-    2-file touch (this file + docs/exploration/index.md)
+    2-file touch (this file + docs/discovery/exploration/index.md,
+    if one exists — per workflow/discovery-surface.md)
 - No log.md for the exploration surface — git history + the index
     status column are the audit trail.
 - No bidirectional `related:` enforcement — working notes can be

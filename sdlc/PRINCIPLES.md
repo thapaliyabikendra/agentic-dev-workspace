@@ -143,7 +143,7 @@ at the foot of this file.
   **✅ Run the 2-file touch atomically: artifact + per-type `index.md`.** If you can't re-sync the index, the edit isn't ready. Chronological audit lives in git history — no per-canonical-type `log.md` (retired 2026-05-16). See [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
 
 - **❌ Coining a new node type when only one node would ever live under it.** Fragments the index without buying retrieval clarity.
-  **✅ Extend an existing type, or capture the content as an ADR (cross-cutting) or DEC (node-scoped).** Apply the ADR-vs-DEC discriminator and the type-extension discriminator together. See [`WORKFLOW.md → Evolving the workflow → Defining a new node type`](WORKFLOW.md).
+  **✅ Extend an existing type, or capture the content as an ADR (cross-cutting) or DEC (node-scoped).** Apply the ADR-vs-DEC discriminator and the type-extension discriminator together. The same doctrine governs NDFs: no new Node Definition Node until the 60% shape-coverage walk has been run (HARD-GATE; procedure in [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md)). See [`WORKFLOW.md → Evolving the workflow → Defining a new node type`](WORKFLOW.md).
 
 - **❌ Hand-authoring or patching an overview or report file.** Turns a build artifact into a silent fork.
   **✅ Fill the wiki first, then regenerate.** If you can't derive the report from the wiki, the wiki is the gap — not the report.

@@ -35,6 +35,8 @@ Key folders:
 | STD-006 R2 | [STD-006 § Rule 2](../STD-006-logging-conventions.md#rule-2--per-layer-log-levels) | `Debug` for routine ops; `Error` (with exception) for faults |
 | STD-006 R3 | [STD-006 § Rule 3](../STD-006-logging-conventions.md#rule-3--structured-logging-with-named-properties) | Named `{Placeholder}` templates; no interpolation |
 | STD-006 R4 | [STD-006 § Rule 4](../STD-006-logging-conventions.md#rule-4--never-log-sensitive-data) | Never log passwords, tokens, card numbers |
+| STD-006 R5 | [STD-006 § Rule 5](../STD-006-logging-conventions.md#rule-5--correlation-enrichment-via-abp-serilog) | ABP enricher handles correlation/tenant/user — no manual push in jobs/adapters |
+| STD-006 R6 | [STD-006 § Rule 6](../STD-006-logging-conventions.md#rule-6--audit-logging-via-abp-audit-module-not-ilogger) | Audit trails via `IAuditingStore`, not `ILogger` — applies to background jobs too |
 
 ## Companion rules in other layers (read only on cross-layer touch)
 

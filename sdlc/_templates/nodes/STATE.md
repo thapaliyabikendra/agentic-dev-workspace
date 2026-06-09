@@ -5,6 +5,7 @@ title: <Entity name> state machine
 status: proposed              # proposed | active | superseded | deprecated
 source_ref: []                # [{frs: FRS-NNN, fs: FS-NNN, op: introduce | modify}] · brownfield: [{absorption: <path>, op: introduce | detail}]
 entity: ENT-NNN
+related: []                   # [ENT-NNN, CMD-NNN, FLW-NNN, ...] — bidirectional per workflow/bidirectional-link.md
 created: YYYY-MM-DD
 version: 1
 updated: YYYY-MM-DD

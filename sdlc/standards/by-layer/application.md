@@ -25,6 +25,7 @@ Key folders:
 | STD-002 R1.3 | [STD-002 § Rule 1.3](../STD-002-dotnet-coding-conventions.md#13-erroror-boundary--never-past-the-appservice) | AppService interface returns `T`, not `ErrorOr<T>` |
 | STD-002 R1.4 | [STD-002 § Rule 1.4](../STD-002-dotnet-coding-conventions.md#14-appservice-unwrap-pattern) | AppService unwraps `ErrorOr<T>` → `UserFriendlyException` |
 | STD-002 R1.5 | [STD-002 § Rule 1.5](../STD-002-dotnet-coding-conventions.md#15-multiple-errors) | Multiple errors: iterate `result.Errors`, fold to one exception |
+| STD-002 R4 | [STD-002 § Rule 4](../STD-002-dotnet-coding-conventions.md#rule-4--repository-query-discipline-iqueryable--whereif) | No in-memory filtering after `GetListAsync(predicate)` — R4 §4.6 scans `Application/` too |
 | STD-005 R10 | [STD-005 § Rule 10](../STD-005-abp-coding-conventions.md#rule-10--auto-api-controllers-are-the-default-http-exposure) | `IApplicationService` auto-exposed; manual controllers need DEC |
 | STD-005 R11 | [STD-005 § Rule 11](../STD-005-abp-coding-conventions.md#rule-11--node-body-to-service-layer-mapping) | AppService: authorize → delegate → unwrap → project only |
 | STD-005 R14 | [STD-005 § Rule 14](../STD-005-abp-coding-conventions.md#rule-14--typed-abp-exceptions-only-http-status-mapping) | Typed ABP exceptions only; no raw `Exception` / `ApplicationException` |

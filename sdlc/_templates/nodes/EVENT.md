@@ -2,7 +2,7 @@
 id: EVT-NNN
 type: event
 title: <EventName, past-tense verb phrase>
-status: active               # active | superseded | deprecated
+status: proposed             # proposed | active | superseded | deprecated
 raised_by: []                # [CMD-NNN, SVC-NNN, ...] — what publishes this event
 consumed_by: []              # [INT-NNN, SVC-NNN, FLW-NNN, ...]
 linked_contract: CON-NNN     # required — the CON node that owns the transport (topic/exchange)

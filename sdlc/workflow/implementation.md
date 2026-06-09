@@ -409,13 +409,15 @@ indexes form the conformance set [`qa-gate.md`](qa-gate.md) verifies.
 Cohort ordering inside the FS's Implementation tasks maps to these ADRs —
 see
 [`plan.md → Implementation-task cohort ordering`](plan.md#implementation-task-cohort-ordering)
-and the project's `task-ordering`-tagged ADR (APP component:
-[`ADR-009`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md);
-look up `docs/<component>/adrs/index.md` for other components). The
-ADR's cohort table is the source of truth for layer order, per-cohort
-STD/CCC anchors, and per-cohort parallel-dispatch eligibility (file-
-disjoint subagents within a cohort per
+and the project's `task-ordering`-tagged ADR (look up
+`docs/<component>/adrs/index.md`; in the originating project this is APP
+`ADR-009-implementation-task-cohort-ordering.md`). When such an ADR
+exists, its cohort table is the source of truth for layer order,
+per-cohort STD/CCC anchors, and per-cohort parallel-dispatch
+eligibility (file-disjoint subagents within a cohort per
 [`agent-contracts.md § Dispatch shapes`](agent-contracts.md#dispatch-shapes)).
+When the project has not yet authored one, the engine-default Round
+structure under § Stage 2 Code below applies as-is.
 
 **Build validation between cohorts.** After each cohort's code lands,
 run your project's build command (declared in
@@ -426,8 +428,9 @@ failures in unrelated projects, missing-type errors across cohort
 boundaries, or DI-resolution errors at startup indicate the cohort
 ordering or dependency declaration is wrong — halt and revisit the FS
 task ordering rather than papering over. Cohort C is the canonical
-surface for STD-005 R12 violations — see
-[`ADR-009 § Rationale`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md#rationale).
+surface for STD-005 R12 violations — rationale in the project's
+`task-ordering`-tagged ADR where one exists (originating project: APP
+ADR-009 § Rationale).
 
 ### Stage 2 Code — per-layer dispatch
 
@@ -438,7 +441,7 @@ references the relevant CHG `adds[]` / `modifies[]` entries. Vague rows
 ("implement the query") fall back to main-session authoring per
 [`sdlc/PRINCIPLES.md`](../PRINCIPLES.md) ("Mechanical work ≠ judgment work").
 
-Round structure (mirrors [ADR-009](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md) cohort ordering):
+Round structure (engine default; a project `task-ordering`-tagged ADR, where present, overrides):
 
 **Round 1 (Cohort A):** parallel — `shared` agent + `domain` agent.
 Each loads `sdlc/standards/by-layer/<shared|domain>.md` + `cross-cutting.md`. Build-gate after round.

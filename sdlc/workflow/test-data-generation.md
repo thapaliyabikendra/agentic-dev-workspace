@@ -66,7 +66,13 @@ time.
 | `{timestamp}` | `Date.now()` (epoch ms) | Need a value unique per test run |
 | `{counter}` | An incrementing per-spec-file counter | Need a value unique per test within a single spec |
 | `{uuid}` | A generated UUID | Need a guaranteed-unique value, length doesn't matter |
-| `{tcNumber}` | The TC's own number (e.g. `TC001`) | Need a value identifiable to a specific TC |
+| `{tcNumber}` | The TC's own zero-padded number, digits only (e.g. `001` for TC-001 — so `TC{tcNumber}` renders `TC001`) | Need a value identifiable to a specific TC |
+
+> Codegen-side substitution values for these tokens (plus codegen-only
+> conveniences like `"valid_email"`) live in
+> [`test-runner-cookbook.md`](test-runner-cookbook.md) § value
+> substitution. The two tables must stay in sync — extend both or
+> neither.
 
 **Combination is allowed and encouraged.** `TC{tcNumber}-RT-{timestamp}`
 produces something like `TC001-RT-1746604800000` at runtime — short,
@@ -203,7 +209,7 @@ Constraints: required, min, max, format.
 | TC intent | Test Data entry |
 |---|---|
 | Happy path (any date) | `Field Name: 2026-01-15` (a fixed sensible date — neither past-only nor future-only without guidance) |
-| Happy path (must be future) | `Field Name: <today + 30 days, ISO 8601>` — emit `{futureDate(30)}` if codegen supports it; otherwise flag for human review |
+| Happy path (must be future) | `Field Name: <today + 30 days, ISO 8601>` — `{futureDate(N)}` is NOT in the base token vocabulary above; emit it only if the project has extended the vocabulary (see note below the table on date-rule extension); otherwise flag for human review |
 | Past when must be future | `Field Name: 2020-01-01 → outOfRange(today, +infinity)` |
 | Invalid format | `Field Name: 'not-a-date' → invalidFormat(date)` |
 

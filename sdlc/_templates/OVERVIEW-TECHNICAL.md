@@ -27,9 +27,11 @@ audience: technical
 - `docs/nodes/permissions/index.md` — authorization rules (PERM rows).
 - `docs/nodes/flows/index.md` — flow titles (FLW rows). Scenarios are
   not pulled into the overview; readers click through.
-- `docs/discovery/open-questions.md` — operator judgement filter. Same
-  caveat as the business template: no audience tag in the file today;
-  pick rows the regenerating operator considers technical.
+- `docs/discovery/open-questions/index.md` — operator judgement filter
+  (per-OQ folder layout; the pre-cutover flat `open-questions.md` is
+  grandfathered where it still exists). Same caveat as the business
+  template: no audience tag today; pick rows the regenerating operator
+  considers technical.
 
 Reference-never-copy applies: every row below links by ID, never
 paraphrases the source page's body.

@@ -44,8 +44,10 @@ naming conventions (Rule 9). Status: accepted. Validation hooks fire at Phase
   narrowed to `api`; STD-005 narrowed to `abp-net` initially. STD-005's body
   prose claim "applies to any .NET project using ABP" was dropped — the
   applicability now lives in frontmatter only. Companion change to the
-  CLAUDE.md Hard rule ("Four governance sources: STD / ADR / CCC / DEC") and
-  to the 4-way discriminator in
+  CLAUDE.md Hard rule ("Four governance sources: STD / ADR / CCC / DEC" —
+  historical wording; NDF became the fifth governance kind on 2026-05-19,
+  see ADR-039 entry below; note added 2026-06-10) and
+  to the 4-way discriminator (now 5-way) in
   [`../workflow/authoring-adr.md`](../workflow/authoring-adr.md). Rationale:
   the prior tension where STD-005 was engine-scoped but ABP-conditional had no
   mechanical home; `applies_when:` generalizes to any future conditional

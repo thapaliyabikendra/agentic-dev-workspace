@@ -18,13 +18,17 @@ applies_when:
 > type** — do not coin. Coining without the discriminator pollutes
 > the workflow with parallel types that only differ in name.
 >
-> The shape-coverage check applies equally to **NDF coining** (per
-> [`ADR-039`](../../docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md)) —
+> The shape-coverage check applies equally to **NDF coining** (per the
+> project's NDF-governance ADR — originating project:
+> `docs/shared/adrs/ADR-039-ndf-fifth-governance-kind.md`) —
 > the walk covers the engine-default 16-type catalog **plus** every
 > existing NDF in the target component's `node_definitions:` **plus** every
-> NDF promoted to `docs/shared/node-definitions/`. See §A.1 in
-> [`../../docs/exploration/EXP-NDF-engine-diffs.md`](../../docs/exploration/EXP-NDF-engine-diffs.md)
-> for the canonical NDF shape-coverage HARD-GATE wording.
+> NDF promoted to `docs/shared/node-definitions/`. **This block is the
+> canonical NDF shape-coverage HARD-GATE wording** (defense-in-depth
+> copies: `WORKFLOW.md § Validation gates`, `ndf-edit.md`); the wording
+> originated in the originating project's
+> `docs/exploration/EXP-NDF-engine-diffs.md` §A.1 — historical
+> reference only, absent in fresh deployments.
 > (Cross-cutting rule:
 > [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
 > "Existing nodes are authoritative — adapt the template, don't

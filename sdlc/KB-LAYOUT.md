@@ -235,7 +235,10 @@ NDF template: [`_templates/NDF.md`](_templates/NDF.md) (top-level — NDF
 Each NDF declares the contract (frontmatter, body sections, allowed
 `related:` types, lifecycle) for its declared type. Phase 2 ingest validates
 new nodes against the contract per the **Phase 2 type-validity HARD-GATE**
-(§A.2 in `docs/exploration/EXP-NDF-engine-diffs.md`).
+(canonical enforcement home: [`workflow/plan.md`](workflow/plan.md);
+wording originated in the originating project's
+`docs/exploration/EXP-NDF-engine-diffs.md` §A.2 — historical reference,
+absent in fresh deployments).
 
 ---
 

@@ -37,7 +37,7 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 
 | File | One-line summary | Entry contract |
 |------|-----------------|----------------|
-| [test-plan-ingest.md](test-plan-ingest.md) | First QA flow — ingests TC files for every FRS use case; sets `test_plan_path` frontmatter; fills FRS test-plan-view table | FS validation passed (after `plan.md` exit) |
+| [test-plan-ingest.md](test-plan-ingest.md) | First QA flow — ingests TC files for every FRS use case; sets `test_plan_path` frontmatter (FRS test-plan-view table retired 2026-05-17) | FS validation passed (after `plan.md` exit) |
 | [test-suite-codegen.md](test-suite-codegen.md) | Codegen-stage of the combined codegen+gate flow. Generates Playwright test spec files from TC markdown, one spec per use-case sub-folder | TC selectors resolved against real DOM; Stage 2 Code complete (after `implementation.md` exit) |
 | [qa-gate.md](qa-gate.md) | Gate-stage of the combined codegen+gate flow — QA verification checklist, ADR-conformance check, code-quality gates, FS status flip to `implemented`. **Shares session with `test-suite-codegen.md`; gate-side verification re-reads FS/FRS/ADRs as if fresh — session-share is for token economy, not skipping checks.** | `test-suite-codegen.md` generation report emitted |
 
@@ -69,7 +69,8 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 |------|-----------------|--------------|
 | [retrieval-discipline.md](retrieval-discipline.md) | What to load at each phase entry — the primary token lever | Load when entering any phase or when a retrieval decision is in doubt |
 | [frs-validation-rules.md](frs-validation-rules.md) | Phase 1.5 gate — severity tiers (Blocker/Major/Minor), bundling detection, NFR rubric, OQ gate-effect taxonomy | Phase 1.5 (Validation Gate) |
-| [fs-qa-verification.md](fs-qa-verification.md) | QA-hat sweep checklist run before flipping an FS from `approved` to `implemented` — referenced from the FS template's `## QA verification` section | Phase 3 (before FS `implemented` flip) |
+| [fs-qa-verification.md](fs-qa-verification.md) | QA-hat sweep checklist run before flipping an FS from `approved` to `implemented` — referenced from the FS template's `## QA verification` section; does NOT replace the qa-gate conformance scans | Phase 3 (before FS `implemented` flip) |
+| [grandfather-registry.md](grandfather-registry.md) | All active grandfather clauses in one pointer-style table — cutover date, who is exempt, canonical statement, retirement trigger | Any phase, on encountering a mixed-vintage artifact; whenever a new grandfather clause is added |
 | [frs-code-extraction-rules.md](frs-code-extraction-rules.md) | Mining existing source code for FRS candidates — signal-to-FRS mapping, code-to-business translation, `[inferred from code]` discipline | Phase 0/1 (brownfield path); code-sourced is inherently brownfield; prototype-sourced is posture-independent. |
 | [frs-prototype-extraction-rules.md](frs-prototype-extraction-rules.md) | Mining a UI prototype for FRS candidates — screen-to-FRS signal mapping, prototype-to-business translation, `[inferred from prototype]` discipline | Phase 0/1 (prototype-sourced path — peer to code-extraction) |
 | [coverage-matrix.md](coverage-matrix.md) | TC completeness reference table — per-use-case tables for identifying which TCs apply | Phase 2 test-plan ingest |

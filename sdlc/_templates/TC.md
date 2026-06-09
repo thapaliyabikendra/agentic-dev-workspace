@@ -25,8 +25,10 @@ updated: YYYY-MM-DD
 > File location:
 > `docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/test-plans/<use-case>/TC-NNN-<slug>.md`
 >
-> See [`../workflow/plan.md → Test plan ingest`](../workflow/plan.md#test-plan-ingest-after-fs-validation)
-> for the section walkthrough, Required Coverage Matrix, and Traces-to rules.
+> See [`../workflow/test-plan-ingest.md`](../workflow/test-plan-ingest.md)
+> for the section walkthrough and
+> [`../workflow/coverage-matrix.md`](../workflow/coverage-matrix.md)
+> for the Required Coverage Matrix.
 > See [`../workflow/test-data-generation.md`](../workflow/test-data-generation.md)
 > for the `## Test Data` rules.
 

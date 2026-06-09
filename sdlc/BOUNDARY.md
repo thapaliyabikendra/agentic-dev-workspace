@@ -69,14 +69,15 @@ without modification.
 
 ### DDD knowledge base structure
 
-- The twelve node types and their `-NNN` ID convention:
+- The sixteen node types and their `-NNN` ID convention:
   - Original seven — Actor / Entity / Command / Flow / State / Decision /
     Integration.
-  - Five additions — Module (MOD), Screen (SCR), Endpoint (EP), Permission
-    (PERM), Change-map (CHG). MOD subsumes both "module" and "feature
-    area"; CHG is born at Phase 1 by the FRS when `touches_nodes:` is
-    non-empty (R-CHG-1) and lives permanently in the milestone-scoped
-    `chg/` folder (never canonical).
+  - Nine additions — Module (MOD), Screen (SCR), Contract (CON — superseded
+    Endpoint/EP 2026-05-14), Permission (PERM), Query (QRY), Service (SVC),
+    Functional Area (FA), Event (EVT), Change-map (CHG). CHG is born at
+    Phase 1 by the FRS when `touches_nodes:` is non-empty (R-CHG-1) and
+    lives permanently in the milestone-scoped `chg/` folder (never
+    canonical). Full catalog: [`KB-LAYOUT.md`](KB-LAYOUT.md).
 - Frontmatter contract: structured `source_ref:
   [{frs, fs, op: introduce | modify}]`, `touches_nodes`, `produces_nodes`,
   `new_nodes`, `consumes_chgs` (replaces `changes:` post-2026-05-17 cutover;
@@ -146,10 +147,10 @@ without modification.
 ### Templates
 
 - All files under [`_templates/`](_templates/) — FRS, FS, Discovery,
-  Milestone, ADR, the twelve node templates (ACTOR, ENTITY, COMMAND, FLOW,
-  STATE, DECISION, INTEGRATION, MODULE, SCREEN, ENDPOINT, PERMISSION,
-  CHANGE), and the index/log pair ([`INDEX.md`](_templates/INDEX.md),
-  [`LOG.md`](_templates/LOG.md)). The *structure* is team-agnostic; any
+  Milestone, ADR, the sixteen node templates (ACTOR, ENTITY, COMMAND,
+  QUERY, FLOW, STATE, DECISION, INTEGRATION, MODULE, SCREEN, CONTRACT,
+  PERMISSION, SERVICE, FUNCTIONAL-AREA, EVENT, CHANGE), and the index/log
+  pair ([`INDEX.md`](_templates/INDEX.md), [`LOG.md`](_templates/LOG.md)). The *structure* is team-agnostic; any
   project-specific examples inside (none today) would be the
   project-specific layer.
 
@@ -312,7 +313,7 @@ Topic-by-topic classification:
 | DDD node status vocabulary | **engine-prescribed** | `proposed → active → superseded \| deprecated`. FS-generated nodes pass through `proposed` (Phase 2 → Phase 3 merge flip); brownfield-absorbed nodes start at `active` directly (Phase-3-equivalent in discipline). |
 | ADR status vocabulary | **engine-prescribed** | `proposed → accepted → deprecated \| superseded`. |
 | DEC status vocabulary | **engine-prescribed** | `proposed → active → superseded \| deprecated`. Parity with other DDD nodes — standalone DECs go canonical at Phase 2 with `proposed`; flip to `active` at Phase 3 merge. Inline DECs have no independent status (they ride the host node's lifecycle). |
-| CHG status vocabulary | **engine-prescribed** | `draft → approved → merged`. CHG nodes are milestone-scoped (never canonical); status transitions edit the file in place at its milestone path. |
+| CHG status vocabulary | **engine-prescribed** | `draft → approved → merged`, with `deprecated` as the off-ramp from `draft` (R-CHG-3 sibling-CHG merge-out, or full FRS abandonment — see `workflow/in-flight-nodes.md`; IDs never reused). CHG nodes are milestone-scoped (never canonical); status transitions edit the file in place at its milestone path. |
 | Standard status vocabulary | **engine-prescribed** | Same as ADR. |
 | Phase 1.5 gate snapshots (CCC index + ADR index + standards index) | **engine-prescribed** | All three indexes snapshot at gate entry. CCC snapshot is now the per-CCC index (`docs/shared/ccc/index.md`) rather than the retired flat baseline doc — individual CCC pages narrow-load on the consuming artifact's `ccc:` declaration. `_version` fields captured. |
 | Test runner choice | **project-time** | Captured in a project-owned test-runner cookbook (`workflow/test-runner-cookbook.md` by convention); formalized in a testing-convention ADR once authored. |
@@ -402,10 +403,11 @@ Phase 1.5 Blocker per
 
 ## Boundary cases (decide during extraction)
 
-- The twelve node types — are all twelve universal, or are some
-  (e.g., Integration, Endpoint) domain-driven? In particular: Endpoint
-  duplicates Command for thin 1:1 REST wiring; Permission is only useful
-  when authorization is non-trivial. Decide when at least one team outside
+- The sixteen node types — are all sixteen universal, or are some
+  (e.g., Integration, Contract) domain-driven? In particular: Contract
+  borders Command for thin 1:1 REST wiring (discriminator in
+  [`KB-LAYOUT.md`](KB-LAYOUT.md)); Permission is only useful when
+  authorization is non-trivial. Decide when at least one team outside
   this project adopts the bundle.
 - Phase 0 Discovery template — the "Existing nodes scanned" section
   assumes brownfield; greenfield teams may want a separate variant rather

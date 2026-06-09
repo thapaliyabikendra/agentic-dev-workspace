@@ -79,6 +79,15 @@ to absorb the generalization.
 
 ### Candidate generalizations — FDE NDF pilot (logged 2026-05-19, not yet activating)
 
+> **Project-pilot quarantine.** Everything in this section is
+> observation data from one originating project's FDE component
+> (project-specific NDF IDs, field names, domain references) — it is
+> NOT engine contract. Nothing here binds any consumer until STD-004's
+> `deferred_until:` trigger fires and a candidate is promoted into the
+> standard's body proper, at which point this log section empties into
+> the rules and the project-specific provenance moves to
+> [`log.md`](log.md).
+
 Sourced from Stage 7 cross-instance validation of FDE-NDF-001/002/003 +
 their three pilot instances. Each candidate is a feature that would plausibly
 recur across components if STD-004 were activated. Logged here per ADR-039

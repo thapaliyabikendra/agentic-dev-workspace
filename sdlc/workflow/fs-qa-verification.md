@@ -69,6 +69,13 @@ in a one-line annotation in the FS body — do not silently skip.
       RESEARCH doc, and the resolver carries `resolves: [OQ-NNN]`
       reciprocally.
 - [ ] `merged: true` and `merge_sha:` set on this FS.
+- [ ] The four conformance scans — ADR-conformance, STD-conformance,
+      CCC-deviation, code-pattern — specified in
+      [`qa-gate.md`](qa-gate.md) have run with no blocking findings.
+      **This checklist does not replace the QA gate**: the
+      `approved → implemented` flip is executed by the QA-track
+      gate-stage, which owns the scan procedure and the milestone /
+      FRS status flips this checklist does not cover.
 
 ---
 

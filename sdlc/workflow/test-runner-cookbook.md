@@ -170,7 +170,7 @@ gets typed. Codegen interpolates per these rules:
 | `"invalid_password"` | `'wrongpassword123'` |
 | `{timestamp}` token | `` `${Date.now()}` `` |
 | `{uuid}` token | `` `${crypto.randomUUID()}` `` |
-| `{tcNumber}` token | `'TC001'` (literal, baked at codegen time) |
+| `{tcNumber}` token | `'001'` (zero-padded digits only, baked at codegen time — the `TC` prefix comes from the literal in the pattern; the spec-title tag keeps the full hyphenated ID, `@TC-001`) |
 | `{counter}` token | incrementing counter per spec file |
 | Templated string (`TC{tcNumber}-{kebab-feature}-{timestamp}`) | `` `TC001-{feature}-${Date.now()}` `` |
 | Any other string literal | Use the string verbatim |
@@ -253,7 +253,7 @@ in TC number order.
 import { test, expect } from '@playwright/test';
 
 // Feature: {feature_name}
-// Source: {docs_repo}/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/test-plans/{use-case}/
+// Source: docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/test-plans/{use-case}/
 
 test.describe('{Feature Name} — {Use Case Title}', () => {
   // Include only for login/auth tests:
@@ -352,8 +352,8 @@ Spec files land at:
 tests/{test_dir}/{feature}/{use-case}.spec.ts
 ```
 
-where `{test_dir}` is resolved from `tests/playwright.config.ts`
-(`testDir` setting) and `{feature}` matches the FS folder slug. See
+where `{test_dir}` is resolved from `playwright.config.ts` at the repo
+root (`testDir` setting) and `{feature}` matches the FS folder slug. See
 [`test-suite-codegen.md`](test-suite-codegen.md)
 for the resolution rules and the one-time `playwright.config.ts`
 bootstrap step.
