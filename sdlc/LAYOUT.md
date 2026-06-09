@@ -60,6 +60,11 @@ artifact). When in doubt about where a new file goes, check here first.
                            derived-reports.md, legacy-absorption.md,
                            evolving-the-workflow.md, coverage-matrix.md, bug-fix.md,
                            change-request.md)
+    /tools                 mechanical tooling that ships with the engine
+                           (engine-lint.mjs — drift scanner over engine
+                           surfaces; run: node sdlc/tools/engine-lint.mjs;
+                           see workflow/lint.md § Mechanical engine-lint
+                           runner)
     /_templates            scaffolding for new artifacts and nodes
                            includes INDEX.md and LOG.md for per-type pairs;
                            16 node templates (ACTOR, ENTITY, COMMAND, QUERY,

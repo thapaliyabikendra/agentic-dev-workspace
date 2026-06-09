@@ -127,7 +127,7 @@ at Phase 3 entry), route by operation:
 | Internal service surfaces | [Pattern 4 — Task reveals an internal service needing its own design](#pattern-4--task-reveals-an-internal-service-needing-its-own-design) |
 | Pre-merge branch check (multi-repo) | [Pre-merge branch-coherence check](#pre-merge-branch-coherence-check) |
 
-The [HARD-GATE](#) callout near the top and
+The **HARD-GATE** callout near the top and
 [Anti-Pattern: "The Shortcut Merge"](#anti-pattern-the-shortcut-merge) are
 doctrinal — re-read on each new Phase 3 even when routing.
 

@@ -226,8 +226,8 @@ referenced by other files; load the canonical file for actual procedure.
 > Filename ID on every artifact; frontmatter links (`source_ref`,
 > `touches_nodes`, `produces_nodes`, `related`, `adrs`, etc.);
 > [`docs/home.md`](../docs/home.md) is the cross-type quick-scan; per-type
-> [`index.md`](adrs/index.md) carries one row per page (the file generators
-> wholesale-read). Surviving `log.md` companions: `docs/research/log.md` and
+> `index.md` (`docs/<component>/adrs/index.md`, per-type node indexes)
+> carries one row per page (the file generators wholesale-read). Surviving `log.md` companions: `docs/research/log.md` and
 > `sdlc/standards/log.md` only. Canonical lifecycle events (nodes, ADRs, CCCs)
 > audit via index Status column + git history.
 

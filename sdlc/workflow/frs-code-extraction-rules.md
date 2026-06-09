@@ -61,7 +61,7 @@ For each code source, walk these signals top-to-bottom. A single file may
 produce multiple FRS candidates (multiple user-journeys). Target columns
 refer to the project's FRS template
 ([`../_templates/FRS.md`](../_templates/FRS.md)) and the canonical DDD
-wiki at [`../nodes/`](../nodes/). Birth phases are type-keyed: FLW and
+wiki at `docs/<component>/nodes/`. Birth phases are type-keyed: FLW and
 ACT are born at Phase 1 alongside their FRS (per R-NEW-1); ENT, CMD, STA,
 CON, INT, DEC, PERM, QRY are born at Phase 2; Phase 3 flips all
 proposed-state nodes to `active`.

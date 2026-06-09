@@ -127,7 +127,20 @@ Do not pre-create `docs/<component>/nodes/` subfolders. They are lazy-created on
 first instance per
 [`sdlc/workflow/maintenance-discipline.md → Lazy creation`](workflow/maintenance-discipline.md).
 
-### 8. Kick off Phase 0
+### 8. Verify engine integrity
+
+Run the mechanical drift scanner:
+
+```
+node sdlc/tools/engine-lint.mjs
+```
+
+Expect exit 0. Notices about skipped `docs/` checks are normal until
+Steps 2–3 create the project KB. A non-zero exit means the engine copy
+you adopted carries drift — fix before building on it. See
+[`sdlc/workflow/lint.md § Mechanical engine-lint runner`](workflow/lint.md#mechanical-engine-lint-runner).
+
+### 9. Kick off Phase 0
 
 Open the first milestone:
 ```

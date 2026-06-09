@@ -190,7 +190,7 @@ missed something; surface it via
 ## Parent-side outcome rubric (dispatched review subagents)
 
 When a review pass is dispatched as an inline subagent (per
-[`../../CLAUDE.md ## When to Use`](../../CLAUDE.md#when-to-use-inline-subagent-dispatch)
+[`agent-contracts.md § When to Use`](agent-contracts.md#when-to-use)
 and the gate dispatch shape at
 [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)),
 the subagent returns the canonical 3-block contract (`## Findings /

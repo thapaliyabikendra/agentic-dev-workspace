@@ -95,7 +95,7 @@ so readers see the snapshot date and underlying wiki state.
    `REPORT-<KIND>.md` template for newer report types).
 2. Walk the template's "Pulls from" list. Read the Karpathy indexes
    first (`docs/<component>/adrs/index.md`, per-type node `index.md`,
-   master [`home.md`](../home.md)); narrow-load only the source pages
+   master [`home.md`](../../docs/home.md)); narrow-load only the source pages
    whose summaries match the section being filled. Same retrieval
    discipline as Phase 2 / Phase 3 — see
    [`retrieval-discipline.md`](retrieval-discipline.md).

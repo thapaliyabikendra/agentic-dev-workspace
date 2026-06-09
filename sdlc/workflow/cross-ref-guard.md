@@ -52,6 +52,14 @@ periodic scan. The audit is fired on milestone close — see
 [`close-milestone.md § C-6`](close-milestone.md#c-6--dangling-cross-reference-audit)
 for the trigger.
 
+> **Automation note (2026-06-10).** Steps 1–2 below (ID resolution,
+> link + anchor verification incl. the normalization rules) are
+> mechanized for engine surfaces by
+> [`../tools/engine-lint.mjs`](../tools/engine-lint.mjs) — run
+> `node sdlc/tools/engine-lint.mjs` at milestone close instead of
+> hand-walking them. Step 3 (tag citations) and project-ID classes
+> under `docs/` remain manual while no project-side tooling exists.
+
 **Audit recipe** (one-shot, ≤ 5 min):
 
 1. Collect citation patterns from framework files:
@@ -77,9 +85,11 @@ for the trigger.
       `<!-- layers: Domain -->` — common on STD-002 / 005 / 006
       headings) before normalizing.
    2. Lowercase the remainder.
-   3. Strip punctuation: `.`, `,`, `?`, `!`, `(`, `)`, `'`, `` ` ``,
-      em-dash `—`, en-dash `–`.
-   4. Replace whitespace and `:` with `-`.
+   3. Strip punctuation: `.`, `,`, `?`, `!`, `(`, `)`, `'`, `` ` ``, `:`,
+      em-dash `—`, en-dash `–`. (Corrected 2026-06-10: `:` is *stripped*,
+      not converted to `-` — GitHub drops it; `STD-001: Engine-level…` →
+      `std-001-engine-level…`, single hyphen.)
+   4. Replace whitespace with `-`.
 
    Gotcha: an em-dash surrounded by spaces (e.g., `boundary — never`)
    collapses to a doubled `--` in the anchor — the dash itself strips,

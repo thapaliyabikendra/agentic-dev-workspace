@@ -223,13 +223,14 @@ Resolution paths:
 The class waits for a real pinned reference to exist before it fires;
 unversioned cross-refs (`ENT-007` without `@v<M>`) are not in scope.
 
-**Pre-commit / pre-merge advisory.**
-[`../../scripts/check-version-bump.sh`](../../scripts/check-version-bump.sh)
-scans staged or ranged canonical-node edits and reports
-`BUMP_MISSING:` for any node whose body / cross-reference frontmatter
-changed but whose `version:` integer did not move. The script is
-advisory — it does not block commits; it is a soft second pair of
-eyes for the bump rule.
+**Pre-commit / pre-merge advisory (slot — script not yet authored).**
+A future `scripts/check-version-bump.sh` would scan staged or ranged
+canonical-node edits and report `BUMP_MISSING:` for any node whose
+body / cross-reference frontmatter changed but whose `version:`
+integer did not move — advisory only, never commit-blocking. Citation
+downgraded to a slot description 2026-06-10 per
+[`cross-ref-guard.md`](cross-ref-guard.md): the script was cited as
+existing but was never authored (caught by `engine-lint` C1).
 
 ### `index-entry-missing`
 
@@ -281,6 +282,34 @@ Direct fixes: QRY-014 index row + log entry added (commit pending).
 
 The report does not persist. The OQs and the index/log entries it
 produces are the durable record.
+
+## Mechanical engine-lint runner
+
+> Scope split. The debt classes above are **project-KB** drift
+> (`docs/`), routed through OQ-NNN by human judgment — they stay a
+> manual operation per this file's "not an automated scanner" framing.
+> **Engine-file** drift (`sdlc/`, `CLAUDE.md`, `README.md`,
+> `.claude/commands/`) is mechanical and IS automated:
+> [`../tools/engine-lint.mjs`](../tools/engine-lint.mjs).
+
+Run: `node sdlc/tools/engine-lint.mjs` (`--strict` promotes warns to
+errors; exit 0 clean / 1 findings). Checks — C1 relative links
+resolve · C2 GFM anchors resolve (normalization per
+[`cross-ref-guard.md`](cross-ref-guard.md)) · C3 STD cites exist ·
+C4 frontmatter contracts (enums parsed from
+[`../BOUNDARY.md`](../BOUNDARY.md) at runtime, never copied) · C5
+index coverage + type-catalog count claims · C6 derived-view
+staleness (warn) · C7 grandfather-registry sync (warn). Exemptions
+are logged in the run output, never silent (`_templates/` links,
+`docs/`-slot links while the KB is absent, append-only logs).
+
+The runner is **detection only** — it never edits files, and it does
+not change this file's gating doctrine: "The Lint Gate" anti-pattern
+above stands; no pre-commit or CI wiring is installed. Findings route
+like any other drift — direct fix when the tiered touch covers it,
+OQ-NNN when resolution needs judgment. Suggested cadence: the same
+triggers as § When to run, plus before an engine-file commit batch —
+advisory only, never commit-blocking.
 
 ## Extending the debt class list
 

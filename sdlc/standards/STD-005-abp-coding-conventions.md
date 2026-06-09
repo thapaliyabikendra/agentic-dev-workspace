@@ -25,7 +25,9 @@ related_adrs: []
 > [`../workflow/authoring-adr.md`](../workflow/authoring-adr.md) for the
 > STD / ADR / CCC / DEC discriminator.
 >
-> Source material: [`../../guidelines/abp-guidelines.md`](../../guidelines/abp-guidelines.md).
+> Source material: `guidelines/abp-guidelines.md` — absorbed into this
+> standard 2026-05-15 and since removed; see [`log.md`](log.md)
+> `[2026-05-15]` entry.
 > When this standard and any component ADR disagree, the ADR wins — flag
 > the drift back here so the standard can be updated.
 
