@@ -17,6 +17,14 @@ applies_when:
 > are always in force. Flow files below assume those rules; they do not
 > re-state them.
 
+> **Detail-file convention (core/detail layering).** Same-name subfolders
+> (`plan/`, `design/`, `implementation/`, `frs-validation-rules/`) hold
+> on-demand detail files for their core flow file. They are loaded lazily
+> via the core file's `## Detail files` table — never at phase entry, and
+> never from this index (engine-lint C5 covers direct children only; the
+> subdirectory notice is expected). Executor rule:
+> [`retrieval-discipline.md § Executor contract`](retrieval-discipline.md#executor-contract-for-section-routed-flow-files).
+
 ---
 
 ## Flow files — load at phase entry / `/clear` boundary
@@ -49,15 +57,15 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 |------|-----------------|--------------|
 | [authoring-adr.md](authoring-adr.md) | Land an ADR — pick artifact type, file it, wire cross-references, run supersession path | Phase 0/1/2 or standalone when an architectural commitment needs recording |
 | [maintenance-discipline.md](maintenance-discipline.md) | Routing gate for canonical edits — 16-row routing table to sub-op files ([`node-edit.md`](node-edit.md), [`bidirectional-link.md`](bidirectional-link.md), [`phase-15-roundtrip.md`](phase-15-roundtrip.md), [`adr-edit.md`](adr-edit.md), [`ccc-edit.md`](ccc-edit.md), [`ndf-edit.md`](ndf-edit.md), [`dec-promotion.md`](dec-promotion.md), [`cross-type-supersession.md`](cross-type-supersession.md), [`tech-stack-touch.md`](tech-stack-touch.md), [`cross-ref-guard.md`](cross-ref-guard.md), [`operation-vocabulary.md`](operation-vocabulary.md), [`discovery-surface.md`](discovery-surface.md), [`lazy-creation.md`](lazy-creation.md), [`node-versioning.md`](node-versioning.md), [`rule-history.md`](rule-history.md), [`anti-pattern-lightweight.md`](anti-pattern-lightweight.md)). 2-file touch (node, ADR, CCC uniformly); (base+N) for related edges; canonical `log.md` retired 2026-05-16. | Any canonical-node, ADR, CCC, or NDF edit — load the gate first, then the matching sub-op |
-| [discuss.md](discuss.md) | Pre-plan discussion — captures architectural decisions after Phase 1.5 gate closure; outputs durable files that survive `/clear` | After Phase 1.5 exit, before `/clear` + `plan.md` |
+| [discuss.md](discuss.md) | Pre-plan discussion — captures architectural decisions after Phase 1.5 gate closure; outputs durable files that survive `/clear` | After Phase 1.5 exit, before `/clear` + `plan.md` (command: `/discuss`) |
 | [planning-conventions.md](planning-conventions.md) | Multi-phase default + sub-agent dispatch table + 7-principle Karpathy gate for forward-looking plan files (e.g. `.claude/plans/*.md`) | When authoring or reviewing a plan (in plan mode or otherwise) |
 | [in-flight-nodes.md](in-flight-nodes.md) | CHG mechanics, cross-FS dependencies, abandonment procedure for `status: proposed` nodes | Phase 2/3 when authoring or merging an FS that touches canonical nodes |
-| [research.md](research.md) | Resolves `blocking-frs` OQs before FRS body sections can be authored | Phase 1 (internal) when ≥1 OQ classified `blocking-frs` |
+| [research.md](research.md) | Resolves `blocking-frs` OQs before FRS body sections can be authored | Phase 1 (internal) when ≥1 OQ classified `blocking-frs` (command: `/research`) |
 | [baseline-references.md](baseline-references.md) | Lifecycle ops for `docs/shared/glossary.md` and `docs/shared/ccc/` (Add / Change / Retire / Drift detection) | Between Phase 1.5 gates when a baseline term needs updating |
-| [absorb-concept.md](absorb-concept.md) | Promotes a concept surfaced during report synthesis to a canonical KB node via RESEARCH staging | When report synthesis surfaces a concept with no canonical node |
+| [absorb-concept.md](absorb-concept.md) | Promotes a concept surfaced during report synthesis to a canonical KB node via RESEARCH staging | When report synthesis surfaces a concept with no canonical node (command: `/absorb-concept`) |
 | [legacy-absorption.md](legacy-absorption.md) | Ingests a legacy doc from `docs-backup/` into canonical wiki — classifies, routes to nodes/ADRs/glossary, never copies verbatim | Maintenance activity when a legacy artifact needs promotion |
 | [lint.md](lint.md) | Debt-scan — detects orphan-node, stale-proposed, baseline-not-cited, stale-version-ref, index-entry-missing | On demand (before milestone close, after long absence, periodic) |
-| [review.md](review.md) | Review pass — QA gates, author self-review, ADR-conformance checks; files findings under `design-fit` or `execution-debt` | Phase 3 QA completion; author self-review at Phase 2 close |
+| [review.md](review.md) | Review pass — QA gates, author self-review, ADR-conformance checks; files findings under `design-fit` or `execution-debt` | Phase 3 QA completion; author self-review at Phase 2 close (command: `/review`) |
 | [verify.md](verify.md) | Post-implementation UAT — walks FRS acceptance criteria in aggregate, routes gaps, produces durable `UAT.md` record | After Phase 3 QA has passed for every FS in the milestone, before milestone close |
 | [prototype-first.md](prototype-first.md) | Bidirectional prototype-first operation — build a clickable UI prototype then drive FRS authoring + reimplementation; supports prototype→milestone seeding AND milestone/CR→prototype validation | When prototype-first flow is active (either direction) |
 
@@ -91,5 +99,5 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 | [new-component-bootstrap.md](new-component-bootstrap.md) | Declare a new component — `id_prefix`, `COMPONENT.md`, per-type index seeding, workspace-level registration | Before Phase 2 ingest when an incoming FS introduces a new component |
 | [abp-project-bootstrap.md](abp-project-bootstrap.md) | Bootstrap an ABP api/ solution — scaffold via `abp new`, then apply baseline hardening + opt-in feature packs to HttpApi.Host and AuthServer | Standalone — operator-invoked when bringing up a new ABP api project |
 | [derived-reports.md](derived-reports.md) | Regenerate audience-facing reports under `docs/reports/` — stable names, templates, regeneration prompts | On demand ("regenerate the `<kind>` overview") |
-| [evolving-the-workflow.md](evolving-the-workflow.md) | Extend the workflow — add a node type, refine a doc template, or define a new derived-report type | When an in-flight FRS/FS surfaces an artifact shape no existing type covers |
+| [evolving-the-workflow.md](evolving-the-workflow.md) | Extend the workflow — add a node type, refine a doc template, or define a new derived-report type | When an in-flight FRS/FS surfaces an artifact shape no existing type covers (command: `/evolve-workflow`) |
 | [vcs-migration.md](vcs-migration.md) | Filesystem-to-issue-tracker mapping table and platform adoption guidance (GitLab/GitHub/ADO/Jira) | Only when planning or executing a VCS platform migration |

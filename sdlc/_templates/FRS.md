@@ -22,6 +22,11 @@ created: YYYY-MM-DD
 
 # FRS-NNN: <Title>
 
+> Inline node/artifact citations in body prose may use wiki links —
+> `[[FLW-NNN#happy]]`, `[[ENT-NNN|Customer]]` (convention:
+> `sdlc/KB-LAYOUT.md` § Wiki-link syntax; display-only — frontmatter
+> declarations remain plain ID lists).
+
 ## Use case
 
 One paragraph. What does the actor want to accomplish, and why? This FRS

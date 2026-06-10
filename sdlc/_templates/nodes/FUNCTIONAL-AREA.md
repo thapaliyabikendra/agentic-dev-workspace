@@ -1,4 +1,4 @@
----
+﻿---
 id: FA-NNN
 type: functional-area
 title: <Functional area name — short summary>
@@ -15,6 +15,8 @@ updated: YYYY-MM-DD
 ---
 
 # FA-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > A **functional area** is a cross-cutting feature concept that spans one
 > or more bounded contexts and one or more services. It is the

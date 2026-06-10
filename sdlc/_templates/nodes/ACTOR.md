@@ -1,4 +1,4 @@
----
+﻿---
 id: ACT-NNN
 type: actor
 title: <Actor name>
@@ -12,6 +12,8 @@ updated: YYYY-MM-DD
 ---
 
 # ACT-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > **Phase-keyed authoring.** ACT is born at **Phase 2** (alongside ENT / CMD /
 > STA / etc.) when the FRS declares `produced_actor: ACT-NNN` in its

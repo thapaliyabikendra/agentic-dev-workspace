@@ -1,4 +1,4 @@
----
+﻿---
 id: SCR-NNN
 type: screen
 title: <Screen / view / major-component name>
@@ -21,6 +21,8 @@ updated: YYYY-MM-DD
 ---
 
 # SCR-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > Scope: what the actor sees and can do. Omit framework, routing, and
 > styling detail.

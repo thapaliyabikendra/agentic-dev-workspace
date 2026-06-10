@@ -1,4 +1,4 @@
----
+﻿---
 id: SVC-NNN
 type: service
 title: <Service name — short summary>
@@ -19,6 +19,8 @@ updated: YYYY-MM-DD
 ---
 
 # SVC-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > A **service** is one independently deployable unit. The `kind:` enum is
 > intentionally project-agnostic — Kafka / Flink / Kubernetes / ABP are

@@ -141,12 +141,10 @@ scanned` in discovery docs and skip Phase 0 legacy-absorption steps.
 
 ### Project KB
 
-Lazy; framework requires the slot:
-
-- `docs/<component>/COMPONENT.md` — descriptor + `id_prefix:`
-- `docs/<component>/adrs/index.md` + `docs/shared/adrs/index.md` — ADRs
-- `docs/<component>/nodes/<type>/index.md` — per-type canonical nodes
-- [`docs/shared/ccc/index.md`](docs/shared/ccc/index.md) — CCC baselines
+Lazy-created slots: `docs/<component>/COMPONENT.md` (descriptor + `id_prefix:`),
+per-type `nodes/<type>/index.md`, `adrs/index.md` (+ `docs/shared/adrs/`),
+[`docs/shared/ccc/index.md`](docs/shared/ccc/index.md). Bootstrap:
+[`sdlc/workflow/new-component-bootstrap.md`](sdlc/workflow/new-component-bootstrap.md).
 
 ## Where to look
 

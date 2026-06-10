@@ -72,6 +72,15 @@ residue and missing ENT-side back-links surfaced in the 2026-05-13 DEC
 audit. See [`PRINCIPLES.md`](../PRINCIPLES.md) — *If it can drift, the
 operation isn't atomic enough.*
 
+**Wiki-link body citations are out of scope (2026-06-10).** A `[[ID]]` /
+`[[ID|label]]` token in docs/ body prose (convention:
+[`KB-LAYOUT.md § Wiki-link syntax`](../KB-LAYOUT.md#wiki-link-syntax-docs-only))
+is a display-only citation — it does NOT add the target to `related:` and
+does NOT trigger this file's `(2 + N)` reciprocal touch. Only frontmatter
+`related:` entries do. A wiki link may *satisfy* the "every `related:` ID
+appears as a navigable body link" rule, but the causality runs one way:
+`related:` demands a body link; a body link demands nothing.
+
 ## Integration
 
 **Parent:** [`maintenance-discipline.md`](maintenance-discipline.md) — routing gate.

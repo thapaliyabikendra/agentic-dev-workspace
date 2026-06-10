@@ -23,7 +23,7 @@ firing reads only the sections the table names.
 | Operation | Sections to read |
 |---|---|
 | Phase 0 / Phase 1 entry | [Nodes → Phase 0/1 — discovery reads](#phase-01--discovery-reads) + [Templates loaded at Phase 1 authoring](#templates-loaded-at-phase-1-authoring) + [Baselines](#baselines) + [ADRs](#adrs) |
-| Phase 1.5 entry (Validation gate) | [Baselines](#baselines) + [STDs and CCCs](#stds-and-cccs) (Phase 1.5 row of the matrix) + [ADRs](#adrs) |
+| Phase 1.5 entry (Validation gate) | [Baselines](#baselines) + [STDs and CCCs](#stds-and-cccs) (Phase 1.5 row of the matrix) + [ADRs](#adrs) — and load [`frs-validation-rules.md`](frs-validation-rules.md) (core) + [`design/validation-gate-detail.md`](design/validation-gate-detail.md) (Pass 1 / Pass 2 check text) |
 | Phase 2 entry (Ingest) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 2 row + [Index opt-out](#index-opt-out)) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) |
 | Phase 3 entry (Merge + Code) | [Nodes → Phase 2/3 — ingest and merge reads](#phase-23--ingest-and-merge-reads) + [STDs and CCCs](#stds-and-cccs) (Phase 3 row) + [Tech-stack operational baseline](#tech-stack-operational-baseline) + [Test artifact rule books](#test-artifact-rule-books) + [ADRs](#adrs) |
 | QA track entry (test-plan-ingest / test-suite-codegen / qa-gate) | [QA-track retrieval](#qa-track-retrieval) (per `qa_phase`) + [ADRs](#adrs) |
@@ -31,13 +31,9 @@ firing reads only the sections the table names.
 | ADR / DEC body-budget or title-cap question | [ADRs](#adrs) |
 | Maintenance op firing (load-on-trigger) | [Maintenance operation references](#maintenance-operation-references) — jump to the firing op's row |
 
-Returning-reader savings depend on **executor compliance**: if a session
-loads the whole file by default after the second phase entry of a
-milestone, the routing table provides nothing. The
+Returning-reader savings depend on **executor compliance** — the
 [Executor contract](#executor-contract-for-section-routed-flow-files)
-below makes section-routing the *intended* read pattern for this file
-and the other flow files that declare a routing table.
-
+below makes section-routing the *intended* read pattern, not decoration.
 If your operation is not in the table, read the file in full.
 
 ## Executor contract for section-routed flow files
@@ -66,6 +62,18 @@ session" are not optional — read them on first session entry.
 This rule is the executor-side contract that makes the routing tables
 in the flow files realize their token savings. Without it, the tables
 are decorative.
+
+**Detail files (core/detail layering).** Files under a flow file's
+same-name subfolder (`sdlc/workflow/plan/`, `design/`, `implementation/`,
+`frs-validation-rules/`) are **sub-resources of their core file** — they
+are NOT loaded at phase entry. Load a detail file only when the core
+file's `## Detail files` table names your current operation as its
+trigger (e.g., `plan/chg-consumption.md` loads when a constituent FRS
+has non-empty `touches_nodes:`, not before). Detail files are not listed
+in [`index.md`](index.md) (engine-lint C5 covers direct children only —
+the subdirectory notice is expected); the core file is their only entry
+point. Every binding gate (HARD-GATE, checklists, severity tables) lives
+in the core files — a detail file never carries a gate the core lacks.
 
 ## Nodes
 

@@ -215,7 +215,7 @@ rule text.
 **Forbidden:** writing outside the ABP project root passed in. Reading STDs not
 cited by the pointer files (waste of tokens). Editing canonical nodes (that path
 goes through the orchestrator per
-[`implementation.md § Node content updates`](implementation.md#node-content-updates-during-implementation)).
+[`implementation/node-sync.md § Node content updates`](implementation/node-sync.md#node-content-updates-during-implementation)).
 
 **Verification by the orchestrator** (per
 [`§ Mutation verification`](#mutation-verification-write-capable-dispatches-only)

@@ -34,7 +34,22 @@ audience: business
   the regenerating operator considers business-relevant.
 
 Reference-never-copy applies: every row below links by ID, never
-paraphrases the source page's body.
+paraphrases the source page's body. ID citations may use wiki-link form
+(`[[ADR-005|Why we ship monthly]]`) per
+[`../KB-LAYOUT.md § Wiki-link syntax`](../KB-LAYOUT.md#wiki-link-syntax-docs-only).
+
+---
+
+## How to use this report (Business Analyst)
+
+Read **Mission** first — the problem space in one paragraph. Then scan
+**Current state** for milestone/FRS status and **Roadmap** for sequence
+and target dates. **Key business decisions** lists the ADRs that
+constrain product scope — click through by ID for the full record.
+**Open questions** carries the unresolved items that may affect
+planning; raise new ones via `docs/discovery/open-questions/`. This
+report is a dated snapshot (`generated_at:` above) — when in doubt,
+the milestone portals and per-type indexes are the live truth.
 
 ---
 

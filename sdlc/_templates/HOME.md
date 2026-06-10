@@ -14,6 +14,18 @@ generated_at: YYYY-MM-DD
 
 ---
 
+## Navigation by persona
+
+| If you are… | Start here | Then read |
+| ----------- | ---------- | --------- |
+| **Business Analyst** | `docs/ROADMAP.md` → `docs/reports/BUSINESS.md` (regenerate if stale) | Milestone portals (`docs/milestones/M-NN-*/`) for scope + FRS status · open questions (`docs/discovery/open-questions/index.md`) · glossary (`docs/shared/glossary.md`) |
+| **Backend Architect** | `docs/reports/TECHNICAL.md` (regenerate if stale) → ADR indexes (`docs/<component>/adrs/index.md`, `docs/shared/adrs/index.md`) | CCC baselines (`docs/shared/ccc/index.md`) · tech stack (`docs/shared/tech-stack.md`) · MOD / INT / CON / FLW per-type indexes |
+
+Reports are regenerated on demand (`/derived-report`); the per-type
+indexes and this file are the always-current surface.
+
+---
+
 ## Milestones
 
 | ID | Title | Kind | Status | FRSs | FSs | Target |
@@ -82,5 +94,8 @@ generated_at: YYYY-MM-DD
 ## Maintenance notes
 
 - Update this file whenever a per-type `index.md` gains or loses a row.
+- Table cells may cite artifacts as `[[M-01]]` / `[[FRS-001]]` wiki links
+  (convention: `sdlc/KB-LAYOUT.md § Wiki-link syntax`); the plain ID is the
+  authoritative cell value either way.
 - Counts are snapshot values — not computed. Read the index for authoritative lists.
 - Milestone and roadmap status: see `docs/ROADMAP.md` (project state, regenerated on demand).

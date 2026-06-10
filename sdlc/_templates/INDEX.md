@@ -31,6 +31,10 @@ Commands, Flows, States, Decisions, Integrations, ADRs) and folder path
   (milestone-scoped, never canonical): `draft` / `approved` / `merged`.
 - **Source** — the FRS, FS, or `standalone` that produced this page. Mirrors
   the page's `source_ref` / `frs_origin` / `fs_origin` frontmatter.
+- **Wiki links** — Summary cells may cross-cite related artifacts with
+  `[[ID]]` / `[[ID|label]]` (docs/-only convention:
+  [`../KB-LAYOUT.md § Wiki-link syntax`](../KB-LAYOUT.md#wiki-link-syntax-docs-only)).
+  The row's own ID column stays a plain ID — it is the lookup key, not a link.
 
 ---
 

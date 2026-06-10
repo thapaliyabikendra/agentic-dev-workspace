@@ -8,10 +8,13 @@
 //   sdlc/standards/index.md           — STD status enum + frontmatter conventions (C4)
 //   REVIEW-SDLC-REPORT.md Rec-02      — check inventory
 //
-// Scope: ENGINE files only. The five KB debt classes in lint.md
+// Scope: ENGINE files only, plus one opt-in docs/ check: CW1 wiki-link
+// resolution (--check-wiki-links; spec: sdlc/KB-LAYOUT.md § Wiki-link
+// syntax). The five judgment-routed KB debt classes in lint.md
 // (orphan-node, stale-proposed, baseline-not-cited, stale-version-ref,
-// index-entry-missing) are a manual, OQ-routed operation by doctrine and
-// are NOT implemented here.
+// index-entry-missing) remain a manual, OQ-routed operation by doctrine
+// and are NOT implemented here; wiki-link-unresolvable's judgment half
+// (forward references) also stays manual.
 //
 // Zero dependencies. Node >= 18. Exit 0 = clean, 1 = error findings
 // (--strict promotes warns to errors). Detection only — never edits files.
@@ -318,6 +321,47 @@ for (const file of surface) {
       if (!registryDates.has(dm[1]))
         add('C7-registry', 'warn', file, i + 1, `grandfather clause dated ${dm[1]} has no grandfather-registry.md row`);
   });
+}
+
+// ---------- CW1 docs/ wiki-link resolution (opt-in: --check-wiki-links) ----------
+// Mechanical twin of lint.md's `wiki-link-unresolvable` manual debt class.
+// Convention spec: sdlc/KB-LAYOUT.md § Wiki-link syntax (docs/ only).
+// Off by default — docs/ may legitimately not exist (lazy-created KB) and
+// unresolvable links can be forward references; the manual class carries
+// the judgment half. Resolution is structural (glob docs/** for
+// <PREFIX>-NNN*.md), never index-mediated.
+
+const CHECK_WIKI = process.argv.includes('--check-wiki-links');
+const docsDir = path.join(REPO, 'docs');
+if (!CHECK_WIKI) {
+  notices.push('CW1: docs/ wiki-link resolution requires --check-wiki-links (off by default)');
+} else if (!fs.existsSync(docsDir)) {
+  notices.push('CW1: --check-wiki-links set but docs/ does not exist — nothing to scan');
+} else {
+  const docsFiles = walk(docsDir);
+  // basename stem -> full path(s); a wiki ID resolves when exactly one stem is `${id}` or starts with `${id}-`
+  const resolveId = (id) => docsFiles.filter((p) => {
+    const b = path.basename(p, '.md');
+    return b === id || b.startsWith(`${id}-`);
+  });
+  const WIKI_RE = /\[\[([^\]|#\n]+)(?:#([^\]|\n]+))?(?:\|([^\]\n]+))?\]\]/g;
+  const ID_RE = /^(?:[A-Za-z]+-\d+|PROTO-[A-Za-z0-9][A-Za-z0-9-]*)$/;
+  for (const file of docsFiles) {
+    const text = scrubFences(fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n'));
+    for (const m of text.matchAll(WIKI_RE)) {
+      const [, id, frag] = m;
+      const line = lineOf(text, m.index);
+      if (!ID_RE.test(id.trim())) {
+        add('CW1-wiki', 'error', file, line, `[[${id}]] is not a valid ID form (KB-LAYOUT.md § Wiki-link syntax)`);
+        continue;
+      }
+      const hits = resolveId(id.trim());
+      if (hits.length === 0) { add('CW1-wiki', 'error', file, line, `[[${id.trim()}]] resolves to no file under docs/`); continue; }
+      if (hits.length > 1) { add('CW1-wiki', 'error', file, line, `[[${id.trim()}]] is ambiguous — ${hits.length} matches under docs/`); continue; }
+      if (frag !== undefined && !anchorsOf(hits[0]).has(decodeURIComponent(frag).toLowerCase()))
+        add('CW1-wiki', 'error', file, line, `#${frag} not a heading anchor in ${path.basename(hits[0])}`);
+    }
+  }
 }
 
 // ---------- report (format per lint.md § Output format) ----------

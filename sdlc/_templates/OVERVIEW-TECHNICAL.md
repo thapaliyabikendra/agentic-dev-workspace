@@ -34,7 +34,24 @@ audience: technical
   considers technical.
 
 Reference-never-copy applies: every row below links by ID, never
-paraphrases the source page's body.
+paraphrases the source page's body. ID citations may use wiki-link form
+(`[[ADR-001|ABP symbol policy]]`) per
+[`../KB-LAYOUT.md § Wiki-link syntax`](../KB-LAYOUT.md#wiki-link-syntax-docs-only).
+
+---
+
+## How to use this report (Backend Architect)
+
+Start with **Architecture commitments** — the accepted ADRs grouped by
+tag are the binding constraints on any new design. **Module map** shows
+bounded-context boundaries; **Integration surface** and **Contract
+surface** show external dependencies and the wire API; **Authorization**
+is the PERM matrix. **Flows (top-level)** is the behavioral narrative —
+open a FLW page for Trigger, Scenarios, Sequence, and Branches. Pair
+this report with `docs/shared/ccc/index.md` (NFR baselines) and
+`docs/shared/tech-stack.md` (operational state) — neither is pulled in
+here. Dated snapshot (`generated_at:` above); per-type indexes are the
+live truth.
 
 ---
 

@@ -15,6 +15,11 @@ each with structural before/after, `adds[]`, and `migration_steps[]`. Phase 3 ap
 CHG deltas, flips new nodes `proposed → active`, and flips consumed CHGs `approved →
 merged`.
 
+> **Core/detail layout.** This is the core file — wholesale-read at Phase 2
+> entry. Step-level procedure detail lives in [`plan/`](plan/) detail files,
+> loaded on demand per the [Detail files](#detail-files-load-on-demand--not-at-phase-entry)
+> table. Every binding gate (HARD-GATEs, Checklist, §6) is in this file.
+
 <HARD-GATE>
 Do NOT write **method bodies, brace-delimited blocks, SQL bodies, YAML payloads,
 implementation file paths, or line-level code** in the FS, the new canonical nodes, or
@@ -87,14 +92,9 @@ applies the deltas.
 Queries canonical (validates the FRS) **and** Ingests journey + modify-intent
 (FLW born to canonical with `status: proposed`; CHG born to milestone with
 `status: draft` when `touches_nodes:` is non-empty). This file (Phase 2)
-Ingests structure + wiring (creates ACT when the FRS declares `produced_actor:`
-+ ENT / CMD / STA / CON / INT / DEC / PERM / QRY; enriches the Phase-1-born
-FLW with `related:` + Sequence + Branches + Compensating + structural
-Postconditions + Decisions; enriches the Phase-1-born CHGs the FS consumes
-with structural delta + adds[] + migration_steps[]).
-[`implementation.md`](implementation.md) (Phase 3) Merges + Codes. Each phase
-boundary requires a `/clear` at entry — Phase 1.5 → Phase 2 and Phase 2 →
-Phase 3.
+Ingests structure + wiring. [`implementation.md`](implementation.md) (Phase 3)
+Merges + Codes. Each phase boundary requires a `/clear` at entry — Phase 1.5 →
+Phase 2 and Phase 2 → Phase 3.
 
 **Prerequisites:** the Design flow has produced a milestone with `status: planning`,
 its validated FRSs in `milestones/M-NN-<slug>/frs/`, every FRS's "Validation findings"
@@ -107,13 +107,10 @@ clean. A context reset has happened between Phase 1.5 and this flow.
 
 ## Anti-Pattern: "The Obvious Path"
 
-Writing a method body, a SQL statement, a YAML configuration block, or a brace-delimited
-code snippet inside the FS or a new node because the implementation looks "obvious" —
-already in your head, no point waiting for Phase 3. The validation gate catches it, but
-the cheaper fix is not to drift in the first place. Phase 2 names structures (a
-`OrderManager` aggregate root with a `Cancel(reason)` method and a `Cancelled` domain
-event); Phase 3 writes them (the `{ ... }` body, the `WHERE` clause, the
-`appsettings.Production.json` block).
+Writing a method body, SQL statement, or YAML block in the FS or a new node because
+the implementation looks "obvious." Phase 2 names structures; Phase 3 writes them.
+→ Full narrative + disguised variants: [`plan/anti-pattern.md`](plan/anti-pattern.md)
+(load at first-time Phase 2 entry).
 
 ---
 
@@ -145,21 +142,31 @@ readers should re-read those on each new Phase 2.
 
 | Operation | Sections to read |
 |---|---|
-| Phase 2 entry (first time) | [Checklist](#checklist) → [Process Flow](#process-flow) → [The Process](#the-process) |
-| Resume mid-FS authoring | [The Process → Authoring sequence](#authoring-sequence--3-4-5-interleave) + the §3/§4/§5 sub-sections |
+| Phase 2 entry (first time) | [Checklist](#checklist) → [Process Flow](#process-flow) → [The Process](#the-process) + first-time detail loads per the table below |
+| Resume mid-FS authoring | [The Process → Authoring sequence](#authoring-sequence--3-4-5-interleave) + the §3/§4/§5 stubs (load their detail files as the step fires) |
 | Context loading question | [The Process → 1. Context loading](#1-context-loading) |
 | ID-claim collision / cross-FS modify-intent conflict | [The Process → 2. ID-claim protocol](#2-id-claim-protocol) |
-| New-node canonical ingest + Phase-1-born FLW enrichment (ACT born here too) | [The Process → 3. New node canonical ingest + Phase-1-born FLW enrichment](#3-new-node-canonical-ingest--phase-1-born-flw-enrichment) |
-| CHG consumption + enrichment (FS consumes a Phase-1-born CHG) | [The Process → 4. CHG node consumption + enrichment](#4-chg-node-consumption--enrichment) |
-| Phase-2 surfaced an undeclared modify-intent | [The Process → 4a. Retroactive `touches_nodes:` loop-back (R-NEW-10)](#4a-retroactive-touches_nodes-loop-back-r-new-10) |
-| FS body authoring (Architecture / Data / Interface / Tasks) | [The Process → 5. FS authoring](#5-fs-authoring) |
+| New-node canonical ingest + Phase-1-born FLW enrichment (ACT born here too) | §3 stub + [`plan/new-node-ingest.md`](plan/new-node-ingest.md) |
+| CHG consumption + enrichment (FS consumes a Phase-1-born CHG) | §4 stub + [`plan/chg-consumption.md`](plan/chg-consumption.md) |
+| Phase-2 surfaced an undeclared modify-intent | §4a stub + [`plan/chg-consumption.md`](plan/chg-consumption.md) |
+| FS body authoring (Architecture / Data / Interface / Tasks) | §5 stub + [`plan/fs-authoring.md`](plan/fs-authoring.md) |
 | Checking Phase 2 exit readiness | [Checklist](#checklist) + [The Process → 6. FS validation loop](#6-fs-validation-loop) |
-| Common Phase 2 mistakes (mid-flow check) | [Common Mistakes](#common-mistakes) + [Red Flags](#red-flags) |
+| Common Phase 2 mistakes (mid-flow check) | [`plan/common-mistakes.md`](plan/common-mistakes.md) + [Red Flags](#red-flags) |
 | Cross-file dependencies / handoff to QA or Phase 3 | [Integration](#integration) |
 
 If your operation is not in the table or you are entering Phase 2 for
 the first time, read the full file in order: Overview → Anti-Pattern
 → When to Use → Checklist → Process Flow → The Process.
+
+## Detail files (load on demand — not at phase entry)
+
+| When | Load |
+|---|---|
+| First-time Phase 2 entry (doctrinal frame + orientation graph) | [`plan/anti-pattern.md`](plan/anti-pattern.md) + [`plan/process-flow.md`](plan/process-flow.md) |
+| Executing §3 (new node ingest / FLW enrichment) | [`plan/new-node-ingest.md`](plan/new-node-ingest.md) |
+| Any constituent FRS has non-empty `touches_nodes:` (§4), or an undeclared modify-intent surfaces (§4a) | [`plan/chg-consumption.md`](plan/chg-consumption.md) |
+| Authoring FS body prose (§5) | [`plan/fs-authoring.md`](plan/fs-authoring.md) |
+| Mid-Phase-2 quality check / reviewer audit | [`plan/common-mistakes.md`](plan/common-mistakes.md) |
 
 ---
 
@@ -188,50 +195,11 @@ FRS-coverage validation lives in §6 (the formal Phase-2 close gate) — not dup
 
 ## Process Flow
 
-```dot
-digraph plan_flow {
-    rankdir=TB;
-    node [fontname="Helvetica"];
-
-    inputs    [shape=oval,  label="Validated FRSs\n+ touched/produced nodes\n+ ADRs"];
-    ctxload   [shape=box,   label="Context loading\n(narrow-load only)"];
-    idclaim   [shape=box,   label="ID-claim protocol"];
-
-    subgraph cluster_interleave {
-        label = "§3/§4/§5 interleave in practice";
-        style = dashed;
-        color = gray;
-        fontsize = 10;
-        fsauthor  [shape=box,   label="FS authoring\n+ new node ingest\n(canonical, status: proposed)"];
-        chgemit   [shape=diamond, label="Any constituent FRS\ndeclared touches_nodes?"];
-        chgnode   [shape=box,   label="Consume Phase-1-born\nCHG(s) via\nconsumes_chgs:\n+ enrich structurally"];
-    }
-
-    fsval     [shape=diamond, label="FS validation\n(zero Blockers/Majors)?"];
-
-    out_fs    [shape=doublecircle, label="FS-NNN.md\n+ proposed nodes in canonical\n+ CHG (if any)"];
-    qatrack   [shape=doublecircle, label="QA track\n(independent session)\n→ test-plan-ingest.md"];
-    next      [shape=doublecircle, label="Phase 3 begins\n(after /clear)"];
-
-    inputs -> ctxload;
-    ctxload -> idclaim;
-    idclaim -> fsauthor;
-    fsauthor -> chgemit;
-    chgemit -> chgnode [label="yes"];
-    chgemit -> fsval   [label="no"];
-    chgnode -> fsval;
-    fsval -> fsauthor [label="fail — repair only flagged items"];
-    fsval -> out_fs   [label="pass"];
-    out_fs -> next    [label="/clear + load implementation.md"];
-    out_fs -> qatrack [label="/clear (separate QA-track cadence)", style=dashed];
-}
-```
-
-The FS-validation diamond is the **node ingest gate** — Phase 2 is not complete
-until zero Blockers and zero Majors remain. Repair is surgical, not full re-draft.
-Test plan ingest is in the QA track and runs in its own session after a separate
-`/clear` — see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-(QA-track entry is a flow boundary; intra-track session-share only between `test-suite-codegen` ↔ `qa-gate`).
+Inputs → context loading → ID-claims → §3/§4/§5 interleave → FS-validation
+diamond (the **node ingest gate** — zero Blockers / zero Majors; repair is
+surgical, not full re-draft) → outputs (FS + proposed nodes + enriched CHGs)
+→ `/clear` to Phase 3; QA track enters separately on its own cadence.
+→ Full DOT graph: [`plan/process-flow.md`](plan/process-flow.md) (load once at orientation).
 
 ---
 
@@ -375,8 +343,8 @@ Two collision signals to surface (never silently resolve):
 ### Authoring sequence — §3, §4, §5 interleave
 
 **Do not execute §3 → §4 → §5 in linear order.** The three sections
-interleave in practice. The linear presentation below is for
-completeness, not execution order. Authoring sequence:
+interleave in practice. The stub presentation below is for completeness,
+not execution order. Authoring sequence:
 
 1. **Draft the FS shell first** — frontmatter (with the FS-NNN ID
    claimed in §2) plus empty section headers. This shell lets §3's
@@ -387,378 +355,58 @@ completeness, not execution order. Authoring sequence:
    Fire the 2-file node touch as part of that ingest. Repeat per
    structure named.
 3. **Declare `consumes_chgs:` and enrich each consumed CHG** (§4).
-   The Phase-1-born CHGs already exist at the milestone-scoped `chg/`
-   home; the FS lists them in `consumes_chgs:` (subset / merge per
-   R-CHG-3) and enriches each in place — structural before/after on
-   `modifies[]`, `adds[]` mirroring new node ingest, `migration_steps[]`.
-4. **Fill the remaining FS sections** (§5 — Architecture decisions,
-   Data model, Interface contracts, Tasks, etc.) using the now-canonical
+4. **Fill the remaining FS sections** (§5) using the now-canonical
    node IDs as references rather than restating their behavior.
 
-The Process Flow diagram above shows this as the `cluster_interleave`
-subgraph (`fsauthor + new-node ingest` in one box, CHG conditional from
-that box). **First-time authors who linearize §3 → §4 → §5 hit the
+**First-time authors who linearize §3 → §4 → §5 hit the
 forward-reference problem:** a node with `fs: FS-NNN` written before
 the FS shell exists.
 
 ### 3. New node canonical ingest + Phase-1-born FLW enrichment
 
-**Two operations fire here.** (a) New Phase-2-born node files are written to canonical
-(ACT — when `produced_actor:` is set — plus ENT, CMD, STA, CON, INT, DEC, PERM, QRY).
-(b) The Phase-1-born FLW (declared in the FRS's `produced_flw:`) is **enriched in
-place** — same file, body content added, `related:` populated, `status:` unchanged
-(`proposed`). Both fire the 2-file touch independently.
+→ Load [`plan/new-node-ingest.md`](plan/new-node-ingest.md) for the full procedure.
 
-**(a) New Phase-2-born nodes.** For every node ID in the FRSs' `produces_nodes:`
-(ENT / CMD / STA / CON / INT / DEC / PERM / QRY — plus any NDF-declared
-custom-type abbreviations registered in the target component's
-`node_definitions:`) and for the ACT-NNN claimed in `produced_actor:` (when
-set), write the node file **directly to canonical** with `status: proposed`:
-
-```
-docs/<component>/nodes/<type>/<ID>-<slug>.md
-```
-
-Use the templates in [`../_templates/nodes/`](../_templates/nodes/). Set
-`status: proposed` in frontmatter. Every new node carries `source_ref` pointing back to
-the FRS and FS:
-
-```yaml
-status: proposed
-source_ref:
-  - frs: FRS-NNN
-    fs: FS-NNN
-    op: introduce
-```
-
-**Note.** `fs: FS-NNN` is a forward reference at ingest — the FS file may not yet exist
-on disk. The ID is valid because it was claimed in §2 (ID-claim protocol); the FS shell
-(frontmatter + empty section headers) is drafted at the start of §5, so the reference
-resolves within the same flow. Shape is consistent across all node templates:
-`source_ref: [{frs:, fs:, op:}]` (list-of-objects).
-
-**ACT-NNN authoring at Phase 2 (when `produced_actor:` is set).** Write the ACT file
-in full at this stage — there is no Phase-1-bare ACT body shape; the entire ACT body
-is authored here using structural language. Body shape: **Description** + **Goals**
-(reference the FRS by ID) + **Preconditions to act** (with PERM-NNN refs when
-applicable) + **Flows they initiate** (FLW-NNN IDs — real because the FLW is
-Phase-1-born) + **Commands they trigger** (CMD-NNN IDs from this FS's
-`produces_nodes:` or existing canonical) + **Queries they issue** (QRY-NNN, optional).
-`related:` populated (CMD / QRY / FLW / PERM IDs). 2-file touch (ACT file +
-`nodes/actors/index.md`). (R-NEW-2a retired 2026-05-17 — the Phase-1-bare ACT body
-shape no longer applies because the ACT is born at Phase 2.)
-
-**Phase-2 node frontmatter / body contract additions (project = APP component,
-ABP / .NET stack).** Two additions per
-[`STD-005 § Rule 11`](../standards/STD-005-abp-coding-conventions.md#rule-11--node-body-to-service-layer-mapping)
-and
-[`STD-005 § Rule 13`](../standards/STD-005-abp-coding-conventions.md#rule-13--shared-validation--schema-constants-per-module):
-
-- **FLW / QRY / CMD** nodes declare `service_layer:` in frontmatter, value
-  `domain` or `application` (default `domain`). The default is the home
-  declared by STD-005 R11 — the body lives in the `<AggregateName>Manager`
-  returning `ErrorOr<T>`. The `application` value flags an exceptional
-  AppService-resident body and requires a node-local DEC or component ADR
-  justifying the deviation (the Phase 2 validator surfaces an unjustified
-  `application` value as a Blocker).
-- **ENT** nodes declare each persisted property's validation constants
-  (max-length, range, decimal-precision, regex-pattern) in the body,
-  named to match the `<Module>Consts.cs` constants Cohort A of
-  [`ADR-009`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md)
-  will author. The ENT body names the constant (e.g.,
-  `DepartmentNameMaxLength = 128`); the actual `.cs` file is Phase 3 Cohort
-  1's deliverable. Phase 2 stops at the names + values. Numeric literals
-  in the ENT body without a constant name are a Blocker per STD-005 R13.
-
-**(b) Phase-1-born FLW enrichment.** The FLW (per `produced_flw:`) already exists in
-canonical with `status: proposed` and Phase-1-bare body shape (`related: []`, Trigger
-+ Scenarios). At Phase 2:
-
-- **FLW enrichment** — open the canonical file, populate `related:` (CMD / STA / ACT
-  IDs sequenced or referenced by this flow), restore the Trigger's `Initiating command:
-  CMD-NNN` line, and fill the Phase-2 sections: **Sequence** (ordered CMD-NNN / DEC-NNN
-  steps), **Branches and gates** (referencing Sequence step numbers), **Compensating
-  actions** (when `mode: async`), **Postconditions** (structural — ENT/STA/downstream
-  FLW refs), and **Decisions** (optional inline DEC). Scenarios stay business-language
-  from Phase 1 — do NOT rewrite them with node IDs. Fire the 2-file touch (FLW file +
-  `nodes/flows/index.md`); `status:` stays `proposed`.
-- **Source ref append** — FLW enrichment appends a Phase-2 entry to `source_ref:`
-  (`{frs: FRS-NNN, fs: FS-NNN, op: detail}`) recording the FS that enriched it,
-  leaving the Phase-1 `{frs: FRS-NNN, op: introduce}` entry intact.
-
-For FLW Scenarios specifically: the three slots (happy / edge / fault) are already
-filled at Phase 1; Phase 2 does NOT rewrite their bodies. If they're underspecified for
-the FS's coverage needs, that's a `R-NEW-10` loop-back to Phase 1.5 (§4a below) — not a
-silent rewrite here.
-
-**Fire the 2-file node touch at ingest** (see [`maintenance-discipline.md`](maintenance-discipline.md)):
-
-- [ ] Each Phase-2-born canonical node file in place at
-      `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`.
-- [ ] Row added to `docs/<component>/nodes/<type>/index.md` showing Status = `proposed`.
-      Create the file from [`../_templates/INDEX.md`](../_templates/INDEX.md) if this is
-      the first node of the type. The index row's Source column (FRS/FS) carries the
-      originating audit trail; the node frontmatter `source_ref:` carries the
-      structured form; git history carries the chronology. No `id-claims.md`
-      introduce row fires (R-NEW-9 amended 2026-05-17) and no canonical `log.md`
-      fires (see [`maintenance-discipline.md → Rule history`](maintenance-discipline.md#rule-history--canonical-logmd-retired-2026-05-16)).
-- [ ] Bidirectional `related:` back-links fired against each target in this node's
-      `related:` list (the (2 + N) touch — every target fires its own 2-file
-      touch regardless of canonical type — see `maintenance-discipline.md`).
-- [ ] For the Phase-1-born FLW enriched here: `related:` populated; Phase-2
-      sections filled (per the bullets above); `nodes/flows/index.md` Status column
-      unchanged (still `proposed`); 2-file touch fires because frontmatter `updated:`
-      and the body change are non-trivial. Status flip is Phase 3's job alone
-      (R-NEW-4).
-- [ ] For the Phase-2-born ACT (when `produced_actor:` is set): file authored
-      in full at `docs/<component>/nodes/actors/ACT-NNN-<slug>.md` with
-      `status: proposed`; row added to `nodes/actors/index.md`.
-
-**For `touches_nodes` (existing canonical nodes any constituent FRS intends to modify):
-do NOT write to canonical at Phase 2.** The canonical file is left untouched; the
-Phase-1-born CHG (consumed via `consumes_chgs:` per §4) records the intended delta
-and is enriched here with structural before/after. Phase 3 applies it.
-
-**Cross-FS dependencies.** If a new node references a `proposed` sibling-FS node that
-hasn't merged yet, declare the dependency in this FS's frontmatter:
-
-```yaml
-depends_on_specs: [FS-006]
-```
-
-Phase 3 enforces merge order from this field. An FS may **read** a sibling-FS proposed
-node via `depends_on_specs:`, but may **not** include it in its own `touches_nodes` /
-CHG `modifies[]` — proposed nodes are provisional, not modify targets.
-
-**No reciprocal back-link.** `depends_on_specs:` is one-way. At Phase 3 merge, the merger
-globs `depends_on_specs:` across all FSs in the milestone to detect dependents before
-retiring or reordering an FS. A generated "Spec dependencies" table on the milestone
-portal is a future enhancement (track in [`evolving-the-workflow.md`](evolving-the-workflow.md)).
-
-**Verify:** every `produces_nodes` ID has a canonical file at the expected path with
-`status: proposed` and an index row showing Status = `proposed`. No canonical node body
-for a `touches_nodes` ID has been touched.
-
-**On failure:** if a 2-file node touch is incomplete, complete it before moving on. If a
-`touches_nodes` ID was edited, revert — it belongs in the CHG, not in canonical yet.
-
----
+**Summary:** (a) write each Phase-2-born node (ACT when `produced_actor:` is set,
+plus ENT / CMD / STA / CON / INT / DEC / PERM / QRY and NDF-declared types) directly
+to canonical with `status: proposed` + `source_ref: [{frs:, fs:, op: introduce}]`,
+firing the 2-file touch and `related:` back-links; (b) enrich the Phase-1-born FLW
+in place (populate `related:`, Sequence, Branches, Compensating actions, structural
+Postconditions; Scenarios stay business-language; `status:` stays `proposed`).
+`touches_nodes` targets are NEVER edited at Phase 2 — their deltas live in the
+consumed CHG (§4). Sibling-FS proposed-node references go in `depends_on_specs:`.
 
 ### 4. CHG node consumption + enrichment
 
-**Birth shift (R-CHG-1).** Post-2026-05-17 cutover: CHG-NNN is born at
-**Phase 1** by the FRS whose `touches_nodes:` is non-empty — one CHG per
-FRS, parallel to `produced_flw:` / `produced_actor:`. Phase 2 **consumes**
-and **enriches**; it does not emit. The CHG file already exists at its
-permanent milestone-scoped home:
+→ Load [`plan/chg-consumption.md`](plan/chg-consumption.md) for the full procedure
+(five steps + splitting heuristics table).
 
-```
-milestones/M-NN-<slug>/chg/CHG-NNN-<slug>.md
-# CR track:
-docs/change-requests/CR-NNN-<slug>/chg/CHG-NNN-<slug>.md
-```
-
-(Pre-cutover CHGs at `specs/FS-NNN-<slug>/nodes/changes/` are
-grandfathered and stay where they are — see
-[`change-request.md`](change-request.md) for the frozen-layout callout.)
-
-**Five-step procedure.**
-
-1. **Phase 1 FRS authoring** (covered in
-   [`design.md § Phase 1`](design.md#phase-1--frs-authoring)) births the
-   per-FRS CHG at the path above with `status: draft`,
-   `source_ref: [{frs: FRS-NNN, op: modify}]`, behavior-language
-   `modifies[]`, optional milestone-level `invariants_before/after`, and
-   optional `removes[]` / `supersedes[]`. No `adds[]`, no
-   `migration_steps[]`, no structural before/after at Phase 1.
-2. **Phase 2 FS authoring declares `consumes_chgs:`** in frontmatter,
-   listing the per-FRS-born CHGs this FS owns. **Default at Phase 2:**
-   consume every CHG born by the FS's constituent FRSs. Two adjustments
-   per R-CHG-3:
-   - **Subset consumption** — consume only a subset when splitting
-     heuristics fire (different bounded context, different risk profile,
-     different reviewer). The unconsumed CHGs route to a sibling FS in the
-     same milestone. Each CHG ends up consumed by exactly one FS before
-     milestone close.
-   - **CHG merging** — at FS-authoring time, two sibling CHGs (born by
-     sibling FRSs in the same milestone) may be merged into one when they
-     target the same bounded context with matching risk and reviewer
-     profile. Procedure: retain one CHG ID; fold the other's `modifies[]`
-     and invariant deltas into it; flip the unused ID to `status:
-     deprecated` (do NOT reuse). The retained CHG's `source_ref:`
-     accumulates both originating FRS IDs.
-3. **Phase 2 FS enrichment** of each consumed CHG:
-   - **Structural before/after on each `modifies[]` entry** — the
-     business-language behavior delta the Phase 1 author wrote stays;
-     the FS author adds the structural before/after columns naming ENT
-     fields, CMD signatures, FLW Sequence step numbers, etc.
-   - **`adds[]` populated** — mirrors the new canonical nodes this FS
-     introduces under §3 (one entry per `new_nodes:` ID).
-   - **`migration_steps[]` populated** — ordered data / schema migration
-     steps required at Phase 3 merge.
-   - 2-file touch on enrichment fires the CHG file's `updated:`
-     timestamp; the milestone-scoped `chg/index.md` row (when one
-     exists — none today, per row-12 gap note) is re-synced.
-4. **Phase 2 FS validation exit** (§6 below) flips each consumed CHG's
-   `status: draft → approved`. The CHG remains at the milestone path
-   permanently.
-5. **Phase 3 merge** applies the CHG's `modifies[]` / `removes[]` /
-   `supersedes[]` deltas to canonical targets (each fires its own 2-file
-   node touch — node file + per-type `index.md` re-sync) and flips the
-   CHG's status `approved → merged` in place.
-
-**Splitting heuristics — applied at FS-consumption time** (reframed from
-the prior FRS-birth granularity table). When deciding whether sibling
-CHGs from sibling FRSs fold into one FS's `consumes_chgs:` (merge them
-into a single CHG per R-CHG-3) or route to separate FSs, apply the same
-heuristics as before:
-
-| Situation | Same bounded context? | Same risk profile? | Same reviewer? | Decision |
-|---|---|---|---|---|
-| Two FRS-born CHGs both targeting the `orders` module, both data-shape changes | ✅ | ✅ | ✅ | **Merge into one CHG** (one FS consumes; per R-CHG-3 procedure) |
-| FRS-born CHG against ENT + FRS-born CHG against CMD, same module, same reviewer | ✅ | ✅ | ✅ | **Merge into one CHG** (the type difference is not load-bearing) |
-| Config-flag CHG + DB-schema-migration CHG from sibling FRSs in same milestone | ✅ | ❌ (reversible vs destructive) | ✅ | **Keep separate** — risk profiles differ; route to separate FSs; each FS consumes its own |
-| CHG against `orders` MOD + CHG against `billing` MOD | ❌ | — | typically ❌ | **Keep separate** — unrelated bounded contexts; different stakeholder review; separate FSs |
-| Critical-path security CHG + cosmetic-copy CHG | ✅ | ❌ | typically ❌ | **Keep separate** — critical-path delta deserves its own review record |
-
-The driving heuristic: a CHG should be **atomically reviewable** — a
-reviewer should be able to approve or reject it without paging in a
-second unrelated context. If you can't summarize the CHG in one sentence
-without "and also," keep the FRS-born CHGs separate (route to different
-FSs) rather than merging them.
-
-If the FS's constituent FRSs all have empty `touches_nodes:` (pure
-additions), `consumes_chgs:` is empty. Pure additions are already
-audited by new nodes' `source_ref`, their per-type `index.md` rows,
-and git history (R-NEW-9 amended 2026-05-17 — no `id-claims.md`
-introduce row).
-
-**Verify:** every Phase-1-born CHG from this FS's constituent FRSs is
-either listed in this FS's `consumes_chgs:` (consumed here) or
-documented in the FS's "Change maps" as merged-in or routed-to-sibling.
-Every `modifies[]` entry in each consumed CHG carries structural
-before/after at Phase 2 close. Every consumed CHG's `adds[]` mirrors
-this FS's `new_nodes:` and `migration_steps[]` is filled.
-
-**On failure:** if a Phase-1-born CHG is not consumed by any FS in the
-milestone, that's a Blocker — fix at FS authoring (consume it) or merge
-it per R-CHG-3 before Phase 2 close.
-
----
+**Summary:** CHG-NNN is Phase-1-born (R-CHG-1) at the milestone-scoped `chg/` home.
+The FS declares `consumes_chgs:` (default: every CHG from its constituent FRSs;
+subset/merge per R-CHG-3 — each CHG consumed by exactly one FS) and enriches each
+in place: structural before/after on `modifies[]`, `adds[]` mirroring this FS's
+`new_nodes:`, `migration_steps[]` filled. §6 exit flips `draft → approved`;
+Phase 3 applies the deltas and flips `approved → merged`.
 
 ### 4a. Retroactive `touches_nodes:` loop-back (R-NEW-10)
 
-If FS authoring surfaces a modify-intent on a canonical node that is **not** declared in
-the FRS's Phase-1 `touches_nodes:`, this is a **claim change** — the FRS's claim surface
-is incomplete. The Phase-2 author MUST halt and loop back to Phase 1.5 rather than
-silently widen the claim from Phase 2 (which would route around the gate).
+→ Load [`plan/chg-consumption.md`](plan/chg-consumption.md) (§4a detail) for the procedure.
 
-**Procedure:**
-
-1. **Halt Phase 2 enrichment** at the moment the missing modify-intent is identified.
-   Do not stage the modify in the CHG yet; do not edit canonical.
-2. **Revise the FRS** — add the missing canonical ID to `touches_nodes:`. Update any
-   FRS body section that references the now-declared modify-intent (Brownfield impact,
-   Business rules, etc.).
-3. **Phase 1.5 delta re-run** — `/clear`, load [`design.md`](design.md), re-run **only**
-   Pass 1's existence + sanity checks on the new `touches_nodes:` entry (not a full
-   Phase 1.5 re-gate; the deltas only).
-4. **Resume Phase 2** — once the Phase 1.5 delta re-run clears, `/clear`, reload this
-   file, and continue FS authoring from where you halted. The new `touches_nodes:` entry
-   feeds into §4's CHG `modifies[]`.
-
-**Why loop-back rather than retro-declare with audit marker.** Phase-2 retro-declaration
-would let Phase 2 silently widen the FRS's claim surface — exactly the failure mode
-Phase 1.5 exists to prevent. The loop-back cost is a small Phase 1.5 delta re-run; the
-cost of silent widening is a silently expanded FS that downstream readers can't audit
-against the FRS's original claims.
-
-**Mitigation against loop-back churn.** §6 FS validation includes a Phase-2-entry
-canonical-state reconnaissance checklist item — every modify-intent the FS will require
-should already be in the FRS's `touches_nodes:` before §5 authoring commits to a body
-section that names it. The reconnaissance is the cheap catch; the loop-back is the
-correctness backstop.
-
----
+**Summary:** a modify-intent surfacing at Phase 2 that is NOT in the FRS's
+`touches_nodes:` is a claim change. Halt, revise the FRS, run a Phase 1.5 **delta**
+re-run on the new entry, then resume Phase 2. Never retro-declare from Phase 2 —
+that routes around the gate.
 
 ### 5. FS authoring
 
-The FS answers *how* to implement the user-journeys its FRSs describe. The new canonical
-nodes (status: proposed) and the CHG node carry the behavioral content. The FS prose
-references nodes by ID — it does not restate their behavior.
+→ Load [`plan/fs-authoring.md`](plan/fs-authoring.md) for the full procedure.
 
-What belongs in the FS prose: architecture decisions, data model changes, interface
-contracts, ordered tasks, dependencies, edge cases, QA verification checklist.
-What does **not** belong: code bodies, implementation file paths, class bodies, behavior
-already in a canonical DDD node (link to the canonical node instead). Structural names
-(class names, method signatures, table names, route paths) ARE the deliverable.
-
-#### Generate before converging
-
-Before settling on an architecture decision, list 2–3 genuinely different approaches
-with what each optimizes for and what it gives up. Record under "Alternatives considered"
-in the FS (see [`../_templates/FS.md`](../_templates/FS.md)).
-
-- **Real alternatives only.** If you can't write a real trade-off, drop it.
-- **Skip for obvious / low-stakes calls.** Forced alternatives are procrastination.
-- **Lead with your recommendation** and the reasoning behind it.
-- **Honor locked decisions.** Dimensions locked in `FS-NNN-CONTEXT.md` are not
-  re-litigated. Cite the lock and skip alternatives for that dimension — generate
-  alternatives only for dimensions still open.
-
-#### Promote to ADR vs file a DEC vs keep inline
-
-Every architecture decision the FS makes faces a three-way fork. Apply the discriminator
-on the spot — don't punt it.
-
-- **Promote to ADR-NNN** if the decision constrains how we'd design future features we
-  haven't met yet (stack, layering, framework idiom, tooling). Create the ADR via
-  [`authoring-adr.md → From an FS`](authoring-adr.md#three-triggers), add it to the FS's
-  `adrs:` frontmatter, and **collapse the FS prose to a reference**.
-- **File a DEC-NNN node** if the decision shapes one specific node's behavior. Written
-  directly to canonical `docs/<component>/nodes/decisions/DEC-NNN-<slug>.md` with
-  `status: proposed`.
-- **Keep inline** if the decision is small, scoped to this FS, and not reusable.
-
-The discriminator: *if it'll be referenced by future specs → ADR; if it explains why one
-specific node looks the way it does → DEC; otherwise → inline.*
-
-#### Section-by-section drafting
-
-Walk the FS template in order — Coverage → New nodes → Change maps → Architecture
-decisions → Data model → Interface contracts → Implementation tasks → Dependencies → QA
-— and pause for confirmation at **section-group boundaries** (CLAUDE.md Rule 10):
-
-| Group | Sections |
-|---|---|
-| 1. Foundation | Coverage + New nodes |
-| 2. Design rationale | Change maps + Architecture decisions |
-| 3. Structural shapes | Data model + Interface contracts |
-| 4. Execution | Implementation tasks + Dependencies + QA |
-
-Ask at most one question per group (3–4 rounds total), wait for the answer, then
-proceed through the next group. PRINCIPLES.md "one question per message" doctrine
-is preserved — each turn still carries one question; the change is cadence, not
-multiplicity. If something stops making sense partway, go back; don't paper over.
-
-#### Implementation-task cohort ordering
-
-Group and order Implementation tasks along the architectural cohorts your project's
-convention ADRs declare, so each cohort's compilation succeeds before the next starts.
-Scan `docs/<component>/adrs/index.md` for the ADR tagged `task-ordering` and consult its
-cohort table. Each task references the relevant convention ADR by ID rather than restating
-the convention.
-
-> **APP component:** [`ADR-009`](../../docs/app/adrs/ADR-009-implementation-task-cohort-ordering.md)
-> (`task-ordering` tag) — see ADR-009 § Decision for the authoritative cohort
-> table (A: Domain + Domain.Shared; B: Application + Application.Contracts;
-> C: EntityFrameworkCore; D: HttpApi + HttpApi.Host). Cross-cutting work
-> (seed contributors, `en.json`, tests) interleaves per scenario. Other
-> components: look up their own `task-ordering`-tagged ADR; if the slot is
-> empty, author the ADR before authoring Implementation tasks.
-
-Cross-cutting tasks (test scaffolding, seed data) land at the end as a final cohort or
-interleaved per scenario, but never before the cohort they validate compiles.
+**Summary:** the FS answers *how*; it references node IDs, never restates their
+behavior, and contains no syntax. Generate 2–3 real alternatives before converging
+(honor `FS-NNN-CONTEXT.md` locks). Route every architecture decision on the spot:
+future-spec-constraining → ADR; single-node rationale → DEC; small + FS-scoped →
+inline. Draft section-by-section, pausing at the four section-group boundaries
+(CLAUDE.md Rule 10, one question per round). Order Implementation tasks by the
+project's `task-ordering`-tagged ADR cohorts.
 
 ---
 
@@ -901,30 +549,8 @@ FS validation passed; the QA track may now run [`test-plan-ingest.md`](test-plan
 
 ## Common Mistakes
 
-**❌ Writing a method body or SQL statement in the FS** — Phase 2 names; Phase 3 writes.
-**✅ Name the structure** (e.g. `OrderManager.Cancel(reason)` + `Cancelled` event) and
-leave the `{ ... }` body for Phase 3.
-
-**❌ Globbing `docs/*/nodes/**` during context loading** — floods the session and violates
-the token discipline that makes the workflow sustainable.
-**✅ Narrow-load only** the node IDs declared in the FRSs' `touches_nodes` and
-`produces_nodes`, plus exactly one `related` hop (per R-LOAD-1).
-
-**❌ Editing an existing canonical node body during Phase 2** — canonical nodes are the
-source of truth; mid-phase edits create un-audited drift.
-**✅ Emit a CHG node** documenting the intended delta; Phase 3 applies it.
-
-**❌ Silently resolving an ID collision** — two FSs claiming the same ID creates invisible
-Phase 3 merge conflicts.
-**✅ Surface the collision** immediately, stop allocation, and reconcile before proceeding.
-
-**❌ Listing a CHG in `consumes_chgs:` for a pure-addition FS** — there is no CHG to consume
-when no canonical node is being modified (post-cutover CHGs are born at Phase 1 only when
-the FRS declares non-empty `touches_nodes:`).
-**✅ Only populate `consumes_chgs:` when at least one constituent FRS declared
-non-empty `touches_nodes:`** — pure additions are audited by `source_ref`, the
-per-type `index.md` row, and git history (R-NEW-9 amended 2026-05-17 — no
-`id-claims.md` introduce row).
+→ Full ❌/✅ pairs: [`plan/common-mistakes.md`](plan/common-mistakes.md) (load for a
+mid-Phase-2 quality check). Compact form: the [Red Flags](#red-flags) list below.
 
 ---
 
@@ -945,14 +571,10 @@ per-type `index.md` row, and git history (R-NEW-9 amended 2026-05-17 — no
 
 ## Integration
 
-- **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-  "Plans contain no syntax" is the doctrinal anchor of this flow's HARD-GATE; "Read the
-  per-type `index.md` before globbing" governs the context-loading step; "Canonical edits
-  use tiered touch" governs every node ingest fired here.
-- **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase pipeline, retrieval
-  discipline, in-flight `status: proposed` rule, CHG-emission rule.
-- **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) — doctrinal anti-patterns
-  the FS-validation gate enforces.
+- **Required before:** same as all dev-track flows —
+  [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) (here especially:
+  "Plans contain no syntax", "Read the per-type `index.md` before globbing",
+  tiered touch), [`../WORKFLOW.md`](../WORKFLOW.md), [`../PRINCIPLES.md`](../PRINCIPLES.md).
 - **Required before (entry):** [`design.md`](design.md) — produces the validated FRS set
   this flow consumes.
 - **Routes to (QA track):** [`test-plan-ingest.md`](test-plan-ingest.md) — runs as an independent flow in the QA track, in its own session. Logical sequencing only: this file's FS validation must pass before the QA track's first flow can begin. No same-session requirement; no `/clear` exception.

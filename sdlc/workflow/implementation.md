@@ -36,6 +36,12 @@ The audit trail is the index row's Status column + git history; no
 canonical `log.md` (retired 2026-05-16). See
 [`maintenance-discipline.md`](maintenance-discipline.md).
 
+> **Core/detail layout.** This is the core file — wholesale-read at Phase 3
+> entry. Situational detail lives in [`implementation/`](implementation/)
+> detail files, loaded on demand per the
+> [Detail files](#detail-files-load-on-demand--not-at-phase-entry) table.
+> Every binding gate (HARD-GATE, checklists) is in this file.
+
 <HARD-GATE>
 Do NOT begin Stage 2 (Code) until every Stage 1 (Merge) exit criterion is green — every new node flipped `proposed → active`, every CHG delta applied to canonical with the matching per-type `index.md` rows re-synced (including any ADR status changes), every CHG flipped `approved → merged`. Coding against a still-`proposed` node, or against a CHG-targeted canonical node that hasn't yet received its delta, breaks the source-of-truth invariant the Merge stage exists to maintain.
 (Cross-cutting rules: see [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) — "Tiered touch for canonical edits".)
@@ -104,32 +110,38 @@ Applies CHG deltas + Flips statuses + Writes code; (QA track flows, independent 
 
 ## Section routing
 
-Single-service / monolith projects skip [Multi-repo Phase 3 model](#multi-repo-phase-3-model) entirely —
-it covers branch-coherence and per-SVC stack discipline that only
-apply when an FS declares `service_repos:`. Skipping that section
-removes ~1,800 chars from the entry-time read.
+Single-service / monolith projects never load
+[`implementation/multi-repo.md`](implementation/multi-repo.md) — it covers
+branch-coherence and per-SVC stack discipline that only apply when an FS
+declares `service_repos:`.
 
 If you've loaded this file for a specific issue mid-flow (rather than
 at Phase 3 entry), route by operation:
 
 | Operation | Sections to read |
 |---|---|
-| Phase 3 entry (first time, monolith) | [Checklist](#checklist) → [Process Flow](#process-flow) → [The Process](#the-process); skip Multi-repo |
-| Phase 3 entry (first time, multi-service) | Same as above + [Multi-repo Phase 3 model](#multi-repo-phase-3-model) |
+| Phase 3 entry (first time, monolith) | [Checklist](#checklist) → [Process Flow](#process-flow) → [The Process](#the-process) |
+| Phase 3 entry (first time, multi-service) | Same as above + [`implementation/multi-repo.md`](implementation/multi-repo.md) |
 | Resume after dependency unblocked | [Stage 1 — Merge](#stage-1--merge) (Step 0 only) |
 | Stage 1 merge of new nodes / CHGs | [Stage 1 — Merge](#stage-1--merge) + [Checklist — Stage 1 Merge exit](#checklist--stage-1-merge-exit-before-stage-2) |
 | Stage 2 code generation | [Stage 2 — Code](#stage-2--code) (conventions: ADRs / STDs / CCCs) |
-| Canonical node edit during Stage 2 | [Node content updates (during implementation)](#node-content-updates-during-implementation) |
-| Status flip during Stage 2 | [Status transitions (during implementation)](#status-transitions-during-implementation) |
-| Task needs research | [Pattern 1 — Task needs research](#pattern-1--task-needs-research) |
-| Task hits a bug | [Pattern 2 — Task encounters a bug](#pattern-2--task-encounters-a-bug) |
-| Task too big | [Pattern 3 — Task is too big](#pattern-3--task-is-too-big) |
-| Internal service surfaces | [Pattern 4 — Task reveals an internal service needing its own design](#pattern-4--task-reveals-an-internal-service-needing-its-own-design) |
-| Pre-merge branch check (multi-repo) | [Pre-merge branch-coherence check](#pre-merge-branch-coherence-check) |
+| Dispatching per-layer coding sub-agents | [`implementation/stage2-dispatch.md`](implementation/stage2-dispatch.md) |
+| Canonical node edit / status flip during Stage 2 | [`implementation/node-sync.md`](implementation/node-sync.md) |
+| Task needs research / hits a bug / too big / internal service surfaces | [`implementation/task-patterns.md`](implementation/task-patterns.md) |
+| Pre-merge branch check (multi-repo) | [`implementation/multi-repo.md`](implementation/multi-repo.md) |
 
 The **HARD-GATE** callout near the top and
 [Anti-Pattern: "The Shortcut Merge"](#anti-pattern-the-shortcut-merge) are
 doctrinal — re-read on each new Phase 3 even when routing.
+
+## Detail files (load on demand — not at phase entry)
+
+| When | Load |
+|---|---|
+| FS's `service_repos:` is non-empty (multi-service) | [`implementation/multi-repo.md`](implementation/multi-repo.md) |
+| Dispatching per-layer coding sub-agents | [`implementation/stage2-dispatch.md`](implementation/stage2-dispatch.md) |
+| A canonical node / ADR needs an edit or status flip during Stage 2 | [`implementation/node-sync.md`](implementation/node-sync.md) |
+| A task hits a non-standard situation (research / bug / too big / new service) | [`implementation/task-patterns.md`](implementation/task-patterns.md) |
 
 ---
 
@@ -408,7 +420,7 @@ indexes form the conformance set [`qa-gate.md`](qa-gate.md) verifies.
 
 Cohort ordering inside the FS's Implementation tasks maps to these ADRs —
 see
-[`plan.md → Implementation-task cohort ordering`](plan.md#implementation-task-cohort-ordering)
+[`plan/fs-authoring.md → Implementation-task cohort ordering`](plan/fs-authoring.md#implementation-task-cohort-ordering)
 and the project's `task-ordering`-tagged ADR (look up
 `docs/<component>/adrs/index.md`; in the originating project this is APP
 `ADR-009-implementation-task-cohort-ordering.md`). When such an ADR
@@ -417,7 +429,9 @@ per-cohort STD/CCC anchors, and per-cohort parallel-dispatch
 eligibility (file-disjoint subagents within a cohort per
 [`agent-contracts.md § Dispatch shapes`](agent-contracts.md#dispatch-shapes)).
 When the project has not yet authored one, the engine-default Round
-structure under § Stage 2 Code below applies as-is.
+structure in
+[`implementation/stage2-dispatch.md`](implementation/stage2-dispatch.md)
+applies as-is.
 
 **Build validation between cohorts.** After each cohort's code lands,
 run your project's build command (declared in
@@ -434,30 +448,15 @@ ADR-009 § Rationale).
 
 ### Stage 2 Code — per-layer dispatch
 
-**Precondition:** the orchestrator MAY dispatch per-layer agents only when the
-FS's "Implementation tasks" rows for the target cohort are mechanically
-specified — each row names the file path, type name, method signatures, and
-references the relevant CHG `adds[]` / `modifies[]` entries. Vague rows
-("implement the query") fall back to main-session authoring per
-[`sdlc/PRINCIPLES.md`](../PRINCIPLES.md) ("Mechanical work ≠ judgment work").
+→ Load [`implementation/stage2-dispatch.md`](implementation/stage2-dispatch.md)
+when dispatching per-layer sub-agents.
 
-Round structure (engine default; a project `task-ordering`-tagged ADR, where present, overrides):
-
-**Round 1 (Cohort A):** parallel — `shared` agent + `domain` agent.
-Each loads `sdlc/standards/by-layer/<shared|domain>.md` + `cross-cutting.md`. Build-gate after round.
-
-**Round 2 (Cohort B):** parallel — `contracts` agent + `application` agent.
-Each loads its pointer file + `cross-cutting.md`. Build-gate after round.
-
-**Round 3 (Cohort C):** `infrastructure` agent.
-Loads `sdlc/standards/by-layer/infrastructure.md` + `cross-cutting.md`. Build-gate after round.
-
-Cohort D (`HttpApi.Host`) stays in the main session — no pointer file is defined in this plan.
-
-Per-round file-disjointness: each agent writes only to its ABP project root (STD-005 R9.2).
-Cross-layer references go through already-merged code from earlier cohorts — not concurrent writes.
-
-Agent envelope: per [`agent-contracts.md § Code-writing dispatch`](agent-contracts.md#code-writing-dispatch).
+**Summary:** dispatch only when the cohort's task rows are mechanically
+specified (file path, type name, signatures, CHG refs) — vague rows stay in
+the main session. Engine default: Round 1 = Cohort A (shared ∥ domain),
+Round 2 = Cohort B (contracts ∥ application), Round 3 = Cohort C
+(infrastructure), Cohort D in main session; build-gate after each round;
+per-agent writes confined to its ABP project root.
 
 Four disciplines distinguish this from "just write the code":
 
@@ -465,8 +464,7 @@ Four disciplines distinguish this from "just write the code":
 wrong — missing an invariant, wrong transition, wrong contract — update the
 canonical node, not just the code. The knowledge base is only useful if it
 stays current with what the code actually does. Each such edit fires an
-`updated` entry per the [Node content updates](#node-content-updates-during-implementation)
-section below.
+`updated` entry per [`implementation/node-sync.md`](implementation/node-sync.md).
 
 **Honor the ADRs.** Decisions captured in the FS's declared ADRs (and the
 convention-tagged ADRs from the index) are not optional. If an FRS or node
@@ -502,112 +500,27 @@ QA-track operator owns the cadence — informational handoff, not a directive �
 close depends on the QA track's final flow ([`qa-gate.md`](qa-gate.md)) flipping the FS to
 `implemented`.
 
-### Node content updates (during implementation)
+### Node content updates / status transitions (during implementation)
 
-The "Keep canonical nodes in sync" discipline above produces content
-edits on canonical nodes — implementation reveals a node was missing an
-invariant, had a wrong transition, or stated a wrong contract, and the
-canonical node gets edited to match reality. These follow the 2-file
-node touch under
-[`maintenance-discipline.md`](maintenance-discipline.md).
+→ Load [`implementation/node-sync.md`](implementation/node-sync.md) when a
+canonical node or ADR needs an edit or lifecycle flip during Stage 2.
 
-- [ ] For every canonical node whose content is edited during
-      implementation:
-      - [ ] Per-type `index.md` row re-synced if the one-line summary,
-            tags, or source changed. (No re-sync needed for purely internal
-            edits that don't change those fields — the node file edit
-            alone is the 1-file-of-2 in that case; the index row simply
-            doesn't need updating.)
-- [ ] Conversely: no silent canonical edits. If you can't write a git
-      commit message that names the reason for the edit, the edit isn't
-      ready — either the FS should have declared it, or you're drifting
-      outside the slice.
-
-### Status transitions (during implementation)
-
-Implementation routinely flips canonical node and ADR lifecycle states — a
-node moves `active → superseded` when its replacement lands; an ADR moves
-`accepted → deprecated` (or `superseded`) when an implementation deviation
-forces it. Each side fires its own touch per
-[`maintenance-discipline.md`](maintenance-discipline.md).
-No silent flips.
-
-- [ ] For every canonical node whose status changes during implementation
-      (2-file node touch):
-      - [ ] Frontmatter `status:` updated on the node file.
-      - [ ] Per-type `index.md` row's Status column re-synced; if status
-            is terminal (`superseded` / `deprecated`), row moved to the
-            Superseded/deprecated section.
-- [ ] For every ADR whose status changes during implementation
-      (2-file ADR touch):
-      - [ ] ADR frontmatter `status:` updated on the file.
-      - [ ] `adrs/index.md` row's Status column re-synced (moved to the
-            Superseded/deprecated section if applicable).
-      - [ ] If superseding: successor ADR authored via the full procedure
-            in [`authoring-adr.md → Steps`](authoring-adr.md#steps-all-triggers).
-
----
+**Summary:** content edits fire the 2-file node touch (index re-sync only
+when summary/tags/source changed); status flips (node or ADR) always fire
+the 2-file touch, with terminal statuses moving the index row to the
+Superseded/deprecated section; ADR supersession routes to
+[`authoring-adr.md`](authoring-adr.md). No silent edits, no silent flips.
 
 ### Task-level patterns
 
-Tasks are first-class within an FS (the Implementation tasks section with
-cohort ordering). They do **not** have their own node type. Task-level issues
-are handled by existing facilities — Exploration for research, bug-fix for
-adjacent bugs, FRS escalation for new scope. Four patterns cover the common
-cases.
+→ Load [`implementation/task-patterns.md`](implementation/task-patterns.md)
+when a task hits a non-standard situation.
 
-#### Pattern 1 — Task needs research
-
-A task requires exploration or option evaluation before it can be executed.
-
-1. Pause the task.
-2. Author an Exploration at workspace level (see
-   [`../_templates/EXPLORATION.md`](../_templates/EXPLORATION.md)).
-   If falsifiable, fill `hypothesis:` / `harness:` / `success_criteria:`
-   (the shape is detected from `hypothesis:` presence); if
-   alternative-evaluation, the body lays out options. Set `tag:` if it
-   helps the index — `tag:` is free-form on Exploration.
-3. Annotate the FS task: `Blocked on: docs/exploration/EXP-<slug>.md`.
-4. Continue non-critical-path tasks, or pause the FS.
-5. When the Exploration reaches `status: done`, update the task with
-   the chosen direction and resume.
-
-#### Pattern 2 — Task encounters a bug
-
-- **Bug in scope** (the task IS fixing this exact thing, or the bug
-  blocks intended behavior): fix as part of the task. No separate artifact.
-- **Bug adjacent to scope** (encountered while working on something
-  else): raise a bug-fix Exploration per [`bug-fix.md`](bug-fix.md); fix on
-  a separate `fix/<slug>` branch; do not drive-by-fix inside the FS branch.
-
-Drive-by refactors of code the FS doesn't require is already an anti-pattern
-in [`../PRINCIPLES.md`](../PRINCIPLES.md). The same discipline applies to bugs.
-
-#### Pattern 3 — Task is too big
-
-- **Same user-journey, deeper than expected:** split into T<N>a /
-  T<N>b / T<N>c within the FS. The user-journey decomposition was
-  right; task decomposition needs refinement.
-- **Genuinely new scope discovered:** pause; raise an OQ; either
-  expand the FS (if still one user-journey) or add a new FRS to the
-  milestone covering the new scope; revalidate; continue.
-- **New internal service / component surfaces:** see Pattern 4.
-
-#### Pattern 4 — Task reveals an internal service needing its own design
-
-Discriminator: *would another FS later want to consume this service
-directly?*
-
-- **No** — it's an internal implementation detail of this feature.
-  Tasks within the current FS. Any research is an Exploration; result
-  feeds back to the tasks.
-- **Yes** — it's a real deliverable. Pause; raise an OQ; author a new
-  FRS (and likely FS) for the service under the same milestone (or a
-  new milestone if scope is broader). The original FS declares
-  `depends_on_specs: [FS-NNN-new-service]`. Phase 3 enforces merge
-  order — the new service merges first.
-
----
+**Summary:** tasks have no node type; the four patterns route to existing
+facilities — needs-research → Exploration; adjacent bug → `fix/<slug>`
+branch per [`bug-fix.md`](bug-fix.md); too-big → split tasks or raise an
+OQ/new FRS; internal-service-surfaces → discriminate on "would another FS
+consume it?" (no → internal tasks; yes → new FRS + `depends_on_specs:`).
 
 ---
 
@@ -626,93 +539,26 @@ directly?*
 
 ## Multi-repo Phase 3 model
 
-> Applies only when the project is multi-service. Single-service /
-> monolith projects skip this section; the FS's `service_repos:` is
-> empty.
+→ Load [`implementation/multi-repo.md`](implementation/multi-repo.md) — applies
+only when the FS declares non-empty `service_repos:`; monolith projects skip.
 
-Service repos are clones **inside** the workspace repo. The workspace
-`.gitignore` excludes every `*-repo/` path; each service repo keeps its
-own git history and tracks code commits independently of the planning
-workspace.
-
-```
-workspace/                          # this repo
-  .gitignore                        # ignores *-repo/
-  CLAUDE.md
-  sdlc/
-  docs/
-  ui-repo/                          # clone of the UI service repo
-  api-repo/                         # clone of the API service repo
-  fraud-detection-repo/             # clone of the stream-processor repo
-  ...
-```
-
-Workspace root is the agent's CWD; service-relative paths look like
-`./api-repo/src/controllers/...`. No worktrees, no submodules.
-
-### Pre-merge branch-coherence check
-
-Before Stage 1 Merge begins, run:
-
-```
-sdlc/scripts/check-branch-coherence.sh docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/FS-NNN.md
-```
-
-The script reads `service_repos:` from the FS frontmatter and verifies
-every listed repo is on `feat/FS-NNN-<slug>`. Any mismatch halts Phase
-3 — the merge does not begin until every service repo is on the
-expected branch. The script also flags missing clones (paths declared
-in `service_repos:` but absent from disk).
-
-A monolith FS — `service_repos:` empty — skips the check trivially
-(the script exits 0 with "no service_repos declared").
-
-### Stage 2 Code across repos
-
-Code edits in Stage 2 land in the appropriate service repo's working
-tree. Each service repo's commit history is independent; the workspace
-does not track those commits. The FS's `merge_sha:` records the **workspace**
-HEAD at merge time — service-repo SHAs live in each service repo's own
-log.
-
-### Reading tech stack across repos
-
-[`Context loading`](#context-loading-before-merging-or-coding) reads
-`docs/shared/tech-stack.md` wholesale for cross-cutting infrastructure. In
-multi-service projects, **also** read the `## Stack` section of every
-SVC node listed in (or implied by) the FS's `service_repos:` — that is
-where per-service runtime, build, test, and deploy commands live. See
-[Per-SVC stack discipline](#per-svc-stack-discipline) below.
-
-### Per-SVC stack discipline
-
-`docs/shared/tech-stack.md` carries **cross-cutting** shared infrastructure
-only — Kafka cluster, databases, observability stack, CI/CD platform,
-language / ecosystem standards, project-wide runtime state. **Per-service**
-runtime, repo URL, branch convention, directory layout, build / test /
-run / deploy commands, environment variables, and deploy target live
-in each SVC node's `## Stack` section. Linking nodes to the stack they
-use is **implicit by containment**: an ENT in MOD-NNN realized by
-SVC-NNN uses SVC-NNN's stack; no per-node tech link.
-
-Source: `sdlc-framework-refinement-v3.md` Δ5 + Δ8.
+**Summary:** service repos are git-ignored clones inside the workspace;
+`check-branch-coherence.sh` gates Stage 1 (every repo on `feat/FS-NNN-<slug>`);
+Stage 2 code lands in service-repo working trees (workspace `merge_sha:` only);
+cross-cutting stack lives in `docs/shared/tech-stack.md`, per-service stack in
+each SVC node's `## Stack` section (implicit-by-containment linking).
 
 ---
 
 ## Integration
 
-- **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules)
-  — "Tiered touch for canonical edits" anchors every Stage 1 Merge
-  touch; "Existing nodes are authoritative" governs Stage 2 Code; "Read
-  the per-type index.md before globbing" governs context loading.
-- **Required before:** [`../WORKFLOW.md`](../WORKFLOW.md) — phase
-  pipeline, retrieval discipline,
-  [`Maintenance discipline`](./maintenance-discipline.md)
-  for the 2-file touch (node, ADR, CCC) fired here.
-- **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
-  doctrinal anti-patterns this stage enforces ("Silent node or ADR
-  edits"; "Editing a canonical node outside an active Phase 3 merge";
-  "If it can drift, the operation isn't atomic enough").
+- **Required before:** same as all dev-track flows —
+  [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) (here
+  especially: tiered touch, "Existing nodes are authoritative", per-type
+  index before globbing), [`../WORKFLOW.md`](../WORKFLOW.md),
+  [`../PRINCIPLES.md`](../PRINCIPLES.md) ("Silent node or ADR edits";
+  "Editing a canonical node outside an active Phase 3 merge"; "If it can
+  drift, the operation isn't atomic enough").
 - **Required before (entry):** [`plan.md`](plan.md) — produces the
   approved FS + proposed nodes + approved CHG this flow consumes.
 - **Rule books wholesale-read during this flow:**

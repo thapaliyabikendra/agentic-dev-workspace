@@ -62,7 +62,7 @@ Two further tracks run alongside the dev track: the **QA track** (`test-plan-ing
 
 **Hard gates** (full list in [`CLAUDE.md § Hard rules`](CLAUDE.md)): run `/clear` and reload the next flow file at every *flow* boundary — context that survives a boundary is a bug, not a feature; every FRS / FS must declare `stack:` **and** `framework:` frontmatter (mandatory since 2026-05-22); never commit without explicit per-commit authorization.
 
-**Slash commands**: `.claude/commands/` carries one command per operation (`/author-frs`, `/author-fs`, `/implement-milestone`, `/open-milestone`, `/test-plan`, `/test-suite`, `/plan`, `/execute-plan`, `/absorb-codebase`, `/create-prototype`, `/api-integration`, `/review-staged`, `/review-prototype-merge`, `/commit-staged`, `/handoff`). Commands are thin wrappers — if a command and its canonical flow file diverge, the flow file wins.
+**Slash commands**: `.claude/commands/` carries one command per operation. Dev track: `/open-milestone`, `/author-frs`, `/discuss`, `/author-fs`, `/implement-milestone`, `/verify-milestone`, `/close-milestone`, `/resume-milestone`. QA track: `/test-plan`, `/test-suite`. CR / defect: `/change-request`, `/bug-fix`. Maintenance & governance: `/author-adr`, `/research`, `/review`, `/kb-lint`, `/regen-roadmap`, `/derived-report`, `/absorb-concept`, `/absorb-docs`, `/absorb-codebase`, `/new-component`, `/evolve-workflow`. Prototyping & integration: `/create-prototype`, `/review-prototype-merge`, `/api-integration`, `/bootstrap-abp`. Generic tooling: `/plan`, `/execute-plan`, `/review-staged`, `/commit-staged`, `/handoff`. Commands are thin wrappers — if a command and its canonical flow file diverge, the flow file wins.
 
 ## Key entry points
 

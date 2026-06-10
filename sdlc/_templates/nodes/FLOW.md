@@ -1,4 +1,4 @@
----
+﻿---
 id: FLW-NNN
 type: flow
 title: <Flow name>
@@ -10,6 +10,8 @@ created: YYYY-MM-DD
 version: 1
 updated: YYYY-MM-DD
 # created_under: pre-2026-05-17    # GRANDFATHER-ONLY. One-off audit marker for FLWs born under the pre-cutover (pre-2026-05-17) model — exempts the node from R-NEW-8's body-shape discriminator. NOT for FLWs born after the cutover; Phase 1.5 Pass 1 flags illegitimate use as a Major finding. Currently used only by FLW-003 (per B5). Retires when FLW-003 flips to status: active at Phase 3.
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 ---
 
 # FLW-NNN: <Title>

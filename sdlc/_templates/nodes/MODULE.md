@@ -1,4 +1,4 @@
----
+﻿---
 id: MOD-NNN
 type: module
 title: <Bounded context name>
@@ -18,6 +18,8 @@ updated: YYYY-MM-DD
 ---
 
 # MOD-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > **MOD is the bounded-context node.** Engineering-facing — the unit of
 > domain invariants. Cross-cutting product capability that spans multiple

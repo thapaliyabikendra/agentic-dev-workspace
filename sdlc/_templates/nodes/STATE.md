@@ -1,4 +1,4 @@
----
+﻿---
 id: STA-NNN
 type: state
 title: <Entity name> state machine
@@ -12,6 +12,8 @@ updated: YYYY-MM-DD
 ---
 
 # STA-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 ## States
 

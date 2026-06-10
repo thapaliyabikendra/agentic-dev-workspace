@@ -1,9 +1,11 @@
----
+﻿---
 id: CHG-NNN
 type: change
 title: <Change-map title — FRS-NNN delta, or per-touchpoint slug>
 status: draft                 # draft | approved | merged | deprecated
 # source_ref: list of originating FRS IDs. Phase 1 birth: single FRS-NNN
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 # (the FRS whose touches_nodes: drove this CHG into existence). FS-time
 # merge (R-CHG-3 sibling-CHG fold) accumulates additional FRS IDs here.
 source_ref: []                # [{frs: FRS-NNN, op: modify}] · brownfield: [{absorption: <path>, op: modify}]

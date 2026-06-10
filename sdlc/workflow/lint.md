@@ -266,6 +266,32 @@ methodology concern via
 [`evolving-the-workflow.md`](evolving-the-workflow.md) rather than
 just patching each case.
 
+### `wiki-link-unresolvable`
+
+*(Added 2026-06-10 with the docs/ wiki-link convention —
+[`KB-LAYOUT.md § Wiki-link syntax`](../KB-LAYOUT.md#wiki-link-syntax-docs-only).)*
+
+**Detection.** A `[[…]]` token in any `docs/` file that either (a) does
+not parse as a valid ID form (`<PREFIX>-NNN`, `M-NN`, `PROTO-<slug>`,
+with optional `#anchor` / `|label`), or (b) parses but the structural
+glob `docs/**/<PREFIX>-NNN*.md` resolves to zero files, or (c) resolves
+to a file but the `#anchor` matches no heading.
+
+**Scan procedure.** Grep `docs/` for `\[\[([^\]]+)\]\]`; for each match,
+parse the ID, run the structural glob, and (when anchored) check the
+target's headings under GFM slug rules. The mechanical twin —
+`node sdlc/tools/engine-lint.mjs --check-wiki-links` — runs the same
+scan automatically; this manual class exists for the judgment half.
+
+**Action.** Judgment-routed, because an unresolvable wiki link is often
+*forward-looking* in an early KB (the FRS cites `[[ENT-009]]` that
+Phase 2 will ingest next week). Classify: (a) typo / wrong prefix →
+direct fix, 1-file touch; (b) forward reference to a claimed-but-unborn
+ID → leave, note the claiming artifact in the lint report; (c) reference
+to a retired/never-existing ID → open an OQ-NNN with
+`origin: workflow-evolution` asking whether the citing prose or the
+missing artifact is the gap.
+
 ## Output format
 
 When a lint pass completes, summarize as:
@@ -301,7 +327,10 @@ resolve · C2 GFM anchors resolve (normalization per
 C4 frontmatter contracts (enums parsed from
 [`../BOUNDARY.md`](../BOUNDARY.md) at runtime, never copied) · C5
 index coverage + type-catalog count claims · C6 derived-view
-staleness (warn) · C7 grandfather-registry sync (warn). Exemptions
+staleness (warn) · C7 grandfather-registry sync (warn) · CW1 docs/
+wiki-link resolution (**opt-in** via `--check-wiki-links` — off by
+default because `docs/` may legitimately not exist; mechanical twin of
+the `wiki-link-unresolvable` manual class above). Exemptions
 are logged in the run output, never silent (`_templates/` links,
 `docs/`-slot links while the KB is absent, append-only logs).
 

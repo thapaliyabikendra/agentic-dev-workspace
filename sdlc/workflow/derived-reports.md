@@ -106,6 +106,13 @@ so readers see the snapshot date and underlying wiki state.
 5. Overwrite `docs/reports/<KIND>.md`. This is a derived report, not a
    log — no append-only history kept.
 
+**Persona alignment.** The BUSINESS and TECHNICAL templates each carry a
+`## How to use this report` preamble (Business Analyst / Backend
+Architect respectively) and `docs/home.md` carries a
+`## Navigation by persona` table — these are part of the template
+contract: preserve them on every regenerate, do not trim them as
+"boilerplate." They are the KB's persona entry points.
+
 **Index-pair rule (singleton vs. multi-instance discriminator).**
 Aggregate-snapshot reports — singleton files such as
 `docs/reports/BUSINESS.md`, `docs/reports/TECHNICAL.md`, and `docs/ROADMAP.md`

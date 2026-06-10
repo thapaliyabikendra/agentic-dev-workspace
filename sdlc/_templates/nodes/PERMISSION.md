@@ -1,4 +1,4 @@
----
+﻿---
 id: PERM-NNN
 type: permission
 title: <Subject can action on resource — one line>
@@ -15,6 +15,8 @@ updated: YYYY-MM-DD
 ---
 
 # PERM-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > **First-class authorization rule.** Promote to PERM when the
 > ACT.Permissions bullet on the actor node outgrows itself — e.g., when

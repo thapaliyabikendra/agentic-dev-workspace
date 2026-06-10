@@ -1,4 +1,4 @@
----
+﻿---
 id: QRY-NNN
 type: query
 title: <Query name, Get / List / Search prefix>
@@ -12,6 +12,8 @@ updated: YYYY-MM-DD
 ---
 
 # QRY-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > **Name prefix discloses shape:** `Get…` (single record by identity),
 > `List…` (paged collection), `Search…` (filterable / faceted),

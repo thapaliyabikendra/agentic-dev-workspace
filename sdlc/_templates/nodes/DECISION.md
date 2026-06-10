@@ -1,4 +1,4 @@
----
+﻿---
 id: DEC-NNN
 type: decision
 title: <Decision title>
@@ -17,6 +17,8 @@ updated: YYYY-MM-DD
 ---
 
 # DEC-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > **Title discloses the decision, not the topic.** "Use string-stored enums
 > for workflow state fields" — not "Event strategy" or "Enum handling". The

@@ -1,4 +1,4 @@
----
+﻿---
 id: CON-NNN
 type: contract
 title: <Protocol + path/topic — short summary>
@@ -19,6 +19,8 @@ updated: YYYY-MM-DD
 ---
 
 # CON-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 > A **contract** is any inter-component surface a service exposes —
 > HTTP/gRPC route, Kafka topic, queue, ksql stream-as-channel, etc.

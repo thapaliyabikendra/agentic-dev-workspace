@@ -89,6 +89,10 @@ and surface the ambiguity as an OQ (`origin: workflow-evolution`).
 > `related:` is a bidirectional contract — every target fires its own 2-file
 > touch in the same atomic operation. The 2-file touch becomes `(2 + N)`.
 > Full procedure + worked example: [`bidirectional-link.md`](bidirectional-link.md).
+> Scoping note: `[[ID]]` wiki-link body citations
+> ([`KB-LAYOUT.md § Wiki-link syntax`](../KB-LAYOUT.md#wiki-link-syntax-docs-only))
+> are display-only — they never trigger the `(2 + N)` touch; only
+> frontmatter `related:` entries do.
 
 ## Tech-stack touch at merge
 

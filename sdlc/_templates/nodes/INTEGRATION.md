@@ -1,4 +1,4 @@
----
+﻿---
 id: INT-NNN
 type: integration
 title: <External system / service>
@@ -12,6 +12,8 @@ updated: YYYY-MM-DD
 ---
 
 # INT-NNN: <Title>
+
+> Body cross-references may use wiki links - `[[ID]]` / `[[ID|label]]` (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; docs/ only).
 
 ## System
 

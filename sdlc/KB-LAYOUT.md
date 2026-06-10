@@ -264,11 +264,60 @@ carry authoring reminders at the relevant sections.
 
 ---
 
+## Wiki-link syntax (docs/ only)
+
+**Scope.** The project KB (`docs/`) supports wiki-style ID links in body
+prose, in addition to standard GFM relative links. Engine files (`sdlc/`,
+`CLAUDE.md`, `README.md`, `.claude/commands/`) use GFM relative links
+ONLY — engine-lint C1/C2 and repo-host rendering depend on it. This
+section is the canonical home of the convention.
+
+**Forms.**
+
+| Form | Resolves to | Example |
+|---|---|---|
+| `[[ID]]` | the artifact file for that ID; rendered label = the ID | `[[ENT-001]]` |
+| `[[ID\|label]]` | same target; rendered label = the alias | `[[ENT-001\|Customer]]` |
+| `[[ID#anchor]]` | a heading inside the target (GFM slug rules — same algorithm as engine-lint C2) | `[[ENT-001#invariants]]` |
+| `[[ID#anchor\|label]]` | anchored + aliased | `[[FLW-002#happy\|happy path]]` |
+
+**Valid ID prefixes.** Any per-type-indexed artifact class: the 16-type
+catalog prefixes (ACT / ENT / CMD / QRY / FLW / STA / DEC / INT / MOD /
+SCR / CON / PERM / SVC / FA / EVT / CHG), NDF-declared custom-type
+prefixes, plus ADR, CCC, NDF, FRS, FS, M (milestone), CR, TC, OQ,
+RESEARCH, and PROTO. A `[[bracketed]]` token that does not parse as
+`<PREFIX>-NNN` (or `PROTO-<slug>` / `M-NN`) is a lint finding
+(`wiki-link-unresolvable`, [`workflow/lint.md`](workflow/lint.md)) —
+never silent text.
+
+**Resolution rule.** ID → file path is structural, not index-mediated:
+glob `docs/**/<PREFIX>-NNN*.md` — the deterministic folder layout in this
+file's node-type tree (plus LAYOUT.md for milestone / CR / discovery
+paths) makes the match unique. Retired/renamed IDs are never reused, so a
+resolved link stays stable.
+
+**Division of labor with `related:`.** Wiki links are **display-only body
+citations** — they do NOT trigger the reciprocal `related:` back-link
+touch. Only frontmatter `related:` entries fire the (2+N) bidirectional
+discipline ([`workflow/bidirectional-link.md`](workflow/bidirectional-link.md)).
+The existing rule "every `related:` ID appears as a navigable link in the
+body" is satisfied by either form — `[[INT-046#blast-radius]]` and
+`[see INT-046 §Blast radius](relative/path.md)` are equally valid; the
+wiki form is preferred for new docs/ content (shorter, rename-proof,
+tool-friendly in Obsidian / GitLab wikis).
+
+**Lint.** Manual debt class `wiki-link-unresolvable` in
+[`workflow/lint.md`](workflow/lint.md); mechanical resolution check in
+`sdlc/tools/engine-lint.mjs` behind the opt-in `--check-wiki-links` flag
+(off by default — `docs/` may legitimately not exist yet).
+
+---
+
 ## Integration
 
 **Canonical home of:** the component wiki folder structure, node-type table,
 ID-prefix list, lazy-creation rules, node content ownership when types share
-a surface, and external research tree.
+a surface, the docs/ wiki-link syntax, and external research tree.
 
 **Parent:** [`WORKFLOW.md → Knowledge base layout`](WORKFLOW.md#knowledge-base-layout) —
 WORKFLOW.md carries the always-loaded summary; this file is the full reference.
