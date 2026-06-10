@@ -34,6 +34,19 @@ files touched in this atomic operation:
 any of these is a half-fired touch — the canonical store is silently
 inconsistent until the next operation catches up.
 
+**Atomicity scope (2026-06-10).** "Same atomic operation" means one
+uninterrupted edit sequence — every file in the unit is written before
+any other operation (a different node's ingest, a commit, a phase step)
+begins. It is **not** a commit-granularity rule: one commit may carry
+many units, and a unit may sit uncommitted (CLAUDE.md Rule 11 governs
+commits separately). The unit is **per node create/edit**: one node's
+`(2 + N)` file set — the worked example's 8 files — is one unit. A bulk
+Phase 2 ingest of M nodes is M sequential units, each closed before the
+next opens — never one M-node mega-unit, which would leave an unbounded
+half-linked surface if interrupted mid-ingest. The step-4 post-op grep
+gate fires once **per unit**, at unit close — M times across a bulk
+ingest, not once at the end.
+
 **Concrete steps when `related:` changes on node A:**
 
 1. For each ID added to A's `related:`: open the target node file, add A

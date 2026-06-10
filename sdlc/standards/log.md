@@ -773,3 +773,35 @@ is demoted to adoption record (STD-007 § Provenance / § Project-specific
 deviations); historical ADR-039 mentions in this append-only log are
 intentionally left intact. Doctrine narrative:
 `workflow/rule-history.md` § NDF spec promoted (2026-06-10).
+
+## [2026-06-10] updated | STD-001 / STD-002 / STD-005 — graduation trigger + AST tooling notes
+
+Source: REVIEW-SDLC-REPORT.md Rec-05 / Rec-07.
+
+- **STD-001 (Rec-05).** New `§ Graduation trigger` (binding): the first
+  domain-layer FRS's milestone MUST carry a named task row *"Graduate
+  STD-001 (migrate STD-002 R5)"*; graduation is an atomic 3-file
+  operation (STD-001 populated, STD-002 R5 → back-link,
+  `by-layer/domain.md` R5 pointer re-pointed in the same change).
+  `deferred_until:` re-worded to point at the section; index row
+  updated in sync. Rationale: STD-002 R5 (DDD-universal) lives in a
+  `stack: [api]` standard, so index-level `applies_when` filtering
+  hides it from non-API projects; re-scoping was rejected (per-rule
+  `applies_when` has no index mechanism) — the gap is accepted and
+  bounded by the trigger.
+- **STD-002 R5.6 + STD-005 R16 (Rec-07).** Both merge-gate scans now
+  carry a **Tooling note**: base-type resolution / assignment-LHS
+  classification (R5.6) and `Disable<ISoftDelete>()` block-scope
+  containment (R16) are not grep-expressible — the gate requires
+  manual review or AST tooling (e.g., Roslyn analyzer); a Phase 3
+  agent MUST NOT report a bare grep as a passing scan. STD-005
+  § Consequences R16 bullet cross-points the note; R16's "greps"
+  wording corrected to "flags".
+
+Companion procedural edits in the same operation (no standards file):
+`workflow/plan.md` §6 checklist regrouped into §6a entry gate / §6b
+writes / §6c verifications with 4 named dependencies (Rec-03);
+`workflow/bidirectional-link.md` gained an atomicity-scope paragraph
+(per-node `(2+N)` unit; bulk ingest = M sequential units; post-op grep
+per unit) (Rec-06). Narrative: `workflow/rule-history.md`
+§ Phase-2 close gate ordered (2026-06-10).

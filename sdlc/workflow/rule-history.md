@@ -1,6 +1,6 @@
 ---
 name: rule-history
-description: "Doctrinal rule changes that shaped the current canonical-edit discipline — CCC promoted to first-class artifacts (2026-05-16), Phase 1 birth list trimmed (2026-05-17), canonical log.md retired (2026-05-16), NDF spec promoted to engine STD-007 (2026-06-10)."
+description: "Doctrinal rule changes that shaped the current canonical-edit discipline — CCC promoted to first-class artifacts (2026-05-16), Phase 1 birth list trimmed (2026-05-17), canonical log.md retired (2026-05-16), NDF spec promoted to engine STD-007 (2026-06-10), Phase-2 close gate ordered + atomicity/AST clarifications (2026-06-10)."
 applies_when:
   stack: [agnostic]
 ---
@@ -127,6 +127,31 @@ grandfathering lives at STD-007 R8 with a
 [`plan.md`](plan.md) (type-validity). Historical ADR-039 mentions in
 append-only logs are intentionally intact. Full landing record:
 [`../standards/log.md`](../standards/log.md) `[2026-06-10]`.
+
+## Phase-2 close gate ordered + atomicity/AST clarifications (2026-06-10)
+
+REVIEW-SDLC Rec-03/05/06/07 batch — four clarifications, **no rule
+content changed**:
+
+- **`plan.md` §6 (Rec-03).** The Phase-2 close gate's Blocker
+  checkboxes (formerly one flat, unordered list interleaving writes
+  with audits) are regrouped: §6a entry gate (canonical-state
+  reconnaissance) → §6b writes (confirm each §5 write landed) → §6c
+  verifications (read-only audits, run only after every §6b box).
+  Four hard dependencies named: recon precedes §5 modify-intent
+  sections; new nodes precede CHG `adds[]` + type-validity;
+  `consumes_chgs:` → CHG structural deltas → `op: modify` id-claims
+  rows; ADR filed before `adrs:` declares it. Every box's text is
+  verbatim-preserved; only grouping and order changed.
+- **`bidirectional-link.md` (Rec-06).** "Same atomic operation" scope
+  defined: one uninterrupted edit sequence per node create/edit (the
+  `(2+N)` set is one unit), not a commit-granularity rule; a bulk
+  Phase 2 ingest of M nodes is M sequential units; the post-op grep
+  gate fires per unit.
+- **STD-001 graduation trigger made binding (Rec-05)** and **STD-002
+  R5.6 / STD-005 R16 merge-gate scans tagged manual-review-or-AST
+  (Rec-07)** — standards-side record:
+  [`../standards/log.md`](../standards/log.md) `[2026-06-10] updated`.
 
 ## Integration
 

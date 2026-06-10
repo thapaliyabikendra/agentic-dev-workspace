@@ -3,7 +3,7 @@ id: STD-002
 title: Engine-level .NET implementation conventions
 status: accepted
 created: 2026-05-13
-updated: 2026-05-22
+updated: 2026-06-10
 supersedes: null
 superseded_by: null
 tags: [dotnet, application-layer, erroror, validation, localization, repository-query, encapsulation, convention]
@@ -515,7 +515,10 @@ Hits block the merge.
 **Anchor:** future STD-001 (DDD standards, placeholder). Companion
 STD-005 rules: Rule 11 (Manager carries node body), Rule 9.2 (Domain
 project folder layout). When STD-001 is authored, this rule migrates
-into it and STD-002 back-links.
+into it and STD-002 back-links; the migration fires at the trigger in
+[STD-001 § Graduation trigger](STD-001-ddd-standards.md#graduation-trigger)
+(first domain-layer FRS, named milestone task row) and re-points
+`by-layer/domain.md`'s R5 pointer in the same operation.
 
 Every property on an `AggregateRoot`, `Entity`, or owned-type is
 **private-write at the language level**. Mutation goes through named
@@ -638,6 +641,13 @@ The Phase 3 merge gate scans `<Project>.Domain/**/*.cs`:
 
 Hits block the merge.
 
+**Tooling note (2026-06-10).** Neither scan is grep-expressible: the
+first qualifier requires resolving each type's base class across files;
+the second requires classifying the assignment LHS's declaring type.
+The regex above only shortlists candidate lines. The gate is satisfied
+by **manual review or AST tooling** (e.g., a Roslyn analyzer) — a
+Phase 3 agent MUST NOT report a bare grep as a passing R5.6 scan.
+
 ---
 
 ## Consequences
@@ -686,4 +696,8 @@ justified and what the narrower rule is.
   (aggregate-root encapsulation) migrates from STD-002 to STD-001 and
   this file back-links — Rule 5's substance survives the move
   unchanged. STD-002's domain-layer scope narrows back to the
-  framework-agnostic application-layer patterns.
+  framework-agnostic application-layer patterns. The migration is
+  owned by a named task row in the first domain-layer FRS's milestone
+  and updates `by-layer/domain.md`'s R5 pointer in the same change —
+  binding procedure at
+  [STD-001 § Graduation trigger](STD-001-ddd-standards.md#graduation-trigger).

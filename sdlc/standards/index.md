@@ -45,7 +45,7 @@
 
 | ID  | Title (one line) | Status | Applies when | Tags | Source |
 | --- | ---------------- | ------ | ------------ | ---- | ------ |
-| [STD-001](STD-001-ddd-standards.md) | Engine-level DDD constraints — aggregate encapsulation, entity vs VO, identity rules, domain-event semantics (placeholder pending first FRS that touches the domain layer) | proposed | agnostic | placeholder, ddd, domain-layer | seed |
+| [STD-001](STD-001-ddd-standards.md) | Engine-level DDD constraints — aggregate encapsulation, entity vs VO, identity rules, domain-event semantics (placeholder; graduates at the first domain-layer FRS via a named milestone task row, migrating STD-002 R5 — see file § Graduation trigger) | proposed | agnostic | placeholder, ddd, domain-layer | seed |
 | [STD-002](STD-002-dotnet-coding-conventions.md) | Engine-level .NET implementation conventions (5 rules — see file § Scope) | accepted | api | dotnet, application-layer, erroror, validation, localization, repository-query, encapsulation, convention | seed |
 | [STD-003](STD-003-api-design.md) | Engine-level API design rules — verb / status code, REST/RPC choice rationale, pagination shape (placeholder pending first FRS that touches an HTTP boundary) | proposed | api | placeholder, api, http | seed |
 | [STD-004](STD-004-node-definitions.md) | Engine-level per-node-type contract guarantees — what each node type's frontmatter and body must carry (deferred pending first cross-project contract drift; NDF per STD-007 is the per-component analog; FDE pilot candidate-generalizations logged 2026-05-19) | deferred | agnostic | deferred, methodology, node-types, ndf-pilot-log | seed |

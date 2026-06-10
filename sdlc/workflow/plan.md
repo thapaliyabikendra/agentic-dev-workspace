@@ -778,8 +778,28 @@ those — not the whole FS.
 
 **Severity of the checkboxes below.** All boxes are **Blocker-tier** — any unchecked box
 prevents Phase 2 close. Major and Minor findings emerge from the self-review pass (the
-first box) and are recorded inline; Minors are noted, Majors must be repaired before
-close.
+first verification box, §6c) and are recorded inline; Minors are noted, Majors must be
+repaired before close.
+
+**Ordering (2026-06-10).** The boxes are grouped: the **entry gate** (§6a), then
+**writes** (§6b — each box confirms a §5 write landed; if unchecked, perform the
+write now), then **verifications** (§6c — read-only audits of the finished
+FS + node + CHG state). Complete every §6b box before starting §6c — an audit
+that runs before its write either fails spuriously or silently passes against
+a stale state. Four hard sequence dependencies exist (the §6b list order
+respects them); everything else within a group is order-free:
+
+1. Canonical-state reconnaissance precedes every §5 body section that names a
+   modify-intent — it is the gate's entry condition, not a close-out check.
+2. New nodes land at canonical before CHG `adds[]` can mirror `new_nodes:` and
+   before the type-validity verification can run.
+3. `consumes_chgs:` is settled, then CHG `modifies[]` structural deltas are
+   enriched, **then** their `op: modify` rows are recorded in `id-claims.md` —
+   a claims row pointing at an unenriched delta is an unauditable claim.
+4. A promoted ADR is filed and indexed before the FS's `adrs:` frontmatter
+   declares it.
+
+#### §6a Entry gate
 
 - [ ] **Canonical-state reconnaissance (Phase-2-entry).** Before §5 commits to body
       sections that name modify-intents, walk every canonical node ID the FS will
@@ -788,64 +808,35 @@ close.
       the FS requires must already be in some FRS's `touches_nodes:`. If a new one
       surfaces, fire the R-NEW-10 loop-back (§4a) before continuing — do not retro-add
       from Phase 2. Per R-NEW-10.
-- [ ] Author self-review pass — look at the FS with fresh eyes:
-  1. Placeholder scan — any "TBD", incomplete sections, or vague requirements?
-  2. Internal consistency — does the FS contradict itself or upstream inputs (FRSs, nodes)?
-  3. Scope — single coherent slice? No scope creep from adjacent FRSs?
-  4. Ambiguity — any task interpretable to build the wrong thing? Pick one interpretation and make it explicit.
-  Fix inline. No separate review file, no dispatched reviewer.
+#### §6b Writes — confirm landed; perform now if unchecked
+
+- [ ] Every new node has been written to canonical at
+      `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`; the FS's
+      "New nodes" section lists each ID and one-line summary.
+- [ ] Every new node has `source_ref` populated (`frs:`, `fs:`, `op: introduce`). Optional
+      `section:` key naming the specific FRS heading improves traceability.
 - [ ] Every Phase-1-born FLW this FS enriches now carries non-empty `related:`
       (per R-NEW-8 — narrowed to FLW only 2026-05-17; empty `related:` is the
       Phase-1-bare body-shape signal; an enriched node MUST move past that).
       Catches a malformed Phase-2 enrichment that forgets to populate `related:`.
       Phase-2-born ACT carries `related:` populated at birth (no separate
       enrichment step).
-- [ ] Every FRS acceptance criterion is **fully covered** in the Coverage table — one row
-      per Flow scenario it spans; no AC partially covered or duplicated within a scenario.
-      Criteria that cannot be mapped to a Flow scenario are raised as `OQ-NNN` files under
-      `docs/discovery/open-questions/` with `origin: fs-authoring, origin_ref: FS-NNN,
-      gate_effect: blocking` — not absorbed as loose FS prose.
-- [ ] Every covered criterion links to a Flow scenario in a canonical FLW node (new FLW
-      nodes carry `status: proposed`).
-- [ ] No node behavior or ADR text is restated in the FS prose — only referenced.
-- [ ] No syntax in the FS or in any new node (method bodies, brace bodies, SQL, YAML).
-- [ ] No unresolved design questions.
-- [ ] Every new node has been written to canonical at
-      `docs/<component>/nodes/<type>/<ID>-<slug>.md` with `status: proposed`; the FS's
-      "New nodes" section lists each ID and one-line summary.
-- [ ] No invented new nodes — every new node's `source_ref` traces to a specific FRS
-      acceptance criterion, FRS body section (Use case / Business rules / Edge cases),
-      or Phase-1-born FLW Scenario. Nodes without a traceable clause are removed,
-      promoted to a DEC, or raised as `OQ-NNN`.
-- [ ] Every new node has `source_ref` populated (`frs:`, `fs:`, `op: introduce`). Optional
-      `section:` key naming the specific FRS heading improves traceability.
-- [ ] **Phase 2 type-validity check** (per §A.2 HARD-GATE). Every node-type
-      abbreviation in `produces_nodes:` is in **either** the engine-default
-      catalog's 15 Phase-2-born canonical types (see §A.2 HARD-GATE for the
-      enumeration; CHG is Phase-1-born and out of scope here) **or** the
-      target component's `node_definitions:`
-      frontmatter. Unknown type-abbreviations are **Blockers**. Pre-existing
-      canonical nodes are grandfathered (per STD-007 R8).
-- [ ] Every CHG `modifies[]` entry consumed by this FS is recorded as `op: modify`
-      in `id-claims.md` (R-NEW-9 amended 2026-05-17 — introduce rows no longer
-      written; the per-type `index.md` row for each new node is the introduce
-      audit). No `op: modify` row duplicates a sibling FS's claim.
-- [ ] **`consumes_chgs:` cardinality check** (per R-CHG-3). Every CHG-NNN
-      in this milestone is consumed by exactly **one** FS — globbing
-      `consumes_chgs:` across the milestone's FSs returns a flat list with
-      no duplicates. Double-consumption (one CHG listed in two FSs) is a
-      **Blocker**. Zero-consumption (a Phase-1-born CHG no FS owns) is a
-      **Blocker** unless the CHG was explicitly merged into another via
-      R-CHG-3 (in which case the unused ID is `status: deprecated`).
-- [ ] Every consumed CHG has structural before/after on its `modifies[]`
-      entries (not just the Phase-1 business-language delta), `adds[]`
-      mirroring this FS's `new_nodes:`, and `migration_steps[]` filled.
 - [ ] If this FS has any constituent FRS with non-empty `touches_nodes:`,
       every such FRS's Phase-1-born CHG appears in this FS's
       `consumes_chgs:` (or is documented as merged/routed in "Change maps"
       per R-CHG-3). The CHG is **not** applied to canonical here — only
       enriched.
-- [ ] No edits to existing canonical node bodies during Phase 2.
+- [ ] Every consumed CHG has structural before/after on its `modifies[]`
+      entries (not just the Phase-1 business-language delta), `adds[]`
+      mirroring this FS's `new_nodes:`, and `migration_steps[]` filled.
+- [ ] Every CHG `modifies[]` entry consumed by this FS is recorded as `op: modify`
+      in `id-claims.md` (R-NEW-9 amended 2026-05-17 — introduce rows no longer
+      written; the per-type `index.md` row for each new node is the introduce
+      audit). No `op: modify` row duplicates a sibling FS's claim.
+- [ ] Any ADR promoted from this FS is filed under
+      `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed in `adrs/index.md`
+      (2-file touch — no `adrs/log.md`), has `fs_origin: FS-NNN`, and is
+      back-linked from the FS's `adrs:` list.
 - [ ] `adrs:` frontmatter declares every ADR consulted.
 - [ ] `standards:` frontmatter declares every STD this FS consumes (inherited
       from the constituent FRSs plus any STD newly surfaced during FS drafting).
@@ -856,14 +847,48 @@ close.
       the constituent FRSs). For each CCC, body prose cites by ID rather than
       restating the baseline. Any operation-specific deviation from a CCC is
       filed as an ADR (with `related: [CCC-NNN]`) whose ID is in `adrs:`.
-- [ ] Every architecture decision has been routed: ADR, DEC, or inline.
-- [ ] Any ADR promoted from this FS is filed under
-      `docs/<component>/adrs/ADR-NNN-<slug>.md`, indexed in `adrs/index.md`
-      (2-file touch — no `adrs/log.md`), has `fs_origin: FS-NNN`, and is
-      back-linked from the FS's `adrs:` list.
 - [ ] `depends_on_specs:` declares every sibling FS whose proposed nodes this FS references.
 - [ ] FS frontmatter: `merged: false`, `merge_sha:` left blank.
 - [ ] FS frontmatter: `test_plan_path:` left blank — filled by Test plan ingest.
+
+#### §6c Verifications — read-only; run after every §6b box is checked
+
+- [ ] Author self-review pass — look at the FS with fresh eyes:
+  1. Placeholder scan — any "TBD", incomplete sections, or vague requirements?
+  2. Internal consistency — does the FS contradict itself or upstream inputs (FRSs, nodes)?
+  3. Scope — single coherent slice? No scope creep from adjacent FRSs?
+  4. Ambiguity — any task interpretable to build the wrong thing? Pick one interpretation and make it explicit.
+  Fix inline. No separate review file, no dispatched reviewer.
+- [ ] Every FRS acceptance criterion is **fully covered** in the Coverage table — one row
+      per Flow scenario it spans; no AC partially covered or duplicated within a scenario.
+      Criteria that cannot be mapped to a Flow scenario are raised as `OQ-NNN` files under
+      `docs/discovery/open-questions/` with `origin: fs-authoring, origin_ref: FS-NNN,
+      gate_effect: blocking` — not absorbed as loose FS prose.
+- [ ] Every covered criterion links to a Flow scenario in a canonical FLW node (new FLW
+      nodes carry `status: proposed`).
+- [ ] No node behavior or ADR text is restated in the FS prose — only referenced.
+- [ ] No syntax in the FS or in any new node (method bodies, brace bodies, SQL, YAML).
+- [ ] No unresolved design questions.
+- [ ] No invented new nodes — every new node's `source_ref` traces to a specific FRS
+      acceptance criterion, FRS body section (Use case / Business rules / Edge cases),
+      or Phase-1-born FLW Scenario. Nodes without a traceable clause are removed,
+      promoted to a DEC, or raised as `OQ-NNN`.
+- [ ] **Phase 2 type-validity check** (per §A.2 HARD-GATE). Every node-type
+      abbreviation in `produces_nodes:` is in **either** the engine-default
+      catalog's 15 Phase-2-born canonical types (see §A.2 HARD-GATE for the
+      enumeration; CHG is Phase-1-born and out of scope here) **or** the
+      target component's `node_definitions:`
+      frontmatter. Unknown type-abbreviations are **Blockers**. Pre-existing
+      canonical nodes are grandfathered (per STD-007 R8).
+- [ ] **`consumes_chgs:` cardinality check** (per R-CHG-3). Every CHG-NNN
+      in this milestone is consumed by exactly **one** FS — globbing
+      `consumes_chgs:` across the milestone's FSs returns a flat list with
+      no duplicates. Double-consumption (one CHG listed in two FSs) is a
+      **Blocker**. Zero-consumption (a Phase-1-born CHG no FS owns) is a
+      **Blocker** unless the CHG was explicitly merged into another via
+      R-CHG-3 (in which case the unused ID is `status: deprecated`).
+- [ ] No edits to existing canonical node bodies during Phase 2.
+- [ ] Every architecture decision has been routed: ADR, DEC, or inline.
 
 **Phase 2 fires the 2-file node touch for each new node's `created` event (canonical
 node + per-type `index.md` row with Status = `proposed`). It does NOT modify

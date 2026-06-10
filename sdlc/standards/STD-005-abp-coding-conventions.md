@@ -3,7 +3,7 @@ id: STD-005
 title: ABP framework coding conventions
 status: accepted
 created: 2026-05-15
-updated: 2026-05-28
+updated: 2026-06-10
 supersedes: null
 superseded_by: null
 tags: [abp, dotnet, entity, dto, naming, convention, validation, controllers, manager, constants, localization-keys, exceptions, authorization, soft-delete, audit-logging, mapperly, bff, page-driven]
@@ -630,10 +630,17 @@ using (_dataFilter.Disable<ISoftDelete>())
 }
 ```
 
-The Phase 3 merge gate greps repository / Manager / AppService code
-for the `IsDeleted` token inside a LINQ `Where` clause that is **not**
+The Phase 3 merge gate flags any `IsDeleted` token inside a LINQ
+`Where` clause in repository / Manager / AppService code that is **not**
 contained in an `IDataFilter.Disable<ISoftDelete>()` `using` block —
 hits block the merge.
+
+**Tooling note (2026-06-10).** The containment test is block-scope
+analysis grep cannot express. A grep for `IsDeleted` only shortlists
+candidate lines; the inside-a-`Disable<ISoftDelete>()`-block
+determination requires **manual review or AST tooling** (e.g., a
+Roslyn analyzer). A Phase 3 agent MUST NOT report a bare grep as a
+passing R16 scan.
 
 ---
 
@@ -702,7 +709,9 @@ project under this methodology. Specifically:
     `<Project>Permissions.<Name>` constant) is flagged (Rule 15).
   - `IsDeleted` referenced inside a LINQ `Where` clause in repository / Manager /
     AppService code that is not contained in an
-    `IDataFilter.Disable<ISoftDelete>()` `using` block is flagged (Rule 16).
+    `IDataFilter.Disable<ISoftDelete>()` `using` block is flagged (Rule 16 —
+    block-scope containment; manual review or AST tooling per the Rule 16
+    tooling note, not bare grep).
   - An AppService structurally eligible for `[Audited]` (touching an aggregate
     root the FRS marks for audit) with no matching
     `Configure<AbpAuditingOptions>(...)` entry is flagged (Rule 17, cross-

@@ -3,7 +3,7 @@ id: STD-001
 title: Engine-level DDD constraints
 status: proposed
 created: 2026-05-13
-updated: 2026-05-20
+updated: 2026-06-10
 supersedes: null
 superseded_by: null
 tags: [placeholder, ddd, domain-layer]
@@ -12,7 +12,7 @@ applies_when:
   stack: [agnostic]
 source: seed
 related_adrs: []
-deferred_until: "first project FRS touches the domain layer; engine-level rules harvested from project ADR(s) at that time"
+deferred_until: "first project FRS touches the domain layer; the hosting milestone MUST carry a named STD-001-graduation task row — see § Graduation trigger"
 operative_source: "docs/<component>/adrs/ (search by tag domain-layer)"
 ---
 
@@ -44,6 +44,30 @@ project's domain-layer convention ADR(s) migrate here. Project-specific
 rules stay in `docs/<component>/adrs/`; those that prove engine-level are
 superseded by this standard via the cross-type supersession path documented
 in [`../workflow/authoring-adr.md → Cross-type supersession`](../workflow/authoring-adr.md#cross-type-supersession-adr-supersedes-dec-or-vice-versa).
+
+## Graduation trigger
+
+Graduation is **not** best-effort (REVIEW-SDLC Rec-05, 2026-06-10).
+When the first FRS touching the domain layer (any ENT or CMD in
+`touches_nodes:` / `produces_nodes:`) enters Phase 1, its milestone
+plan MUST carry a named task row — *"Graduate STD-001 (migrate STD-002
+R5)"* — so the migration has an owner and cannot silently slip. The
+graduation operation is atomic across three files:
+
+1. **This file** — populate § Standards with the harvested rules;
+   [STD-002 Rule 5](STD-002-dotnet-coding-conventions.md#rule-5--aggregate-root-encapsulation-builder-style-mutation)
+   (aggregate-root encapsulation) migrates here, substance unchanged.
+2. **STD-002** — Rule 5 body replaced by a back-link to the new home;
+   STD-002's domain-layer scope narrows (see STD-002 § Revisit if).
+3. **[`by-layer/domain.md`](by-layer/domain.md)** — the R5 row in
+   "Rules to load" and the R5 common-defects bullet re-point
+   STD-002 R5 → STD-001 R\<n\> in the same operation.
+
+Until graduation, STD-002 R5 is the operative aggregate-encapsulation
+rule. Known, accepted gap: STD-002 is `applies_when.stack: [api]`, so
+index-level filtering hides R5 from non-API projects even though the
+rule is DDD-universal — the gap is bounded by this trigger, not fixed
+by re-scoping (per-rule `applies_when` has no index mechanism).
 
 ## Consequences
 
