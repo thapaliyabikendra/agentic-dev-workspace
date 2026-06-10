@@ -1,6 +1,6 @@
 ---
 name: test-plan-ingest
-description: "Use after the generate-feat-spec FS validation loop passes (zero Blockers, zero Majors). Ingests TC files for every FRS use case, sets the FS test_plan_path frontmatter, and fills the FRS test-plan-view table. Runs as the first flow of the QA track — independent of plan.md's session."
+description: "Use after the generate-feat-spec FS validation loop passes (zero Blockers, zero Majors). Ingests TC files for every FRS use case and sets the FS test_plan_path frontmatter. Runs as the first flow of the QA track — independent of plan.md's session."
 applies_when:
   stack: [agnostic]
 ---

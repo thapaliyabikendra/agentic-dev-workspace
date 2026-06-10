@@ -229,13 +229,10 @@ The class waits for a real pinned reference to exist before it fires;
 unversioned cross-refs (`ENT-007` without `@v<M>`) are not in scope.
 
 **Pre-commit / pre-merge advisory (slot — script not yet authored).**
-A future `scripts/check-version-bump.sh` would scan staged or ranged
+A future version-bump check script would scan staged or ranged
 canonical-node edits and report `BUMP_MISSING:` for any node whose
 body / cross-reference frontmatter changed but whose `version:`
-integer did not move — advisory only, never commit-blocking. Citation
-downgraded to a slot description 2026-06-10 per
-[`cross-ref-guard.md`](cross-ref-guard.md): the script was cited as
-existing but was never authored (caught by `engine-lint` C1).
+integer did not move — advisory only, never commit-blocking.
 
 ### `index-entry-missing`
 

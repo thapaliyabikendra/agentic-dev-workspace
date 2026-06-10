@@ -63,7 +63,7 @@ sanity-sub-flavors** (`flw-coverage`, `phase-1-bare-body-shape`,
 `state-promotion-deferred`) — these record under `type: sanity` with the
 sub-flavor named in the Rationale prefix (e.g.,
 `"Blocker: phase-1-bare-body-shape — …"`). Introduction dates and
-rationale: [`frs-validation-rules/revision-history.md`](frs-validation-rules/revision-history.md).
+rationale: [`## Revision history`](#revision-history) below.
 The eight checks fan out as parallel Pass 1 dispatches; the
 Pass 2 cross-FRS sweep produces `cross-frs` rows including the
 **CHG-conflict** sub-flavor (per R-CHG-6, see
@@ -91,7 +91,7 @@ baseline pages).
 |---|---|
 | A language-trap finding fires and the worked ❌/✅ form is needed; or the FRS is prototype-sourced | [`frs-validation-rules/examples.md`](frs-validation-rules/examples.md) |
 | A named sanity sub-flavor fires (ac-single-outcome / deferred-finding-raises-oq / nfr-baseline-trace / within-frs-rule-restatement / protocol-surface-leak / external-boundary-undeclared / state-promotion-deferred) | [`frs-validation-rules/additional-rules-full.md`](frs-validation-rules/additional-rules-full.md) |
-| Auditing a rule's origin or a grandfather date | [`frs-validation-rules/revision-history.md`](frs-validation-rules/revision-history.md) |
+| Auditing a rule's origin or a grandfather date | [`## Revision history`](#revision-history) (this file) |
 
 ---
 
@@ -493,8 +493,16 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
 
 ## Revision history
 
-→ Full per-version rationale (v1.0 2026-05-11 … v1.5 2026-05-28):
-[`frs-validation-rules/revision-history.md`](frs-validation-rules/revision-history.md).
+> Load only when auditing a rule's origin or a grandfather date.
+
+| Version | Date | Source |
+|---------|------|--------|
+| 1.0 | 2026-05-11 | Absorbed from the shared FRS validation rules reference (v3.1) during workflow absorption, distilled to the project's FRS template and Phase 1.5 gate. Issue-tracker label automation, harness orchestrator dispatch, the 14-item Self-Review mnemonic legend, and per-section schema enforcement (Section-N references) were dropped — the project is filesystem-based with a different FRS template shape. Severity, bundling detection, NFR rubric, `[inferred from code]` propagation, OQ tag taxonomy, and audit reproducibility set retained. |
+| 1.1 | 2026-05-17 | Added `protocol-surface-leak` sanity sub-flavor (Major) — formalizes the "Common language traps" guidance for HTTP routes / status codes / payload shapes / OAuth2 literals / error-code string literals as an enforced finding. CON-NNN reference is the sanctioned cure; ABP public-API symbol names remain covered by ADR-001. Triggered by retroactive cleanup of FRS-001/002/003 (M-01 user-auth) on the same date. |
+| 1.2 | 2026-05-17 | Added `external-boundary-undeclared` sanity sub-flavor (Major) — formalizes that an outbound external boundary signalled by a non-`In-app` Notifications channel or a named outbound framework abstraction (`IAccountEmailer`, `IEmailSender`, `ISmsSender`, `IPushNotificationService`, named `IHttpClientFactory` clients, vendor SDK adapters) requires an `INT-NNN` node — declared in `produces_nodes:` / `touches_nodes:` or cited inline in body prose. INT-NNN reference is the sanctioned cure (parallel to CON-NNN for `protocol-surface-leak`); CCC citation does NOT exempt (CCC is policy layer, INT is boundary layer). Distributed-event publishing to external Kafka / RabbitMQ is out of this rule's scope (routes to EVT-NNN + linked CON-NNN per KB-LAYOUT). Triggered by FRS-001 M-01 audit identifying email-dispatch boundary as undeclared; companion edits in `frs-code-extraction-rules.md` (Translation discipline table) and `_templates/FRS.md` (Notifications heading prompt). |
+| 1.3 | 2026-05-17 | Added `state-promotion-deferred` sanity sub-flavor (Minor) — formalizes the STA vs. inline-on-entity discriminator newly introduced in [`KB-LAYOUT.md → Node-type discriminators`](../KB-LAYOUT.md#node-type-discriminators). Fires when an FRS describes a lifecycle transition that crosses any of the six threshold criteria (≥3 states, ≥2 transitions, named non-CMD guard, consumed domain event on transition, terminal-state semantics, illegal-transition enforcement) without declaring `STA-NNN` in `produces_nodes:` or carrying a citable inline-DEC justifying continued inline modeling. STA-NNN reference is the cure; defer path requires an inline DEC on the entity (or a paragraph in FRS Brownfield impact). Minor severity reflects that this is a modeling judgement — Phase 2 can still ingest the FRS — and matches the precedent set by `nfr-baseline-trace`. Triggered by the M-01 user-auth feedback session questioning why `ENT-001.EmailConfirmed` was modeled inline rather than as STA-001; the framework had no objective trigger for "formal state machine" beyond the ENTITY template's `(if applicable)` hedge. Companion edits in `_templates/nodes/ENTITY.md` (Lifecycle section's State machine line now cites the KB-LAYOUT discriminator). No retroactive M-01 trigger: `EmailConfirmed` (single boolean, single transition, no consumed event, no terminal handling) stays below all six criteria and remains inline. |
+| 1.4 | 2026-05-22 | Promoted "FRS uses a stack-narrow STD without declaring it in `standards:`" (`type: standard-conflict`) from Major to Blocker. The Major classification let undeclared stack-applicable STDs propagate FRS → FS, where the live FSs' `standards:` slot shipped `[]` and the QA gate's STD-conformance dispatch never fired against rules that materially applied — the failure mode that left STD-002 (.NET / ABP coding conventions: `ErrorOr<T>` returns, FluentValidation, aggregate encapsulation) invisible to FS-001 / FS-002 / FS-003. Promotion forces FRS authors to enumerate the stack-applicable STD set at Phase 1.5, closing the upstream half of the gap. Applies prospectively — pre-2026-05-22 FRSs that already cleared Phase 1.5 are grandfathered. Defense-in-depth companion edit: [`qa-gate.md`](qa-gate.md) gains a fourth code-pattern conformance dispatch (parallel to ADR / STD / CCC) that scans project-baseline patterns even when `standards:` is empty. |
+| 1.5 | 2026-05-28 | Added `[inferred from prototype]` propagation rule as peer to `[inferred from code]`, completing the input-medium symmetry: brownfield code-mining and greenfield prototype-seeding now share Phase 1.5 tag-enforcement discipline. Same Major severity on the two violations (untagged prototype-inferred item; tag stripped without OQ confirmation). Dual-tag form `[inferred from code, prototype]` covered for mixed-source extractions. Companion to new file [`frs-prototype-extraction-rules.md`](frs-prototype-extraction-rules.md) (v1.0 same date), which governs how the tag is attached at extraction time. Severity table's Major row also widened to name both tags. |
 
 ---
 

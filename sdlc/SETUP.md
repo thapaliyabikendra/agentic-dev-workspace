@@ -71,12 +71,10 @@ docs/
     COMPONENT.md             ← from sdlc/_templates/COMPONENT.md (shared variant)
     glossary.md              ← from sdlc/_templates/GLOSSARY.md
     ccc/                     ← lazy-created on first CCC (see Step 6); no log.md
-                                (canonical `log.md` retired 2026-05-16)
     tech-stack.md            ← author manually per `BOUNDARY.md` § Engine-vs-project axis
                                 (no template; 8-section structure is engine-prescribed)
     adrs/                    ← cross-component ADR store (≥2-component ADRs only)
-      index.md               ← from sdlc/_templates/INDEX.md  (ADR variant)
-                                (no log.md — canonical `log.md` retired 2026-05-16)
+      index.md               ← from sdlc/_templates/INDEX.md  (ADR variant; no log.md)
                                 Component-scoped `docs/<component>/adrs/index.md` is
                                 lazy-created on first component ADR — do not pre-seed.
   home.md                    ← stub; will be derived once nodes exist
@@ -115,7 +113,7 @@ as the per-CCC template. For each new CCC:
    [`sdlc/_templates/INDEX.md`](_templates/INDEX.md) (CCC variant — columns:
    `ID | Status | Title | Stack | Tags | Source | Updated`).
 2. Add a row to `docs/shared/ccc/index.md` (Active table). 2-file touch —
-   no `ccc/log.md` (canonical `log.md` retired 2026-05-16).
+   no `ccc/log.md`.
 
 Anything project-specific that deviates from a CCC baseline gets its own
 ADR back-linked via `related: [CCC-NNN]` in the ADR's frontmatter — the

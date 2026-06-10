@@ -54,11 +54,9 @@ live under `docs/<component>/node-definitions/` (per-component) or
 `docs/shared/node-definitions/` (cross-component promotion). See
 `## Node definitions (per-component custom types)` below.
 
-Each node-type folder gets only an `index.md` companion (no `log.md`) — per the
-2026-05-16 rule change in
+Each node-type folder gets only an `index.md` companion (no `log.md`) — per
 [`workflow/maintenance-discipline.md`](workflow/maintenance-discipline.md).
-All canonical `log.md` companions (nodes, ADRs, CCCs) were retired on
-2026-05-16; chronological audit is git history. Research
+Chronological audit is git history; only the research
 (`docs/research/log.md`) and standards (`sdlc/standards/log.md`) logs are
 retained.
 
@@ -193,8 +191,7 @@ docs/shared/ccc/                # canonical CCC tree
   CCC-NNN-<slug>.md             # individual pages, narrow-loaded
 ```
 
-No `ccc/log.md` — chronological audit is git history (canonical `log.md`
-retired 2026-05-16).
+No `ccc/log.md` — chronological audit is git history.
 
 CCC entries are *cited references*: FRSs and ADRs link by ID rather than
 restating content. Lifecycle: `proposed → accepted → superseded |
@@ -225,8 +222,8 @@ docs/shared/node-definitions/         # cross-component promotions (lazy)
   NDF-NNN-<slug>.md                  # unprefixed after promotion ADR
 ```
 
-No `node-definitions/log.md` — chronological audit is git history (canonical
-`log.md` retired 2026-05-16). Lazy-create the folder + `index.md` on first
+No `node-definitions/log.md` — chronological audit is git history.
+Lazy-create the folder + `index.md` on first
 NDF instance, per
 [`workflow/maintenance-discipline.md → Lazy creation`](workflow/maintenance-discipline.md#lazy-creation).
 NDF template: [`_templates/NDF.md`](_templates/NDF.md) (top-level — NDF

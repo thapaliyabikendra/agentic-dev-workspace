@@ -583,8 +583,8 @@ the documented failure mode that motivated the lint. Lint surface area:
 57 rule-anchor citations currently spread across the six pointer files
 (`cross-cutting.md`, `shared.md`, `domain.md`, `contracts.md`,
 `application.md`, `infrastructure.md`). Closes plan item #1; the
-remaining five items in the same plan are tracked in
-`c:\Users\bikendrathapaliya\.claude\plans\standards-folder-deferred-followups.md`.
+remaining five items in the same plan are tracked in the session plan
+(standards-folder-deferred-followups).
 
 ## [2026-05-22] plan-consolidated | BOUNDARY.md + FRS.md + FS.md + retrieval-discipline.md + frs-validation-rules.md + CLAUDE.md — `framework:` promoted to mandatory consumer-side declaration (HARD-GATE)
 
@@ -650,8 +650,8 @@ backfill; the next substantive edit to any of them MUST backfill both
   follows the 2026-05-22 hygiene-pass entry's Tier-3 deferred items
   list. Closes plan item #2; remaining four items in the same plan
   (#3 STD-001 authoring, #4 STD-005 split, #5 STD-002 split, #6 / #7 /
-  #8 trigger-gated) tracked in
-  `c:\Users\bikendrathapaliya\.claude\plans\standards-folder-deferred-followups.md`.
+  #8 trigger-gated) tracked in the session plan
+  (standards-folder-deferred-followups).
 
 ## [2026-05-22] rule-history | cross-ref-guard.md — pointer-file sub-check normalization rules tightened (em-dash + HTML-comment handling)
 
@@ -820,3 +820,27 @@ STD-006 precedent. Same operation landed the companion engine edits:
 `workflow/lint.md`, ledger-pair shape in `workflow/derived-reports.md`,
 pointer-collapse op 17 in `workflow/maintenance-discipline.md`,
 contract-first inversion in `_templates/UI-REPO-CONTRACT.md`.
+
+## [2026-06-10] plan-consolidated | Engine hygiene sweep — completed review artifacts + orphans removed, stale transition prose trimmed
+
+Files removed (all zero live inbound references): the four root review
+work-products (REVIEW-SDLC tracker + report, REVIEW-EFFICIENCY tracker +
+report — all findings terminal and harvested; provenance survives in git
+history and the citations in this log), `CLAUDE-CODE-GUIDELINES.md`
+(Karpathy guidelines — unreferenced; principles covered by
+PRINCIPLES.md), `guidelines/superpowers-skill-authoring-guide.md`
+(format never adopted), and `scripts/check-version-bump.sh` (never wired
+into a gate; `lint.md` keeps the advisory-check slot description).
+Detail-file fold: `workflow/frs-validation-rules/revision-history.md`
+folded into `frs-validation-rules.md § Revision history` (one fewer file
+hop; all three inbound links repointed). Prose trims: "retired
+2026-05-16/17" date parentheticals stripped from SETUP.md / LAYOUT.md /
+KB-LAYOUT.md layout notes (CLAUDE.md Rule 8 stays the dated canonical
+home); `maintenance-discipline.md` rule-history stubs compressed to
+anchor + pointer; BOUNDARY.md QA-session-share restatement reduced to a
+bare cross-ref; WORKFLOW.md Overview `/clear` sentence collapsed to the
+flows-table pointer; user-local plan paths in this log generalized. The
+inline revision-history tables in `frs-code-extraction-rules.md` and
+`frs-prototype-extraction-rules.md` were audited for removal but
+**kept** — they are the only home of that per-version rationale (no
+counterpart entries here or in `rule-history.md`).

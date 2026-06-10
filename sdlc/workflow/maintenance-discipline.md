@@ -215,23 +215,15 @@ redundancy.
 
 ## Rule history — CCC promoted to first-class artifacts (2026-05-16)
 
-> CCCs promoted from a single baseline file to first-class CCC-NNN artifacts
-> under `docs/shared/ccc/`. Tiered-touch covers CCCs with the same 2-file
-> shape as nodes and ADRs.
 > Full entry: [`rule-history.md#ccc-promoted-to-first-class-artifacts-2026-05-16`](rule-history.md#ccc-promoted-to-first-class-artifacts-2026-05-16).
 
 ## Rule history — Phase 1 birth list trimmed (2026-05-17)
 
-> ACT relocated from Phase 1 birth to Phase 2 birth. R-NEW-2a retired;
-> R-NEW-7 / R-NEW-8 narrowed to FLW only. Duplicate-actor detection at
-> Phase 1.5 explicitly dropped.
 > Full entry: [`rule-history.md#phase-1-birth-list-trimmed-2026-05-17`](rule-history.md#phase-1-birth-list-trimmed-2026-05-17).
 
 ## Rule history — canonical `log.md` retired (2026-05-16)
 
-> The lifecycle 3-file touch (third file was a per-type `log.md`) was retired
-> for all canonical artifacts. Nodes / ADRs / CCCs now use the 2-file touch
-> uniformly. Surviving logs: `docs/research/log.md`, `sdlc/standards/log.md`.
+> Surviving logs: `docs/research/log.md`, `sdlc/standards/log.md`.
 > Full entry: [`rule-history.md#canonical-logmd-retired-2026-05-16`](rule-history.md#canonical-logmd-retired-2026-05-16).
 
 ---

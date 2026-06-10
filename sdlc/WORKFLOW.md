@@ -37,10 +37,8 @@ CHG structurally (before/after on `modifies[]`, `adds[]`, `migration_steps[]`).
 `proposed → active` / CHGs `approved → merged`. **CR track**
 ([`workflow/change-request.md`](workflow/change-request.md)) is a lightweight
 single-FRS alternative producing a CR-scoped container. **QA track** runs as
-three flows (`test-plan-ingest` → `test-suite-codegen` → `qa-gate`).
-`/clear` boundaries: QA-track entry and between `test-plan-ingest` ↔
-`test-suite-codegen`; `test-suite-codegen` ↔ `qa-gate` is session-shared
-per CLAUDE.md Rule 5.
+three flows (`test-plan-ingest` → `test-suite-codegen` → `qa-gate`);
+`/clear` boundaries per the QA track flows table below.
 
 Three principles run through every phase:
 

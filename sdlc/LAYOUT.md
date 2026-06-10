@@ -66,7 +66,8 @@ artifact). When in doubt about where a new file goes, check here first.
                            see workflow/lint.md § Mechanical engine-lint
                            runner)
     /_templates            scaffolding for new artifacts and nodes
-                           includes INDEX.md and LOG.md for per-type pairs;
+                           includes INDEX.md for per-type indexes (LOG.md
+                           serves only the two surviving logs);
                            16 node templates (ACTOR, ENTITY, COMMAND, QUERY,
                            FLOW, STATE, DECISION, INTEGRATION + MODULE,
                            SCREEN, CONTRACT, PERMISSION, CHANGE, SERVICE,
@@ -88,7 +89,7 @@ artifact). When in doubt about where a new file goes, check here first.
     (No /docs/glossary.md.)  ← project-owned domain vocabulary lives under
                                 /shared/glossary.md
     (No /docs/cross-cutting-concerns.md.) ← NFR baselines live as per-CCC
-                                pages under /shared/ccc/ (flat doc retired 2026-05-16)
+                                pages under /shared/ccc/
     (No top-level /adrs/.) ← ADRs live under /<component>/adrs/ per
                               ## Component structure (docs/) below.
     /discovery
@@ -215,7 +216,7 @@ docs/
     adrs/                      ← only ADRs spanning ≥2 components; starts empty
     glossary.md
     ccc/                       ← per-CCC NFR baseline files (replaces flat cross-cutting-concerns.md)
-      index.md                 ← Karpathy catalog (no log.md — retired 2026-05-16)
+      index.md                 ← Karpathy catalog (no log.md)
       CCC-NNN-*.md             ← individual CCC pages
     tech-stack.md
   <component-slug>/            ← standalone component
