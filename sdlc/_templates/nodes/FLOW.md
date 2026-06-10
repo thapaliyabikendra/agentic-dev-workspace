@@ -89,6 +89,19 @@ detects the duplicate" — and Phase 2 enrichment lands the step number.
   - <expected system response: error surface, state rollback, recovery; the
     terminal state>
 
+## Journey walkthrough
+
+> **Phase 1 — optional BA enrichment.** One to three paragraphs of
+> plain-language narrative: who does what, in what order, and why it
+> matters — written for a product audience. **No node IDs, no technical
+> terms** — name actors by role ("the branch officer", not ACT-NNN) and
+> outcomes in business terms ("the order is placed", not "CMD-NNN
+> executes"). The JOURNEYS derived report
+> ([`../OVERVIEW-JOURNEYS.md`](../OVERVIEW-JOURNEYS.md)) pulls this
+> section verbatim; when omitted, the report narrates `#happy` instead.
+> Phase 2 enrichment never touches this section. Omit when the
+> Scenarios already tell the story clearly.
+
 ## Brownfield notes
 
 > **Phase 1 — optional.** Author observation about existing

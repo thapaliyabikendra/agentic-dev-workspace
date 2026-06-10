@@ -18,7 +18,7 @@ generated_at: YYYY-MM-DD
 
 | If you are… | Start here | Then read |
 | ----------- | ---------- | --------- |
-| **Business Analyst** | `docs/ROADMAP.md` → `docs/reports/BUSINESS.md` (regenerate if stale) | Milestone portals (`docs/milestones/M-NN-*/`) for scope + FRS status · open questions (`docs/discovery/open-questions/index.md`) · glossary (`docs/shared/glossary.md`) |
+| **Business Analyst** | `docs/reports/JOURNEYS.md` (regenerate if stale) → `docs/ROADMAP.md` | `docs/reports/BUSINESS.md` for milestone status · milestone portals (`docs/milestones/M-NN-*/`) for scope + FRS status · prototype catalog (`docs/prototypes/index.md`) · open questions (`docs/discovery/open-questions/index.md`) · glossary (`docs/shared/glossary.md`) |
 | **Backend Architect** | `docs/reports/TECHNICAL.md` (regenerate if stale) → ADR indexes (`docs/<component>/adrs/index.md`, `docs/shared/adrs/index.md`) | CCC baselines (`docs/shared/ccc/index.md`) · tech stack (`docs/shared/tech-stack.md`) · MOD / INT / CON / FLW per-type indexes |
 
 Reports are regenerated on demand (`/derived-report`); the per-type

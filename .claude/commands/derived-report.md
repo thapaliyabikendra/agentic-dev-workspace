@@ -1,9 +1,9 @@
 ---
-description: Regenerate a wiki-derived report under docs/reports/ — derived-reports.md. Aggregate snapshots (BUSINESS.md, TECHNICAL.md) or multi-instance category outputs (release-notes, articles, api, overviews). Build artifacts — link by ID, never hand-edit, fix the source wiki and regenerate. NOT for ROADMAP.md (that is /regen-roadmap).
-argument-hint: [report kind — business | technical | release-notes | articles | api | overviews — plus instance topic for multi-instance kinds]
+description: Regenerate a wiki-derived report under docs/reports/ — derived-reports.md. Aggregate snapshots (BUSINESS.md, TECHNICAL.md, JOURNEYS.md) or multi-instance category outputs (release-notes, articles, api, overviews). Build artifacts — link by ID, never hand-edit, fix the source wiki and regenerate. NOT for ROADMAP.md (that is /regen-roadmap).
+argument-hint: [report kind — business | technical | journeys | release-notes | articles | api | overviews — plus instance topic for multi-instance kinds]
 ---
 
-Regenerate an audience-facing derived report. Copies the kind's template, walks its `Pulls from` list (Karpathy indexes first, narrow-load per section — same retrieval discipline as Phase 2/3), fills sections with one-line summaries that **link by ID**, stamps `generated_at:` + `source_commit:`, and overwrites the output. Aggregate snapshots are singletons (`docs/reports/BUSINESS.md`, `TECHNICAL.md` — no index pair); multi-instance kinds land slug-named under `docs/reports/<category>/` with a per-category `index.md` catalog row (no `log.md` — git history is the audit).
+Regenerate an audience-facing derived report. Copies the kind's template, walks its `Pulls from` list (Karpathy indexes first, narrow-load per section — same retrieval discipline as Phase 2/3), fills sections with one-line summaries that **link by ID**, stamps `generated_at:` + `source_commit:`, and overwrites the output. Aggregate snapshots are singletons (`docs/reports/BUSINESS.md`, `TECHNICAL.md`, `JOURNEYS.md` — the BA front door — no index pair); multi-instance kinds land slug-named under `docs/reports/<category>/` with a per-category `index.md` catalog row (no `log.md` — git history is the audit).
 
 **Report kind (+ instance topic):** $ARGUMENTS
 (If empty, ask which kind — and for multi-instance kinds, which release/topic/version/feature instance.)

@@ -47,3 +47,10 @@ Command chain for reference:
 QA track: `/test-plan` →[`/clear`]→ `/test-suite` → `/verify-milestone` → `/close-milestone`
 Standalone: `/change-request` · `/bug-fix` · `/api-integration` (cross-repo `ui/` ↔ `api/` + KB)
 Reimplementation (React → Angular, ADR-040) is a Phase-3 concern, deferred to the implementation track; it is not produced here.
+
+## Related operations
+
+- `/generate-prototype` — the **reverse direction** (KB→prototype, `sdlc/workflow/prototype-generation.md`): the prototype is generated from FLW/SCR/ACT nodes rather than captured from an external artifact. Same `PROTO-<slug>` identity and disposition home.
+- `/ba-intake` — raw BA requirements → draft FLW/SCR/ACT nodes (feeds `/generate-prototype`).
+
+BA-first chain: `/ba-intake` → `/generate-prototype` → stakeholder review → `/author-frs` →[`/clear`]→ `/author-fs` →[`/clear`]→ `/implement-milestone` → `/api-integration`

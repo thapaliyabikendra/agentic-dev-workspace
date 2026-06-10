@@ -266,7 +266,7 @@ referenced by other files; load the canonical file for actual procedure.
 
 > Survey vs. Exploration discriminator, shape detection, cross-linking.
 > Full procedure: [`workflow/design.md → Pre-FRS artifact types`](workflow/design.md#pre-frs-artifact-types).
-> When the input medium is a UI prototype, see [`workflow/prototype-first.md`](workflow/prototype-first.md) for the bidirectional prototype-first operation (prototype→milestone seeding or milestone/CR→prototype validation).
+> When the input medium is a UI prototype, see [`workflow/prototype-first.md`](workflow/prototype-first.md) for the bidirectional prototype-first operation (prototype→milestone seeding or milestone/CR→prototype validation). The reverse direction — generating/updating a mock-mode prototype *from* KB nodes (BA-driven, scoped anti-regression doctrine, raw-requirements intake) — is [`workflow/prototype-generation.md`](workflow/prototype-generation.md).
 
 ### Bugs
 
@@ -309,7 +309,9 @@ referenced by other files; load the canonical file for actual procedure.
 ### Derived reports
 
 > Two output shapes under `docs/reports/`: **aggregate snapshots** —
-> singletons (`BUSINESS.md`, `TECHNICAL.md`) — and **multi-instance
+> singletons (`BUSINESS.md`, `TECHNICAL.md`, `JOURNEYS.md` — the BA
+> front door per
+> [`KB-LAYOUT.md § Persona lens`](KB-LAYOUT.md#persona-lens)) — and **multi-instance
 > category outputs** — per-instance publications under
 > `docs/reports/{release-notes,articles,api,overviews}/`, each with a
 > per-category Karpathy `index.md`. All are wiki-derived views; the
@@ -418,6 +420,7 @@ the `from_cr:` field is defined in [`_templates/FRS.md`](_templates/FRS.md).
 [`workflow/legacy-absorption.md`](workflow/legacy-absorption.md),
 [`workflow/baseline-references.md`](workflow/baseline-references.md),
 [`workflow/derived-reports.md`](workflow/derived-reports.md),
+[`workflow/prototype-generation.md`](workflow/prototype-generation.md),
 [`workflow/evolving-the-workflow.md`](workflow/evolving-the-workflow.md),
 [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md),
 [`workflow/abp-project-bootstrap.md`](workflow/abp-project-bootstrap.md),

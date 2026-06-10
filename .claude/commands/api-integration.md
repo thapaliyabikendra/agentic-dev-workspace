@@ -3,7 +3,7 @@ description: Wire a ui/ prototype page/domain from mock data to the real api/ ba
 argument-hint: [page or domain to wire — e.g. "BG review" or "/bank/bg/:id"]
 ---
 
-Wire a prototype page or domain from mock data to the real backend. This command is cross-repo: it operates mainly on the `ui/` subdir (its own git repo, nested under the working dir) and `api/` (ABP backend); KB-node extraction lands in `planning/`. Canonical pointers therefore live in `ui/docs/` and `ui/.claude/`, not under `sdlc/` — load those first.
+Wire a prototype page or domain from mock data to the real backend. This command is cross-repo: it operates mainly on the `ui/` subdir (its own git repo, nested under the working dir) and `api/` (ABP backend); KB-node extraction lands in the canonical wiki (`docs/<component>/nodes/`). Canonical pointers for the wiring protocol live in `ui/docs/` and `ui/.claude/`, not under `sdlc/` — load those first.
 
 **Page / domain to wire:** $ARGUMENTS
 (If empty, ask which page or domain before starting — this command is page-by-page.)
@@ -27,7 +27,7 @@ Verify the target page/domain is identified and the prototype screen exists befo
 
 ## Phase & boundaries
 
-Cross-repo / standalone — not bound to a numbered SDLC phase. Runs any time after a prototype screen exists; feeds KB nodes back into `planning/` as CON/SCR/PERM nodes and (via `frs-prototype-extraction-rules.md`) into FRS extraction.
+Cross-repo / standalone — not bound to a numbered SDLC phase. Runs any time after a prototype screen exists; feeds KB nodes back into `docs/<component>/nodes/` as CON/SCR/PERM nodes and (via `frs-prototype-extraction-rules.md`) into FRS extraction.
 
 High-level steps (detail owned by `ui/docs/PROTOTYPE-API-INTEGRATION.md`):
 
@@ -39,7 +39,7 @@ High-level steps (detail owned by `ui/docs/PROTOTYPE-API-INTEGRATION.md`):
 
 ## Produces
 
-Per page: `@endpoint`/`@permission`/`@implements` docblock slots declared; real caller + mock handler registered; permission guard wired UI and backend; CON-NNN, SCR-NNN, PERM-NNN nodes in `planning/`; FRS extraction queued via `PROTO-<slug>`.
+Per page: `@endpoint`/`@permission`/`@implements` docblock slots declared; real caller + mock handler registered; permission guard wired UI and backend; CON-NNN, SCR-NNN, PERM-NNN nodes in `docs/<component>/nodes/`; FRS extraction queued via `PROTO-<slug>`.
 
 ## On completion
 
@@ -48,3 +48,12 @@ See `ui/docs/PROTOTYPE-API-INTEGRATION.md` for the page-level exit checklist. Ru
 **Catalog-dark caveat:** catalog-dark routes cannot be route-guarded until their permissions are minted (per CCC-002 / backend and ADR-036 follow-up). Do not block on this — note the gap and proceed; the follow-up is a separate pass.
 
 **Commit discipline:** commits to `ui/` need explicit user authorization, per commit (rule 11). Authorization for one commit does not carry forward to the next.
+
+## Engine-side prerequisites (how a page becomes wireable)
+
+These land upstream of this command — via `/generate-prototype` (or `/create-prototype`) → `/author-frs` → Phase 2 ingest:
+
+1. `ui/docs/PROTOTYPE-API-INTEGRATION.md` exists — bootstrapped from `sdlc/_templates/UI-REPO-CONTRACT.md` (project copy wins at runtime).
+2. The screen exists in mock mode with its `@implements` docblock and screen-index entry; `PROTO-<slug>` is `adopted` (`adopted_into:` set at Phase 1.5 exit).
+3. Phase 2 has allocated SCR-NNN (+ the CON nodes the screen `invokes:`) and the back-patch pass has populated `SCR.code_ref:` (`sdlc/workflow/prototype-generation.md § Phase position`).
+4. `bun run kb:trace` is green before entry; anything else is `prototype-drift` (`sdlc/workflow/lint.md`) — resolve via scoped regeneration first.

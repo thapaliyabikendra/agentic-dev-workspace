@@ -73,9 +73,10 @@ artifact). When in doubt about where a new file goes, check here first.
                            FUNCTIONAL-AREA, EVENT — SERVICE/FUNCTIONAL-AREA opt-in
                            for multi-service topologies; CONTRACT supersedes
                            the prior ENDPOINT template 2026-05-14);
-                           plus OVERVIEW-BUSINESS.md and
-                           OVERVIEW-TECHNICAL.md for aggregate-snapshot
-                           reports, and PUBLICATION.md for the
+                           plus OVERVIEW-BUSINESS.md, OVERVIEW-TECHNICAL.md,
+                           and OVERVIEW-JOURNEYS.md for aggregate-snapshot
+                           reports, UI-REPO-CONTRACT.md for ui-repo
+                           bootstrap conventions, and PUBLICATION.md for the
                            multi-instance category outputs under
                            docs/reports/{release-notes,articles,api,overviews}/
   /docs                    project knowledge base
@@ -162,6 +163,8 @@ artifact). When in doubt about where a new file goes, check here first.
                            multi-instance.
     BUSINESS.md          ← aggregate snapshot — stakeholder business overview
     TECHNICAL.md         ← aggregate snapshot — engineering/architecture overview
+    JOURNEYS.md          ← aggregate snapshot — BA front door: user journeys
+                           in plain language (FLW/SCR/ACT-derived)
                            Note: docs/ROADMAP.md is project state
                            (milestones in-flight, stuck signals) —
                            it stays under /docs, NOT here.

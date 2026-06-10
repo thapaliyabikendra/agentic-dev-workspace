@@ -8,7 +8,8 @@ applies_when:
 > Periodic debt-scan operation. **Lint detects drift; it does not
 > regenerate artifacts.** Codifies the closed set of debt classes
 > (`orphan-node`, `stale-proposed`, `baseline-not-cited`,
-> `stale-version-ref`, `index-entry-missing`) plus the routing rule:
+> `stale-version-ref`, `index-entry-missing`, `wiki-link-unresolvable`,
+> `prototype-drift`) plus the routing rule:
 > resolution-worthy drift becomes an `OQ-NNN`; missing-index repairs
 > fire a direct tiered touch. Sibling to
 > [`derived-reports.md`](derived-reports.md) (regeneration) and
@@ -113,16 +114,18 @@ For each debt class below:
 2. Walk the relevant indexes / folders using the procedure.
 3. For each violation found, take the documented **action**.
 
-When all four classes are walked, emit a one-line summary report to the
+When all classes are walked, emit a one-line summary report to the
 session (or to the user) listing findings as
 `<debt-class> | <artifact-id> | <one-line detail>`. The report itself is
 not persisted — the OQ-NNN entries and `index.md` row updates it
 produces are the durable record.
 
-## Debt classes — initial set
+## Debt classes
 
-Four classes seed the operation. New classes are added when a pattern of
-drift becomes evident; each addition goes through
+Five classes seeded the operation (`wiki-link-unresolvable` added
+2026-06-10 with the wiki-link convention; `prototype-drift` added
+2026-06-10 with the KB→prototype generation operation). New classes are
+added when a pattern of drift becomes evident; each addition goes through
 [`evolving-the-workflow.md`](evolving-the-workflow.md) and lands here
 with detection rule, scan procedure, and action.
 
@@ -291,6 +294,38 @@ ID → leave, note the claiming artifact in the lint report; (c) reference
 to a retired/never-existing ID → open an OQ-NNN with
 `origin: workflow-evolution` asking whether the citing prose or the
 missing artifact is the gap.
+
+### `prototype-drift`
+
+*(Added 2026-06-10 with the KB→prototype generation operation —
+[`prototype-generation.md`](prototype-generation.md).)*
+
+**Detection.** Structural disagreement between a SCR node and its
+realizing ui-repo file(s): (a) a `code_ref:` path that does not exist;
+(b) a referenced file whose `@implements` docblock is missing or names a
+different ID; (c) an entity fixture whose `@entity-shape ENT-NNN
+(version: N)` docblock version no longer matches the ENT node's
+`version:` frontmatter; (d) a `screens:` row in an **adopted** PROTO
+descriptor with no corresponding screen-index entry. Semantic drift —
+the rendered screen no longer matching the SCR's Layout / UI intent
+prose — is NOT this class; it is caught at BA review and Phase 1.5,
+not by lint.
+
+**Scan procedure.** Requires the ui repo on disk; skip (and say so in
+the report) in an engine-only or docs-only checkout. Mechanical twin:
+the ui repo's `kb:trace` gate
+([`../_templates/UI-REPO-CONTRACT.md § kb:trace`](../_templates/UI-REPO-CONTRACT.md))
+runs (a)–(c) automatically; this manual class adds (d) and the routing
+judgment.
+
+**Action.** (a)/(b)/(d) → scoped regeneration via
+[`prototype-generation.md § Sub-flow B`](prototype-generation.md) — the
+KB is the source, the screen is rebuilt to match, never the reverse.
+(c) → update the fixture to the ENT's current shape (one fixture file;
+the fix propagates to every screen showing that entity). If the *node*
+is what's stale (the code moved ahead of the KB), that is a
+silent-canonical-write smell — route an OQ-NNN instead of patching
+either side.
 
 ## Output format
 

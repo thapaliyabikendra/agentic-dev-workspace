@@ -64,10 +64,11 @@ The QA track is **trigger-independent** — two flows that consume dev-track out
 | [baseline-references.md](baseline-references.md) | Lifecycle ops for `docs/shared/glossary.md` and `docs/shared/ccc/` (Add / Change / Retire / Drift detection) | Between Phase 1.5 gates when a baseline term needs updating |
 | [absorb-concept.md](absorb-concept.md) | Promotes a concept surfaced during report synthesis to a canonical KB node via RESEARCH staging | When report synthesis surfaces a concept with no canonical node (command: `/absorb-concept`) |
 | [legacy-absorption.md](legacy-absorption.md) | Ingests a legacy doc from `docs-backup/` into canonical wiki — classifies, routes to nodes/ADRs/glossary, never copies verbatim | Maintenance activity when a legacy artifact needs promotion |
-| [lint.md](lint.md) | Debt-scan — detects orphan-node, stale-proposed, baseline-not-cited, stale-version-ref, index-entry-missing | On demand (before milestone close, after long absence, periodic) |
+| [lint.md](lint.md) | Debt-scan — detects orphan-node, stale-proposed, baseline-not-cited, stale-version-ref, index-entry-missing, wiki-link-unresolvable, prototype-drift | On demand (before milestone close, after long absence, periodic) |
 | [review.md](review.md) | Review pass — QA gates, author self-review, ADR-conformance checks; files findings under `design-fit` or `execution-debt` | Phase 3 QA completion; author self-review at Phase 2 close (command: `/review`) |
 | [verify.md](verify.md) | Post-implementation UAT — walks FRS acceptance criteria in aggregate, routes gaps, produces durable `UAT.md` record | After Phase 3 QA has passed for every FS in the milestone, before milestone close |
 | [prototype-first.md](prototype-first.md) | Bidirectional prototype-first operation — build a clickable UI prototype then drive FRS authoring + reimplementation; supports prototype→milestone seeding AND milestone/CR→prototype validation | When prototype-first flow is active (either direction) |
+| [prototype-generation.md](prototype-generation.md) | KB→prototype operation (peer of prototype-first, reverse direction) — generate / incrementally update a mock-mode ui prototype from FLW/SCR/ACT nodes; raw-requirements intake sub-flow; scoped-change anti-regression doctrine | When generating or updating a prototype from KB content (commands: `/generate-prototype`, `/ba-intake`) |
 
 ---
 

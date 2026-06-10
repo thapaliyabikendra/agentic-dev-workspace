@@ -313,11 +313,51 @@ tool-friendly in Obsidian / GitLab wikis).
 
 ---
 
+## Persona lens
+
+The single canonical KB segregates by **persona view, not by content
+store**. No separate `business/` folder exists — the type taxonomy
+encodes the split, and the derived reports are the per-persona front
+doors. No `audience:` frontmatter axis exists on nodes: type identity
+IS the audience signal (a cross-cutting axis would double the
+maintenance surface for zero retrieval gain).
+
+| Node type | Authored by | Notes |
+|---|---|---|
+| FLW | **BA** at Phase 1 (Trigger, Scenarios, Journey walkthrough); Architect at Phase 2 (Sequence, Branches, wiring) | Phase 1 body is the BA surface — pure business language by template rule |
+| ACT | **BA** | Plain-language actor descriptions |
+| SCR | **BA** (Description, Layout/UI intent, Display states); Architect (`invokes:`, `code_ref:` at Phase 2/3) | BA never authors `code_ref:` |
+| STA | **BA** (state names, business meaning); Architect (guards, events) | |
+| PERM | **BA** (policy statement); Architect (technical gate) | |
+| FA | **BA** | Cross-MOD product slices |
+| glossary (`docs/shared/glossary.md`) | **BA** | |
+| ENT · CMD · QRY · CON · INT · MOD · SVC · EVT · DEC | **Architect** | BA encounters these only as names inside FLW prose |
+
+**Read access is unrestricted both ways** — BA-authored node bodies are
+plain language by design and may be read directly by anyone; the lens
+governs *authorship*, not visibility. All BA edits route through
+commands / conversational drafting (frontmatter, ID allocation, and
+index touches stay AI-handled).
+
+**Entry points:** BA → `docs/reports/JOURNEYS.md` (derived; lazy;
+template [`_templates/OVERVIEW-JOURNEYS.md`](_templates/OVERVIEW-JOURNEYS.md));
+Architect → `docs/reports/TECHNICAL.md`. Persona navigation table:
+`docs/home.md § Navigation by persona`
+([`_templates/HOME.md`](_templates/HOME.md)).
+
+**Enforcement** is convention, not lint: the Phase 1.5 body-shape
+discriminator (R-NEW-8) already flags node IDs / technical content in
+Phase-1 FLW bodies, which is the only machine-checkable boundary the
+lens needs.
+
+---
+
 ## Integration
 
 **Canonical home of:** the component wiki folder structure, node-type table,
 ID-prefix list, lazy-creation rules, node content ownership when types share
-a surface, the docs/ wiki-link syntax, and external research tree.
+a surface, the persona lens (BA vs. Architect authorship split), the docs/
+wiki-link syntax, and external research tree.
 
 **Parent:** [`WORKFLOW.md → Knowledge base layout`](WORKFLOW.md#knowledge-base-layout) —
 WORKFLOW.md carries the always-loaded summary; this file is the full reference.
