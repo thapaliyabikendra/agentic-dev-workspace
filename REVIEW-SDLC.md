@@ -1,6 +1,6 @@
 # REVIEW-SDLC.md — Framework Review Tracker
 
-> Status: COMPLETE (2026-06-10, single session)
+> Status: COMPLETE (2026-06-10, single session) · Remediation: Rec-01/02/03/05/06/07 DONE (commits `1af5253`, `7d71fab`, `ec67570` — see Session 2); Rec-04 deferred by design; Rec-08 blocked on first QA-track run
 > Started: 2026-06-10
 > Scope: review + full remediation (low- AND medium-effort fixes; HIGH-effort items → recommendations only)
 > Deliverable: [`REVIEW-SDLC-REPORT.md`](REVIEW-SDLC-REPORT.md) — 8 prioritized recommendations + 31 applied fixes
@@ -104,6 +104,10 @@ Category: drift | complexity | gap | automation | strength
 **Next step (user):** review `git diff`, then authorize commit(s) if desired — suggested batches: (1) engine fixes under sdlc/, (2) command + README fixes, (3) review tracker + report. Then pick up Rec-01 (ADR-039 promotion) or Rec-02 (lint runner) as the next work item.
 **Re-load first (future session):** REVIEW-SDLC-REPORT.md → this file → sdlc/workflow/grandfather-registry.md.
 **Open threads:** WORKFLOW.md still cites ADR-039 directly ×3 (intentional — Rec-01 scope); STD-001 graduation trigger open-ended (Rec-05); afterEach/beforeEach fixture decision pending first QA-track run (Rec-08).
+
+### Session 2 — 2026-06-10 (recommendations executed)
+**Completed:** Review edits committed (`81783fe`, `3bef751`, `451c82e`). Rec-01 DONE (`1af5253`): NDF spec promoted to engine `sdlc/standards/STD-007-ndf-governance.md` (source: harvested-from-ADR-039); 25 cite sites across 13 files re-pointed; ADR-039 demoted to adoption record; grandfather-registry gained the 2026-05-19 `declared_via:` row. Rec-02 DONE (`7d71fab`): `sdlc/tools/engine-lint.mjs` (Node ≥18, zero deps, exit 0/1, `--strict`; checks C1 links / C2 GFM anchors / C3 STD cites / C4 frontmatter contracts / C5 index coverage + count claims / C6 staleness warn / C7 registry sync warn); first run caught 8 real defects, all fixed; final run clean (147 files, 0/0). Rec-03/05/06/07 DONE (`ec67570`): plan.md §6 regrouped (§6a entry gate / §6b writes / §6c verifications, 4 named dependencies, box texts verbatim); STD-001 gained binding § Graduation trigger (named milestone task row; atomic 3-file migration incl. by-layer/domain.md R5 re-point; re-scoping R5 to [agnostic] rejected — `applies_when` is file-level, no per-rule index mechanism); bidirectional-link.md atomicity scope (per-node (2+N) unit; bulk ingest = M sequential units; post-op grep per unit); STD-002 R5.6 + STD-005 R16 tagged manual-review-or-AST. This session: tracker + report stamped with disposition.
+**Open threads (terminal state):** Rec-04 — coin the six lifecycle flow files via `evolving-the-workflow.md` on first real need (deployment likely first). Rec-08 — fixture-pattern decision (`test-data-generation.md:269`) on first QA-track run. engine-lint accepted gaps: no test harness for the script; C5 skips `workflow/abp-bootstrap/` subdir coverage; tag-citation checks + project-ID classes under `docs/` stay manual. Nothing pushed to any remote.
 
 ---
 

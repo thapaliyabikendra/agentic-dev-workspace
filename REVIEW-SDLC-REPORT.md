@@ -2,7 +2,19 @@
 
 > Reviewed: 2026-06-10 · Scope: full engine (`sdlc/` 128 files, `.claude/commands/` 15, root docs) · Method: 3 exploration agents → adversarial verification (6 agents, every finding re-checked against files before assertion) → 3 deep-dive agents → remediation.
 > Findings ledger with file:line evidence: [`REVIEW-SDLC.md`](REVIEW-SDLC.md). **31 of 40 findings fixed in this pass**; the rest are recommendations below.
-> All edits are uncommitted (CLAUDE.md Rule 11).
+> All edits are uncommitted (CLAUDE.md Rule 11). *(Historical — see Disposition.)*
+>
+> **Disposition (2026-06-10, post-review sessions).** All review edits committed
+> (`81783fe` engine fixes + grandfather-registry, `3bef751` commands + README,
+> `451c82e` this tracker + report). Recommendations executed:
+> **Rec-01 DONE** (`1af5253` — STD-007 NDF governance, all ADR-039 cites re-pointed) ·
+> **Rec-02 DONE** (`7d71fab` — `sdlc/tools/engine-lint.mjs`, 8 defects caught + fixed) ·
+> **Rec-03 / 05 / 06 / 07 DONE** (`ec67570` — plan.md §6 ordered; STD-001 graduation
+> trigger made binding, re-scope option rejected; bidirectional-link atomicity scope;
+> R5.6/R16 tagged manual-or-AST) ·
+> **Rec-04 deferred by design** (route each flow file through `evolving-the-workflow.md`
+> on first real need) · **Rec-08 blocked** until the QA track first runs.
+> Nothing pushed to a remote.
 
 ## Executive summary
 
