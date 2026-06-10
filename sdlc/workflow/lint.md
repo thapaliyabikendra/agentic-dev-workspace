@@ -49,12 +49,14 @@ canonical content and flags violations of the discipline rules in
 [`../PRINCIPLES.md`](../PRINCIPLES.md), and
 [`maintenance-discipline.md`](maintenance-discipline.md).
 
-Lint is a **named workflow operation, not a slash command and not an
-automated scanner.** Invoked by reading this file and walking through
-each debt class against the current workspace. Findings route into
-existing artifact machinery — OQ-NNN for resolution-worthy drift,
-direct tiered touch for missing-index repairs. No new artifact type
-is introduced.
+Lint is a **named workflow operation, not an automated scanner.**
+Invoked by reading this file and walking through each debt class
+against the current workspace. The `/kb-lint` slash command is an
+**invocation shim** for this operation — it loads this file and sets
+scope; it does not automate the walk or the routing judgment, which
+stay manual. Findings route into existing artifact machinery — OQ-NNN
+for resolution-worthy drift, direct tiered touch for missing-index
+repairs. No new artifact type is introduced.
 
 > **OQ `origin:` fit.** Lint findings currently route to OQ-NNN with
 > `origin: workflow-evolution` (for orphan / stale-proposed) or

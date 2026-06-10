@@ -1,6 +1,7 @@
 ---
 description: Tag a checkpoint, start a `--no-commit --no-ff` merge of a source branch, then review the merged-but-uncommitted result for regressions and conflicts. Never commits. Runs on Sonnet; user-invoked only.
 argument-hint: [source branch to merge] [path to git repo] (branch defaults to develop; repo defaults to current dir)
+model: sonnet
 disable-model-invocation: true
 ---
 

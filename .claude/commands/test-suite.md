@@ -38,4 +38,4 @@ QA track, second step. Entered after `/clear` (separating from `/test-plan`). Co
 
 ## On completion
 
-Terminal step of the QA track — no successor command. Exit per `qa-gate.md` outcome routing.
+Terminal step of the QA track. Exit per `qa-gate.md` outcome routing. Once the gate has passed for every FS in the milestone, milestone close-out follows: `/verify-milestone` (UAT confirmation — see its entry gate for when it applies) → `/close-milestone`.

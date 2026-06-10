@@ -43,5 +43,7 @@ The flow file owns the detail of each artifact.
 Flow has registered `PROTO-<slug>` (`draft`) with its screen inventory and the artifact in `raw/`. Next: `/clear` → `/author-frs <milestone> PROTO-<slug>` — Phase 0/1 then routes on input medium = prototype, consults `sdlc/workflow/frs-prototype-extraction-rules.md`, and cites the prototype via SURVEY `prototype_ref: [PROTO-<slug>]`. The `draft → adopted` flip and `adopted_into:` are set there at Phase 1.5 exit.
 
 Command chain for reference:
-`[/open-milestone] → /create-prototype → [/clear] → /author-frs` →[`/clear`]→ `/author-fs` →[`/clear`]→ `/implement-milestone`
+`/open-milestone` → [`/create-prototype` → `/clear`] → `/author-frs` →[`/clear`]→ `/author-fs` →[`/clear`]→ `/implement-milestone`
+QA track: `/test-plan` →[`/clear`]→ `/test-suite` → `/verify-milestone` → `/close-milestone`
+Standalone: `/change-request` · `/bug-fix` · `/api-integration` (cross-repo `ui/` ↔ `api/` + KB)
 Reimplementation (React → Angular, ADR-040) is a Phase-3 concern, deferred to the implementation track; it is not produced here.
