@@ -113,8 +113,9 @@ boundary with existing types isn't sharp. **The right move when an
 existing type covers ≥60% is to extend that type's template** — add
 the missing field or sub-shape, run the audit-pass against existing
 artifacts, and keep the type set sharp. Doctrinal anchor:
-[`../PRINCIPLES.md`](../PRINCIPLES.md) — *Coining a new artifact type
-when an existing one would carry the data.*
+[`../PRINCIPLES.md`](../PRINCIPLES.md) — *Coining a new node type when
+only one node would ever live under it* (canonical narrative is this
+section; PRINCIPLES.md carries the registry stub).
 
 Three forms of extension, each with its own discriminator. Apply
 sequentially — refine first, invent last.
@@ -197,8 +198,9 @@ maintained.
   — "Existing nodes are authoritative — adapt the template, don't
   retrofit." is the doctrinal anchor of this flow's HARD-GATE.
 - **Required before:** [`../PRINCIPLES.md`](../PRINCIPLES.md) —
-  "Coining a new artifact type when an existing one would carry the
-  data" is the named anti-pattern.
+  "Coining a new node type when only one node would ever live under
+  it" is the named anti-pattern (registry stub there; canonical
+  narrative in this file's Anti-Pattern section).
 - **Required before:** [`../KB-LAYOUT.md`](../KB-LAYOUT.md)
   — the existing node types this file extends.
 - **Callers (this file is wholesale-read by):**

@@ -7,7 +7,7 @@ applies_when:
 
 # Test Suite Codegen
 
-Generates Playwright (or runner-equivalent) spec files from the Phase 2 TC markdown files for a given FS. This is the **second flow of the QA track** — runs in its own session after `implementation.md`'s Stage 2 Code is complete and the developer has resolved selectors against the real DOM. Independent of any prior `implementation.md` session. **Shares session with [`qa-gate.md`](qa-gate.md)** (third QA-track flow) — no `/clear` between codegen and gate per CLAUDE.md Rule 5; gate inherits the resolved-selector + spec-emit context. Each TC becomes one test case; each use-case sub-folder becomes one spec file. Spec files are disposable — regenerated end-to-end each run; hand edits are lost.
+Generates Playwright (or runner-equivalent) spec files from the Phase 2 TC markdown files for a given FS. This is the **second flow of the QA track** — runs in its own session after `implementation.md`'s Stage 2 Code is complete and the developer has resolved selectors against the real DOM. Independent of any prior `implementation.md` session. **Shares session with [`qa-gate.md`](qa-gate.md)** (third QA-track flow) — no `/clear` between codegen and gate per CLAUDE.md HR-CLEAR; gate inherits the resolved-selector + spec-emit context. Each TC becomes one test case; each use-case sub-folder becomes one spec file. Spec files are disposable — regenerated end-to-end each run; hand edits are lost.
 
 ---
 
@@ -103,6 +103,6 @@ Surface any remaining TODOs (unresolved selectors, ambiguous step text) explicit
 ## Integration
 
 - **Triggered after:** [`implementation.md`](implementation.md) Stage 2 Code is complete. Runs in its own QA-track session — `/clear` between `implementation.md` exit and this flow.
-- **Routes to:** [`qa-gate.md`](qa-gate.md) — **session-shared** (no `/clear` between this flow and the QA gate; gate inherits codegen context per CLAUDE.md Rule 5).
+- **Routes to:** [`qa-gate.md`](qa-gate.md) — **session-shared** (no `/clear` between this flow and the QA gate; gate inherits codegen context per CLAUDE.md HR-CLEAR).
 - **Rule book:** [`test-runner-cookbook.md`](test-runner-cookbook.md) — action-inference table, code emission table, selector resolution, value substitution, auth/SSO patterns, and the full spec file template including the mandatory `createdRecords + afterEach` cleanup pattern.
 - **Test data:** [`test-data-generation.md`](test-data-generation.md) — directive interpolation for TC Test Data fields.

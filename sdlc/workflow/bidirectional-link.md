@@ -38,7 +38,7 @@ inconsistent until the next operation catches up.
 uninterrupted edit sequence — every file in the unit is written before
 any other operation (a different node's ingest, a commit, a phase step)
 begins. It is **not** a commit-granularity rule: one commit may carry
-many units, and a unit may sit uncommitted (CLAUDE.md Rule 11 governs
+many units, and a unit may sit uncommitted (CLAUDE.md HR-COMMIT governs
 commits separately). The unit is **per node create/edit**: one node's
 `(2 + N)` file set — the worked example's 8 files — is one unit. A bulk
 Phase 2 ingest of M nodes is M sequential units, each closed before the
@@ -71,6 +71,20 @@ becomes desirable, promote inline → standalone (see
 residue and missing ENT-side back-links surfaced in the 2026-05-13 DEC
 audit. See [`PRINCIPLES.md`](../PRINCIPLES.md) — *If it can drift, the
 operation isn't atomic enough.*
+
+**Orphan `related:` entries (canonical here; stub in
+[`PRINCIPLES.md`](../PRINCIPLES.md)).**
+
+- ❌ A `related:` entry with no navigable body link — an orphan pointer:
+  the frontmatter declares a dependency the prose never explains.
+- ✅ Every `related:` ID appears as a navigable link in the body prose
+  (e.g., `see INT-046 §Blast radius`) with a one-sentence context note.
+
+The reverse direction is governed by the wiki-link carve-out below:
+`related:` demands a body link; a display-only body citation demands
+nothing. A body reference that expresses a *real dependency* (the node's
+behavior changes if the target changes) still belongs in `related:` —
+the carve-out covers citations, not dependencies.
 
 **Wiki-link body citations are out of scope (2026-06-10).** A `[[ID]]` /
 `[[ID|label]]` token in docs/ body prose (convention:

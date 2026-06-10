@@ -336,7 +336,7 @@ Each is wholesale-read **only** when the matching operation fires; otherwise unr
 `/clear` map: QA-track entry (into `test-plan-ingest`) and between
 `test-plan-ingest` ↔ `test-suite-codegen`. `test-suite-codegen` and
 `qa-gate` share a session — `qa-gate` inherits codegen's reads, no
-re-load of FS / TC files / runner config (CLAUDE.md Rule 5).
+re-load of FS / TC files / runner config (CLAUDE.md HR-CLEAR).
 
 | `qa_phase` | Load |
 |------------|------|

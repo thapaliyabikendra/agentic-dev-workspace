@@ -120,7 +120,7 @@ nodes yet. This is the `/ba-intake` command's procedure.
    - SCR per described surface: Description, Layout / UI intent, Display
      states; `shows:` / `invokes:` / `observes:` stay empty (Phase 2).
    - ACT only when the actor is absent from the ACT index.
-3. **Clarify conversationally** — one question per turn (CLAUDE.md rule 10):
+3. **Clarify conversationally** — one question per turn (CLAUDE.md HR-ONE-Q):
    journey boundaries, actor identity, missing edge / fault behavior.
 4. **BA approves drafts** before any canonical ingest; then proceed to
    Sub-flow A.

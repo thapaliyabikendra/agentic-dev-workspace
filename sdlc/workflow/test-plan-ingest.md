@@ -40,6 +40,15 @@ TC-NNN-<slug>.md                 (test case, FS-staged at Phase 2)
 <use-case>.<ext>                  (test spec, tests/ folder at Phase 3)
 ```
 
+**Doctrine — QA hat is a moment, not a document** (canonical here; stub in
+[`PRINCIPLES.md`](../PRINCIPLES.md)). The Phase-1-born FLW's three scenarios
+(happy / edge / fault) *are* the test plan. The TC files carry the executable
+interpretation via their `**Traces to:**` line citing `FLW-NNN#happy` /
+`#edge` / `#fault` anchors — the trace lives on the TC, not in the FRS.
+Drafting a separate test-plan document creates a sibling that drifts; the FRS
+does not carry a Test plan view table (retired 2026-05-17 — TC `Traces to:`
+is regenerable via grep).
+
 - **FLW nodes are the behavioral source of truth.** Scenarios live as
   named anchors (`#happy`, `#edge-N`, `#fault-N`) inside the canonical
   FLW node body and are referenced — never restated — by TCs via their

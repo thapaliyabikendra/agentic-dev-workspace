@@ -13,7 +13,7 @@ Per-phase procedure lives in [`workflow/`](workflow/); doctrinal *why* lives in
 
 <HARD-GATE>
 Do NOT begin Phase 2 (Ingest), Phase 3 (Merge + Code), or the QA-track flows `test-plan-ingest.md` / `test-suite-codegen.md` without a `/clear` and a reload of
-the next flow file only. `qa-gate.md` is the exception — it shares session with `test-suite-codegen.md` and inherits codegen context (no `/clear` between them per CLAUDE.md Rule 5). Context that survives a *flow boundary* is a bug, not a feature.
+the next flow file only. `qa-gate.md` is the exception — it shares session with `test-suite-codegen.md` and inherits codegen context (no `/clear` between them per CLAUDE.md HR-CLEAR). Context that survives a *flow boundary* is a bug, not a feature.
 Detail at [## Anti-Pattern: "The Informed Skip"](#anti-pattern-the-informed-skip).
 (Cross-cutting rules: see [CLAUDE.md ## Hard rules](../CLAUDE.md#hard-rules).)
 </HARD-GATE>
@@ -133,7 +133,7 @@ criteria. **Dev track** flows respect the `/clear` boundaries at Phase 1.5→2
 and Phase 2→3. **QA track** `/clear` boundaries: on QA-track entry
 (`test-plan-ingest`) and between `test-plan-ingest` ↔ `test-suite-codegen`.
 `test-suite-codegen` ↔ `qa-gate` is session-shared (one combined flow, two
-stages) — no `/clear` between them. See [CLAUDE.md Rule 5](../CLAUDE.md#hard-rules)
+stages) — no `/clear` between them. See [CLAUDE.md HR-CLEAR](../CLAUDE.md#hard-rules)
 and [`workflow/qa-gate.md`](workflow/qa-gate.md).
 
 **Maintenance operations** sit alongside phase flows but are not tied to

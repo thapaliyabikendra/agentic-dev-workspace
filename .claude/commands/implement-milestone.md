@@ -33,4 +33,4 @@ Active nodes; applied CHG deltas; FS `merged: true` + `merge_sha:`; production c
 
 See `sdlc/workflow/implementation.md` for the exit criteria and completion marker. Hands to the QA track: `/test-plan` (then `/clear` → `/test-suite`).
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit. Authorization for one commit does not carry forward to the next.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit. Authorization for one commit does not carry forward to the next.

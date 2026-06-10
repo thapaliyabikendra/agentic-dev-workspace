@@ -27,7 +27,17 @@ docs/<component>/nodes/<type>/<ID>-<slug>.md
 ```
 
 Use the templates in [`../../_templates/nodes/`](../../_templates/nodes/). Set
-`status: proposed` in frontmatter. Every new node carries `source_ref` pointing back to
+`status: proposed` in frontmatter.
+
+**Existing nodes are authoritative — adapt the template, don't retrofit**
+(canonical detail of [`CLAUDE.md HR-NODE-AUTH`](../../../CLAUDE.md#hard-rules)).
+When existing canonical nodes of a type diverge from the current template
+shape (extra sections, established field order, legacy-but-consistent
+conventions), the new node follows the **established shape** of its
+canonical siblings; template gaps are fixed forward in
+[`../../_templates/nodes/`](../../_templates/nodes/), never by rewriting
+existing nodes to match a template change. Retrofitting existing nodes is
+a canonical edit outside an active Phase 3 merge — a process violation. Every new node carries `source_ref` pointing back to
 the FRS and FS:
 
 ```yaml

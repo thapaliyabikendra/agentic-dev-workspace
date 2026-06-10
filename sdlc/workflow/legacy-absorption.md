@@ -124,10 +124,11 @@ document captures and re-authors it against the canonical template;
 direct copy-paste from `docs-backup/` into a canonical artifact body
 is the smell. If the legacy phrasing is genuinely worth preserving,
 quote it in a `> source: docs-backup/<file>.md` callout in the node's
-`source_ref` provenance — never in the body proper. Doctrinal anchor:
-[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-"Reference, never copy" + "The legacy KB is a quarry, not an
-authority."
+`source_ref` provenance — never in the body proper. Doctrinal anchors:
+[`../../CLAUDE.md HR-REF`](../../CLAUDE.md#hard-rules) — "Reference,
+never copy" — and [`../PRINCIPLES.md`](../PRINCIPLES.md) — "The legacy
+KB is a quarry, not an authority" (registry stub there; canonical
+detail is this file).
 
 ## Dispatch posture
 

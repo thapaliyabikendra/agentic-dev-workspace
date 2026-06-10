@@ -59,7 +59,7 @@ Phase 2 FS validation as a **Blocker**. Pre-existing canonical nodes that
 predate NDF introduction (2026-05-19) carry no `declared_via:` pointer and
 are grandfathered (per STD-007 R8). This is the **canonical enforcement home**;
 the wording is identical to its restatement in `WORKFLOW.md § Validation
-gates` and `ndf-edit.md` per CLAUDE.md Rule 12 defense-in-depth.
+gates` and `ndf-edit.md` per CLAUDE.md HR-STYLE defense-in-depth.
 (`maintenance-discipline.md § Files to touch on an NDF edit` summarizes
 the two HARD-GATEs but carries no wording copy — corrected 2026-06-10,
 the prior claim named it as a restatement site.)
@@ -405,7 +405,7 @@ behavior, and contains no syntax. Generate 2–3 real alternatives before conver
 (honor `FS-NNN-CONTEXT.md` locks). Route every architecture decision on the spot:
 future-spec-constraining → ADR; single-node rationale → DEC; small + FS-scoped →
 inline. Draft section-by-section, pausing at the four section-group boundaries
-(CLAUDE.md Rule 10, one question per round). Order Implementation tasks by the
+(CLAUDE.md HR-ONE-Q, one question per round). Order Implementation tasks by the
 project's `task-ordering`-tagged ADR cohorts.
 
 ---

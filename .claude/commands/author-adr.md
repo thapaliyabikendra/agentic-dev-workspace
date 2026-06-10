@@ -35,4 +35,4 @@ The classified artifact + its 2-file touch (artifact + index row; no `log.md` â€
 
 Report the discriminator's classification and why, the artifact ID landed, and every cross-reference wired. If the discriminator routed to STD or CCC, name the file it landed in instead â€” that is a success, not a deflection.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

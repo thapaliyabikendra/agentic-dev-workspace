@@ -64,7 +64,7 @@ without modification.
   with the per-FRS CHG nodes under `chg/` (sibling to `specs/`), born at
   Phase 1 by their owning FRS and consumed at Phase 2 by the FS via
   `consumes_chgs:`.
-- Validation gates and context-reset rule: four named `/clear` boundaries — two in the dev track (Phase 1.5→2, Phase 2→3), and two in the QA track (from `plan.md` to `test-plan-ingest.md`, and from `implementation.md` to `test-suite-codegen.md`). QA-track session sharing: CLAUDE.md Rule 5.
+- Validation gates and context-reset rule: four named `/clear` boundaries — two in the dev track (Phase 1.5→2, Phase 2→3), and two in the QA track (from `plan.md` to `test-plan-ingest.md`, and from `implementation.md` to `test-suite-codegen.md`). QA-track session sharing: CLAUDE.md HR-CLEAR.
 - Author self-review + user-review handoff at phase exits.
 
 ### DDD knowledge base structure

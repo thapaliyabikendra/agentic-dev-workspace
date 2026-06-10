@@ -99,7 +99,7 @@ conditionally-entered tracks. The `/clear` labels mark canonical
 `HARD-GATE` instances (see [`WORKFLOW.md`](WORKFLOW.md) HARD-GATE block);
 QA-track flows are independent of the dev track. `/clear` between
 `test-plan-ingest` ↔ `test-suite-codegen`; `test-suite-codegen` ↔ `qa-gate`
-share a session per CLAUDE.md Rule 5.
+share a session per CLAUDE.md HR-CLEAR.
 
 The milestone is **the planning container**, top-down or retroactive — it
 holds its discoveries, FRSs, and FSs under one path. Multiple FSs can be

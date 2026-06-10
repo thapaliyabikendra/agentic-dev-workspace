@@ -31,4 +31,4 @@ Per route — **coin node type:** KB-LAYOUT.md catalog row + `sdlc/_templates/no
 
 Report the discriminator verdict (coin / extend / drop) with the three diamond answers, every engine file modified, and any instance-audit performed. Run `node sdlc/tools/engine-lint.mjs` and confirm 0 errors before declaring done.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

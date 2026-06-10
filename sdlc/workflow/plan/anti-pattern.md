@@ -1,6 +1,6 @@
 ---
 name: plan-anti-pattern
-description: "Detail file of plan.md — Anti-Pattern: The Obvious Path (full narrative). Load at first-time Phase 2 entry for the doctrinal frame."
+description: "Detail file of plan.md — Anti-Patterns: The Obvious Path + Too Simple to Need a Spec (full narratives). Load at first-time Phase 2 entry for the doctrinal frame."
 applies_when:
   stack: [agnostic]
 ---
@@ -29,3 +29,16 @@ The same drift wears subtler disguises:
 - **"Pre-written for efficiency"** — method bodies drafted in the FS to "save a
   step." They bypass the convention ADR/STD/CCC load that Phase 3's coding
   stage performs, so the saved step is repaid as drift.
+
+# Anti-Pattern: "Too Simple to Need a Spec"
+
+Skipping the FS because the work feels small — a one-entity CRUD slice, a
+field addition, a toggle. The cost: simple work is where unexamined
+assumptions cause the most wasted effort; with no FS there is no declared
+node set, no CHG consumption, no validation gate, and the change lands as
+silent drift the next FS trips over. **Write the short FS anyway.** A
+narrow slice produces a narrow FS — a screenful of Coverage + tasks — and
+the discipline (declared sets, proposed-node ingest, QA traceability) is
+exactly what keeps small work cheap. If the work is genuinely below the
+FS line, it is a bug fix ([`../bug-fix.md`](../bug-fix.md)) — that track
+exists so "too simple" has an honest home, not an exemption.

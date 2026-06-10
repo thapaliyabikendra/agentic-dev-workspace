@@ -47,7 +47,7 @@ See `ui/docs/PROTOTYPE-API-INTEGRATION.md` for the page-level exit checklist. Ru
 
 **Catalog-dark caveat:** catalog-dark routes cannot be route-guarded until their permissions are minted (per CCC-002 / backend and ADR-036 follow-up). Do not block on this — note the gap and proceed; the follow-up is a separate pass.
 
-**Commit discipline:** commits to `ui/` need explicit user authorization, per commit (rule 11). Authorization for one commit does not carry forward to the next.
+**Commit discipline:** commits to `ui/` need explicit user authorization, per commit (HR-COMMIT). Authorization for one commit does not carry forward to the next.
 
 ## Engine-side prerequisites (how a page becomes wireable)
 

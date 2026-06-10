@@ -31,4 +31,4 @@ Phase-1-internal — no `/clear` to enter or exit; sessions 0/1/1.5 keep sharing
 
 Report every OQ closed (ID → resolver artifact), every artifact created, and any ADRs spawned. Confirm zero `blocking-frs` OQs remain open, then hand back to FRS authoring (design.md Phase 1 step 3).
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

@@ -20,7 +20,7 @@ Pre-FRS input utility — no upstream phase gates it. Precondition: requirements
 
 ## Phase & boundaries
 
-Phase-0 / pre-Phase-1. Drafts are `status: proposed` with business-language-only bodies (no node IDs in Phase-1 sections — R-NEW-8 applies even to pre-FRS drafts). One question per turn during clarification (CLAUDE.md rule 10): journey boundaries (one journey or two?), actor identity, missing edge/fault behavior. Present all drafts for BA approval **before** writing into `docs/<component>/nodes/` — draft review first, canonical ingest second.
+Phase-0 / pre-Phase-1. Drafts are `status: proposed` with business-language-only bodies (no node IDs in Phase-1 sections — R-NEW-8 applies even to pre-FRS drafts). One question per turn during clarification (CLAUDE.md HR-ONE-Q): journey boundaries (one journey or two?), actor identity, missing edge/fault behavior. Present all drafts for BA approval **before** writing into `docs/<component>/nodes/` — draft review first, canonical ingest second.
 
 ## Produces
 

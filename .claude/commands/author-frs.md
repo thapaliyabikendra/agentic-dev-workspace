@@ -3,7 +3,7 @@ description: Author a milestone's FRSs — design.md Phase 0 (scope/SURVEY) -> P
 argument-hint: [milestone id/slug — plus prototype path or requirements if not already seeded]
 ---
 
-Author the FRSs for an open milestone. Runs `sdlc/workflow/design.md` Phase 0 (scope / SURVEY), Phase 1 (FRS + FLW + CHG authoring), and the Phase 1.5 validation gate. Seed-medium routing (design.md Phase 0 callout): prototype → `sdlc/workflow/prototype-first.md` (bidirectional doctrine) + `sdlc/workflow/frs-prototype-extraction-rules.md`, `PROTO-<slug>` at `docs/prototypes/`, `[inferred from prototype]` tags, SURVEY `prototype_ref:`; existing code → `sdlc/workflow/frs-code-extraction-rules.md`, `[inferred from code]`; raw requirements → neither rule book (prose is confirmed intent). One-question-per-turn cadence applies throughout (CLAUDE.md rule 10).
+Author the FRSs for an open milestone. Runs `sdlc/workflow/design.md` Phase 0 (scope / SURVEY), Phase 1 (FRS + FLW + CHG authoring), and the Phase 1.5 validation gate. Seed-medium routing (design.md Phase 0 callout): prototype → `sdlc/workflow/prototype-first.md` (bidirectional doctrine) + `sdlc/workflow/frs-prototype-extraction-rules.md`, `PROTO-<slug>` at `docs/prototypes/`, `[inferred from prototype]` tags, SURVEY `prototype_ref:`; existing code → `sdlc/workflow/frs-code-extraction-rules.md`, `[inferred from code]`; raw requirements → neither rule book (prose is confirmed intent). One-question-per-turn cadence applies throughout (CLAUDE.md HR-ONE-Q).
 
 **Milestone + seed:** $ARGUMENTS
 (If empty, ask for the milestone id/slug and any seed input before starting.)

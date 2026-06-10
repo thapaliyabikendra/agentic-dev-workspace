@@ -36,4 +36,4 @@ Phase-0/1 (pre-FRS, stable `<Module>.<Area>.<Screen>` file identity) through pos
 
 Report the scope generated, catalog reuse vs. new components, and trace result. Next: BA reviews in the browser and iterates (re-invoke with a scoped change), then `/author-frs` for the canonical contract; `draft → adopted` flips at Phase 1.5 exit there. Mock→real wiring per page is `/api-integration` (Phase 3).
 
-**Commit discipline:** commits (workspace or `ui/`) need explicit user authorization, per commit (rule 11).
+**Commit discipline:** commits (workspace or `ui/`) need explicit user authorization, per commit (HR-COMMIT).

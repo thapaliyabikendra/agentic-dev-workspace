@@ -3,7 +3,7 @@ description: Author a milestone's Feature Specs — plan.md Phase 2 Ingest. Draf
 argument-hint: [milestone id/slug, or specific FRS scope]
 ---
 
-Author the Feature Specs for a milestone by running the Phase-2 Ingest flow. The canonical flow here is `sdlc/workflow/plan.md` — the Phase-2 Ingest flow — which is **distinct from the `/plan` slash command** (generic work-item planner); the name `/author-fs` was chosen specifically to avoid that collision. This command drafts FS-NNN files, ingests proposed canonical nodes (ACT/ENT/CMD/QRY and the other 15 Phase-2-born types), and enriches the Phase-1 FLW + CHG nodes. Deliverables are structural names only — no method bodies, brace blocks, SQL, YAML payloads, or file paths. FS drafting pauses at the 3–4 section-group boundaries (CLAUDE.md rule 10), one question per round.
+Author the Feature Specs for a milestone by running the Phase-2 Ingest flow. The canonical flow here is `sdlc/workflow/plan.md` — the Phase-2 Ingest flow — which is **distinct from the `/plan` slash command** (generic work-item planner); the name `/author-fs` was chosen specifically to avoid that collision. This command drafts FS-NNN files, ingests proposed canonical nodes (ACT/ENT/CMD/QRY and the other 15 Phase-2-born types), and enriches the Phase-1 FLW + CHG nodes. Deliverables are structural names only — no method bodies, brace blocks, SQL, YAML payloads, or file paths. FS drafting pauses at the 3–4 section-group boundaries (CLAUDE.md HR-ONE-Q), one question per round.
 
 **Milestone or FRS scope:** $ARGUMENTS
 (If empty, ask for the milestone id/slug or FRS scope before starting.)

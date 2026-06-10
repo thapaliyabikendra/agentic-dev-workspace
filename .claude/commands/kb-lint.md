@@ -34,4 +34,4 @@ A one-line-per-finding summary report (`<debt-class> | <artifact-id> | <detail>`
 
 Report findings grouped by routing (OQs opened / direct fixes applied / engine findings). If `index-entry-missing` violations accumulate, flag the tiered-touch erosion as a methodology concern per the flow file — don't just patch.
 
-**Commit discipline (rule 11):** direct fixes and OQ files stay uncommitted without explicit user authorization.
+**Commit discipline (HR-COMMIT):** direct fixes and OQ files stay uncommitted without explicit user authorization.

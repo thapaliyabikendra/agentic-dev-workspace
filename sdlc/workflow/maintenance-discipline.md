@@ -209,7 +209,7 @@ mirror), do not maintain both — collapse:
 
 **Exception:** framework HARD-GATE restating across canonical workflow
 files stays legal (defense-in-depth carve-out,
-[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) Rule 12).
+[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) HR-STYLE).
 The collapse op targets *content* duplication, not deliberate gate
 redundancy.
 

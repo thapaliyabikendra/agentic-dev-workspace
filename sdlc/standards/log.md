@@ -211,7 +211,7 @@ belongs inline on the actor's `Permissions:` bullet. Promotion to PERM
 is reserved for guards that add content beyond the baseline (ownership /
 tenancy / state predicates, attribute combinations, or the same
 non-trivial expression cited from multiple commands). Existing
-PERM-001..003 are not retrofitted (CLAUDE.md rule 4). No rule
+PERM-001..003 are not retrofitted (CLAUDE.md HR-NODE-AUTH). No rule
 renumbering; no merge-gate change; `standards/index.md` schema
 unchanged. Source: plan `is-perm-nodes-overkill-expressive-brooks.md`.
 
@@ -380,7 +380,7 @@ covers the Stage 6 engine-file diffs only.
   - `docs/home.md` — IDs convention list gained NDF-NNN (unqualified
     for shared promotions) and `{PREFIX}-NDF-NNN` (per-component).
 
-- **Two top-of-tree HARD-GATEs landed per CLAUDE.md Rule 12
+- **Two top-of-tree HARD-GATEs landed per CLAUDE.md HR-STYLE
   (Output style — framework HARD-GATE defense-in-depth exception).** Wording identical at each landing site (only
   relative-link paths differ). Canonical home is single per gate;
   restatements at ≥2 additional files.
@@ -835,7 +835,7 @@ Detail-file fold: `workflow/frs-validation-rules/revision-history.md`
 folded into `frs-validation-rules.md § Revision history` (one fewer file
 hop; all three inbound links repointed). Prose trims: "retired
 2026-05-16/17" date parentheticals stripped from SETUP.md / LAYOUT.md /
-KB-LAYOUT.md layout notes (CLAUDE.md Rule 8 stays the dated canonical
+KB-LAYOUT.md layout notes (CLAUDE.md HR-TIERED stays the dated canonical
 home); `maintenance-discipline.md` rule-history stubs compressed to
 anchor + pointer; BOUNDARY.md QA-session-share restatement reduced to a
 bare cross-ref; WORKFLOW.md Overview `/clear` sentence collapsed to the

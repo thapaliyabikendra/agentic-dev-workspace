@@ -31,4 +31,4 @@ Optional gate between Phase 1.5 exit and the `/clear` that opens Phase 2. Fires 
 
 Report every locked decision (entry number + one line), every CONTEXT.md path written, and confirm the flow file's exit checklist. Then the session proceeds to `/clear` + `/author-fs`.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

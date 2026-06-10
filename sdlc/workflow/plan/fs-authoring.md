@@ -54,7 +54,7 @@ specific node looks the way it does → DEC; otherwise → inline.*
 
 Walk the FS template in order — Coverage → New nodes → Change maps → Architecture
 decisions → Data model → Interface contracts → Implementation tasks → Dependencies → QA
-— and pause for confirmation at **section-group boundaries** (CLAUDE.md Rule 10):
+— and pause for confirmation at **section-group boundaries** (CLAUDE.md HR-ONE-Q):
 
 | Group | Sections |
 |---|---|

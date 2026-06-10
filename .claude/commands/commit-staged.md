@@ -14,7 +14,7 @@ Review the staged changes in a git repository for regressions, and commit them *
 
 ## Authorization note
 
-This command is user-invoked. Invoking it **is** the explicit per-commit authorization required by `CLAUDE.md` rule 11. Authorization covers exactly one commit of the currently-staged changes — nothing more (no push, no amend of others' commits, no staging of new files unless asked below).
+This command is user-invoked. Invoking it **is** the explicit per-commit authorization required by `CLAUDE.md` HR-COMMIT. Authorization covers exactly one commit of the currently-staged changes — nothing more (no push, no amend of others' commits, no staging of new files unless asked below).
 
 ## Procedure
 

@@ -32,4 +32,4 @@ Maintenance operation, not a phase — fires from inside a report-regeneration s
 
 Report the RESEARCH-NNN created or advanced, every canonical artifact promoted (ID + type), every implication still `proposed`, and any OQs raised. Suggest regenerating the affected derived report (`/derived-report`) once promotions land.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

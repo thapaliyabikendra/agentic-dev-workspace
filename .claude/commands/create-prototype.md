@@ -27,7 +27,7 @@ Pre-FRS input-disposition utility — no upstream phase gates it. Precondition: 
 
 ## Phase & boundaries
 
-Phase-0 / pre-Phase-1 input disposition. No `/clear` required on entry. The prototype stays `status: draft` throughout this command (authoring + stakeholder iteration). The `draft → adopted` flip is NOT done here — it happens at the Phase 1.5 exit checklist inside `/author-frs`, the moment the consuming FRS reaches `approved` (`adopted_into:` cites that FRS). On completion `/clear` fires at the flow boundary into FRS authoring (CLAUDE.md rule 5); the durable handoff is the `PROTO-<slug>` ID + its on-disk files, not session context.
+Phase-0 / pre-Phase-1 input disposition. No `/clear` required on entry. The prototype stays `status: draft` throughout this command (authoring + stakeholder iteration). The `draft → adopted` flip is NOT done here — it happens at the Phase 1.5 exit checklist inside `/author-frs`, the moment the consuming FRS reaches `approved` (`adopted_into:` cites that FRS). On completion `/clear` fires at the flow boundary into FRS authoring (CLAUDE.md HR-CLEAR); the durable handoff is the `PROTO-<slug>` ID + its on-disk files, not session context.
 
 ## Produces
 

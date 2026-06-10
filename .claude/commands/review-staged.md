@@ -14,7 +14,7 @@ Review the staged changes in a git repository for regressions and report the fin
 
 ## Authorization note
 
-This command is review-only. It does **not** commit, push, amend, or stage anything — regardless of how clean the review comes out. If the user wants the changes committed after reading the review, that is a separate, explicit authorization (e.g. the `commit-staged` command) per `CLAUDE.md` rule 11.
+This command is review-only. It does **not** commit, push, amend, or stage anything — regardless of how clean the review comes out. If the user wants the changes committed after reading the review, that is a separate, explicit authorization (e.g. the `commit-staged` command) per `CLAUDE.md` HR-COMMIT.
 
 ## Procedure
 

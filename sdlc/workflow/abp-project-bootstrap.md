@@ -14,12 +14,12 @@ applies_when:
 > `appsettings.json` schema. Standalone — invoked by the operator,
 > independent of the dev-track and QA-track flows.
 
-> **HARD-GATE (workflow-local — not CLAUDE.md Hard rule 12):**
+> **HARD-GATE (workflow-local — not CLAUDE.md HR-COMMIT):**
 >
 > 1. **No auto-`abp new`.** The CLI scaffold call writes a project tree
 >    and is irreversible without `git clean`. Operator authorization is
 >    required **per invocation**; one authorization = one invocation; no
->    carry-forward. CLAUDE.md Hard rule 12 covers commit-equivalents
+>    carry-forward. CLAUDE.md HR-COMMIT covers commit-equivalents
 >    (`git commit`, `gh pr create`); this op enforces its own gate
 >    because `abp new` predates the commit gate in the lifecycle.
 > 2. **No split-pack apply.** Paired packs ship together or neither

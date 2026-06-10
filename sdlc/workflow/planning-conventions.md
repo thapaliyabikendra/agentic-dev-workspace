@@ -11,8 +11,8 @@ applies_when:
 > vs single-pass, where to dispatch sub-agents (Explore / Plan / general-purpose),
 > and the seven-principle Karpathy gate every non-trivial plan must clear before
 > the user is asked to approve it. Doctrinal anchor:
-> [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) Rule 7 (plan
-> mechanics) and Rule 12 (token-optimized output, lead with the recommendation).
+> [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) HR-PLAN (plan
+> mechanics) and HR-STYLE (token-optimized output, lead with the recommendation).
 
 > **HARD-GATE:** Do NOT declare a plan ready for user approval until (a) the
 > Karpathy scorecard scores at least PARTIAL on every principle and STRONG on
@@ -72,7 +72,7 @@ Multi-stage plans (≥2 phases) carry a progress checklist using `[ ]` / `[x]`
 per step. Mark each step `[x]` before advancing — the checklist is the
 durable signal that survives `/clear`. Canonical procedure:
 [`../WORKFLOW.md § Validation gates`](../WORKFLOW.md#validation-gates) and
-[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) Rule 7.
+[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) HR-PLAN.
 
 ## Sub-agent dispatch
 
@@ -144,7 +144,7 @@ ready.
 
 **Lead with the recommendation.** The first non-context section names the
 proposed approach; alternatives, rationale, and trade-offs follow. Token-
-economy and pointer-heavy output style applies (CLAUDE.md Rule 12).
+economy and pointer-heavy output style applies (CLAUDE.md HR-STYLE).
 
 ## Reversibility surfacing
 
@@ -351,15 +351,15 @@ silent; a plan may override per phase, explicitly:
   destructive step authorizes that invocation only — it does not carry
   to subsequent phases, retries, or sessions. Anchor for the
   commit-specific case:
-  [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) Rule 11
+  [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) HR-COMMIT
   (commit authorization never carries forward); this clause is its
   plan-execution generalization for every destructive action class.
 
 ## Integration
 
 - **Required before:** [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) —
-  Rule 7 (plans contain no syntax; multi-stage progress-checklist
-  requirement); Rule 12 (token-optimized output style, lead with the
+  HR-PLAN (plans contain no syntax; multi-stage progress-checklist
+  requirement); HR-STYLE (token-optimized output style, lead with the
   recommendation); HARD-GATE on doctrinal–procedural drift (any change to
   this file must atomically check `PRINCIPLES.md`).
 - **Required before:** [`../WORKFLOW.md § Validation gates`](../WORKFLOW.md#validation-gates) —

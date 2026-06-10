@@ -33,4 +33,4 @@ Standalone maintenance operation. No tiered touch — `docs/ROADMAP.md` is a reg
 
 Summarize the stuck-class counts and anything newly surfaced. Stuck findings that warrant action route to their per-artifact procedure (FS abandonment via `maintenance-discipline.md`, CHG re-evaluation via `plan.md`) — the roadmap surfaces; it does not resolve.
 
-**Commit discipline (rule 11):** commit the regenerated ROADMAP.md alongside the motivating work only with explicit user authorization.
+**Commit discipline (HR-COMMIT):** commit the regenerated ROADMAP.md alongside the motivating work only with explicit user authorization.

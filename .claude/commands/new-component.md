@@ -34,4 +34,4 @@ One-shot utility, fired from inside Phase 1 / Phase 2 / absorption — same sess
 
 Walk the flow file's bootstrap checklist — all seven boxes — then hand straight back to the motivating work (the FRS/FS/absorption ingest that was gated on this). Report the prefix coined and the registrations touched.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

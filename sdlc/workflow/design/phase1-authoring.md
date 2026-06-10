@@ -197,6 +197,12 @@ later.
   questions are for genuinely open spaces, not for "did you mean A or B".
 - **Focus on purpose, constraints, success criteria.** Skip implementation
   detail — that belongs in Phase 2.
+- **Surface adjacent problems; never absorb them silently.** When the
+  dialog uncovers a problem next to (not inside) the journey being
+  specified, raise an `OQ-NNN` under `docs/discovery/open-questions/`
+  (`origin: frs-authoring`) or record it under the FRS's "Brownfield
+  impact" — hidden scope expansion drifts the spec from what was agreed.
+  The user decides what's in scope, not the draft.
 - **Draft section by section.** Walk the FRS template in order — Use case →
   Actors → Preconditions → Postconditions → Business rules → Edge cases →
   Acceptance criteria → Brownfield impact — and pause for confirmation

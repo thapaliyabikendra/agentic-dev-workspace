@@ -26,7 +26,7 @@ merge_sha:                    # git sha of HEAD at the moment Phase 3 merge comp
 
 > Planning artifact. **No syntax — the FS names structures; Phase 3 writes them.**
 > Behavioral content lives in canonical DDD nodes; this file references
-> them by ID, never restates them (CLAUDE.md Hard rule 3). Body-prose ID
+> them by ID, never restates them (CLAUDE.md HR-REF). Body-prose ID
 > citations may use wiki links — `[[ENT-NNN]]` / `[[FLW-NNN#happy|happy path]]`
 > (convention: `sdlc/KB-LAYOUT.md` § Wiki-link syntax; display-only —
 > frontmatter declarations remain plain ID lists).

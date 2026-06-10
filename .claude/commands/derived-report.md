@@ -33,4 +33,4 @@ Aggregate kinds: `docs/reports/<KIND>.md` overwritten from `sdlc/_templates/OVER
 
 Report what was regenerated and from which sources; list any concepts routed to `absorb-concept.md`.
 
-**Commit discipline (rule 11):** the regenerated report stays uncommitted without explicit user authorization.
+**Commit discipline (HR-COMMIT):** the regenerated report stays uncommitted without explicit user authorization.

@@ -35,4 +35,4 @@ Standalone operator workflow — independent of the dev-track and QA-track flows
 
 Walk the flow file's verification checklist and report the banner path taken, packs applied (named pairs intact), and any gaps surfaced.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

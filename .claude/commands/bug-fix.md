@@ -34,4 +34,4 @@ Standalone lightweight track — skips Phase 0/1/1.5/2, CHG nodes, and the Cover
 
 Direct path: fix merged, Exploration `done`. Escalation path: hand to `/author-frs` under a new or existing milestone per the change-request routing in `sdlc/WORKFLOW.md`.
 
-**Commit discipline (rule 11):** never `git commit` (or merge `fix/<slug>`) without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` (or merge `fix/<slug>`) without explicit user authorization, per commit.

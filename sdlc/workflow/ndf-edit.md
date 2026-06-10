@@ -28,7 +28,7 @@ Status column + git history. There is no `node-definitions/log.md`. Two
 HARD-GATEs apply to NDF coining and to Phase 2 ingest of NDF-declared
 instances — canonical homes are `evolving-the-workflow.md` (shape-coverage)
 and `plan.md` (type-validity); the restatements below carry the **identical
-wording** (CLAUDE.md Rule 12 defense-in-depth).
+wording** (CLAUDE.md HR-STYLE defense-in-depth).
 
 > **HARD-GATE — NDF shape-coverage walk required.** Do NOT coin a new Node
 > Definition Node (NDF) until the 60% shape-coverage walk has been run

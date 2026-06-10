@@ -152,7 +152,7 @@ You MUST complete these in order:
 1. Load context (FS-declared sets only — FS, new canonical nodes, CHG files, ADRs, tech-stack)
 2. Stage 1 — Merge (flip every new node `proposed → active`, apply CHG deltas to canonical targets, flip every CHG `approved → merged`)
 3. Stage 2 — Code (implement against now-active canonical nodes, one cohort at a time, build-validate between cohorts)
-4. Hand off to the **QA track** — `test-suite-codegen.md` (fresh session after `/clear`) then `qa-gate.md` (session-shared with codegen per CLAUDE.md Rule 5). Do not load them in this session.
+4. Hand off to the **QA track** — `test-suite-codegen.md` (fresh session after `/clear`) then `qa-gate.md` (session-shared with codegen per CLAUDE.md HR-CLEAR). Do not load them in this session.
 
 ---
 
@@ -209,7 +209,7 @@ This flow runs in two stages, in order:
 
 After Stage 2 Code is complete, this flow exits. The **QA track** then runs:
 `test-suite-codegen.md` (fresh session after `/clear` from this file) followed
-by `qa-gate.md` (session-shared with codegen per CLAUDE.md Rule 5). The
+by `qa-gate.md` (session-shared with codegen per CLAUDE.md HR-CLEAR). The
 FS-to-`implemented` flip happens in `qa-gate.md` once its checks pass —
 milestone close depends on that flip, but cadence is up to the QA-track
 operator.

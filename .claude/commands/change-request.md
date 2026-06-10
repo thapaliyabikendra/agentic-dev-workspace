@@ -37,4 +37,4 @@ Standalone track, milestone-free. `/clear` boundaries mirror the milestone track
 
 CR-3 done → QA track unchanged: `/test-plan` →[`/clear`]→ `/test-suite` (TC files under the CR's `specs/.../test-plans/`). No milestone close — the CR portal's status is the terminal record.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

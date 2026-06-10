@@ -31,4 +31,4 @@ Portal `status: done` + `done_date:`; `MILESTONE-STATE.md` finalized (`dev_phase
 
 Flow emits `## MILESTONE CLOSED`. Call `advisor()` before declaring the milestone complete (CLAUDE.md Advisor gate — declaring a milestone complete).
 
-**Commit discipline (rule 11):** the close commit (portal + state + roadmap) needs explicit user authorization — never commit without it.
+**Commit discipline (HR-COMMIT):** the close commit (portal + state + roadmap) needs explicit user authorization — never commit without it.

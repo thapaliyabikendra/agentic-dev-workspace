@@ -31,4 +31,4 @@ A classified findings list (session output — findings are not a new artifact t
 
 Report findings count per heading, every routing decision made (finding → destination), fixes applied vs deferred, and any OQs raised. State whether the pass closed clean or is blocked.
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

@@ -280,7 +280,7 @@ an API doc for a new external consumer). Never speculative.
    discipline as Phase 2 / Phase 3 — see
    [`retrieval-discipline.md`](retrieval-discipline.md).
 3. Fill body sections with link-by-ID summaries. Do not paraphrase
-   node bodies; reference, never copy (CLAUDE.md hard rule #3).
+   node bodies; reference, never copy (CLAUDE.md HR-REF).
 4. Add a row to the category `index.md` (slug, title, audience,
    status, source IDs).
 5. Update `updated:` to today's date on regen; leave `created:` as

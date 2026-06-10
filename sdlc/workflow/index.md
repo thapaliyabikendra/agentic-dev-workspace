@@ -41,7 +41,7 @@ applies_when:
 
 ## QA track flow files — load at QA-track flow entry / `/clear` boundary
 
-The QA track is **trigger-independent** — two flows that consume dev-track outputs on their own cadence (the second flow runs as one session with two stages: codegen-stage + gate-stage). `/clear` boundaries: QA-track entry (into `test-plan-ingest`) and between `test-plan-ingest` ↔ `test-suite-codegen` (entry to the codegen+gate combined flow). `test-suite-codegen` → `qa-gate` is a **stage transition inside one flow** — no `/clear` — per CLAUDE.md Rule 5.
+The QA track is **trigger-independent** — two flows that consume dev-track outputs on their own cadence (the second flow runs as one session with two stages: codegen-stage + gate-stage). `/clear` boundaries: QA-track entry (into `test-plan-ingest`) and between `test-plan-ingest` ↔ `test-suite-codegen` (entry to the codegen+gate combined flow). `test-suite-codegen` → `qa-gate` is a **stage transition inside one flow** — no `/clear` — per CLAUDE.md HR-CLEAR.
 
 | File | One-line summary | Entry contract |
 |------|-----------------|----------------|

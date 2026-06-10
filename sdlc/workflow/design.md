@@ -377,7 +377,7 @@ nodes/FLOW.md, and nodes/CHANGE.md (when any FRS declares `touches_nodes:`).
       re-runs the same AC→scenario coverage check as a gate-level
       validation (R-NEW-3); the Phase 1 exit pass is author self-review
       and the Phase 1.5 pass is the gate (defense-in-depth per
-      [`../../CLAUDE.md` hard rule #13 framework exception](../../CLAUDE.md#hard-rules)).
+      [`../../CLAUDE.md` HR-STYLE framework exception](../../CLAUDE.md#hard-rules)).
       The Flow scenarios *are* the test plan — do not draft a parallel
       test-plan artifact.
 

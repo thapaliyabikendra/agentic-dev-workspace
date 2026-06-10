@@ -36,4 +36,4 @@ Canonical nodes / ADRs / CCCs / glossary terms at `status: active`, each with it
 
 Summarize: artifacts promoted (by type), conflicts halted on, OQs raised, the footer marked. Call `advisor()` before declaring the absorption complete (CLAUDE.md Advisor gate — completing an operation).
 
-**Commit discipline (rule 11):** never `git commit` without explicit user authorization, per commit.
+**Commit discipline (HR-COMMIT):** never `git commit` without explicit user authorization, per commit.

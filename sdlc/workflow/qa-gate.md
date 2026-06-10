@@ -14,7 +14,7 @@ the FS to `implemented` once all gates pass. **Shares session with
 selector-resolved + spec-emitted context; no `/clear` between them. Logical
 dependency on `implementation.md` Stage 2 Code completion stays (the FS-to-implemented
 flip is meaningless without code); the test-suite-codegen → qa-gate boundary is now
-session-shared per CLAUDE.md Rule 5.
+session-shared per CLAUDE.md HR-CLEAR.
 
 Solo doesn't mean QA is skipped — it means the QA hat is the same human at a deliberate
 moment.
@@ -269,7 +269,7 @@ After the QA verification checklist passes, emit a run-report from
 
 - **Triggered after:** [`test-suite-codegen.md`](test-suite-codegen.md) emits its generation report.
   **Shares session with `test-suite-codegen.md`** (back-to-back; no `/clear` between them, per
-  CLAUDE.md Rule 5). The logical dependency on `implementation.md` Stage 2 Code completion
+  CLAUDE.md HR-CLEAR). The logical dependency on `implementation.md` Stage 2 Code completion
   is preserved through codegen's own entry contract.
 - **Required before:** [`agent-contracts.md → Contract Layer 1`](agent-contracts.md#contract-layer-1--subagent-dispatch-return-shape)
   — the ADR-conformance check dispatch contract lives there.

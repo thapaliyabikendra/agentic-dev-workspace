@@ -14,7 +14,7 @@ Parse as: first token = **source branch to merge** (default `develop`); the rema
 
 ## Authorization note
 
-Invoking this command authorizes exactly two mutating actions: creating the backup tag and starting the **paused** merge (`--no-commit --no-ff`). It does **not** authorize the commit. Per `CLAUDE.md` rule 11, committing the merge is a separate, explicit step the user takes afterward (e.g. the `commit-staged` command). This command never pushes, amends, or commits — regardless of how clean the review comes out.
+Invoking this command authorizes exactly two mutating actions: creating the backup tag and starting the **paused** merge (`--no-commit --no-ff`). It does **not** authorize the commit. Per `CLAUDE.md` HR-COMMIT, committing the merge is a separate, explicit step the user takes afterward (e.g. the `commit-staged` command). This command never pushes, amends, or commits — regardless of how clean the review comes out.
 
 ## Procedure
 
