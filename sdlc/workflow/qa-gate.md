@@ -237,6 +237,27 @@ single-FS milestones where the QA checklist already walked all criteria.
 
 ---
 
+## E2E run-report
+
+After the QA verification checklist passes, emit a run-report from
+[`../_templates/E2E-RUN-REPORT.md`](../_templates/E2E-RUN-REPORT.md) at
+`docs/milestones/M-NN-<slug>/specs/FS-NNN-<slug>/E2E-RUN-REPORT-YYYY-MM-DD.md`.
+
+- **Positioning:** the checklist above is the *live gate procedure*;
+  the run-report is the *durable record of that execution* — expected
+  vs. exact-observed values, defects, coverage map. Not a second gate.
+- **Mandatory** for milestones with ≥ 3 FSs or tightly scoped QA;
+  **optional** for a single-FS milestone whose checklist explicitly
+  walked every check (mirrors the [`verify.md`](verify.md) invocation
+  rule).
+- Each defect record carries its **Test to verify** field — defect and
+  repro/acceptance are one artifact; closure routes via
+  [`bug-fix.md`](bug-fix.md).
+- Historical run-reports are never edited — append a dated note when a
+  defect closes, or emit a new dated report.
+
+---
+
 ## Common Mistakes
 
 **❌ Retrying the QA subagent dispatch without changing inputs after a NEEDS_CONTEXT or BLOCKED return** — identical dispatch returns identical result.
@@ -256,6 +277,9 @@ single-FS milestones where the QA checklist already walked all criteria.
   [`authoring-adr.md`](authoring-adr.md) (QA gate surfaces an ADR deviation requiring
   supersession),
   [`derived-reports.md`](derived-reports.md) (regenerate after the FS flips to `implemented`).
+- **Emits:** `E2E-RUN-REPORT-YYYY-MM-DD.md` per FS (template:
+  [`../_templates/E2E-RUN-REPORT.md`](../_templates/E2E-RUN-REPORT.md);
+  see § E2E run-report for the mandatory/optional rule).
 - **Routes to (after FS flips to `implemented`):** user-review handoff;
   [`close-milestone.md`](close-milestone.md) if every spec in the milestone is merged;
   optionally [`verify.md`](verify.md) for structured UAT.

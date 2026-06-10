@@ -41,9 +41,9 @@ Individual CCC-NNN artifacts under `docs/shared/ccc/` are first-class and
 [`evolving-the-workflow.md`](evolving-the-workflow.md) /
 [`new-component-bootstrap.md`](new-component-bootstrap.md) are the
 **callers** that fire the touches as part of their own procedures; this
-file (and the 16 op files it routes to) is the **rule book** they consult.
+file (and the op files it routes to) is the **rule book** they consult.
 
-## Routing table — 16 ops
+## Routing table — 17 ops
 
 | # | Op | File | One-line summary |
 |---|----|------|------------------|
@@ -63,6 +63,7 @@ file (and the 16 op files it routes to) is the **rule book** they consult.
 | 14 | First node of a new type (folder + index lazy-create) | [`lazy-creation.md`](lazy-creation.md) | `<type>/index.md` materialises on first node; no companion `log.md` |
 | 15 | Doctrinal rule changes shaping the discipline | [`rule-history.md`](rule-history.md) | CCC promoted (2026-05-16); Phase 1 birth list trimmed (2026-05-17); canonical `log.md` retired (2026-05-16) |
 | 16 | Anti-pattern + Process Flow diagram | [`anti-pattern-lightweight.md`](anti-pattern-lightweight.md) | "The Lightweight Shortcut"; the 2-file + (base+N) touch graph |
+| 17 | Pointer-collapse + tombstone | [§ in this file](#pointer-collapse--tombstone) | A doc restates another file's canonical content → collapse to pointer + dated tombstone; in-file op, small enough to need no sub-op file |
 
 If your operation is not in the table, read the per-op file whose
 description matches your edit. If still unsure, follow the closest match
@@ -188,6 +189,29 @@ and surface the ambiguity as an OQ (`origin: workflow-evolution`).
 > on first node. ADR / CCC / NDF indexes follow the same lazy rule. No
 > companion `log.md` is ever created.
 > Full procedure: [`lazy-creation.md`](lazy-creation.md).
+
+## Pointer-collapse + tombstone
+
+When a section of a file restates content whose canonical home is
+another file (drifted duplicate, stale onboarding copy, per-tool rule
+mirror), do not maintain both — collapse:
+
+1. Replace the restated content with a one-line pointer:
+   `→ [canonical home § Section](path#anchor)`.
+2. Add a tombstone comment at the collapse site:
+   `<!-- collapsed YYYY-MM-DD: content restated <canonical path>; pointer is the residual -->`.
+   The tombstone prevents re-inflation — a later editor who finds the
+   pointer can verify the canonical home still holds the authority and
+   knows the collapse was deliberate, not an accident.
+3. Fire the normal touch for the collapsed file's class (2-file when it
+   is a canonical artifact; none when it is an engine doc — engine-lint
+   C1 covers the new pointer's resolution).
+
+**Exception:** framework HARD-GATE restating across canonical workflow
+files stays legal (defense-in-depth carve-out,
+[`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) Rule 12).
+The collapse op targets *content* duplication, not deliberate gate
+redundancy.
 
 ## Rule history — CCC promoted to first-class artifacts (2026-05-16)
 

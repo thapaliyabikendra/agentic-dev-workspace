@@ -135,6 +135,41 @@ validation; the FRS authored via [`design.md`](design.md) Phase 1 remains
 the canonical, testable contract, and the `new-component-bootstrap` /
 ID-ceiling rules apply unchanged when drafts land in `docs/`.
 
+## Prompt-output conventions
+
+When a generation pass is delivered as a *prompt* to a downstream
+generator (an external prototyping agent, or a dispatched code-writing
+sub-agent), the prompt follows this shape — each element exists to
+bound regression risk, the same risk the anti-regression doctrine
+bounds on the KB side:
+
+1. **Goal first.** The first line states the observable end-state the
+   user should see — the generator can sanity-check its own result
+   against it.
+2. **Meta-rationale.** One paragraph explaining the structural choices
+   (component decomposition, fixture strategy, scope boundary) — so
+   the generator follows the structure instead of improvising around it.
+3. **Negative constraints.** A `## Do not change` block naming
+   **specific files**, not categories. This is the prompt-side anchor
+   of the overwrite guard (doctrine point 4): the biggest regression
+   sources are named, not implied. Narrow deltas explicitly ("do not
+   add tests beyond updating the existing mock") rather than blanket
+   prohibitions.
+4. **Verification checklist.** A `## Verify (observable)` block listing
+   end-states checkable by running the prototype — routes render, click
+   navigates, state displays — not internal code states the generator
+   cannot reliably introspect.
+
+## Post-generation quality check (advisory)
+
+After Sub-flow A or B, optionally run the
+[`prototype-eval-rubric.md`](prototype-eval-rubric.md) pass — scored
+dimensions, severity-tiered findings, dated report in
+`docs/prototypes/<slug>/`. Advisory by design: the adoption flip's gate
+remains the consuming FRS at Phase 1.5 (see § Phase position), and
+structural drift remains [`lint.md § prototype-drift`](lint.md#prototype-drift)'s
+job. The eval informs the BA iteration loop (step 4 of § The BA loop).
+
 ## Phase position & the two-pass identity
 
 - **Pre-FRS (Phase 0/1):** generation may run from proposed drafts. File
@@ -203,3 +238,6 @@ reading any business-facing node body directly is always fine
   [`../_templates/OVERVIEW-JOURNEYS.md`](../_templates/OVERVIEW-JOURNEYS.md).
 - **Drift detection:** [`lint.md § prototype-drift`](lint.md#prototype-drift)
   — structural KB↔prototype drift class; resolution re-enters at Sub-flow B.
+- **Quality check (advisory):**
+  [`prototype-eval-rubric.md`](prototype-eval-rubric.md) — scored
+  evaluation after Sub-flow A / B; never gates the adoption flip.

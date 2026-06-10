@@ -15,10 +15,10 @@ the next action if the milestone is not fully passed._
 
 ## Acceptance criteria status
 
-| FRS | Criterion | Result | Gap entry ref |
-|-----|-----------|--------|--------------|
-| FRS-NNN | AC-01: _text_ | confirmed / failed / not-verified | — or §Gaps-N |
-| FRS-NNN | AC-02: _text_ | confirmed / failed / not-verified | — or §Gaps-N |
+| FRS | Criterion | Result | Confidence | Gap entry ref |
+|-----|-----------|--------|------------|--------------|
+| FRS-NNN | AC-01: _text_ | confirmed / failed / not-verified | code-verified / kb-inferred | — or §Gaps-N |
+| FRS-NNN | AC-02: _text_ | confirmed / failed / not-verified | code-verified / kb-inferred | — or §Gaps-N |
 
 _Every acceptance criterion from every FRS in the milestone must appear in
 this table. Do not omit. Add rows as needed._

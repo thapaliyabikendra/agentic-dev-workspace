@@ -229,6 +229,22 @@ One paragraph: two-way doors or one-way? Name the irreversible parts.
 **Signal Phase N is done:** <observable>
 ```
 
+## Requirement→step coverage map
+
+Plans that originate from a list of stated requirements (a spec, a user
+enumeration, an approved design) and run ≥ 2 phases end with a footer
+table mapping each requirement to the step implementing it:
+
+| Requirement | Implementing step | Status |
+|---|---|---|
+
+A requirement with no implementing step is a coverage gap — repair
+before declaring the plan ready. This is the proof obligation for
+Principle 5 (Stay In Scope): the map shows every requirement was
+absorbed or explicitly routed to `## Out of scope`, not silently
+dropped. Skip only when the request was a single requirement (the plan
+*is* the map).
+
 ## Self-review pass
 
 Before declaring a plan ready, the author re-applies the Karpathy
@@ -315,6 +331,29 @@ sub-agent's context window.
 **Shorthand:** once this rule is loaded, the user may invoke with just the
 plan path and the phrase "execute the plan" — the subagent constraint is
 implied.
+
+### Per-step failure handling (fail-stop discipline)
+
+Execution never improvises recovery. Defaults apply when the plan is
+silent; a plan may override per phase, explicitly:
+
+- **Failure clause per phase.** Each phase may declare what constitutes
+  failure for its steps and whether recovery is `self-heal` (retry /
+  fallback named in the plan) or `stop-and-ask`. **Default:
+  `stop-and-ask`** — on failure, stop, show the exact tool/command
+  output, report what state the workspace was left in, and ask. Silent
+  recovery masks the signal the failure carries.
+- **Least-privilege tool declaration.** A phase that only reads
+  declares read-only sub-agents/tools; write access is declared only by
+  phases that write. A read-shaped phase requesting write access is a
+  scope violation — flag it at plan review.
+- **Invocation-scoped authorization.** Operator approval for a
+  destructive step authorizes that invocation only — it does not carry
+  to subsequent phases, retries, or sessions. Anchor for the
+  commit-specific case:
+  [`../../CLAUDE.md ## Hard rules`](../../CLAUDE.md#hard-rules) Rule 11
+  (commit authorization never carries forward); this clause is its
+  plan-execution generalization for every destructive action class.
 
 ## Integration
 

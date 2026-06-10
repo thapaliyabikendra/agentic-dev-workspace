@@ -805,3 +805,18 @@ writes / §6c verifications with 4 named dependencies (Rec-03);
 (per-node `(2+N)` unit; bulk ingest = M sequential units; post-op grep
 per unit) (Rec-06). Narrative: `workflow/rule-history.md`
 § Phase-2 close gate ordered (2026-06-10).
+
+## [2026-06-10] created | STD-008 Engine-level UI component architecture conventions
+
+Harvested from the ui prototype repo's organically evolved conventions
+(REVIEW of ui/*.md, 2026-06-10). 6 rules: single architecture authority,
+feature-module isolation, state-seam edits, scoped change protocol,
+computed-not-effect-synced derived state, prohibitions-with-rationale.
+`applies_when: { stack: [ui] }` — first UI-stack engine standard (peer of
+STD-002/005/006 on the api side). Framework bindings conditional per the
+STD-006 precedent. Same operation landed the companion engine edits:
+`workflow/prototype-eval-rubric.md` (new rule book), `_templates/E2E-RUN-REPORT.md`
++ `_templates/UI-GUIDELINES.md` (new templates), ratchet-baseline section in
+`workflow/lint.md`, ledger-pair shape in `workflow/derived-reports.md`,
+pointer-collapse op 17 in `workflow/maintenance-discipline.md`,
+contract-first inversion in `_templates/UI-REPO-CONTRACT.md`.

@@ -109,7 +109,11 @@ Cross-module imports are blocked (ESLint `no-restricted-imports` or
 equivalent): a file under `src/<module-A>/` may not import from
 `src/<module-B>/` — shared pieces go through `src/components/` (the
 catalog). This kills the "same component implemented differently in two
-modules" failure mode mechanically.
+modules" failure mode mechanically. Engine standard behind this rule —
+and the wider component-architecture discipline (single authority file,
+state seam, scoped change, prohibitions):
+[`../standards/STD-008-ui-component-architecture.md`](../standards/STD-008-ui-component-architecture.md);
+this file does not restate it.
 
 ## Scaffold
 
@@ -146,6 +150,52 @@ done:
 4. Every fixture's `@entity-shape` version matches its ENT node.
 5. Report: **0 broken, 0 dangling** — anything else is `prototype-drift`.
 
+## Contract-first inversion (BFF posture)
+
+The prototype does more than render — it **proposes the API contract**,
+and the backend honors that proposal. Method, path, DTO shape, portal,
+and permission are design decisions largely deterministic at prototype
+time; declaring them in the screen's docblock makes the proposal
+machine-checkable, so *a forgotten contract slot fails the build
+instead of shipping silently*.
+
+Tag vocabulary (per data-bound screen file):
+
+| Tag | Cardinality | Backing rule (what must resolve, or the gate fails) |
+|---|---|---|
+| `@implements SCR-NNN` / `@exploration EXP-<slug>` | exactly one | SCR node exists (or EXP registered per the exploration discipline) |
+| `@portal <name>` | 0..1 | named audience surface exists in the route map |
+| `@endpoint <VERB> <path> -> <DtoName>` | one per API path used | at `/api-integration` time: DTO defined + real caller present + backend handler present (CON node is the KB-side anchor) |
+| `@permission <policy-string>` | one per gated action | entry in the permission catalog; string byte-identical to the backend's (PERM node is the source) |
+
+- **Presence, not absence.** A file need not carry a tag; any tag it
+  carries must resolve. The check (`kb:trace` / build gate) fires on
+  declared-but-unresolved slots — that is what makes the declaration
+  mean something.
+- **The seam asymmetry.** The API seam is generation-transparent (mock
+  mode makes it invisible to the generator). The **permission seam is
+  NOT** — a permission encodes authorization intent, which action needs
+  which policy, and that is not inferable from markup. No tool adds it;
+  it is declared deliberately, per gated affordance.
+- Pre-Phase-2 (no CON/PERM nodes yet) the `@endpoint` / `@permission`
+  tags may be absent; the `/api-integration` pass adds them. The
+  back-patch never *removes* a resolving tag.
+
+## Extension protocol
+
+Designated extension points (service registry, mock registry, fixture
+factory, screen index) are documented with three elements: **what the
+extension point is · the exact file/call to extend · what does NOT
+need touching** ("the registry lookup means `<shell file>` does not
+need touching when adding a screen service"). The negative clause is
+the isolation contract — it stops cargo-cult edits to files the
+extension was designed to leave alone.
+
+Docblocks and KB node `code_ref:` notes cite **code-level symbols**
+(constant names, function names, type names) alongside behavior —
+`@implements SCR-042 — uses IInvoiceExportService` — symbol citations
+make the doc↔code link machine-verifiable rather than prose-matched.
+
 ## Permission guards
 
 Role-gated affordances wrap in the project's permission-guard component;
@@ -157,6 +207,9 @@ method as `@permission` docblocks at `/api-integration` time.
 
 - [ ] Copy this file to `ui/docs/PROTOTYPE-API-INTEGRATION.md`; adapt
       snippets to the stack (ADR-040).
+- [ ] Copy [`UI-GUIDELINES.md`](UI-GUIDELINES.md) into the ui repo;
+      fill the token catalog; wire its literal-value detection into the
+      verify script.
 - [ ] Register the ui repo in `docs/project.md § Components`.
 - [ ] Implement the service registry + `VITE_MOCK_MODE` flag.
 - [ ] Create `src/__mocks__/`, `src/screens/index.ts`,

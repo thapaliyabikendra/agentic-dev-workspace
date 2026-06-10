@@ -123,6 +123,23 @@ Write `docs/milestones/M-NN-<slug>/UAT.md` from the template at
 - The `## Acceptance criteria status` table must carry every criterion from
   every FRS — no omissions.
 
+#### Confidence disclosure
+
+Each criterion classification in the `## Acceptance criteria status`
+table carries a `confidence:` annotation:
+
+- **code-verified** — the classification rests on execution evidence
+  (a named passing test, or the QA pass opened the running
+  implementation).
+- **kb-inferred** — the classification rests on spec/checklist prose
+  only, with no execution evidence.
+
+A `kb-inferred` "confirmed" is weaker than it looks — classify it
+`not-yet-verified` rather than `confirmed-passing` when execution
+evidence is absent. **Scope guard:** confidence annotates evidence
+strength only; it does not change V-3 routing and does not re-open
+Phase 3 QA (see Anti-Pattern: "The Second Gate").
+
 ### V-5 — Emit VERIFICATION.md (optional)
 
 For each FS that has ≥ 1 gap entry, write a short
@@ -145,6 +162,24 @@ marker as the last line of the verify.md operation's output:
 This marker is on its own H2 line with no inline content. It signals to
 any orchestrator or downstream consumer that the milestone's UAT is clean.
 When `status:` is `partial` or `failed`, the marker is **not** emitted.
+
+---
+
+## Report immutability
+
+The UAT.md emitted at V-4 is the durable record — never edit it
+retroactively. When a subsequent fix or decision changes a gap's
+routing, append a dated amendment at the bottom of the file:
+
+```
+## Amendment YYYY-MM-DD — <gap ref> rerouted from <X> to <Y>
+```
+
+The original classification stands as an accurate snapshot; the
+amendment is the audit trail. Same convention as the dated E2E
+run-reports ([`qa-gate.md § E2E run-report`](qa-gate.md#e2e-run-report))
+and prototype eval reports
+([`prototype-eval-rubric.md`](prototype-eval-rubric.md)).
 
 ---
 
