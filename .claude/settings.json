@@ -18,8 +18,6 @@
       "CronCreate",
       "CronDelete",
       "CronList",
-      "TeamCreate",
-      "TeamDelete",
       "ScheduleWakeup",
       "ShareOnboardingGuide",
       "Skill",
