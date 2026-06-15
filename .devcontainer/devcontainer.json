@@ -1,0 +1,20 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
+  },
+  "mounts": [
+    "source=claude-code-bikendra.thapaliya,target=/home/vscode/.claude,type=volume"
+  ],
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "GIT_USER_NAME": "Bikendra Thapaliya",
+    "GIT_USER_EMAIL": "bikendra.thapaliya@amniltech.com",
+    "PATH": "${containerEnv:PATH}:/home/vscode/.local/bin"
+  },
+  "postCreateCommand": ["bash", "-c", "sudo chown -R vscode:vscode /home/vscode/.claude && source /usr/local/share/nvm/nvm.sh && claude install && echo 'export PATH=\"$HOME/.local/bin:$PATH\"' >> /home/vscode/.bashrc; latest=$(ls -t /home/vscode/.claude/backups/.claude.json.backup.* 2>/dev/null | head -1) && [ -n \"$latest\" ] && cp \"$latest\" /home/vscode/.claude.json || true; bash .devcontainer/bootstrap-repos.sh --best-effort"],
+  "postStartCommand": "git config --global user.name \"${GIT_USER_NAME}\" && git config --global user.email \"${GIT_USER_EMAIL}\" && git config --global credential.helper 'store --file=/home/vscode/.claude/.git-credentials' && ~/.local/bin/claude update || true"
+}
