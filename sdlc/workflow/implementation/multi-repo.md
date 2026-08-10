@@ -29,7 +29,14 @@ workspace/                          # this repo
 ```
 
 Workspace root is the agent's CWD; service-relative paths look like
-`./api-repo/src/controllers/...`. No worktrees, no submodules.
+`./api-repo/src/controllers/...`. No submodules.
+
+**Worktrees (revised 2026-08-10):** the single-workspace case is still a plain clone per service, as
+above. For **parallel** FEATs, the enclosing programme may instead assemble a workspace from one
+`git worktree` per service repo off a shared source checkout — each service dir is then a worktree on
+its own `feat/FEAT-NNNN-<slug>` branch rather than a full clone. This is transparent to everything in
+this file (service-relative paths and the branch-coherence check are unchanged); it only changes how
+the dirs are created/torn down. See the programme guideline `guidelines/parallel-workspaces.md`.
 
 ## Pre-merge branch-coherence check
 
