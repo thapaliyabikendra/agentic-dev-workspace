@@ -284,7 +284,7 @@ after stakeholder confirmation — see
   documented legacy material rather than live code, route there
   instead.
 - **Routes findings to:** OQ-NNN files under
-  [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+  [`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
   with `origin: frs-authoring` when stakeholder confirmation is owed
   for a code-inferred item.
 - **Sibling rule books:**

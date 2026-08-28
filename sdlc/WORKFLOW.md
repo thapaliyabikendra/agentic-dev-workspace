@@ -256,7 +256,7 @@ referenced by other files; load the canonical file for actual procedure.
 > surface the conflict in the FRS ("Brownfield impact" at Phase 1, or
 > "Validation finding" at Phase 1.5) — do not absorb silently in Phase 2/3.
 > Cross-node / cross-ADR conflicts found outside an active FRS become OQ-NNN
-> files under [`discovery/open-questions/`](../docs/discovery/open-questions/) with
+> files under [`discovery/open-questions/`](../../../discovery/open-questions) with
 > `origin: legacy-absorption` or `origin: workflow-evolution`. Discovery
 > surface discipline: [`workflow/maintenance-discipline.md → Discovery surface discipline`](workflow/maintenance-discipline.md#discovery-surface-discipline).
 

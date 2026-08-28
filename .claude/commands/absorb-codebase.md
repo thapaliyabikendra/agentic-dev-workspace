@@ -39,7 +39,7 @@ There is **no FRS here**, so:
 - **Code-inferred intent surfaces as an OQ, not a tag.** Every
   business rule, edge path, fault path, actor, or precondition you infer
   from code *alone* (no prose to confirm it) → raise `OQ-NNN` under
-  [`docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+  [`docs/discovery/open-questions/`](../../../../discovery/open-questions)
   with `origin: legacy-absorption, origin_ref: <logical name>`. Surface,
   never absorb silently — there is no Phase 1.5 gate to catch it later.
 - **The feature-tracker → FRS row is dropped.** It is the only

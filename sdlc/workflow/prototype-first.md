@@ -57,7 +57,7 @@ ordinary brief → FRS path), or the input medium is existing application
 1. **Register the prototype.** Create `docs/prototypes/<slug>/PROTO-<slug>.md`
    from [`../_templates/PROTOTYPE.md`](../_templates/PROTOTYPE.md) (`status:
    draft`), drop the verbatim artifact under `docs/prototypes/<slug>/raw/`,
-   and add a row to [`../../docs/prototypes/index.md`](../../docs/prototypes/index.md).
+   and add a row to [`../../docs/prototypes/index.md`](../../../../prototypes/index.md).
    Set `motivated_by:` per direction — **empty** for prototype-sourced;
    **cite the CR/CHG/`M-NN`** for change-driven.
 2. **Stakeholder iterate.** Run the prototype → review → revise loop; log each
@@ -83,7 +83,7 @@ ordinary brief → FRS path), or the input medium is existing application
 
 The prototype is a **throwaway** spec of intended shape, not code to be ported
 verbatim. Reimplement it in the UI repo registered in the component/repo registry
-([`../../docs/project.md` § Components](../../docs/project.md#components))
+([`../../docs/project.md` § Components](../../../../project.md#components))
 using the project's UI stack (ADR-040). A React-in-browser prototype targeting
 an Angular UI is a **React → Angular reimplementation**; reference the registry
 and ADR-040 rather than hardcoding a path, so a repo move does not break this
@@ -102,7 +102,7 @@ register it in `§ Components` when the reimplementation milestone opens.)*
 - **Disposition home & classification:**
   [`../BOUNDARY.md § Toolchain assumptions`](../BOUNDARY.md#toolchain-assumptions)
   (engine-prescribed Prototype disposition); catalog at
-  [`../../docs/prototypes/index.md`](../../docs/prototypes/index.md);
+  [`../../docs/prototypes/index.md`](../../../../prototypes/index.md);
   template [`../_templates/PROTOTYPE.md`](../_templates/PROTOTYPE.md).
 - **Peer:** [`frs-code-extraction-rules.md`](frs-code-extraction-rules.md) —
   the code-sourced path (inherently brownfield), peer to this

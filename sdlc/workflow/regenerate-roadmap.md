@@ -31,7 +31,7 @@ applies_when:
 state matters, suspecting a milestone or FRS has gone silently
 stuck and want the surfacing surface, a periodic discipline trigger
 fires (e.g., before milestone close or quarterly), or
-[`docs/exploration/EXP-deferred-work-assessment-*.md`](../../docs/exploration/)
+[`docs/exploration/EXP-deferred-work-assessment-*.md`](../../../../exploration)
 flags a stuck-signal class as recurring.
 
 **Do NOT use when:** the report needing regen is BUSINESS.md or

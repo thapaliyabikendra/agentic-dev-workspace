@@ -76,7 +76,7 @@ This file expands those checks with **severity classification**,
 **bundling detection**, the **NFR rubric**, the **`[inferred from code]`
 propagation rule** for brownfield code-mining, the **OQ gate-effect
 taxonomy** linking findings to OQ-NNN files under
-[`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/),
+[`../../docs/discovery/open-questions/`](../../../../discovery/open-questions),
 and the **audit reproducibility set** captured per finding.
 
 The rules apply on top of the project's FRS template
@@ -130,7 +130,7 @@ soften a gate to make a phase pass.*
 
 Blockers must be resolved before Phase 2. Majors are resolved or raised
 as `OQ-NNN` files under
-[`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+[`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
 with `origin: validation-gate` and `gate_effect: blocking | post-approval`
 (see [OQ gate-effect taxonomy](#oq-gate-effect-taxonomy) below). Minors
 are optional.
@@ -310,7 +310,7 @@ Mixed code+prototype sources carry the dual tag
 
 Unresolved Validation findings (and other ambiguities surfaced during
 drafting) become OQ-NNN files under
-[`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+[`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
 with `origin: validation-gate` (or `frs-authoring` for drafting-time
 finds). Gate-attached OQs carry a `gate_effect:`:
 
@@ -485,7 +485,7 @@ Example Rationale:
 `"Major: baseline-not-cited — Auditability restates retention default in para 3 (baseline_version: { CCC-012: 2026-05-16 }). Replace with CCC-012 reference in the FRS's ccc: frontmatter."`
 
 When `resolution: deferred`, a matching `OQ-NNN` file exists under
-[`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+[`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
 with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
 `gate_effect:`, and a back-link to this FRS in `nodes:` / body.
 
@@ -533,7 +533,7 @@ with `origin: validation-gate`, `origin_ref: FRS-NNN`, the appropriate
   [`authoring-adr.md`](authoring-adr.md) — when the resolution to an
   `adr-conflict` Blocker is an ADR supersession.
 - **Routes findings to:** OQ-NNN files under
-  [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+  [`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
   for deferred / blocking questions; severity stays on the finding row
   in the FRS's `Validation findings` table.
 - **Sibling rule books:**

@@ -262,7 +262,7 @@ canonical body structure from [`_templates/COMPONENT.md`](_templates/COMPONENT.m
 Template: [`_templates/COMPONENT.md`](_templates/COMPONENT.md).
 Bootstrap procedure: [`workflow/new-component-bootstrap.md`](workflow/new-component-bootstrap.md).
 
-**Component inventory (this project):** see [`docs/project.md § Components`](../docs/project.md#components).
+**Component inventory (this project):** see [`docs/project.md § Components`](../../../project.md#components).
 The table there carries component slugs, types, ID prefixes, titles, and ADR ranges —
 the single source of truth for anything downstream that needs to reference concrete component paths.
 

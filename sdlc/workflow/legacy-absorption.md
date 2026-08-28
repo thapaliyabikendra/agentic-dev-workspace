@@ -185,7 +185,7 @@ that make the gate enforceable.
 - **Surface conflicts, never absorb.** When legacy text contradicts an
   existing canonical node or ADR, flag the conflict in the absorbing
   FRS's "Brownfield impact" section, or raise an `OQ-NNN` under
-  [`discovery/open-questions/`](../../docs/discovery/open-questions/)
+  [`discovery/open-questions/`](../../../../discovery/open-questions)
   with `origin: legacy-absorption, origin_ref: legacy` when no FRS is
   in flight. Canonical wiki + ADRs win; the absorption stops at the
   conflict until the human resolves it.

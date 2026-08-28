@@ -451,7 +451,7 @@ process in [`evolving-the-workflow.md`](evolving-the-workflow.md).
   `index-entry-missing` findings, and for the bidirectional-link
   enforcement that orphan-node resolutions route to.
 - **Routes findings to:** OQ-NNN files under
-  [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+  [`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
   for orphan / stale-proposed / baseline-not-cited / stale-version-ref;
   direct tiered touch (via
   [`maintenance-discipline.md`](maintenance-discipline.md)) for

@@ -362,7 +362,7 @@ High-value OQ surfaces specific to prototype-only inputs:
   the brownfield-path peer when the milestone scope cites existing
   application source code instead of (or alongside) a prototype.
 - **Routes findings to:** OQ-NNN files under
-  [`../../docs/discovery/open-questions/`](../../docs/discovery/open-questions/)
+  [`../../docs/discovery/open-questions/`](../../../../discovery/open-questions)
   with `origin: frs-authoring` when stakeholder confirmation is
   owed for a prototype-inferred item.
 - **Sibling rule books:**
