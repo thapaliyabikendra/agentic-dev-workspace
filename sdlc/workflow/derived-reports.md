@@ -270,6 +270,22 @@ edit (see [`cross-ref-guard.md`](cross-ref-guard.md)).
 onboarding gap (cut an overview or article), audience request (cut
 an API doc for a new external consumer). Never speculative.
 
+**Capability pair (`overviews/`).** When one capability (an aggregate
+and the flows, screens and integrations around it) needs both a
+business and a technical entry point, author two instances, not one
+mixed page:
+
+| Instance | `audience:` | Pulls from (lens per [`../KB-LAYOUT.md § Persona lens`](../KB-LAYOUT.md#persona-lens)) | Body | Budget |
+|---|---|---|---|---|
+| `<slug>-business.md` | `stakeholder` | business-lens headings of FLW / SCR / STA / PERM / ENT, ACT, DEC outcomes | What it does and why · Who acts · Rules that matter · Decided vs open · Maturity | ≤ 60 lines |
+| `<slug>-technical.md` | `developer` | ENT / CMD / QRY / CON / INT / DEC / ADR | Node map by type · Hops · Contracts and topics · Pitfalls · Open questions · Conflicts between sources | ≤ 90 lines |
+
+Each links the other on line 1 of its body. Every rule, number or
+name is a one-line gloss + ID link — no paraphrased node bodies. No
+owner for a claim → [`absorb-concept.md`](absorb-concept.md); owners
+that disagree → list under *Conflicts between sources* and open an
+OQ-NNN, never pick one in the overview.
+
 **Procedure on author / regenerate:**
 
 1. Copy [`../_templates/PUBLICATION.md`](../_templates/PUBLICATION.md);

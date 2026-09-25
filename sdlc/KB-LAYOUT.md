@@ -336,9 +336,30 @@ governs *authorship*, not visibility. All BA edits route through
 commands / conversational drafting (frontmatter, ID allocation, and
 index touches stay AI-handled).
 
+**Section boundary** (single owner of the per-heading lens). Mixed-lens
+types split by **heading name**, not by physical order — readers and
+agents select sections by name; existing nodes are not reordered to
+match (HR-NODE-AUTH).
+
+| Type | Business-lens headings | Everything else |
+|---|---|---|
+| FLW | Trigger · Scenarios · Journey walkthrough | technical (Sequence, Branches and gates, Compensating actions, Postconditions, legacy Technical Implementation / Shadow QA) |
+| SCR | Description · Layout / UI intent · Display states | technical |
+| STA | States (names + meaning) | technical (Transitions guards, Invariants) |
+| PERM | policy statement | technical gate |
+| ENT | Purpose · Lifecycle | technical — Invariants are field-level; their plain meaning is glossed in a business overview, linked to the ENT |
+| ACT · FA | whole body | — |
+| CMD · QRY · CON · INT · MOD · SVC · EVT · DEC | — | whole body |
+
+`## Brownfield notes` (any type) is history, neither lens — skip it for
+current behaviour.
+
 **Entry points:** BA → `docs/reports/JOURNEYS.md` (derived; lazy;
 template [`_templates/OVERVIEW-JOURNEYS.md`](_templates/OVERVIEW-JOURNEYS.md));
-Architect → `docs/reports/TECHNICAL.md`. Persona navigation table:
+Architect → `docs/reports/TECHNICAL.md`; per capability, the
+`overviews/<slug>-business.md` / `-technical.md` pair
+([`workflow/derived-reports.md § Multi-instance category outputs`](workflow/derived-reports.md#multi-instance-category-outputs)).
+Persona navigation table:
 `docs/home.md § Navigation by persona`
 ([`_templates/HOME.md`](_templates/HOME.md)).
 

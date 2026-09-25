@@ -9,7 +9,7 @@ applies_when:
 > regenerate artifacts.** Codifies the closed set of debt classes
 > (`orphan-node`, `stale-proposed`, `baseline-not-cited`,
 > `stale-version-ref`, `index-entry-missing`, `wiki-link-unresolvable`,
-> `prototype-drift`) plus the routing rule:
+> `prototype-drift`, `restated-fact`) plus the routing rule:
 > resolution-worthy drift becomes an `OQ-NNN`; missing-index repairs
 > fire a direct tiered touch. Sibling to
 > [`derived-reports.md`](derived-reports.md) (regeneration) and
@@ -124,7 +124,8 @@ produces are the durable record.
 
 Five classes seeded the operation (`wiki-link-unresolvable` added
 2026-06-10 with the wiki-link convention; `prototype-drift` added
-2026-06-10 with the KB→prototype generation operation). New classes are
+2026-06-10 with the KB→prototype generation operation; `restated-fact`
+2026-09-25). New classes are
 added when a pattern of drift becomes evident; each addition goes through
 [`evolving-the-workflow.md`](evolving-the-workflow.md) and lands here
 with detection rule, scan procedure, and action.
@@ -290,7 +291,11 @@ direct fix, 1-file touch; (b) forward reference to a claimed-but-unborn
 ID → leave, note the claiming artifact in the lint report; (c) reference
 to a retired/never-existing ID → open an OQ-NNN with
 `origin: workflow-evolution` asking whether the citing prose or the
-missing artifact is the gap.
+missing artifact is the gap. Bulk case of (a) — name-form links left by
+legacy absorption (`[[CMD-ActivateAccountWhitelist]]`): run
+[`../tools/rewrite-legacy-wikilinks.mjs`](../tools/rewrite-legacy-wikilinks.mjs)
+(dry run by default, `--write` to apply; resolves only unique
+prefix + slug matches and reports the rest).
 
 ### `prototype-drift`
 
@@ -323,6 +328,38 @@ the fix propagates to every screen showing that entity). If the *node*
 is what's stale (the code moved ahead of the KB), that is a
 silent-canonical-write smell — route an OQ-NNN instead of patching
 either side.
+
+### `restated-fact`
+
+*(Added 2026-09-25 — first survey found 11 facts restated across one
+32-node capability, 4 of them contradicting their owner.)*
+
+**Detection.** A domain fact — an enumeration (types, kinds, statuses),
+a threshold or duration, an invariant, an enforcement semantic, a
+wire name (topic, key, permission) — spelled out in a node that is not
+its owner. Naming or linking the fact is not a restatement; writing its
+values or rule out again is.
+
+**Owner rule.** Enumeration / invariant of an aggregate → its ENT;
+lifecycle states and transitions → STA; a choice between options → DEC
+or ADR; wire shape → CON; integration wire behaviour → INT; one
+operation's pre/postconditions → CMD. HR-REF is the doctrine.
+
+**Scan procedure.** Per capability (an aggregate and its neighbourhood):
+list the facts its owners state, grep the neighbourhood for each value
+set, compare. Manual — what counts as "the same fact" is judgment.
+
+**Action.** Copy agrees with owner and cites it inline (`one of … per
+ADR-001`) → a citation, not debt; leave it (CMD / CON stay
+self-contained for implementers, and the inline ID makes the copy
+greppable when the owner changes). Copy agrees but cites nothing → add
+the owner ID inline; prose that paraphrases the owner's rule → replace
+with an ID link (tiered touch per copy). Copy contradicts owner → do
+**not** pick a side: open
+an OQ-NNN (`origin: workflow-evolution`, `nodes:` = owner + copies),
+unless the owner's own status settles it (e.g. an ENT that explicitly
+supersedes the copy's design → fix the copy). Owner itself missing the
+fact → owner gets it first, then the copies link.
 
 ## Graduated enforcement (ratchet baseline)
 
@@ -394,7 +431,11 @@ index coverage + type-catalog count claims · C6 derived-view
 staleness (warn) · C7 grandfather-registry sync (warn) · CW1 docs/
 wiki-link resolution (**opt-in** via `--check-wiki-links` — off by
 default because `docs/` may legitimately not exist; mechanical twin of
-the `wiki-link-unresolvable` manual class above). Exemptions
+the `wiki-link-unresolvable` manual class above) · CW2 docs/
+relative markdown links + anchors resolve (**opt-in** via
+`--check-docs-links`; `docs/raw-sources/**` exempt). CW1 never resolves an ID
+into `docs/raw-sources/**` (archived copies would make canonical IDs
+ambiguous). Exemptions
 are logged in the run output, never silent (`_templates/` links,
 `docs/`-slot links while the KB is absent, append-only logs).
 

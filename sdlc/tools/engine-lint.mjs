@@ -339,8 +339,11 @@ if (!CHECK_WIKI) {
   notices.push('CW1: --check-wiki-links set but docs/ does not exist — nothing to scan');
 } else {
   const docsFiles = walk(docsDir);
+  // docs/raw-sources/** is verbatim legacy input: scanned as a source, never a
+  // resolution target (its archived ADR-001 etc. would make canonical IDs ambiguous)
+  const targetFiles = docsFiles.filter((p) => !path.relative(docsDir, p).replaceAll('\\', '/').startsWith('raw-sources/'));
   // basename stem -> full path(s); a wiki ID resolves when exactly one stem is `${id}` or starts with `${id}-`
-  const resolveId = (id) => docsFiles.filter((p) => {
+  const resolveId = (id) => targetFiles.filter((p) => {
     const b = path.basename(p, '.md');
     return b === id || b.startsWith(`${id}-`);
   });
@@ -362,6 +365,35 @@ if (!CHECK_WIKI) {
         add('CW1-wiki', 'error', file, line, `#${frag} not a heading anchor in ${path.basename(hits[0])}`);
     }
   }
+}
+
+// ---------- CW2 docs/ relative-link resolution (opt-in: --check-docs-links) ----------
+// C1/C2 applied to project-KB markdown links, which nothing else checks —
+// a hand-written overview can lose every governed link unnoticed. Off by
+// default for the same reason as CW1. docs/raw-sources/** is exempt
+// (verbatim legacy input, not canonical).
+
+const CHECK_DOCS_LINKS = process.argv.includes('--check-docs-links');
+if (!CHECK_DOCS_LINKS) {
+  notices.push('CW2: docs/ relative-link resolution requires --check-docs-links (off by default)');
+} else if (!fs.existsSync(docsDir)) {
+  notices.push('CW2: --check-docs-links set but docs/ does not exist — nothing to scan');
+} else {
+  const isRawSource = (f) => path.relative(docsDir, f).replaceAll('\\', '/').startsWith('raw-sources/');
+  for (const file of walk(docsDir).filter((f) => !isRawSource(f))) {
+    const text = scrubInlineCode(scrubHtmlComments(scrubFences(fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n'))));
+    for (const m of text.matchAll(LINK_RE)) {
+      const target = m[2];
+      if (/^(https?:|mailto:|tel:)/i.test(target)) continue;
+      const line = lineOf(text, m.index);
+      const [p, frag] = target.split('#');
+      const resolved = p === '' ? file : path.resolve(path.dirname(file), decodeURIComponent(p));
+      if (!fs.existsSync(resolved)) { add('CW2-link', 'error', file, line, `target does not exist: ${target}`); continue; }
+      if (frag !== undefined && resolved.endsWith('.md') && !anchorsOf(resolved).has(decodeURIComponent(frag).toLowerCase()))
+        add('CW2-link', 'error', file, line, `#${frag} not a heading anchor in ${path.basename(resolved)}`);
+    }
+  }
+  notices.push('CW2: docs/raw-sources/** exempt — verbatim legacy input');
 }
 
 // ---------- report (format per lint.md § Output format) ----------
