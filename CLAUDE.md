@@ -84,6 +84,11 @@ Scoped HARD-GATEs — trigger → canonical rule book:
 - **HR-COMMIT** — never `git commit` (or any commit-equivalent —
   `git commit -am`, `gh pr create`) without explicit user authorization.
   Authorization for one commit does not carry forward to the next.
+  **Exception (Tier A):** a session may commit, without asking, on a local
+  `feat/`, `fix/` or `docs/` `<ID>-<slug>` branch that it cut and that its
+  live claim row names — path-scoped, per ticket. Any push, PR, or commit on
+  `main`/`develop`/a shared branch still needs explicit authorization. Owner:
+  the task board's `governance/rules/no-unauthorized-commit.md`.
 - **HR-STYLE** — output style: token-optimized — compact, structured,
   rule-dense, pointer-heavy, redundancy-free; lead with the
   recommendation. **Exception** to redundancy-free: framework HARD-GATE
